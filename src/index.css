@@ -1,9 +1,22 @@
+/* Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap");
 @import "tailwindcss";
 
-html,
-body {
-  overflow-x: hidden;
+@font-face {
+  font-family: "DomineWebRegular";
+  src: url("/fonts/DomineWebRegular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
 }
+
+
+@layer base {
+  body {
+    @apply font-serif;
+    overflow-x: hidden;
+  }
+}
+
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;
@@ -11,4 +24,3 @@ body {
 .no-scrollbar {
   scrollbar-width: none;
 }
-

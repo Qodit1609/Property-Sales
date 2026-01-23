@@ -20,7 +20,7 @@ const Home: React.FC = () => {
 
   return (
     <section className="relative min-h-screen overflow-hidden pt-[80px]">
-      {/* Background Slider */}
+      
       {images.map((img, index) => (
         <div
           key={index}
@@ -35,13 +35,13 @@ const Home: React.FC = () => {
         />
       ))}
 
-      {/* Overlay */}
+     
       <div className="absolute inset-0 bg-black/50" />
 
-      {/* Hero Content */}
+      
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 min-h-[70vh] flex items-center">
         <div className="max-w-2xl text-white">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl  leading-tight mb-4">
             Your Piece of Earth Awaits
           </h1>
 
@@ -59,11 +59,10 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Search Bar */}
+      
       <div className="relative z-20 mt-16 sm:mt-24 px-4 sm:px-6">
         <div className="max-w-[1320px] mx-auto bg-gradient-to-r from-[#006557] via-[#00897b] to-[#43cea2] rounded-2xl p-4 sm:p-6 shadow-2xl">
           <form className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            {/* Location */}
             <div className="flex flex-col">
               <label className="text-xs font-semibold text-white mb-1">
                 Location
@@ -75,7 +74,6 @@ const Home: React.FC = () => {
               </select>
             </div>
 
-            {/* Category */}
             <div className="flex flex-col">
               <label className="text-xs font-semibold text-white mb-1">
                 Category
@@ -87,7 +85,6 @@ const Home: React.FC = () => {
               </select>
             </div>
 
-            {/* Type */}
             <div className="flex flex-col">
               <label className="text-xs font-semibold text-white mb-1">
                 Type
@@ -99,7 +96,6 @@ const Home: React.FC = () => {
               </select>
             </div>
 
-            {/* Search Input */}
             <div className="flex flex-col lg:col-span-2">
               <label className="text-xs font-semibold text-white mb-1">
                 Search

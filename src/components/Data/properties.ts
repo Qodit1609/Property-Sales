@@ -1,0 +1,121 @@
+import type { Property } from "../Crads/PropertyCard";
+
+export const properties: Property[] = [
+  {
+    id: 1,
+    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
+    price: "£650,000",
+    title: "Precentors Court",
+    location: "York, North Yorkshire, YO1 7EJ",
+    sold: true,
+    imagesCount: 13,
+    sqft: "1,417 sq ft",
+    beds: 3,
+    baths: 2,
+    receptions: 2
+  },
+  {
+    id: 2,
+    image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994",
+    price: "£465,000",
+    title: "Gordon Road",
+    location: "Winchester, Hampshire, SO23 7DD",
+    sold: true,
+    imagesCount: 9,
+    sqft: "790 sq ft",
+    beds: 2,
+    baths: 2,
+    receptions: 1
+  },
+  {
+    id: 3,
+    image: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde",
+    price: "£1,495,000",
+    title: "Warrenhurst Gardens",
+    location: "Weybridge, Surrey, KT13 OEJ",
+    sold: true,
+    imagesCount: 12,
+    sqft: "3,164 sq ft",
+    beds: 4,
+    baths: 3,
+    receptions: 4
+  },
+  {
+    id: 4,
+    image: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae",
+    price: "£895,000",
+    title: "Brentfields",
+    location: "Looe, Cornwall, PL13 2JJ",
+    sold: true,
+    imagesCount: 21,
+    sqft: "3,080 sq ft",
+    beds: 4,
+    baths: 3,
+    receptions: 3
+  },
+  {
+    id: 5,
+    image: "https://images.unsplash.com/photo-1572120360610-d971b9d7767c",
+    price: "£720,000",
+    title: "Oakwood Villas",
+    location: "Reading, Berkshire, RG1 3EU",
+    sold: false,
+    imagesCount: 11,
+    sqft: "1,980 sq ft",
+    beds: 4,
+    baths: 3,
+    receptions: 2
+  },
+  {
+    id: 6,
+    image: "https://images.unsplash.com/photo-1599423300746-b62533397364",
+    price: "£540,000",
+    title: "Maple Residency",
+    location: "Milton Keynes, MK9 2EA",
+    sold: false,
+    imagesCount: 8,
+    sqft: "1,250 sq ft",
+    beds: 3,
+    baths: 2,
+    receptions: 2
+  },
+  {
+    id: 7,
+    image: "https://images.unsplash.com/photo-1580587771525-78b9dba3b914",
+    price: "£1,250,000",
+    title: "The Grand Manor",
+    location: "Oxford, Oxfordshire, OX2 6HF",
+    sold: true,
+    imagesCount: 18,
+    sqft: "4,500 sq ft",
+    beds: 6,
+    baths: 5,
+    receptions: 4
+  },
+  {
+    id: 8,
+    image: "https://images.unsplash.com/photo-1605146768851-eda79da39897",
+    price: "£399,000",
+    title: "River View Apartments",
+    location: "Leeds, West Yorkshire, LS1 4AP",
+    sold: false,
+    imagesCount: 6,
+    sqft: "820 sq ft",
+    beds: 2,
+    baths: 1,
+    receptions: 1
+  },
+  {
+    id: 9,
+    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9",
+    price: "£980,000",
+    title: "Hilltop Farmhouse",
+    location: "Cotswolds, Gloucestershire, GL54 2HQ",
+    sold: true,
+    imagesCount: 24,
+    sqft: "3,900 sq ft",
+    beds: 5,
+    baths: 4,
+    receptions: 3
+  }
+];
