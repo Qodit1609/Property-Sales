@@ -70,7 +70,7 @@ const PropertySection = () => {
   }, [showAll]);
 
   return (
-    <section className="w-full bg-white">
+    <section className="w-full bg-white pt-16 sm:pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-6">
           <p className="text-sm text-green-600">Featured Property</p>
@@ -78,6 +78,7 @@ const PropertySection = () => {
             Recommended Properties for You
           </h2>
         </div>
+
         {!showAll ? (
           <div
             ref={scrollRef}
