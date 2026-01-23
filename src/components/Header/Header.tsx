@@ -7,7 +7,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
-  { label: "Farmhouse / Farmland", href: "/farmhouse-farmland" },
+  { label: "Farmhouse / Farmland", href: "/farmhouse" },
   { label: "Agriculture Land", href: "/agriculture-land" },
   { label: "Resort Properties", href: "/resort-properties" },
   { label: "Rent Farmhouse", href: "/rent-farmhouse" },
@@ -22,7 +22,7 @@ const HeaderNav: React.FC<{ items: NavItem[]; isMobile?: boolean }> = ({
       isMobile
         ? "flex flex-col gap-4 text-center"
         : "hidden md:flex items-center gap-8"
-    } text-white font-medium`}
+    } text-white font-medium font-serif`}
   >
     {items.map((item) => (
       <a
@@ -40,7 +40,7 @@ const Header: React.FC = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="fixed top-0 left-0 z-50 w-full flex justify-center">
+    <header className="fixed top-0 left-0 z-50 w-full flex justify-center font-serif">
       <div
         className="
           w-[94%]
