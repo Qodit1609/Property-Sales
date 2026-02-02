@@ -43,17 +43,17 @@ const services: Service[] = [
 
 const ServiceSection: React.FC = () => {
   return (
-    <section className="bg-[#FAF6E9] py-16 px-4">
+    <section className="bg-[#FFFBE6] py-16 px-4">
       <div className="max-w-7xl mx-auto text-center">
 
         <div className="flex items-center justify-center gap-6 mb-4">
-          <div className="w-28 h-[1px] bg-green-700/40" />
+          <div className="w-28 h-[1px] bg-[#347928]/40" />
 
-          <p className="text-green-700 font-medium">
+          <p className="text-[#347928] font-medium">
             OUR SERVICES
           </p>
 
-          <div className="w-28 h-[1px] bg-green-700/40" />
+          <div className="w-28 h-[1px] bg-[#347928]/40" />
         </div>
 
         <p className="max-w-3xl mx-auto text-gray-700 text-base md:text-lg leading-relaxed mb-12">
@@ -69,8 +69,8 @@ const ServiceSection: React.FC = () => {
               className={`group rounded-2xl p-8 text-left cursor-pointer transition-all duration-300
                 ${
                   service.active
-                    ? "bg-[#005041] text-white"
-                    : "bg-white text-gray-800 hover:bg-[#005041]"
+                    ? "bg-[#347928] text-white"
+                    : "bg-white text-gray-800 hover:bg-[#347928]"
                 }`}
             >
               <div
@@ -78,7 +78,7 @@ const ServiceSection: React.FC = () => {
                   ${
                     service.active
                       ? "text-white"
-                      : "text-[#005041] group-hover:text-white"
+                      : "text-[#347928] group-hover:text-white"
                   }`}
               >
                 {service.icon}
@@ -99,8 +99,8 @@ const ServiceSection: React.FC = () => {
                 className={`text-sm mb-6 transition-colors
                   ${
                     service.active
-                      ? "text-gray-200"
-                      : "text-gray-600 group-hover:text-gray-200"
+                      ? "text-[#C0EBA6]"
+                      : "text-gray-600 group-hover:text-[#C0EBA6]"
                   }`}
               >
                 {service.description}
@@ -110,8 +110,8 @@ const ServiceSection: React.FC = () => {
                 className={`text-sm font-semibold transition-colors
                   ${
                     service.active
-                      ? "text-orange-400"
-                      : "text-orange-500 group-hover:text-orange-300"
+                      ? "text-[#FCCD2A]"
+                      : "text-[#FCCD2A] group-hover:text-[#FFFBE6]"
                   }`}
               >
                 Check it →

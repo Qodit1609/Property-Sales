@@ -39,7 +39,10 @@ const Home: React.FC = () => {
       <div className="relative z-10 w-[94%] max-w-[1320px] mx-auto px-4 sm:px-6 md:px-10 min-h-[75vh] flex items-center">
         <div className="max-w-2xl w-full text-white text-center sm:text-left">
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold leading-snug mb-4">
-            Your Piece of <span className="block sm:inline">Earth Awaits</span>
+            Your Piece of{" "}
+            <span className="block sm:inline text-[#FCCD2A]">
+              Earth Awaits
+            </span>
           </h1>
 
           <p className="text-sm sm:text-base md:text-lg text-gray-200 mb-6">
@@ -49,7 +52,7 @@ const Home: React.FC = () => {
 
           <a
             href="/publish"
-            className="inline-flex items-center justify-center bg-gradient-to-r from-[#006557] via-[#00897b] to-[#43cea2] text-white font-semibold px-6 py-3 rounded-xl shadow-lg"
+            className="inline-flex items-center justify-center bg-gradient-to-r from-[#347928] via-[#2f6f25] to-[#347928] text-white font-semibold px-6 py-3 rounded-xl shadow-lg hover:opacity-95 transition"
           >
             Publish a Property
           </a>
@@ -57,21 +60,21 @@ const Home: React.FC = () => {
       </div>
 
       <div className="absolute left-1/2 bottom-[-45px] z-20 w-full -translate-x-1/2 px-4">
-        <div className="w-[94%] max-w-[1200px] mx-auto bg-gradient-to-r from-[#006557] via-[#00897b] to-[#43cea2] rounded-2xl shadow-2xl px-4 sm:px-6 py-5">
+        <div className="w-[94%] max-w-[1200px] mx-auto bg-gradient-to-r from-[#347928] via-[#2f6f25] to-[#347928] rounded-2xl shadow-2xl px-4 sm:px-6 py-5">
           <form className="grid grid-cols-1 sm:grid-cols-2 md:flex gap-3 items-stretch">
-            <select className="w-full md:w-[180px] px-4 py-3 rounded-lg bg-white">
+            <select className="w-full md:w-[180px] px-4 py-3 rounded-lg bg-[#FFFBE6]">
               <option>Location</option>
               <option>Indore</option>
               <option>Bhopal</option>
             </select>
 
-            <select className="w-full md:w-[180px] px-4 py-3 rounded-lg bg-white">
+            <select className="w-full md:w-[180px] px-4 py-3 rounded-lg bg-[#FFFBE6]">
               <option>Category</option>
               <option>Farmhouse</option>
               <option>Farmland</option>
             </select>
 
-            <select className="w-full md:w-[160px] px-4 py-3 rounded-lg bg-white">
+            <select className="w-full md:w-[160px] px-4 py-3 rounded-lg bg-[#FFFBE6]">
               <option>Type</option>
               <option>Buy</option>
               <option>Rent</option>
@@ -83,13 +86,13 @@ const Home: React.FC = () => {
                 placeholder="Search a Property"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-white"
+                className="w-full px-4 py-3 rounded-lg bg-[#FFFBE6]"
               />
             </div>
 
             <button
               type="submit"
-              className="w-full md:w-auto px-6 py-3 rounded-lg bg-white text-[#006557] font-semibold hover:bg-gray-100 transition"
+              className="w-full md:w-auto px-6 py-3 rounded-lg bg-[#FCCD2A] text-[#347928] font-semibold hover:brightness-95 transition"
             >
               🔍 Search
             </button>

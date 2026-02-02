@@ -27,10 +27,12 @@ const PropertySection = () => {
   }, [showAll]);
 
   return (
-    <section className="w-full bg-white pt-16 sm:pt-20">
+    <section className="w-full bg-[#FFFBE6] pt-16 sm:pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-6">
-          <p className="text-sm text-green-600">Featured Property</p>
+          <p className="text-sm text-[#347928]">
+            Featured Property
+          </p>
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Recommended Properties for You
           </h2>
@@ -62,20 +64,19 @@ const PropertySection = () => {
           {!showAll ? (
             <button
               onClick={() => setShowAll(true)}
-              className="bg-orange-500 text-white px-6 py-3 rounded-lg w-full sm:w-auto"
+              className="bg-[#FCCD2A] text-[#347928] font-semibold px-6 py-3 rounded-lg w-full sm:w-auto hover:brightness-95 transition"
             >
               Show all Property
             </button>
           ) : (
             <button
               onClick={() => setShowAll(false)}
-              className="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg w-full sm:w-auto"
+              className="bg-[#C0EBA6] text-[#347928] font-semibold px-6 py-3 rounded-lg w-full sm:w-auto hover:brightness-95 transition"
             >
               ✕ Close
             </button>
           )}
         </div>
-
       </div>
     </section>
   );

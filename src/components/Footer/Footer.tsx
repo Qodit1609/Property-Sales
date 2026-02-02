@@ -14,9 +14,6 @@ const Footer: React.FC = () => {
     { label: "Home" },
     { label: "About" },
     { label: "Blogs" },
-    { label: "Farm House" },
-    { label: "Farmland" },
-    { label: "Rental" },
   ];
 
   const socialIcons: IconItem[] = [
@@ -39,27 +36,29 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="w-full text-white bg-gradient-to-r from-[#006557] via-[#00897b] to-[#43cea2]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-3">
-          <div className="flex flex-col items-center md:items-start text-center md:text-left">
+    <footer className="bg-gradient-to-r from-[#2f6f25] via-[#347928] to-[#2f6f25] text-[#FFFBE6]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4 text-center lg:text-left">
+          <div className="flex flex-col items-center lg:items-start">
             <img
-              src="https://dummyimage.com/200x80/006557/ffffff&text=1+Bigha"
+              src="https://dummyimage.com/200x80/347928/ffffff&text=1+Bigha"
               alt="1bigha logo"
               className="h-14 mb-4"
             />
-            <p className="text-sm text-white/90 max-w-xs">
-              Easiest way to find your dream land
+            <p className="text-sm text-[#FFFBE6]/90 max-w-xs">
+              The easiest way to find, buy, and invest in your dream land.
             </p>
           </div>
 
-          <div className="flex flex-col items-center md:items-start">
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+          <div className="flex flex-col items-center lg:items-start">
+            <h3 className="text-lg font-semibold mb-4 tracking-wide">
+              Quick Links
+            </h3>
             <ul className="space-y-2">
               {quickLinks.map((item) => (
                 <li
                   key={item.label}
-                  className="text-sm text-white/90 hover:text-white transition cursor-pointer"
+                  className="text-sm text-[#FFFBE6]/80 hover:text-[#FCCD2A] transition cursor-pointer"
                 >
                   {item.label}
                 </li>
@@ -67,52 +66,55 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
-          <div className="flex flex-col items-center md:items-start">
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-
-            <ul className="space-y-3 text-sm text-white/90">
-              <li className="flex items-center gap-2">
+          <div className="flex flex-col items-center lg:items-start max-w-xs mx-auto lg:mx-0">
+            <h3 className="text-lg font-semibold mb-4 tracking-wide">
+              Contact
+            </h3>
+            <ul className="space-y-3 text-sm text-[#FFFBE6]/80">
+              <li className="flex items-center justify-center lg:justify-start gap-2">
                 <img
                   src="https://cdn-icons-png.flaticon.com/512/732/732200.png"
-                  alt="Email"
                   className="w-4 h-4"
                 />
                 info@1bigha.com
               </li>
 
-              <li className="flex items-center gap-2">
+              <li className="flex items-center justify-center lg:justify-start gap-2">
                 <img
                   src="https://cdn-icons-png.flaticon.com/512/724/724664.png"
-                  alt="Phone"
                   className="w-4 h-4"
                 />
                 +91 9039055488
               </li>
 
-              <li className="flex items-start gap-2">
+              <li className="flex items-start justify-center lg:justify-start gap-2 text-center lg:text-left">
                 <img
                   src="https://cdn-icons-png.flaticon.com/512/684/684908.png"
-                  alt="Location"
                   className="w-4 h-4 mt-1"
                 />
                 <span>
-                  1Bigha Gwali Palasia, Mhow Indore, M.P.
+                  Gwali Palasia, Mhow Indore, M.P.
                 </span>
               </li>
             </ul>
+          </div>
 
-            <div className="flex gap-4 mt-5">
+          <div className="flex flex-col items-center lg:items-start">
+            <h3 className="text-lg font-semibold mb-4 tracking-wide">
+              Follow Us
+            </h3>
+            <div className="flex justify-center lg:justify-start gap-4">
               {socialIcons.map((icon) => (
                 <a
                   key={icon.alt}
                   href="#"
                   aria-label={icon.alt}
-                  className="bg-white p-2 rounded-full shadow-md hover:scale-110 transition"
+                  className="bg-[#FFFBE6] p-2 rounded-full shadow hover:ring-2 hover:ring-[#FCCD2A] hover:scale-110 transition"
                 >
                   <img
                     src={icon.src}
                     alt={icon.alt}
-                    className="w-5 h-5 object-contain"
+                    className="w-5 h-5"
                   />
                 </a>
               ))}
@@ -121,9 +123,11 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-black/10 text-center py-3 text-xs sm:text-sm text-white/90">
-        © 2025 - 1bigha.com - All Rights Reserved | Developed by{" "}
-        <span className="font-semibold text-white">Nexolvia</span>
+      <div className="border-t border-[#FFFBE6]/20 py-4 text-center text-xs sm:text-sm text-[#FFFBE6]/80 px-4">
+        © 2025 1bigha.com · All Rights Reserved · Developed by{" "}
+        <span className="text-[#FCCD2A] font-semibold">
+          Nexolvia
+        </span>
       </div>
     </footer>
   );
