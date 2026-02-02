@@ -1,103 +1,157 @@
 import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import Modal from "../Modal/Modal";
+import ContactPopup from "../ContactPopup/ContactPopup";
 
-/* ---------- Types ---------- */
 interface NavItem {
   label: string;
   href: string;
 }
 
-/* ---------- Navigation Data ---------- */
 const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
-  { label: "Farmhouse / Farmland", href: "/farmhouse-farmland" },
-  { label: "Agriculture Land", href: "/agriculture-land" },
-  { label: "Resort Properties", href: "/resort-properties" },
-  { label: "Rent Farmhouse", href: "/rent-farmhouse" },
+  { label: "Farmhouse / Farmland", href: "/farmhouse" },
+  { label: "Agriculture Land", href: "/farmhouse" },
+  { label: "Resort Properties", href: "/farmhouse" },
+  { label: "Rent Farmhouse", href: "/farmhouse" },
 ];
 
-/* ---------- Sub Components ---------- */
-const HeaderNav: React.FC<{ items: NavItem[]; isMobile?: boolean }> = ({
-  items,
-  isMobile = false,
-}) => (
-  <nav
-    className={`${
-      isMobile
-        ? "flex flex-col gap-4 text-center"
-        : "hidden md:flex items-center gap-8"
-    } text-white font-medium`}
-  >
-    {items.map((item) => (
-      <a
-        key={item.label}
-        href={item.href}
-        className="hover:text-white/80 transition"
-      >
-        {item.label}
-      </a>
-    ))}
-  </nav>
-);
+const HeaderNav: React.FC<{
+  items: NavItem[];
+  isMobile?: boolean;
+  onNavigate?: () => void;
+}> = ({ items, isMobile = false, onNavigate }) => {
+  const location = useLocation();
+  const [hovered, setHovered] = useState<string | null>(null);
 
-/* ---------- Main Header ---------- */
-const Header: React.FC = () => {
-  const [open, setOpen] = useState(false);
+  const activePath = hovered ?? location.pathname;
 
   return (
-    <header className="fixed top-0 left-0 z-50 w-full flex justify-center">
-      <div
-        className="
-          w-[94%]
-          max-w-[1320px]
-          bg-gradient-to-r from-[#006557] via-[#00897b] to-[#43cea2]
-          shadow-lg
-          rounded-b-2xl
-          px-4 sm:px-6 md:px-10
-        "
-      >
-        {/* Top Bar */}
-        <div className="flex h-[72px] items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-2 text-white font-bold text-lg sm:text-xl">
-            <span className="text-2xl">P</span>
-            <span>PropDown</span>
-          </div>
+    <nav
+      className={`${
+        isMobile
+          ? "flex flex-col gap-6 items-center px-6"
+          : "hidden md:flex items-center gap-8"
+      } font-medium font-serif`}
+    >
+      {items.map((item) => {
+        const isActive = activePath === item.href;
 
-          {/* Desktop Nav */}
-          <HeaderNav items={NAV_ITEMS} />
-
-          {/* CTA (Desktop) */}
-          <a
-            href="/contact"
-            className="hidden md:inline-flex px-6 py-2 rounded-full bg-white text-[#006557] font-semibold shadow-md hover:bg-[#006557] hover:text-white transition border-2 border-white hover:border-[#006557]"
+        return (
+          <Link
+            key={item.label}
+            to={item.href}
+            onClick={onNavigate}
+            onMouseEnter={() => setHovered(item.href)}
+            onMouseLeave={() => setHovered(null)}
+            className={`
+              relative inline-block pb-1
+              transition-colors duration-300
+              ${isActive ? "text-[#FCCD2A]" : "text-white"}
+              hover:text-[#FCCD2A]
+              after:content-['']
+              after:absolute
+              after:left-0
+              after:bottom-0
+              after:h-[2px]
+              after:w-full
+              after:bg-[#FCCD2A]
+              after:transition-transform
+              after:duration-300
+              after:origin-center
+              ${isActive ? "after:scale-x-100" : "after:scale-x-0"}
+            `}
           >
-            Connect With Us
-          </a>
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+};
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-white text-2xl"
-            onClick={() => setOpen(!open)}
-            aria-label="Toggle Menu"
-          >
-            ☰
-          </button>
-        </div>
+const Header: React.FC = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
 
-        {/* Mobile Menu */}
-        {open && (
-          <div className="md:hidden pb-6 pt-4 border-t border-white/20">
-            <HeaderNav items={NAV_ITEMS} isMobile />
-            <a
-              href="/contact"
-              className="mt-4 mx-auto flex w-fit px-6 py-2 rounded-full bg-white text-[#006557] font-semibold shadow-md"
+  return (
+    <>
+      <header className="fixed top-0 left-0 z-50 w-full flex justify-center font-serif">
+        <div
+          className="
+            w-[94%]
+            max-w-[1320px]
+            bg-gradient-to-r from-[#347928] via-[#2f6f25] to-[#347928]
+            shadow-lg
+            rounded-b-2xl
+            px-4 sm:px-6 md:px-10
+          "
+        >
+          <div className="flex h-[72px] items-center justify-between">
+            <div className="flex items-center gap-2 text-white font-bold text-lg sm:text-xl">
+              <span className="text-2xl">P</span>
+              <span>PropDown</span>
+            </div>
+
+            <HeaderNav items={NAV_ITEMS} />
+
+            <button
+              onClick={() => setContactOpen(true)}
+              className="hidden md:inline-flex px-6 py-2 rounded-full bg-[#FFFBE6] text-[#347928] font-semibold shadow-md hover:bg-[#FCCD2A] transition"
             >
               Connect With Us
-            </a>
+            </button>
+
+            <button
+              className="md:hidden text-white text-2xl"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle Menu"
+            >
+              ☰
+            </button>
           </div>
-        )}
-      </div>
-    </header>
+
+          {menuOpen && (
+            <div className="md:hidden mt-4 pb-8 border-t border-white/20">
+              <div className="max-w-md mx-auto pt-6">
+                <HeaderNav
+                  items={NAV_ITEMS}
+                  isMobile
+                  onNavigate={() => setMenuOpen(false)}
+                />
+
+                <button
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setContactOpen(true);
+                  }}
+                  className="
+                    mt-8 mx-auto block
+                    px-10 py-3
+                    rounded-full
+                    bg-[#FFFBE6]
+                    text-[#347928]
+                    font-semibold
+                    shadow-md
+                    hover:bg-[#FCCD2A]
+                  "
+                >
+                  Connect With Us
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </header>
+
+      <Modal
+        open={contactOpen}
+        onClose={() => setContactOpen(false)}
+        title="Contact Us"
+      >
+        <ContactPopup />
+      </Modal>
+    </>
   );
 };
 
