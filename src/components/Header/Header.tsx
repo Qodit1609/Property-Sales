@@ -11,9 +11,9 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "Farmhouse / Farmland", href: "/farmhouse" },
-  { label: "Agriculture Land", href: "/farmhouse" },
-  { label: "Resort Properties", href: "/farmhouse" },
-  { label: "Rent Farmhouse", href: "/farmhouse" },
+  { label: "Agriculture Land", href: "/agriculture-land" },
+  { label: "Resort Properties", href: "/resort-properties" },
+  { label: "Rent Farmhouse", href: "/rent-farmhouse" },
 ];
 
 const HeaderNav: React.FC<{
