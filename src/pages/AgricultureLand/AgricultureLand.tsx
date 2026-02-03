@@ -1,16 +1,15 @@
 import React from "react";
+
 import PropertyCard from "../../components/Crads/PropertyCard";
 import { properties } from "../../components/Data/properties";
 import PropertyLayout from "../PropertyDetails/PropertyLayout";
 
-const Farmhouse: React.FC = () => {
+const AgricultureLand: React.FC = () => {
   return (
     <PropertyLayout>
-      {properties.map((property) => (
-        <PropertyCard key={property.id} property={property} />
-      ))}
+      {properties.map((property) => ( <PropertyCard property={property} /> ))}
     </PropertyLayout>
   );
 };
 
-export default Farmhouse;
+export default AgricultureLand;

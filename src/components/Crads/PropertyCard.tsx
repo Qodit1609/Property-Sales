@@ -2,20 +2,23 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Camera, Star, BedDouble, Bath, Sofa } from "lucide-react";
 
+/* 🔹 Property Interface (API payload based) */
 export interface Property {
-  id: number;
-  image: string;
-  price: string;
+  _id: string;
   title: string;
-  location: string;
-  sold?: boolean;
-  imagesCount: number;
-  sqft: string;
-  beds: number;
-  baths: number;
-  receptions: number;
+  description: string;
+  price: number;
+  propertyType: string;
+  address: string;
+  images: string[];
+  status: string;
+  location: {
+    type: "Point";
+    coordinates: [number, number];
+  };
 }
 
+/* 🔹 Props */
 interface Props {
   property: Property;
 }
@@ -25,9 +28,11 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
 
   return (
     <div
-      onClick={() => navigate(`/property/${property.id}`)}
+      onClick={() => navigate(`/property/${property._id}`)}
       className="
         bg-[#FFFBE6] border border-[#C0EBA6]
+        w-full h-[520px]
+        flex flex-col
         overflow-hidden
         cursor-pointer
         hover:shadow-lg
@@ -35,14 +40,15 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
         transition-all duration-200
       "
     >
+      {/* 🔹 Image Section */}
       <div className="relative">
         <img
-          src={property.image}
+          src={property.images?.[0]}
           alt={property.title}
           className="h-[220px] w-full object-cover"
         />
 
-        {property.sold && (
+        {property.status === "approved" && (
           <span className="absolute top-3 left-3 bg-[#347928] text-white text-xs font-semibold px-3 py-1">
             Available
           </span>
@@ -50,7 +56,7 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
 
         <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-black/70 text-white text-xs px-2 py-1 rounded-md">
           <Camera size={14} />
-          {property.imagesCount}
+          {property.images.length}
         </div>
 
         <div className="absolute bottom-3 right-3 text-[#FCCD2A]">
@@ -58,39 +64,54 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
         </div>
       </div>
 
-      <div className="p-4">
+      {/* 🔹 Content */}
+      <div className="p-4 flex flex-col flex-1">
         <p className="text-xs text-[#347928] font-sans">
-          Guide price
+          {property.propertyType}
         </p>
 
-        <h2 className="text-2xl text-gray-900">
-          {property.price}
+        <h2 className="text-2xl text-gray-900 mt-1">
+          ₹ {property.price.toLocaleString("en-IN")}
         </h2>
 
-        <h3 className="text-lg font-serif mt-1 text-[#347928]">
+        {/* 🔒 Title fixed (max 2 lines) */}
+        <h3
+          title={property.title}
+          className="
+            text-lg font-serif mt-1 text-[#347928]
+            line-clamp-2
+          "
+        >
           {property.title}
         </h3>
 
-        <p className="text-sm text-gray-600 font-sans mt-1">
-          {property.location}
+        {/* 🔒 Address fixed (1 line) */}
+        <p
+          title={property.address}
+          className="
+            text-sm text-gray-600 font-sans mt-1
+            truncate
+          "
+        >
+          {property.address}
         </p>
 
-        <div className="mt-16 border-t border-[#C0EBA6]"></div>
+        <div className="mt-auto">
+          <div className="border-t border-[#C0EBA6] my-4"></div>
 
-        <div className="flex justify-end gap-6 text-sm text-[#347928] font-sans mt-4">
-          <div className="flex items-center gap-1">
-            <BedDouble size={14} />
-            {property.beds}
-          </div>
+          {/* 🔹 Static icons (future me API se aa sakta hai) */}
+          <div className="flex justify-end gap-6 text-sm text-[#347928] font-sans">
+            <div className="flex items-center gap-1">
+              <BedDouble size={14} /> 3
+            </div>
 
-          <div className="flex items-center gap-1">
-            <Bath size={14} />
-            {property.baths}
-          </div>
+            <div className="flex items-center gap-1">
+              <Bath size={14} /> 2
+            </div>
 
-          <div className="flex items-center gap-1">
-            <Sofa size={14} />
-            {property.receptions}
+            <div className="flex items-center gap-1">
+              <Sofa size={14} /> 1
+            </div>
           </div>
         </div>
       </div>
