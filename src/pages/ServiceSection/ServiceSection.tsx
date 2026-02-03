@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  Home,
-  Building2,
-  Briefcase,
-  Warehouse
-} from "lucide-react";
+import { Home, Building2, Briefcase, Warehouse } from "lucide-react";
 
 interface Service {
   title: string;
@@ -43,20 +38,17 @@ const services: Service[] = [
 
 const ServiceSection: React.FC = () => {
   return (
-    <section className="bg-[#FFFBE6] py-16 px-4">
+    <section className="bg-[#F8F9F1] py-16 px-4">
       <div className="max-w-7xl mx-auto text-center">
-
         <div className="flex items-center justify-center gap-6 mb-4">
-          <div className="w-28 h-[1px] bg-[#347928]/40" />
-
-          <p className="text-[#347928] font-medium">
+          <div className="w-28 h-[1px] bg-[#2D6A4F]/40" />
+          <p className="text-[#2D6A4F] font-medium tracking-wide">
             OUR SERVICES
           </p>
-
-          <div className="w-28 h-[1px] bg-[#347928]/40" />
+          <div className="w-28 h-[1px] bg-[#2D6A4F]/40" />
         </div>
 
-        <p className="max-w-3xl mx-auto text-gray-700 text-base md:text-lg leading-relaxed mb-12">
+        <p className="max-w-3xl mx-auto text-[#6D4C41] text-base md:text-lg leading-relaxed mb-12">
           We provide end-to-end real estate solutions focused on farmhouses,
           villas, resort properties, and agricultural land, ensuring
           transparency, expert guidance, and long-term value for every client.
@@ -66,53 +58,48 @@ const ServiceSection: React.FC = () => {
           {services.map((service, index) => (
             <div
               key={index}
-              className={`group rounded-2xl p-8 text-left cursor-pointer transition-all duration-300
-                ${
-                  service.active
-                    ? "bg-[#347928] text-white"
-                    : "bg-white text-gray-800 hover:bg-[#347928]"
-                }`}
+              className={`group rounded-2xl p-8 text-left cursor-pointer transition-all duration-300 ${
+                service.active
+                  ? "bg-[#1B4332] text-white"
+                  : "bg-[#D8F3DC] text-[#1B4332] hover:bg-[#1B4332]"
+              }`}
             >
               <div
-                className={`mb-6 transition-colors
-                  ${
-                    service.active
-                      ? "text-white"
-                      : "text-[#347928] group-hover:text-white"
-                  }`}
+                className={`mb-6 transition-colors ${
+                  service.active
+                    ? "text-[#95D5B2]"
+                    : "text-[#2D6A4F] group-hover:text-[#95D5B2]"
+                }`}
               >
                 {service.icon}
               </div>
 
               <h3
-                className={`text-xl font-semibold mb-3 transition-colors
-                  ${
-                    service.active
-                      ? "text-white"
-                      : "text-gray-900 group-hover:text-white"
-                  }`}
+                className={`text-xl font-semibold mb-3 transition-colors ${
+                  service.active
+                    ? "text-white"
+                    : "text-[#1B4332] group-hover:text-white"
+                }`}
               >
                 {service.title}
               </h3>
 
               <p
-                className={`text-sm mb-6 transition-colors
-                  ${
-                    service.active
-                      ? "text-[#C0EBA6]"
-                      : "text-gray-600 group-hover:text-[#C0EBA6]"
-                  }`}
+                className={`text-sm mb-6 transition-colors ${
+                  service.active
+                    ? "text-[#95D5B2]"
+                    : "text-[#6D4C41] group-hover:text-[#95D5B2]"
+                }`}
               >
                 {service.description}
               </p>
 
               <span
-                className={`text-sm font-semibold transition-colors
-                  ${
-                    service.active
-                      ? "text-[#FCCD2A]"
-                      : "text-[#FCCD2A] group-hover:text-[#FFFBE6]"
-                  }`}
+                className={`text-sm font-semibold transition-colors ${
+                  service.active
+                    ? "text-[#D8F3DC]"
+                    : "text-[#2D6A4F] group-hover:text-[#D8F3DC]"
+                }`}
               >
                 Check it →
               </span>
