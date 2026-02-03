@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./src/**/*.{js,ts,jsx,tsx}"],
+  content: [
+  "./index.html",
+  "./src/**/*.{js,jsx,ts,tsx}",
+],
   theme: {
     extend: {
       fontFamily: {
@@ -12,7 +15,14 @@ export default {
           "serif",
         ],
       },
+
+      /* ✅ GLOBAL COLORS ADDED */
+      colors: {
+        b1: "var(--b1)",
+        b2: "var(--b2)",
+        fg: "var(--fg)",
+      },
     },
   },
-plugins: [require("@tailwindcss/line-clamp")],
+  plugins: [require("@tailwindcss/line-clamp")],
 };

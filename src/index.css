@@ -1,15 +1,23 @@
 /* Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap");
+
+/* Tailwind import */
 @import "tailwindcss";
 
+/* Custom font */
 @font-face {
   font-family: "DomineWebRegular";
   src: url("/fonts/DomineWebRegular.woff2") format("woff2");
   font-weight: normal;
   font-style: normal;
 }
+:root {
+  --b1: #1B4332;
+  --b2: #95D5B2;
+  --fg: #F8F9F1;
+}
 
-
+/* ===== BASE STYLES ===== */
 @layer base {
   body {
     @apply font-serif;
@@ -17,10 +25,22 @@
   }
 }
 
-
+/* ===== GLOBAL FOOTER COLOR ===== */
+@layer components {
+  .footer-bg {
+    background: linear-gradient(
+      135deg,           /* corner se start */
+      var(--b2) 0%,     /* light color at corner */
+      var(--b1) 60%     /* dark color spread */
+    );
+    color: var(--fg);
+  }
+}
+/* ===== UTILITIES ===== */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   scrollbar-width: none;
 }

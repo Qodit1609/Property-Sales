@@ -24,20 +24,23 @@ const Footer: React.FC = () => {
   ];
 
   return (
-    <footer className="bg-gradient-to-r from-[#1B4332] via-[#1B4332] to-[#2D6A4F] text-[#F8F9F1]">
+    <footer className="footer-bg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4 text-center lg:text-left">
+
+          {/* Logo & Description */}
           <div className="flex flex-col items-center lg:items-start">
             <img
               src="https://dummyimage.com/200x80/2D6A4F/ffffff&text=1+Bigha"
               alt="1bigha logo"
               className="h-14 mb-4"
             />
-            <p className="text-sm text-[#D8F3DC] max-w-xs">
+            <p className="text-sm text-fg/80 max-w-xs">
               The easiest way to find, buy, and invest in your dream land.
             </p>
           </div>
 
+          {/* Quick Links */}
           <div className="flex flex-col items-center lg:items-start">
             <h3 className="text-lg font-semibold mb-4 tracking-wide">
               Quick Links
@@ -46,7 +49,7 @@ const Footer: React.FC = () => {
               {quickLinks.map((item) => (
                 <li
                   key={item.label}
-                  className="text-sm text-[#D8F3DC] hover:text-[#F8F9F1] transition cursor-pointer"
+                  className="text-sm text-fg/80 hover:text-fg transition cursor-pointer"
                 >
                   {item.label}
                 </li>
@@ -54,11 +57,12 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
+          {/* Contact */}
           <div className="flex flex-col items-center lg:items-start max-w-xs mx-auto lg:mx-0">
             <h3 className="text-lg font-semibold mb-4 tracking-wide">
               Contact
             </h3>
-            <ul className="space-y-3 text-sm text-[#D8F3DC]">
+            <ul className="space-y-3 text-sm text-fg/80">
               <li className="flex items-center justify-center lg:justify-start gap-2">
                 <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" className="w-4 h-4" />
                 info@1bigha.com
@@ -74,6 +78,7 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
+          {/* Social Icons */}
           <div className="flex flex-col items-center lg:items-start">
             <h3 className="text-lg font-semibold mb-4 tracking-wide">
               Follow Us
@@ -91,12 +96,14 @@ const Footer: React.FC = () => {
               ))}
             </div>
           </div>
+
         </div>
       </div>
 
-      <div className="border-t border-white/30 py-4 text-center text-xs sm:text-sm text-[#D8F3DC] px-4">
+      {/* Bottom Bar */}
+      <div className="border-t border-white/30 py-4 text-center text-xs sm:text-sm text-fg/80 px-4">
         © 2025 1bigha.com · All Rights Reserved · Developed by{" "}
-        <span className="text-[#F8F9F1] font-semibold">Nexolvia</span>
+        <span className="text-fg font-semibold">Nexolvia</span>
       </div>
     </footer>
   );
