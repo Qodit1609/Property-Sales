@@ -35,6 +35,22 @@
     );
     color: var(--fg);
   }
+
+   .glass-card {
+  @apply relative rounded-2xl p-6 h-fit
+    bg-white/60
+    backdrop-blur-md
+    border border-white/40
+    text-[#1B4332];
+}
+
+  .glass-btn {
+    @apply px-4 py-2 rounded-full border
+      border-[#2D6A4F] text-[#2D6A4F]
+      text-xs font-semibold
+      hover:bg-[#2D6A4F] hover:text-white
+      transition;
+  }
 }
 /* ===== UTILITIES ===== */
 .no-scrollbar::-webkit-scrollbar {

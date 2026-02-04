@@ -22,6 +22,9 @@ export default {
         b2: "var(--b2)",
         fg: "var(--fg)",
       },
+      backdropBlur: {
+      xs: "2px",
+    },
     },
   },
   plugins: [require("@tailwindcss/line-clamp")],

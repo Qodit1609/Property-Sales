@@ -2,6 +2,7 @@ import React from "react";
 
 type LinkItem = {
   label: string;
+  href: string;
 };
 
 type IconItem = {
@@ -10,10 +11,14 @@ type IconItem = {
 };
 
 const Footer: React.FC = () => {
-  const quickLinks: LinkItem[] = [
-    { label: "Home" },
-    { label: "About" },
-    { label: "Blogs" },
+  const quickLinks: LinkItem[] = [ 
+  { label: "Home", href: "/" },
+  { label: "Farmhouse / Farmland", href: "/farmhouse" },
+  { label: "Agriculture Land", href: "/agriculture-land" },
+  { label: "Resort Properties", href: "/resort-properties" },
+  { label: "Rent Farmhouse", href: "/rent-farmhouse" },
+  { label: "About", href: "/" },
+  { label: "Blogs", href: "/" },
   ];
 
   const socialIcons: IconItem[] = [
@@ -42,24 +47,26 @@ const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div className="flex flex-col items-center lg:items-start">
-            <h3 className="text-lg font-semibold mb-4 tracking-wide">
+            <h3 className="text-base font-semibold mb-4 tracking-wide">
               Quick Links
             </h3>
-            <ul className="space-y-2">
-              {quickLinks.map((item) => (
-                <li
-                  key={item.label}
-                  className="text-sm text-fg/80 hover:text-fg transition cursor-pointer"
-                >
-                  {item.label}
-                </li>
-              ))}
-            </ul>
+           <ul className="space-y-2">
+  {quickLinks.map((item) => (
+    <li key={item.label}>
+      <a
+        href={item.href}
+        className="text-sm text-fg/80 hover:text-fg transition"
+      >
+        {item.label}
+      </a>
+    </li>
+  ))}
+</ul>
           </div>
 
           {/* Contact */}
           <div className="flex flex-col items-center lg:items-start max-w-xs mx-auto lg:mx-0">
-            <h3 className="text-lg font-semibold mb-4 tracking-wide">
+            <h3 className="text-base font-semibold mb-4 tracking-wide">
               Contact
             </h3>
             <ul className="space-y-3 text-sm text-fg/80">
@@ -80,7 +87,7 @@ const Footer: React.FC = () => {
 
           {/* Social Icons */}
           <div className="flex flex-col items-center lg:items-start">
-            <h3 className="text-lg font-semibold mb-4 tracking-wide">
+            <h3 className="text-base font-semibold mb-4 tracking-wide">
               Follow Us
             </h3>
             <div className="flex justify-center lg:justify-start gap-6">
@@ -102,7 +109,7 @@ const Footer: React.FC = () => {
 
       {/* Bottom Bar */}
       <div className="border-t border-white/30 py-4 text-center text-xs sm:text-sm text-fg/80 px-4">
-        © 2025 1bigha.com · All Rights Reserved · Developed by{" "}
+        © 2026 abc.com · All Rights Reserved · Developed by{" "}
         <span className="text-fg font-semibold">Nexolvia</span>
       </div>
     </footer>
