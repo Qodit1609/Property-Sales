@@ -65,9 +65,9 @@ const PropertyList = () => {
           ref={sliderRef}
           className="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth no-scrollbar touch-pan-x px-1"
         >
-          {properties.map((property, index) => (
+          {properties.map((property) => (
             <div
-              key={index}
+              key={property._id}
               className="min-w-[240px] sm:min-w-[280px] md:min-w-[300px]"
             >
               <PropertyCard property={property} />
