@@ -28,12 +28,15 @@ const Footer: React.FC = () => {
     { src: "https://cdn-icons-png.flaticon.com/512/1384/1384060.png", alt: "YouTube" },
   ];
 
+  /* 🔧 Easy future control (change here only) */
+  const ICON_BOX = "w-8 h-8 sm:w-9 sm:h-9";
+  const ICON_IMG = "w-4 h-4 sm:w-5 sm:h-5";
+
   return (
     <footer className="footer-bg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4 text-center lg:text-left">
-
-          {/* Logo & Description */}
+          
           <div className="flex flex-col items-center lg:items-start">
             <img
               src="https://dummyimage.com/200x80/2D6A4F/ffffff&text=1+Bigha"
@@ -45,7 +48,6 @@ const Footer: React.FC = () => {
             </p>
           </div>
 
-          {/* Quick Links */}
           <div className="flex flex-col items-center lg:items-start">
             <h3 className="text-base font-semibold mb-4 tracking-wide">
               Quick Links
@@ -64,7 +66,6 @@ const Footer: React.FC = () => {
 </ul>
           </div>
 
-          {/* Contact */}
           <div className="flex flex-col items-center lg:items-start max-w-xs mx-auto lg:mx-0">
             <h3 className="text-base font-semibold mb-4 tracking-wide">
               Contact
@@ -85,29 +86,38 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
-          {/* Social Icons */}
           <div className="flex flex-col items-center lg:items-start">
             <h3 className="text-base font-semibold mb-4 tracking-wide">
               Follow Us
             </h3>
-            <div className="flex justify-center lg:justify-start gap-6">
+
+            <div className="flex justify-center lg:justify-start gap-3 sm:gap-4">
               {socialIcons.map((icon) => (
                 <a
                   key={icon.alt}
                   href="#"
                   aria-label={icon.alt}
-                  className="transition-transform hover:scale-110"
+                  className={`
+                    flex items-center justify-center
+                    bg-[var(--b2)] rounded-md
+                    ${ICON_BOX}
+                    shadow-sm
+                    transition-all duration-300
+                    hover:scale-110 hover:shadow-md
+                  `}
                 >
-                  <img src={icon.src} alt={icon.alt} className="w-8 h-8" />
+                  <img
+                    src={icon.src}
+                    alt={icon.alt}
+                    className={ICON_IMG}
+                  />
                 </a>
               ))}
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* Bottom Bar */}
       <div className="border-t border-white/30 py-4 text-center text-xs sm:text-sm text-fg/80 px-4">
         © 2026 abc.com · All Rights Reserved · Developed by{" "}
         <span className="text-fg font-semibold">Nexolvia</span>

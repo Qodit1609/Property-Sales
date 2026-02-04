@@ -9,8 +9,8 @@ const PropertyFilterCard: React.FC = () => {
   const [tags, setTags] = useState<string[]>([]);
 
   const toggleTag = (tag: string) => {
-    setTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
+    setTags(prev =>
+      prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]
     );
   };
 
@@ -35,38 +35,21 @@ const PropertyFilterCard: React.FC = () => {
     console.log("Applied Filters:", payload);
   };
 
-  const titleClass = "text-xs uppercase tracking-wide text-[#FFFBE6]/80 mb-1";
+  const titleClass = "text-xs uppercase tracking-wide text-[var(--fg)]/80 mb-1";
 
   return (
-    <div className="w-[320px] bg-[#347928] text-[#FFFBE6] p-5 rounded-2xl shadow-xl">
+    <div className="w-[320px] bg-[var(--b1-mid)] text-[var(--fg)] p-5 rounded-2xl shadow-xl">
       <div className="flex mb-5">
         <input
           type="text"
           placeholder="Search Farmhouse/Farmland"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="
-            flex-1 px-3 py-2
-            rounded-l-md
-            text-gray-900
-            bg-[#FFFBE6]
-            border border-[#C0EBA6]
-            focus:border-[#FCCD2A]
-            focus:ring-1 focus:ring-[#FCCD2A]
-            outline-none
-          "
+          onChange={e => setSearch(e.target.value)}
+          className="flex-1 px-3 py-2 rounded-l-md bg-[var(--fg)] text-[var(--b1)] border border-[var(--b2)] focus:border-[var(--b2)] focus:ring-1 focus:ring-[var(--b2)] outline-none"
         />
         <button
           onClick={applyFilters}
-          className="
-            bg-[#FCCD2A]
-            px-4
-            rounded-r-md
-            border border-l-0 border-[#FCCD2A]
-            text-[#347928]
-            font-semibold
-            hover:brightness-95
-          "
+          className="bg-[var(--b2)] px-4 rounded-r-md border border-l-0 border-[var(--b2)] text-[var(--b1-mid)] font-semibold hover:brightness-95"
         >
           Go
         </button>
@@ -79,8 +62,8 @@ const PropertyFilterCard: React.FC = () => {
         max={50000000}
         step={500000}
         value={maxPrice}
-        onChange={(e) => setMaxPrice(Number(e.target.value))}
-        className="w-full accent-[#FCCD2A]"
+        onChange={e => setMaxPrice(Number(e.target.value))}
+        className="w-full accent-[var(--b2)]"
       />
       <div className="flex justify-between text-xs mb-2">
         <span>10 lac</span>
@@ -97,8 +80,8 @@ const PropertyFilterCard: React.FC = () => {
         min={0}
         max={200}
         value={distance}
-        onChange={(e) => setDistance(Number(e.target.value))}
-        className="w-full accent-[#FCCD2A]"
+        onChange={e => setDistance(Number(e.target.value))}
+        className="w-full accent-[var(--b2)]"
       />
       <div className="flex justify-between text-sm mb-5">
         <span>0</span>
@@ -113,8 +96,8 @@ const PropertyFilterCard: React.FC = () => {
         max={40000}
         step={500}
         value={size}
-        onChange={(e) => setSize(Number(e.target.value))}
-        className="w-full accent-[#FCCD2A]"
+        onChange={e => setSize(Number(e.target.value))}
+        className="w-full accent-[var(--b2)]"
       />
       <div className="flex justify-between text-sm mb-5">
         <span>0</span>
@@ -124,13 +107,13 @@ const PropertyFilterCard: React.FC = () => {
 
       <p className={`${titleClass} mb-2`}>TAGS</p>
       <div className="grid grid-cols-2 gap-2 mb-5">
-        {["Hot", "Popular", "Latest", "Premium"].map((tag) => (
+        {["Hot", "Popular", "Latest", "Premium"].map(tag => (
           <label key={tag} className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={tags.includes(tag)}
               onChange={() => toggleTag(tag)}
-              className="accent-[#FCCD2A]"
+              className="accent-[var(--b2)]"
             />
             {tag}
           </label>
@@ -139,7 +122,7 @@ const PropertyFilterCard: React.FC = () => {
 
       <button
         onClick={clearAll}
-        className="w-full bg-[#C0EBA6] text-[#347928] py-2 rounded-md font-semibold hover:brightness-95"
+        className="w-full bg-[var(--b2)] text-[var(--b1-mid)] py-2 rounded-md font-semibold hover:brightness-95"
       >
         Clear All
       </button>

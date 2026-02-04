@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const inputClass =
-  "w-full rounded-lg border border-[#95D5B2] px-4 py-2 bg-[#F8F9F1] text-[#1B4332] placeholder:text-[#6D4C41] outline-none transition hover:border-[#2D6A4F] focus:border-[#2D6A4F] focus:ring-2 focus:ring-[#2D6A4F]/30";
+  "w-full rounded-lg border border-[var(--b2)] px-4 py-2 bg-[var(--fg)] text-[var(--b1)] placeholder:text-[var(--brown)] outline-none transition hover:border-[var(--b1-mid)] focus:border-[var(--b1-mid)] focus:ring-2 focus:ring-[var(--b1-mid)]/30";
 
 const ContactPopup: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"details" | "whatsapp">("details");
@@ -14,14 +14,14 @@ const ContactPopup: React.FC = () => {
   };
 
   return (
-    <div className="space-y-5 bg-[#D8F3DC] p-5 rounded-2xl">
-      <div className="flex bg-[#95D5B2]/40 rounded-full p-1">
+    <div className="space-y-5 bg-[var(--b2-soft)] p-5 rounded-2xl">
+      <div className="flex bg-[var(--b2)]/40 rounded-full p-1">
         <button
           onClick={() => setActiveTab("details")}
           className={`flex-1 py-2 rounded-full text-sm font-medium transition ${
             activeTab === "details"
-              ? "bg-[#F8F9F1] text-[#1B4332] shadow"
-              : "text-[#1B4332]"
+              ? "bg-[var(--fg)] text-[var(--b1)] shadow"
+              : "text-[var(--b1)]"
           }`}
         >
           Share Details
@@ -31,8 +31,8 @@ const ContactPopup: React.FC = () => {
           onClick={() => setActiveTab("whatsapp")}
           className={`flex-1 py-2 rounded-full text-sm font-medium transition ${
             activeTab === "whatsapp"
-              ? "bg-[#F8F9F1] text-[#1B4332] shadow"
-              : "text-[#1B4332]"
+              ? "bg-[var(--fg)] text-[var(--b1)] shadow"
+              : "text-[var(--b1)]"
           }`}
         >
           WhatsApp
@@ -50,7 +50,9 @@ const ContactPopup: React.FC = () => {
               value={propertyType}
               onChange={(e) => setPropertyType(e.target.value)}
               className={`${inputClass} ${
-                propertyType ? "text-[#1B4332]" : "text-[#6D4C41]"
+                propertyType
+                  ? "text-[var(--b1)]"
+                  : "text-[var(--brown)]"
               }`}
             >
               <option value="" disabled>
@@ -73,21 +75,21 @@ const ContactPopup: React.FC = () => {
             placeholder="Tell us more about what you need"
           />
 
-          <p className="text-sm text-[#6D4C41]">
+          <p className="text-sm text-[var(--brown)]">
             Name and phone are required.
           </p>
 
           <div className="flex flex-col sm:flex-row sm:justify-end gap-3">
             <button
               type="reset"
-              className="border border-[#2D6A4F] text-[#2D6A4F] px-4 py-2 rounded-full hover:bg-[#95D5B2]/40 transition"
+              className="border border-[var(--b1-mid)] text-[var(--b1-mid)] px-4 py-2 rounded-full hover:bg-[var(--b2)]/40 transition"
             >
               Reset
             </button>
 
             <button
               type="submit"
-              className="bg-[#2D6A4F] text-white px-5 py-2 rounded-full hover:bg-[#1B4332] transition"
+              className="bg-[var(--b1-mid)] text-[var(--white)] px-5 py-2 rounded-full hover:bg-[var(--b1)] transition"
             >
               Submit
             </button>
@@ -97,12 +99,12 @@ const ContactPopup: React.FC = () => {
 
       {activeTab === "whatsapp" && (
         <div className="space-y-4">
-          <div className="border border-[#95D5B2] bg-[#F8F9F1] rounded-xl p-4 text-sm space-y-2">
-            <p className="font-medium text-[#1B4332]">
+          <div className="border border-[var(--b2)] bg-[var(--fg)] rounded-xl p-4 text-sm space-y-2">
+            <p className="font-medium text-[var(--b1)]">
               Prefer a quick chat? Ping us on WhatsApp.
             </p>
 
-            <ul className="list-disc pl-5 space-y-1 text-[#6D4C41]">
+            <ul className="list-disc pl-5 space-y-1 text-[var(--brown)]">
               <li>Instant conversation with a specialist</li>
               <li>Share images / location pins easily</li>
               <li>Service hours: 9am – 7pm IST</li>
@@ -112,7 +114,7 @@ const ContactPopup: React.FC = () => {
 
           <button
             onClick={openWhatsApp}
-            className="bg-[#2D6A4F] text-white px-5 py-2 rounded-full hover:bg-[#1B4332] transition w-full sm:w-auto"
+            className="bg-[var(--b1-mid)] text-[var(--white)] px-5 py-2 rounded-full hover:bg-[var(--b1)] transition w-full sm:w-auto"
           >
             Open WhatsApp
           </button>
