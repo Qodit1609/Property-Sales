@@ -2,6 +2,7 @@ import React from "react";
 
 type LinkItem = {
   label: string;
+  href: string;
 };
 
 type IconItem = {
@@ -10,10 +11,14 @@ type IconItem = {
 };
 
 const Footer: React.FC = () => {
-  const quickLinks: LinkItem[] = [
-    { label: "Home" },
-    { label: "About" },
-    { label: "Blogs" },
+  const quickLinks: LinkItem[] = [ 
+  { label: "Home", href: "/" },
+  { label: "Farmhouse / Farmland", href: "/farmhouse" },
+  { label: "Agriculture Land", href: "/agriculture-land" },
+  { label: "Resort Properties", href: "/resort-properties" },
+  { label: "Rent Farmhouse", href: "/rent-farmhouse" },
+  { label: "About", href: "/" },
+  { label: "Blogs", href: "/" },
   ];
 
   const socialIcons: IconItem[] = [
@@ -23,42 +28,49 @@ const Footer: React.FC = () => {
     { src: "https://cdn-icons-png.flaticon.com/512/1384/1384060.png", alt: "YouTube" },
   ];
 
+  /* 🔧 Easy future control (change here only) */
+  const ICON_BOX = "w-8 h-8 sm:w-9 sm:h-9";
+  const ICON_IMG = "w-4 h-4 sm:w-5 sm:h-5";
+
   return (
-    <footer className="bg-gradient-to-r from-[#1B4332] via-[#1B4332] to-[#2D6A4F] text-[#F8F9F1]">
+    <footer className="footer-bg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4 text-center lg:text-left">
+          
           <div className="flex flex-col items-center lg:items-start">
             <img
               src="https://dummyimage.com/200x80/2D6A4F/ffffff&text=1+Bigha"
               alt="1bigha logo"
               className="h-14 mb-4"
             />
-            <p className="text-sm text-[#D8F3DC] max-w-xs">
+            <p className="text-sm text-fg/80 max-w-xs">
               The easiest way to find, buy, and invest in your dream land.
             </p>
           </div>
 
           <div className="flex flex-col items-center lg:items-start">
-            <h3 className="text-lg font-semibold mb-4 tracking-wide">
+            <h3 className="text-base font-semibold mb-4 tracking-wide">
               Quick Links
             </h3>
-            <ul className="space-y-2">
-              {quickLinks.map((item) => (
-                <li
-                  key={item.label}
-                  className="text-sm text-[#D8F3DC] hover:text-[#F8F9F1] transition cursor-pointer"
-                >
-                  {item.label}
-                </li>
-              ))}
-            </ul>
+           <ul className="space-y-2">
+  {quickLinks.map((item) => (
+    <li key={item.label}>
+      <a
+        href={item.href}
+        className="text-sm text-fg/80 hover:text-fg transition"
+      >
+        {item.label}
+      </a>
+    </li>
+  ))}
+</ul>
           </div>
 
           <div className="flex flex-col items-center lg:items-start max-w-xs mx-auto lg:mx-0">
-            <h3 className="text-lg font-semibold mb-4 tracking-wide">
+            <h3 className="text-base font-semibold mb-4 tracking-wide">
               Contact
             </h3>
-            <ul className="space-y-3 text-sm text-[#D8F3DC]">
+            <ul className="space-y-3 text-sm text-fg/80">
               <li className="flex items-center justify-center lg:justify-start gap-2">
                 <img src="https://cdn-icons-png.flaticon.com/512/732/732200.png" className="w-4 h-4" />
                 info@1bigha.com
@@ -75,18 +87,30 @@ const Footer: React.FC = () => {
           </div>
 
           <div className="flex flex-col items-center lg:items-start">
-            <h3 className="text-lg font-semibold mb-4 tracking-wide">
+            <h3 className="text-base font-semibold mb-4 tracking-wide">
               Follow Us
             </h3>
-            <div className="flex justify-center lg:justify-start gap-6">
+
+            <div className="flex justify-center lg:justify-start gap-3 sm:gap-4">
               {socialIcons.map((icon) => (
                 <a
                   key={icon.alt}
                   href="#"
                   aria-label={icon.alt}
-                  className="transition-transform hover:scale-110"
+                  className={`
+                    flex items-center justify-center
+                    bg-[var(--b2)] rounded-md
+                    ${ICON_BOX}
+                    shadow-sm
+                    transition-all duration-300
+                    hover:scale-110 hover:shadow-md
+                  `}
                 >
-                  <img src={icon.src} alt={icon.alt} className="w-8 h-8" />
+                  <img
+                    src={icon.src}
+                    alt={icon.alt}
+                    className={ICON_IMG}
+                  />
                 </a>
               ))}
             </div>
@@ -94,9 +118,9 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
-      <div className="border-t border-white/30 py-4 text-center text-xs sm:text-sm text-[#D8F3DC] px-4">
-        © 2025 1bigha.com · All Rights Reserved · Developed by{" "}
-        <span className="text-[#F8F9F1] font-semibold">Nexolvia</span>
+      <div className="border-t border-white/30 py-4 text-center text-xs sm:text-sm text-fg/80 px-4">
+        © 2026 abc.com · All Rights Reserved · Developed by{" "}
+        <span className="text-fg font-semibold">Nexolvia</span>
       </div>
     </footer>
   );

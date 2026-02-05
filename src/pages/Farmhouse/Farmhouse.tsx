@@ -1,19 +1,4 @@
-// import React from "react";
-// import PropertyCard from "../../components/Crads/PropertyCard";
-// import { properties } from "../../components/Data/properties";
-// import PropertyLayout from "../PropertyDetails/PropertyLayout";
 
-// const Farmhouse: React.FC = () => {
-//   return (
-//     <PropertyLayout>
-//       {properties.map((property) => (
-//         <PropertyCard key={property.id} property={property} />
-//       ))}
-//     </PropertyLayout>
-//   );
-// };
-
-// export default Farmhouse;
 import React from "react";
 import PropertyCard from "../../components/Crads/PropertyCard";
 import { getByType } from "../../components/Data/properties";

@@ -1,7 +1,10 @@
 /* Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap");
+
+/* Tailwind import */
 @import "tailwindcss";
 
+/* Custom font */
 @font-face {
   font-family: "DomineWebRegular";
   src: url("/fonts/DomineWebRegular.woff2") format("woff2");
@@ -9,7 +12,17 @@
   font-style: normal;
 }
 
+:root {
+  --b1: #1B4332;        /* dark green */
+  --b1-mid: #2D6A4F;    /* medium green */
+  --b2: #95D5B2;        /* light green */
+  --b2-soft: #D8F3DC;   /* very light green */
+  --fg: #F8F9F1;        /* off-white */
+  --white: #ffffff;
+  --brown: #6D4C41;
+}
 
+/* ===== BASE STYLES ===== */
 @layer base {
   body {
     @apply font-serif;
@@ -17,10 +30,66 @@
   }
 }
 
+/* ===== GLOBAL FOOTER COLOR ===== */
+@layer components {
+  .footer-bg {
+    background: linear-gradient(
+      135deg,
+      var(--b2) 0%,
+      var(--b1) 60%
+    );
+    color: var(--fg);
+  }
 
+   .glass-card {
+  @apply relative rounded-2xl p-6 h-fit
+    bg-white/60
+    backdrop-blur-md
+    border border-white/40
+    text-[#1B4332];
+}
+
+  .glass-btn {
+    @apply px-4 py-2 rounded-full border
+      border-[#2D6A4F] text-[#2D6A4F]
+      text-xs font-semibold
+      hover:bg-[#2D6A4F] hover:text-white
+      transition;
+  }
+}
+
+/* ===== HEADER STYLES ===== */
+@layer components {
+  .header-bg {
+    background: linear-gradient(
+      to left ,
+      var(--b2) 0%,
+    var(--b1-mid) 50%,
+    var(--b1) 100%
+    );
+    color: var(--fg);
+  }
+
+  .text-brand {
+    color: var(--b2);
+  }
+
+  .btn-brand {
+    background-color: var(--b2);
+    color: var(--b1);
+  }
+
+  .btn-brand:hover {
+    background-color: var(--b1-mid);
+    color: var(--fg);
+  }
+}
+
+/* ===== UTILITIES ===== */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   scrollbar-width: none;
 }

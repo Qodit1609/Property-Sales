@@ -44,8 +44,8 @@ const HeaderNav: React.FC<{
             onMouseEnter={() => setHovered(item.href)}
             onMouseLeave={() => setHovered(null)}
             className={`relative inline-block pb-1 transition-colors duration-300 ${
-              isActive ? "text-[#95D5B2]" : "text-white"
-            } hover:text-[#95D5B2] after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-full after:bg-[#95D5B2] after:transition-transform after:duration-300 after:origin-center ${
+              isActive ? "text-brand" : "text-fg"
+            } hover:text-brand after:content-[''] after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-full after:bg-[var(--b2)] after:transition-transform after:duration-300 after:origin-center ${
               isActive ? "after:scale-x-100" : "after:scale-x-0"
             }`}
           >
@@ -64,10 +64,10 @@ const Header: React.FC = () => {
   return (
     <>
       <header className="fixed top-0 left-0 z-50 w-full flex justify-center">
-        <div className="w-[94%] max-w-[1320px] bg-gradient-to-r from-[#1B4332] via-[#2D6A4F] to-[#95D5B2] shadow-lg rounded-b-2xl px-4 sm:px-6 md:px-10">
+        <div className="w-[94%] max-w-[1320px] header-bg shadow-lg rounded-b-2xl px-4 sm:px-6 md:px-10">
           <div className="flex h-[72px] items-center justify-between">
-            <div className="flex items-center gap-2 text-white font-bold text-lg sm:text-xl">
-              <span className="text-2xl text-[#95D5B2]">P</span>
+            <div className="flex items-center gap-2 text-fg font-bold text-lg sm:text-xl">
+              <span className="text-2xl text-brand">P</span>
               <span>PropDown</span>
             </div>
 
@@ -75,13 +75,13 @@ const Header: React.FC = () => {
 
             <button
               onClick={() => setContactOpen(true)}
-              className="hidden md:inline-flex px-6 py-2 rounded-full bg-[#1B4332] text-white font-semibold shadow-md transition hover:bg-[#2D6A4F]"
+              className="hidden md:inline-flex px-6 py-2 rounded-full btn-brand font-semibold shadow-md transition"
             >
               Get Started
             </button>
 
             <button
-              className="md:hidden text-white text-2xl"
+              className="md:hidden text-fg text-2xl"
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle Menu"
             >
@@ -102,7 +102,7 @@ const Header: React.FC = () => {
                     setMenuOpen(false);
                     setContactOpen(true);
                   }}
-                  className="mt-8 mx-auto block px-10 py-3 rounded-full bg-[#1B4332] text-white font-semibold shadow-md transition hover:bg-[#2D6A4F]"
+                  className="mt-8 mx-auto block px-10 py-3 rounded-full btn-brand font-semibold shadow-md transition"
                 >
                   Get Started
                 </button>
