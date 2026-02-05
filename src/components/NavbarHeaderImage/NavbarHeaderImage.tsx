@@ -1,48 +1,37 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 
-const CONFIG: Record<
-  string,
-  { title: string; image: string }
-> = {
-  "/farmhouse": {
-    title: "Farmhouse / Farmland",
-    image:
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-  },
-  "/agriculture-land": {
-    title: "Agriculture Land",
-    image:
-      "https://images.unsplash.com/photo-1500382017468-9049fed747ef",
-  },
-  "/resort-properties": {
-    title: "Resort Properties",
-    image:
-      "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-  },
-  "/rent-farmhouse": {
-    title: "Rent Farmhouse",
-    image:
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994",
-  },
+const TITLES: Record<string, string> = {
+  "/farmhouse":           "Buy Farmhouse in Indore",
+  "/agriculture-land":    "Buy Agricultural Land in Indore",
+  "/resort-properties":   "Resort Properties in Madhya Pradesh",
+  "/rent-farmhouse":      "Rent a Farmhouse Near Indore",
 };
 
 const NavbarHeaderImage: React.FC = () => {
-  const { pathname } = useLocation();
-  const data = CONFIG[pathname];
+  const path  = useLocation().pathname;
+  const title = TITLES[path] ?? "Explore Properties";
 
-  if (!data) return null;
+  // highlight "Indore" in yellow if present
+  const parts = title.split("Indore");
 
   return (
     <section
-      className="relative h-[60vh] md:h-[70vh] bg-cover bg-center"
-      style={{ backgroundImage: `url(${data.image})` }}
+      className="relative h-[70vh] bg-cover bg-center"
+      style={{ backgroundImage: "url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6')" }}
     >
-      <div className="absolute inset-0 bg-[var(--b1-mid)]/60"></div>
-
+      <div className="absolute inset-0 bg-[#347928]/60" />
       <div className="relative z-10 flex items-center justify-center h-full px-4">
-        <h1 className="text-[var(--fg)] text-3xl md:text-5xl text-center font-bold">
-          {data.title}
+        <h1 className="text-[#FFFBE6] text-3xl md:text-5xl text-center font-bold">
+          {parts.length > 1 ? (
+            <>
+              {parts[0]}
+              <span className="text-[#FCCD2A]">Indore</span>
+              {parts[1]}
+            </>
+          ) : (
+            title
+          )}
         </h1>
       </div>
     </section>

@@ -1,65 +1,45 @@
-export interface AgentDetails {
-  name: string
-  phone: string
-  email: string
-  address: string
-  image: string
-}
-
-export interface OwnerDetails {
-  name: string
-  phone: string
-}
-
-export interface PropertyMedia {
-  gallery: string[]
-  videoUrl: string
-}
-
-export interface PropertyHighlights {
-  landType: "Agricultural"
-  waterAvailability: boolean
-  electricityAvailable: boolean
-  roadAccess: boolean
-  soilType: string
-}
-
-export interface ExtendedProperty {
-  landSize: string
-  totalImages: number
-  media: PropertyMedia
-  owner: OwnerDetails
-  agent: AgentDetails
-  highlights: PropertyHighlights
-  aboutProperty: string
-}
 
 export interface Property {
-  _id: string
-  title: string
-  description: string
-  price: number
-  propertyType: string
-  address: string
-  images: string[]
-  sellerId: string | null
-  status: string
-  createdAt: string
-  updatedAt: string
+  _id: string;
+  title: string;
+  description: string;
+  price: number;
+  propertyType: string; // "Villa"|"Commercial"|"Flat"|"Farmhouse"|"Agriculture Land"|"Resort"|"Rent Farmhouse"
+  address: string;
+  images: string[];
+  sellerId: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
   location: {
-    type: "Point"
-    coordinates: [number, number]
-  }
+    type: "Point";
+    coordinates: [number, number];
+  };
+  // ── fields the filter card needs ──
+  size: number;               // sqft  OR  acres  (see isSizeInAcres)
+  beds: number;
+  baths: number;
+  parking: number;
+  distanceFromIndore: number; // km
+  tags: string[];             // ["Hot"|"Popular"|"Latest"|"Premium"]
 }
 
-export const properties: (Property & ExtendedProperty)[] = [
+// Returns true when this propertyType's size is in Acres
+export function isSizeInAcres(propertyType: string): boolean {
+  return propertyType === "Agriculture Land";
+}
+
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+export const properties: Property[] = [
+  // ── Villa ──
   {
-    _id: "agri-indore-001",
-    title: "Agricultural Land in Sanwer",
-    description: "Fertile agricultural land suitable for wheat and soybean farming.",
-    price: 15000000,
-    propertyType: "Agricultural Land",
-    address: "Village Sanwer, Indore, Madhya Pradesh",
+    _id: "prop_villa_01",
+    title: "Luxury Villa in Gurgaon",
+    description: "Premium 5 BHK villa with private pool, landscaped garden, and modern architecture.",
+    price: 35000000,
+    propertyType: "Villa",
+    address: "Indore – South Tukoganj, Madhya Pradesh",
     images: [
       "https://images.unsplash.com/photo-1500382017468-9049fed747ef",
       "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
@@ -68,508 +48,764 @@ export const properties: (Property & ExtendedProperty)[] = [
     status: "approved",
     createdAt: "2026-01-22T06:24:49.160Z",
     updatedAt: "2026-01-22T08:35:07.149Z",
-    location: {
-      type: "Point",
-      coordinates: [75.82, 22.92]
-    },
-    landSize: "5 Acres",
-    totalImages: 2,
-    media: {
-      gallery: [
-        "https://images.unsplash.com/photo-1500382017468-9049fed747ef",
-        "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
-        "https://images.unsplash.com/photo-1469474968028-56623f02e42e"
-      ],
-      videoUrl: "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4"
-    },
-    owner: {
-      name: "Ramesh Patel",
-      phone: "+91 98765 43210"
-    },
-    agent: {
-      name: "Nikki Houston",
-      phone: "+91 79999 12345",
-      email: "nikki.indore@realty.com",
-      address: "Vijay Nagar, Indore, MP",
-      image: "https://randomuser.me/api/portraits/women/44.jpg"
-    },
-    highlights: {
-      landType: "Agricultural",
-      waterAvailability: true,
-      electricityAvailable: true,
-      roadAccess: true,
-      soilType: "Black Cotton Soil"
-    },
-    aboutProperty:
-      "This agricultural land is located near Sanwer with excellent soil fertility, proper irrigation facilities, and direct road access. Ideal for long-term farming investment."
+    location: { type: "Point", coordinates: [75.83, 22.74] },
+    size: 6200, beds: 5, baths: 4, parking: 3,
+    distanceFromIndore: 12,
+    tags: ["Premium", "Popular"],
   },
   {
-    _id: "agri-indore-002",
-    title: "Farmland in Hatod",
-    description: "Open agricultural land with tube well and electricity connection.",
-    price: 12000000,
-    propertyType: "Agricultural Land",
-    address: "Village Hatod, Indore, Madhya Pradesh",
-    images: [
-      "https://images.unsplash.com/photo-1464226184884-fa280b87c399"
-    ],
+    _id: "prop_villa_02",
+    title: "Modern Villa in Scheme-54",
+    description: "Spacious 4 BHK villa with contemporary design, rooftop terrace and private garden.",
+    price: 28000000,
+    propertyType: "Villa",
+    address: "Indore – Scheme 54, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1564013799919-ab600027ffc6"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-23T10:00:00.000Z",
+    updatedAt: "2026-01-23T12:00:00.000Z",
+    location: { type: "Point", coordinates: [75.88, 22.72] },
+    size: 5100, beds: 4, baths: 3, parking: 2,
+    distanceFromIndore: 8,
+    tags: ["Hot"],
+  },
+  {
+    _id: "prop_villa_03",
+    title: "Elegant Villa in Vijay Nagar",
+    description: "Beautiful 3 BHK villa with Italian marble flooring and smart home features.",
+    price: 18500000,
+    propertyType: "Villa",
+    address: "Indore – Vijay Nagar, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1613490493576-7fde63acd811"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-24T08:00:00.000Z",
+    updatedAt: "2026-01-24T10:00:00.000Z",
+    location: { type: "Point", coordinates: [75.89, 22.75] },
+    size: 4200, beds: 3, baths: 3, parking: 2,
+    distanceFromIndore: 7,
+    tags: ["Latest", "Premium"],
+  },
+  {
+    _id: "prop_villa_04",
+    title: "Premium Villa in AB Road",
+    description: "Luxurious 6 BHK villa with home theater, gym, and infinity pool.",
+    price: 52000000,
+    propertyType: "Villa",
+    address: "Indore – AB Road, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1512917774080-9991f1c4c750"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-25T09:00:00.000Z",
+    updatedAt: "2026-01-25T11:00:00.000Z",
+    location: { type: "Point", coordinates: [75.86, 22.73] },
+    size: 8500, beds: 6, baths: 5, parking: 4,
+    distanceFromIndore: 10,
+    tags: ["Premium", "Hot"],
+  },
+
+  // ── Commercial ──
+  {
+    _id: "prop_comm_01",
+    title: "Commercial Space in Saket",
+    description: "Prime commercial space, 2000 sq ft, ideal for office or retail.",
+    price: 15000000,
+    propertyType: "Commercial",
+    address: "Indore – Geeta Bhawan, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1497366216548-37526070297c"],
     sellerId: null,
     status: "approved",
     createdAt: "2026-01-22T06:24:49.160Z",
-    updatedAt: "2026-01-22T08:35:07.149Z",
-    location: {
-      type: "Point",
-      coordinates: [75.78, 22.7]
-    },
-    landSize: "3.5 Acres",
-    totalImages: 1,
-    media: {
-      gallery: [
-        "https://images.unsplash.com/photo-1464226184884-fa280b87c399",
-        "https://images.unsplash.com/photo-1501785888041-af3ef285b470"
-      ],
-      videoUrl: ""
-    },
-    owner: {
-      name: "Mahesh Verma",
-      phone: "+91 99887 66554"
-    },
-    agent: {
-      name: "Amit Joshi",
-      phone: "+91 78888 33445",
-      email: "amit.joshi@realty.com",
-      address: "Rajendra Nagar, Indore, MP",
-      image: "https://randomuser.me/api/portraits/men/32.jpg"
-    },
-    highlights: {
-      landType: "Agricultural",
-      waterAvailability: true,
-      electricityAvailable: true,
-      roadAccess: false,
-      soilType: "Loamy Soil"
-    },
-    aboutProperty:
-      "Peaceful farmland located in Hatod village, suitable for vegetable farming and organic agriculture."
+    updatedAt: "2026-01-22T08:35:07.153Z",
+    location: { type: "Point", coordinates: [75.82, 22.75] },
+    size: 2000, beds: 0, baths: 1, parking: 4,
+    distanceFromIndore: 5,
+    tags: ["Popular"],
   },
   {
-  _id: "agri-indore-003",
-  title: "Agricultural Land in Mhow",
-  description:
-    "Well-maintained agricultural land suitable for maize and soybean farming with good water availability.",
-  price: 18000000,
-  propertyType: "Agricultural Land",
-  address: "Village Mhow, Indore, Madhya Pradesh",
-  images: [
-    "https://picsum.photos/id/1018/1200/800",
-    "https://picsum.photos/id/1025/1200/800"
-  ],
-  sellerId: null,
-  status: "approved",
-  createdAt: "2026-01-22T06:24:49.160Z",
-  updatedAt: "2026-01-22T08:35:07.160Z",
-  location: {
-    type: "Point",
-    coordinates: [75.77, 22.55]
+    _id: "prop_comm_02",
+    title: "Showroom in AB Road",
+    description: "Ground-floor showroom with high visibility. Perfect for retail brands.",
+    price: 9800000,
+    propertyType: "Commercial",
+    address: "Indore – AB Road, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1486325212027-8081e485255e"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-24T09:00:00.000Z",
+    updatedAt: "2026-01-24T11:00:00.000Z",
+    location: { type: "Point", coordinates: [75.85, 22.73] },
+    size: 1400, beds: 0, baths: 1, parking: 2,
+    distanceFromIndore: 3,
+    tags: ["Latest"],
   },
-  landSize: "6 Acres",
-  totalImages: 2,
-  media: {
-    gallery: [
-      "https://picsum.photos/id/1039/1200/800",
-      "https://picsum.photos/id/1043/1200/800",
-      "https://picsum.photos/id/1050/1200/800"
-    ],
-    videoUrl:
-      "https://sample-videos.com/video123/mp4/720/sample_960x400_ocean_with_audio.mp4"
+  {
+    _id: "prop_comm_03",
+    title: "Office Space in Treasure Island",
+    description: "Modern office space with dedicated parking and 24/7 security.",
+    price: 22000000,
+    propertyType: "Commercial",
+    address: "Indore – Treasure Island, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1497366811353-6870744d04b2"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-26T07:00:00.000Z",
+    updatedAt: "2026-01-26T09:00:00.000Z",
+    location: { type: "Point", coordinates: [75.90, 22.71] },
+    size: 3500, beds: 0, baths: 2, parking: 6,
+    distanceFromIndore: 4,
+    tags: ["Premium", "Hot"],
   },
-  owner: {
-    name: "Suresh Yadav",
-    phone: "+91 98260 44556"
-  },
-  agent: {
-    name: "Rahul Sharma",
-    phone: "+91 79998 66778",
-    email: "rahul.sharma@realty.com",
-    address: "Palasia, Indore, MP",
-    image: "https://randomuser.me/api/portraits/men/45.jpg"
-  },
-  highlights: {
-    landType: "Agricultural",
-    waterAvailability: true,
-    electricityAvailable: true,
-    roadAccess: true,
-    soilType: "Medium Black Soil"
-  },
-  aboutProperty:
-    "Located near Mhow, this agricultural land offers excellent connectivity, fertile soil, and year-round water availability, making it ideal for commercial farming."
-},
-{
-  _id: "agri-indore-004",
-  title: "Agricultural Land in Depalpur",
-  description:
-    "Spacious agricultural land with canal water access, ideal for multi-crop farming.",
-  price: 22000000,
-  propertyType: "Agricultural Land",
-  address: "Village Depalpur, Indore, Madhya Pradesh",
-  images: [
-    "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
-    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
-  ],
-  sellerId: null,
-  status: "approved",
-  createdAt: "2026-01-22T06:24:49.160Z",
-  updatedAt: "2026-01-22T08:35:07.170Z",
-  location: {
-    type: "Point",
-    coordinates: [75.53, 22.85]
+  {
+    _id: "prop_comm_04",
+    title: "Retail Shop in Sarafa Bazaar",
+    description: "Prime location retail shop in the heart of Indore's famous jewelry market.",
+    price: 12500000,
+    propertyType: "Commercial",
+    address: "Indore – Sarafa Bazaar, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1441986300917-64674bd600d8"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-27T08:00:00.000Z",
+    updatedAt: "2026-01-27T10:00:00.000Z",
+    location: { type: "Point", coordinates: [75.87, 22.72] },
+    size: 800, beds: 0, baths: 1, parking: 0,
+    distanceFromIndore: 2,
+    tags: ["Hot", "Popular"],
   },
 
-  landSize: "8 Acres",
-  totalImages: 2,
-  media: {
-    gallery: [
+  // ── Flat ──
+  {
+    _id: "prop_flat_01",
+    title: "Cozy 1 BHK Flat in Sudama Nagar",
+    description: "Compact 1 BHK flat, perfect for singles or couples.",
+    price: 2800000,
+    propertyType: "Flat",
+    address: "Indore – Sudama Nagar, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-22T06:24:49.160Z",
+    updatedAt: "2026-01-22T08:35:07.155Z",
+    location: { type: "Point", coordinates: [75.81, 22.76] },
+    size: 620, beds: 1, baths: 1, parking: 1,
+    distanceFromIndore: 6,
+    tags: ["Latest"],
+  },
+  {
+    _id: "prop_flat_02",
+    title: "Spacious 3 BHK in Palasia",
+    description: "Well-furnished 3 BHK flat with balcony and modern kitchen in a gated society.",
+    price: 7200000,
+    propertyType: "Flat",
+    address: "Indore – Palasia, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1556909114-f6e7ad7d3136"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-25T08:00:00.000Z",
+    updatedAt: "2026-01-25T10:00:00.000Z",
+    location: { type: "Point", coordinates: [75.84, 22.77] },
+    size: 1450, beds: 3, baths: 2, parking: 1,
+    distanceFromIndore: 9,
+    tags: ["Popular", "Hot"],
+  },
+  {
+    _id: "prop_flat_03",
+    title: "Luxury 2 BHK in Rajendra Nagar",
+    description: "Modern 2 BHK with premium fittings and community amenities.",
+    price: 4500000,
+    propertyType: "Flat",
+    address: "Indore – Rajendra Nagar, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-26T09:00:00.000Z",
+    updatedAt: "2026-01-26T11:00:00.000Z",
+    location: { type: "Point", coordinates: [75.85, 22.74] },
+    size: 980, beds: 2, baths: 2, parking: 1,
+    distanceFromIndore: 5,
+    tags: ["Premium"],
+  },
+  {
+    _id: "prop_flat_04",
+    title: "4 BHK Penthouse in Bhanwarkuan",
+    description: "Spacious penthouse with terrace garden and skyline views.",
+    price: 9800000,
+    propertyType: "Flat",
+    address: "Indore – Bhanwarkuan, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1545324418-cc1a3fa10c00"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-27T10:00:00.000Z",
+    updatedAt: "2026-01-27T12:00:00.000Z",
+    location: { type: "Point", coordinates: [75.88, 22.73] },
+    size: 2200, beds: 4, baths: 3, parking: 2,
+    distanceFromIndore: 4,
+    tags: ["Premium", "Latest"],
+  },
+  {
+    _id: "prop_flat_05",
+    title: "2 BHK in Nipania",
+    description: "Affordable 2 BHK flat in well-connected area with park view.",
+    price: 3200000,
+    propertyType: "Flat",
+    address: "Indore – Nipania, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1502672260266-1c1ef2d93688"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-28T08:00:00.000Z",
+    updatedAt: "2026-01-28T10:00:00.000Z",
+    location: { type: "Point", coordinates: [75.82, 22.69] },
+    size: 850, beds: 2, baths: 1, parking: 1,
+    distanceFromIndore: 11,
+    tags: ["Latest"],
+  },
+
+  // ── Farmhouse ──
+  {
+    _id: "prop_farm_01",
+    title: "Countryside Farmhouse Near Mhow",
+    description: "Stunning 3 BHK farmhouse on 1.5 acres with lush greenery and open verandas.",
+    price: 22000000,
+    propertyType: "Farmhouse",
+    address: "Mhow – NH-3, Madhya Pradesh",
+    images: [
+      "https://images.unsplash.com/photo-1770090288856-7729ed4294a1?q=80&w=2042&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1501004318641-b39e6451bec6",
-      "https://images.unsplash.com/photo-1464226184884-fa280b87c399",
-      "https://images.unsplash.com/photo-1501785888041-af3ef285b470"
     ],
-    videoUrl: ""
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-26T07:00:00.000Z",
+    updatedAt: "2026-01-26T09:00:00.000Z",
+    location: { type: "Point", coordinates: [75.70, 22.55] },
+    size: 3800, beds: 3, baths: 2, parking: 2,
+    distanceFromIndore: 35,
+    tags: ["Premium", "Hot"],
   },
-  owner: {
-    name: "Narayan Singh",
-    phone: "+91 97533 88990"
+  {
+    _id: "prop_farm_02",
+    title: "Eco Farmhouse in Sanand",
+    description: "Eco-friendly farmhouse with solar panels and organic gardens.",
+    price: 18500000,
+    propertyType: "Farmhouse",
+    address: "Sanand – Near Indore, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1519082572439-7ed19908e47e?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-27T06:00:00.000Z",
+    updatedAt: "2026-01-27T08:00:00.000Z",
+    location: { type: "Point", coordinates: [75.75, 22.60] },
+    size: 2900, beds: 2, baths: 2, parking: 2,
+    distanceFromIndore: 28,
+    tags: ["Latest", "Popular"],
   },
-  agent: {
-    name: "Ankit Jain",
-    phone: "+91 70001 55443",
-    email: "ankit.jain@realty.com",
-    address: "Scheme No. 140, Indore, MP",
-    image: "https://randomuser.me/api/portraits/men/52.jpg"
+  {
+    _id: "prop_farm_03",
+    title: "Heritage Farmhouse in Dewas",
+    description: "Restored heritage farmhouse with traditional architecture and modern amenities.",
+    price: 32000000,
+    propertyType: "Farmhouse",
+    address: "Dewas – Heritage District, Madhya Pradesh",
+    images: ["https://plus.unsplash.com/premium_photo-1674624682232-c9ced5360a2e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-28T07:00:00.000Z",
+    updatedAt: "2026-01-28T09:00:00.000Z",
+    location: { type: "Point", coordinates: [76.05, 22.96] },
+    size: 5200, beds: 4, baths: 3, parking: 3,
+    distanceFromIndore: 42,
+    tags: ["Premium"],
   },
-  highlights: {
-    landType: "Agricultural",
-    waterAvailability: true,
-    electricityAvailable: true,
-    roadAccess: true,
-    soilType: "Deep Black Soil"
-  },
-  aboutProperty:
-    "This farmland in Depalpur is well-connected and benefits from canal irrigation, making it highly productive and suitable for long-term agricultural investment."
-},
-{
-  _id: "agri-indore-005",
-  title: "Agricultural Land near Kanadia Road",
-  description:
-    "Prime agricultural land located near Indore city limits, suitable for vegetables and cash crops.",
-  price: 26000000,
-  propertyType: "Agricultural Land",
-  address: "Kanadia Road Village, Indore, Madhya Pradesh",
-  images: [
-    "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
-    "https://images.unsplash.com/photo-1464226184884-fa280b87c399"
-  ],
-  sellerId: null,
-  status: "approved",
-  createdAt: "2026-01-22T06:24:49.160Z",
-  updatedAt: "2026-01-22T08:35:07.180Z",
-  location: {
-    type: "Point",
-    coordinates: [75.90, 22.68]
+  {
+    _id: "prop_farm_04",
+    title: "Modern Farmhouse in Simrol",
+    description: "Contemporary farmhouse with infinity pool and outdoor entertainment area.",
+    price: 26500000,
+    propertyType: "Farmhouse",
+    address: "Simrol – Indore Road, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1600585154340-be6161a56a0c"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-29T08:00:00.000Z",
+    updatedAt: "2026-01-29T10:00:00.000Z",
+    location: { type: "Point", coordinates: [75.68, 22.68] },
+    size: 4100, beds: 3, baths: 3, parking: 3,
+    distanceFromIndore: 25,
+    tags: ["Hot", "Latest"],
   },
 
-  landSize: "4 Acres",
-  totalImages: 2,
-  media: {
-    gallery: [
-      "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
-      "https://images.unsplash.com/photo-1500534314209-a26db0f5a8a6",
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e"
-    ],
-    videoUrl: "https://sample-videos.com/video123/mp4/720/sample_960x400_ocean_with_audio.mp4"
+    {
+    _id: "prop_farm_05",
+    title: "Modern Farmhouse in Khandwa",
+    description: "Natural farmhouse with exploration of nature and pure air.",
+    price: 10000000,
+    propertyType: "Farmhouse",
+    address: "Khandwa – khadwa Road, Madhya Pradesh",
+    images: ["https://plus.unsplash.com/premium_photo-1733760180239-ef05b25dd5ad?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-29T08:00:00.000Z",
+    updatedAt: "2026-01-29T10:00:00.000Z",
+    location: { type: "Point", coordinates: [75.68, 22.68] },
+    size: 40000, beds: 3, baths: 3, parking: 3,
+    distanceFromIndore: 185,
+    tags: ["Hot", "Latest","Popular"],
   },
-  owner: {
-    name: "Vikram Malviya",
-    phone: "+91 98932 77110"
+  {
+    _id: "prop_farm_07",
+    title: "Luxury Farmhouse with Private Garden",
+    description: "A beautifully designed farmhouse surrounded by greenery, offering a peaceful lifestyle away from the city. Perfect for weekend stays, family gatherings, and nature lovers.",
+    price: 6500000,
+    propertyType: "Farmhouse",
+    address: "Near Mandideep Industrial Area, Hoshangabad Road, Bhopal, Madhya Pradesh – 462046",
+    images: ["https://images.unsplash.com/photo-1534073133331-c4b62a557083?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-29T08:00:00.000Z",
+    updatedAt: "2026-01-29T10:00:00.000Z",
+    location: { type: "Point", coordinates: [75.68, 22.68] },
+    size: 40000, beds: 3, baths: 3, parking: 3,
+    distanceFromIndore: 185,
+    tags: ["Premium"],
   },
-  agent: {
-    name: "Pooja Mehta",
-    phone: "+91 79990 22334",
-    email: "pooja.mehta@realty.com",
-    address: "Bhawarkua, Indore, MP",
-    image: "https://randomuser.me/api/portraits/women/65.jpg"
-  },
-  highlights: {
-    landType: "Agricultural",
-    waterAvailability: true,
-    electricityAvailable: true,
-    roadAccess: true,
-    soilType: "Loamy Black Soil"
-  },
-  aboutProperty:
-    "Located close to Kanadia Road, this land offers easy city access while maintaining high agricultural value. Ideal for vegetable farming and polyhouse development."
-},
-{
-  _id: "agri-indore-006",
-  title: "Agricultural Land in Rau",
-  description:
-    "Well-connected agricultural land near Rau with fertile soil and reliable irrigation facilities.",
-  price: 24000000,
-  propertyType: "Agricultural Land",
-  address: "Village Rau, Indore, Madhya Pradesh",
-  images: [
-    "https://images.unsplash.com/photo-1500382017468-9049fed747ef",
-    "https://images.unsplash.com/photo-1501004318641-b39e6451bec6"
-  ],
-  sellerId: null,
-  status: "approved",
-  createdAt: "2026-01-22T06:24:49.160Z",
-  updatedAt: "2026-01-22T08:35:07.190Z",
-  location: {
-    type: "Point",
-    coordinates: [75.83, 22.63]
-  },
-
-  landSize: "5.5 Acres",
-  totalImages: 2,
-  media: {
-    gallery: [
-      "https://images.unsplash.com/photo-1500382017468-9049fed747ef",
-      "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e"
-    ],
-    videoUrl: ""
-  },
-  owner: {
-    name: "Kailash Patidar",
-    phone: "+91 98267 55421"
-  },
-  agent: {
-    name: "Sonal Rathore",
-    phone: "+91 79991 66778",
-    email: "sonal.rathore@realty.com",
-    address: "Rajendra Nagar, Indore, MP",
-    image: "https://randomuser.me/api/portraits/women/48.jpg"
-  },
-  highlights: {
-    landType: "Agricultural",
-    waterAvailability: true,
-    electricityAvailable: true,
-    roadAccess: true,
-    soilType: "Black Alluvial Soil"
-  },
-  aboutProperty:
-    "This agricultural land in Rau offers excellent connectivity to Indore city along with fertile soil and strong irrigation support, making it ideal for high-yield farming."
-},
-{
-  _id: "agri-indore-007",
-  title: "Agricultural Land in Betma",
-  description:
-    "Productive agricultural land with open surroundings, suitable for soybean and gram cultivation.",
-  price: 19500000,
-  propertyType: "Agricultural Land",
-  address: "Village Betma, Indore, Madhya Pradesh",
-  images: [
-    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-    "https://images.unsplash.com/photo-1501785888041-af3ef285b470"
-  ],
-  sellerId: null,
-  status: "approved",
-  createdAt: "2026-01-22T06:24:49.160Z",
-  updatedAt: "2026-01-22T08:35:07.200Z",
-  location: {
-    type: "Point",
-    coordinates: [75.61, 22.73]
+   {
+    _id: "prop_farm_08",
+    title: "Serene Farmhouse Near Highway",
+    description: "Spacious farmhouse located close to the main highway with easy access to the city. Features open lawns, ample parking, and a calm environment for relaxation.",
+    price: 4500000,
+    propertyType: "Farmhouse",
+    address: "Village Sehore Road, NH-46, Sehore, Madhya Pradesh – 466001",
+    images: ["https://plus.unsplash.com/premium_photo-1685133855379-711aa008f7ba?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-29T08:00:00.000Z",
+    updatedAt: "2026-01-29T10:00:00.000Z",
+    location: { type: "Point", coordinates: [75.68, 22.68] },
+    size: 39000, beds: 3, baths: 3, parking: 3,
+    distanceFromIndore: 185,
+    tags: ["Premium"],
   },
 
-  landSize: "6.5 Acres",
-  totalImages: 2,
-  media: {
-    gallery: [
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-      "https://images.unsplash.com/photo-1464226184884-fa280b87c399",
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e"
-    ],
-    videoUrl: ""
+  // ── Agriculture Land  ← size is in ACRES here ──
+  {
+    _id: "prop_agri_01",
+    title: "Fertile Land Near Ujjain Road",
+    description: "Rich black-soil plot ideal for wheat and soybean. Bore-well available.",
+    price: 12000000,
+    propertyType: "Agriculture Land",
+    address: "Indore – Ujjain Road, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1591389703635-e15a07b842d7?q=80&w=1933&auto=format&fit=crop"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-28T05:00:00.000Z",
+    updatedAt: "2026-01-28T07:00:00.000Z",
+    location: { type: "Point", coordinates: [75.78, 22.82] },
+    size: 50, beds: 0, baths: 0, parking: 0,
+    distanceFromIndore: 22,
+    tags: ["Popular"],
   },
-  owner: {
-    name: "Govind Patidar",
-    phone: "+91 98262 99887"
+  {
+    _id: "prop_agri_02",
+    title: "Premium Agri Plot in Dhar",
+    description: "Large irrigated plot with road access and electricity.",
+    price: 8500000,
+    propertyType: "Agriculture Land",
+    address: "Dhar – Near NH-3, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1587745890135-20db8c79b027?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-29T04:00:00.000Z",
+    updatedAt: "2026-01-29T06:00:00.000Z",
+    location: { type: "Point", coordinates: [75.30, 22.60] },
+    size: 31.5, beds: 0, baths: 0, parking: 0,
+    distanceFromIndore: 55,
+    tags: ["Hot", "Latest"],
   },
-  agent: {
-    name: "Deepak Chauhan",
-    phone: "+91 79993 44556",
-    email: "deepak.chauhan@realty.com",
-    address: "Sudama Nagar, Indore, MP",
-    image: "https://randomuser.me/api/portraits/men/61.jpg"
+  {
+    _id: "prop_agri_03",
+    title: "Small Farm Near Betul",
+    description: "Compact plot surrounded by forests. Great for organic farming.",
+    price: 4200000,
+    propertyType: "Agriculture Land",
+    address: "Betul – Forest Edge, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1563514227147-6d2ff665a6a0?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-30T03:00:00.000Z",
+    updatedAt: "2026-01-30T05:00:00.000Z",
+    location: { type: "Point", coordinates: [77.90, 21.70] },
+    size: 5, beds: 0, baths: 0, parking: 0,
+    distanceFromIndore: 90,
+    tags: ["Latest","Hot"],
   },
-  highlights: {
-    landType: "Agricultural",
-    waterAvailability: true,
-    electricityAvailable: false,
-    roadAccess: true,
-    soilType: "Medium Black Soil"
+  {
+    _id: "prop_agri_04",
+    title: "Large Agricultural Plot in Khargone",
+    description: "Expansive 10-acre land with canal irrigation and farm equipment shed.",
+    price: 25000000,
+    propertyType: "Agriculture Land",
+    address: "Khargone – Main Road, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1625246333195-78d9c38ad449"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-31T04:00:00.000Z",
+    updatedAt: "2026-01-31T06:00:00.000Z",
+    location: { type: "Point", coordinates: [75.61, 21.82] },
+    size: 10, beds: 0, baths: 0, parking: 0,
+    distanceFromIndore: 85,
+    tags: ["Premium", "Popular"],
   },
-  aboutProperty:
-    "Located in Betma village, this agricultural land offers fertile soil and peaceful surroundings, making it ideal for traditional and commercial farming."
-},
-{
-  _id: "agri-indore-008",
-  title: "Agricultural Land near Pithampur",
-  description:
-    "Large agricultural land parcel near Pithampur with strong soil quality and irrigation access.",
-  price: 30000000,
-  propertyType: "Agricultural Land",
-  address: "Village near Pithampur, Indore, Madhya Pradesh",
-  images: [
-    "https://images.unsplash.com/photo-1500382017468-9049fed747ef",
-    "https://images.unsplash.com/photo-1501004318641-b39e6451bec6"
-  ],
-  sellerId: null,
-  status: "approved",
-  createdAt: "2026-01-22T06:24:49.160Z",
-  updatedAt: "2026-01-22T08:35:07.210Z",
-  location: {
-    type: "Point",
-    coordinates: [75.70, 22.62]
+  {
+    _id: "prop_agri_05",
+    title: "Mango Orchard in Pithampur",
+    description: "7-acre established mango orchard with regular income and farmhouse.",
+    price: 18000000,
+    propertyType: "Agriculture Land",
+    address: "Pithampur – Industrial Area, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1464226184884-fa280b87c399"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-01T05:00:00.000Z",
+    updatedAt: "2026-02-01T07:00:00.000Z",
+    location: { type: "Point", coordinates: [75.69, 22.60] },
+    size: 70, beds: 0, baths: 0, parking: 0,
+    distanceFromIndore: 32,
+    tags: ["Hot", "Premium"],
   },
-
-  landSize: "10 Acres",
-  totalImages: 2,
-  media: {
-    gallery: [
-      "https://images.unsplash.com/photo-1500382017468-9049fed747ef",
-      "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e"
-    ],
-    videoUrl: "https://sample-videos.com/video123/mp4/720/sample_960x400_ocean_with_audio.mp4"
+  {
+    _id: "prop_agri_06",
+    title: "Riverfront Agricultural Land",
+    description: "Beautiful 4-acre plot along river with year-round water availability.",
+    price: 15500000,
+    propertyType: "Agriculture Land",
+    address: "Rau – Riverfront, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1500382017468-9049fed747ef"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-02T04:00:00.000Z",
+    updatedAt: "2026-02-02T06:00:00.000Z",
+    location: { type: "Point", coordinates: [75.72, 22.65] },
+    size: 56, beds: 0, baths: 0, parking: 0,
+    distanceFromIndore: 18,
+    tags: ["Popular", "Latest"],
   },
-  owner: {
-    name: "Prakash Solanki",
-    phone: "+91 98930 11223"
+  {
+    _id: "prop_agri_07",
+    title: "Open Agricultural Land with Road Access",
+    description: "Fully cultivable land with clear boundaries and good soil texture. Ideal for growing wheat, soybean, and pulses.",
+    price: 800000,
+    propertyType: "Agriculture Land",
+    address: "Village Sultanpur, Vidisha Road, Vidisha District, Madhya Pradesh – 464001",
+    images: ["https://images.unsplash.com/photo-1497094249532-36ecba33f9ff?q=80&w=2074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-02T04:00:00.000Z",
+    updatedAt: "2026-02-02T06:00:00.000Z",
+    location: { type: "Point", coordinates: [75.72, 22.65] },
+    size: 37, beds: 0, baths: 0, parking: 0,
+    distanceFromIndore: 18,
+    tags: ["Popular", "Premium"],
   },
-  agent: {
-    name: "Ritu Agarwal",
-    phone: "+91 79992 77889",
-    email: "ritu.agarwal@realty.com",
-    address: "Sapna Sangeeta, Indore, MP",
-    image: "https://randomuser.me/api/portraits/women/57.jpg"
-  },
-  highlights: {
-    landType: "Agricultural",
-    waterAvailability: true,
-    electricityAvailable: true,
-    roadAccess: true,
-    soilType: "Deep Black Soil"
-  },
-  aboutProperty:
-    "Situated close to Pithampur industrial area, this agricultural land offers excellent long-term value with high soil fertility and water resources."
-},
-{
-  _id: "agri-indore-009",
-  title: "Agricultural Land in Simrol",
-  description:
-    "Scenic agricultural land surrounded by hills, ideal for organic and horticulture farming.",
-  price: 17000000,
-  propertyType: "Agricultural Land",
-  address: "Village Simrol, Indore, Madhya Pradesh",
-  images: [
-    "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-    "https://images.unsplash.com/photo-1501785888041-af3ef285b470"
-  ],
-  sellerId: null,
-  status: "approved",
-  createdAt: "2026-01-22T06:24:49.160Z",
-  updatedAt: "2026-01-22T08:35:07.220Z",
-  location: {
-    type: "Point",
-    coordinates: [75.92, 22.52]
-  },
-
-  landSize: "7 Acres",
-  totalImages: 2,
-  media: {
-    gallery: [
-      "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-      "https://images.unsplash.com/photo-1464226184884-fa280b87c399",
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e"
-    ],
-    videoUrl: ""
-  },
-  owner: {
-    name: "Arjun Pawar",
-    phone: "+91 99770 55667"
-  },
-  agent: {
-    name: "Neha Kulkarni",
-    phone: "+91 79995 33445",
-    email: "neha.kulkarni@realty.com",
-    address: "Bicholi Mardana, Indore, MP",
-    image: "https://randomuser.me/api/portraits/women/41.jpg"
-  },
-  highlights: {
-    landType: "Agricultural",
-    waterAvailability: true,
-    electricityAvailable: false,
-    roadAccess: true,
-    soilType: "Red-Black Mixed Soil"
-  },
-  aboutProperty:
-    "Located in the scenic Simrol region, this land is perfect for organic farming, floriculture, and long-term agricultural investment."
-},
-{
-  _id: "agri-indore-010",
-  title: "Agricultural Land in Tillor Khurd",
-  description:
-    "Premium agricultural land with excellent connectivity, suitable for high-value crops and farmhouses.",
-  price: 28000000,
-  propertyType: "Agricultural Land",
-  address: "Village Tillor Khurd, Indore, Madhya Pradesh",
-  images: [
-    "https://images.unsplash.com/photo-1500382017468-9049fed747ef",
-    "https://images.unsplash.com/photo-1501004318641-b39e6451bec6"
-  ],
-  sellerId: null,
-  status: "approved",
-  createdAt: "2026-01-22T06:24:49.160Z",
-  updatedAt: "2026-01-22T08:35:07.230Z",
-  location: {
-    type: "Point",
-    coordinates: [75.88, 22.66]
+   {
+    _id: "prop_agri_08",
+    title: "Cultivable Agricultural Land for Sale",
+    description: "Spacious agricultural land with direct road access, making movement of machinery and produce easy. Suitable for farming and land banking.",
+    price: 12700000,
+    propertyType: "Agriculture Land",
+    address: "Village Ichhawar, Ichhawar Tehsil, Sehore District, Madhya Pradesh – 466115",
+    images: ["https://images.unsplash.com/photo-1609226511778-60c277756b6e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-02T04:00:00.000Z",
+    updatedAt: "2026-02-02T06:00:00.000Z",
+    location: { type: "Point", coordinates: [75.72, 22.65] },
+    size: 78, beds: 0, baths: 0, parking: 0,
+    distanceFromIndore: 18,
+    tags: ["Hot"],
   },
 
-  landSize: "6 Acres",
-  totalImages: 2,
-  media: {
-    gallery: [
-      "https://images.unsplash.com/photo-1500382017468-9049fed747ef",
-      "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e"
+  // ── Resort ──
+  {
+    _id: "prop_resort_01",
+    title: "Lakeside Resort in Panna",
+    description: "Luxury 4-BHK resort-style property overlooking a private lake.",
+    price: 42000000,
+    propertyType: "Resort",
+    address: "Panna – Lakeside, Madhya Pradesh",
+    images: [
+      "https://images.unsplash.com/photo-1744307679140-f4abf4a9bd01?q=80&w=2073&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05",
     ],
-    videoUrl: ""
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-01-31T02:00:00.000Z",
+    updatedAt: "2026-01-31T04:00:00.000Z",
+    location: { type: "Point", coordinates: [79.87, 24.72] },
+    size: 8500, beds: 4, baths: 3, parking: 4,
+    distanceFromIndore: 120,
+    tags: ["Premium", "Popular"],
   },
-  owner: {
-    name: "Rajesh Tomar",
-    phone: "+91 98266 77889"
+  {
+    _id: "prop_resort_02",
+    title: "Hill-Top Resort in Pachmarhi",
+    description: "Serene hill-top property with panoramic views and 3 guest suites.",
+    price: 31000000,
+    propertyType: "Resort",
+    address: "Pachmarhi – Hill Station, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1763446365381-af606c46d1af?q=80&w=1975&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-01T01:00:00.000Z",
+    updatedAt: "2026-02-01T03:00:00.000Z",
+    location: { type: "Point", coordinates: [78.43, 22.70] },
+    size: 6800, beds: 3, baths: 3, parking: 3,
+    distanceFromIndore: 95,
+    tags: ["Hot"],
   },
-  agent: {
-    name: "Manish Gupta",
-    phone: "+91 79997 55667",
-    email: "manish.gupta@realty.com",
-    address: "LIG Square, Indore, MP",
-    image: "https://randomuser.me/api/portraits/men/58.jpg"
+  {
+    _id: "prop_resort_03",
+    title: "Boutique Resort in Maheshwar",
+    description: "Heritage resort with river view and 8 luxury rooms for boutique hospitality.",
+    price: 55000000,
+    propertyType: "Resort",
+    address: "Maheshwar – Narmada Ghat, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-02T02:00:00.000Z",
+    updatedAt: "2026-02-02T04:00:00.000Z",
+    location: { type: "Point", coordinates: [75.59, 22.17] },
+    size: 12000, beds: 8, baths: 8, parking: 10,
+    distanceFromIndore: 91,
+    tags: ["Premium", "Hot"],
   },
-  highlights: {
-    landType: "Agricultural",
-    waterAvailability: true,
-    electricityAvailable: true,
-    roadAccess: true,
-    soilType: "Rich Black Soil"
+  {
+    _id: "prop_resort_04",
+    title: " Resort in Mandleshwar",
+    description: "Heritage resort with river view and 8 luxury rooms for boutique hospitality.",
+    price: 58000000,
+    propertyType: "Resort",
+    address: "Mandleshwar –  Near fort, Madhya Pradesh",
+    images: ["https://plus.unsplash.com/premium_photo-1687960116497-0dc41e1808a2?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-02T02:00:00.000Z",
+    updatedAt: "2026-02-02T04:00:00.000Z",
+    location: { type: "Point", coordinates: [75.59, 22.17] },
+    size: 78000, beds: 8, baths: 8, parking: 10,
+    distanceFromIndore: 91,
+    tags: ["Premium", "Hot"],
   },
-  aboutProperty:
-    "Situated in Tillor Khurd, this land offers premium location advantages near Indore, making it suitable for high-yield farming as well as farmhouse development."
+  {
+    _id: "prop_resort_05",
+    title: " Resort in Mandleshwar",
+    description: "Heritage resort with river view and 8 luxury rooms for boutique hospitality.",
+    price: 6000000,
+    propertyType: "Resort",
+    address: "Mandleshwar –  Near fort, Madhya Pradesh",
+    images: ["https://plus.unsplash.com/premium_photo-1682913629540-3857602b540c?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-02T02:00:00.000Z",
+    updatedAt: "2026-02-02T04:00:00.000Z",
+    location: { type: "Point", coordinates: [75.59, 22.17] },
+    size: 15000, beds: 8, baths: 8, parking: 10,
+    distanceFromIndore: 91,
+    tags: ["Premium", "Hot"],
+  },
+  {
+    _id: "prop_resort_06",
+    title: " Green Valley Luxury Resort",
+    description: "A premium resort surrounded by lush greenery, offering spacious rooms, a swimming pool, and modern amenities. Ideal for family vacations, destination weddings, and corporate retreats.",
+    price: 8000000,
+    propertyType: "Resort",
+    address: "Near Kerwa Dam Road, Kaliasot Area, Bhopal, Madhya Pradesh – 462038",
+    images: ["https://plus.unsplash.com/premium_photo-1682285212027-6af0d0f70e07?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-02T02:00:00.000Z",
+    updatedAt: "2026-02-02T04:00:00.000Z",
+    location: { type: "Point", coordinates: [75.59, 22.17] },
+    size: 15000, beds: 8, baths: 8, parking: 10,
+    distanceFromIndore: 91,
+    tags: ["Premium", "Hot"],
+  },
+  {
+    _id: "prop_resort_07",
+    title: " Royal Heritage Resort",
+    description: "A heritage-style resort with royal architecture, modern interiors, and premium hospitality services. Suitable for weddings, cultural events, and luxury stays.",
+    price: 89000000,
+    propertyType: "Resort",
+    address: "Village Bhojpur Road, Raisen District, Madhya Pradesh – 464551",
+    images: ["https://plus.unsplash.com/premium_photo-1733342441106-96a5e23b2c9f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-02T02:00:00.000Z",
+    updatedAt: "2026-02-02T04:00:00.000Z",
+    location: { type: "Point", coordinates: [75.59, 22.17] },
+    size: 32000, beds: 8, baths: 8, parking: 10,
+    distanceFromIndore: 91,
+    tags: ["Premium", "Hot"],
+  },
+  {
+    _id: "prop_resort_08",
+    title: "Palm Grove Weekend Resort",
+    description: "A modern weekend resort with landscaped gardens, a poolside restaurant, and indoor-outdoor recreational facilities. Suitable for short stays and celebrations.",
+    price: 65000000,
+    propertyType: "Resort",
+    address: "Indore–Ujjain Highway, Near Manglia Toll Plaza, Indore District, Madhya Pradesh – 453771",
+    images: ["https://plus.unsplash.com/premium_photo-1681922761648-d5e2c3972982?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-02T02:00:00.000Z",
+    updatedAt: "2026-02-02T04:00:00.000Z",
+    location: { type: "Point", coordinates: [75.59, 22.17] },
+    size: 16000, beds: 8, baths: 8, parking: 10,
+    distanceFromIndore: 91,
+    tags: ["Premium", "Hot"],
+  },
+
+  // ── Rent Farmhouse ──
+  {
+    _id: "prop_rentfarm_01",
+    title: "Rent – Weekend Farmhouse in Mhow",
+    description: "Fully furnished farmhouse for short or long stays. Pool included.",
+    price: 45000,
+    propertyType: "Rent Farmhouse",
+    address: "Mhow – Countryside, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1761591672163-abaa765eb459?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-01T00:00:00.000Z",
+    updatedAt: "2026-02-01T02:00:00.000Z",
+    location: { type: "Point", coordinates: [75.72, 22.53] },
+    size: 2200, beds: 2, baths: 2, parking: 2,
+    distanceFromIndore: 30,
+    tags: ["Popular", "Latest"],
+  },
+  {
+    _id: "prop_rentfarm_02",
+    title: "Rent – Luxury Farmhouse in Sanand",
+    description: "Premium rental with 4 bedrooms, modular kitchen, private orchard.",
+    price: 75000,
+    propertyType: "Rent Farmhouse",
+    address: "Sanand – Lush Valley, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?q=80&w=1935&auto=format&fit=crop"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-02T00:00:00.000Z",
+    updatedAt: "2026-02-02T02:00:00.000Z",
+    location: { type: "Point", coordinates: [75.76, 22.62] },
+    size: 3600, beds: 4, baths: 3, parking: 3,
+    distanceFromIndore: 26,
+    tags: ["Premium"],
+  },
+  {
+    _id: "prop_rentfarm_03",
+    title: "Rent – Budget Farmhouse in Rau",
+    description: "Affordable farmhouse rental with basic amenities and large garden space.",
+    price: 25000,
+    propertyType: "Rent Farmhouse",
+    address: "Rau – Village Road, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-03T00:00:00.000Z",
+    updatedAt: "2026-02-03T02:00:00.000Z",
+    location: { type: "Point", coordinates: [75.73, 22.66] },
+    size: 1800, beds: 2, baths: 1, parking: 2,
+    distanceFromIndore: 20,
+    tags: ["Latest"],
+  },
+  {
+    _id: "prop_rentfarm_04",
+    title: "Rent – Party Farmhouse in Simrol",
+    description: "Large event-ready farmhouse with DJ setup, swimming pool, and seating for 100.",
+    price: 95000,
+    propertyType: "Rent Farmhouse",
+    address: "Simrol – Event Zone, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1600585154526-990dced4db0d"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-04T00:00:00.000Z",
+    updatedAt: "2026-02-04T02:00:00.000Z",
+    location: { type: "Point", coordinates: [75.69, 22.67] },
+    size: 5000, beds: 3, baths: 4, parking: 15,
+    distanceFromIndore: 24,
+    tags: ["Premium", "Hot"],
+  },
+  {
+    _id: "prop_rentfarm_05",
+    title: "Rent – Whispering Palms Staycation",
+    description: "A quiet staycation resort with palm-lined pathways, pool area, and comfortable rooms, ideal for private parties and weekend escapes.",
+    price: 48000,
+    propertyType: "Rent Farmhouse",
+    address: "Near Kolar Road Extension, Bhopal, Madhya Pradesh – 462042",
+    images: ["https://images.unsplash.com/photo-1529316275402-0462fcc4abd6?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-04T00:00:00.000Z",
+    updatedAt: "2026-02-04T02:00:00.000Z",
+    location: { type: "Point", coordinates: [75.69, 22.67] },
+    size: 19500, beds: 3, baths: 4, parking: 15,
+    distanceFromIndore: 24,
+    tags: ["Premium", "Latest"],
+  },
+  {
+    _id: "prop_rentfarm_06",
+    title: "Rent – Silver Fern Retreat",
+    description: "A calm and elegant resort designed for private stays and celebrations, featuring open lawns, poolside seating, and premium rooms.",
+    price: 42000,
+    propertyType: "Rent Farmhouse",
+    address: "Simrol – Event Zone, Madhya Pradesh",
+    images: ["https://images.unsplash.com/photo-1693933714044-131908e39427?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-04T00:00:00.000Z",
+    updatedAt: "2026-02-04T02:00:00.000Z",
+    location: { type: "Point", coordinates: [75.69, 22.67] },
+    size: 16800, beds: 3, baths: 4, parking: 15,
+    distanceFromIndore: 24,
+    tags: ["Popular"],
+  },
+    {
+    _id: "prop_rentfarm_07",
+    title: "Rent – Amber Woods Resortt",
+    description: "Lake-facing resort offering peaceful views, luxury cottages, and open gathering areas. Perfect for retreats and small destination weddings.",
+    price: 65000,
+    propertyType: "Rent Farmhouse",
+    address: "Near Upper Lake, Van Vihar Road, Bhopal, Madhya Pradesh – 462002",
+    images: ["https://images.unsplash.com/photo-1601701119533-fde20cecbf4e?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-04T00:00:00.000Z",
+    updatedAt: "2026-02-04T02:00:00.000Z",
+    location: { type: "Point", coordinates: [75.69, 22.67] },
+    size: 26800, beds: 3, baths: 4, parking: 15,
+    distanceFromIndore: 24,
+    tags: ["Popular"],
+  },
+   {
+    _id: "prop_rentfarm_08",
+    title: "Rent – Crimson Court Event Resort",
+    description: "A premium event-focused resort with banquet lawns and elegant architecture, suitable for weddings, receptions, and large celebrations.",
+    price: 90000,
+    propertyType: "Rent Farmhouse",
+    address: "Sehore–Ashta Road, Sehore District, Madhya Pradesh – 466001",
+    images: ["https://images.unsplash.com/photo-1561501900-3701fa6a0864?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"],
+    sellerId: null,
+    status: "approved",
+    createdAt: "2026-02-04T00:00:00.000Z",
+    updatedAt: "2026-02-04T02:00:00.000Z",
+    location: { type: "Point", coordinates: [75.69, 22.67] },
+    size: 38000, beds: 3, baths: 4, parking: 15,
+    distanceFromIndore: 24,
+    tags: ["Hot","Latest"],
+  },
+
+];
+// Helper: grab only the types you need
+export function getByType(...types: string[]) {
+  return properties.filter((p) => types.includes(p.propertyType));
 }
-
-
-
-
-
-]
