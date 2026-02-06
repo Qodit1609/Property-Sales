@@ -66,10 +66,9 @@ const Header: React.FC = () => {
       <header className="fixed top-0 left-0 z-50 w-full flex justify-center">
         <div className="w-[94%] max-w-[1320px] header-bg shadow-lg rounded-b-2xl px-4 sm:px-6 md:px-10">
           <div className="flex h-[72px] items-center justify-between">
-            <div className="flex items-center gap-2 text-fg font-bold text-lg sm:text-xl">
-              <span className="text-2xl text-brand">P</span>
-              <span>PropDown</span>
-            </div>
+          <Link to="/" className="flex items-center gap-2 font-bold text-lg sm:text-xl text-fg">
+              <span className="text-[var(--b2)]">B</span>hoomi Wala
+          </Link>
 
             <HeaderNav items={NAV_ITEMS} />
 

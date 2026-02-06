@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import PropertyCard from "./PropertyCard";
-import { properties } from "./Properties";
+import PropertyCard from "../Crads/PropertyCard";
+import { properties } from "../Data/properties";
 
 const PropertySection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -27,13 +27,13 @@ const PropertySection = () => {
   }, [showAll]);
 
   return (
-    <section className="w-full bg-[#FFFBE6] pt-16 sm:pt-20">
+    <section className="w-full bg-[var(--b2-soft)] pt-16 sm:pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-6">
-          <p className="text-sm text-[#347928]">
+          <p className="text-sm text-[var(--b1-mid)] font-sans">
             Featured Property
           </p>
-          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[var(--b1)] font-serif">
             Recommended Properties for You
           </h2>
         </div>
@@ -44,10 +44,7 @@ const PropertySection = () => {
             className="flex items-start gap-6 overflow-x-auto no-scrollbar"
           >
             {properties.map((item) => (
-              <div
-                key={item.id}
-                className="w-[340px] flex-shrink-0"
-              >
+              <div key={item._id} className="w-[340px] flex-shrink-0">
                 <PropertyCard property={item} />
               </div>
             ))}
@@ -55,7 +52,7 @@ const PropertySection = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {properties.map((item) => (
-              <PropertyCard key={item.id} property={item} />
+              <PropertyCard key={item._id} property={item} />
             ))}
           </div>
         )}
@@ -64,14 +61,30 @@ const PropertySection = () => {
           {!showAll ? (
             <button
               onClick={() => setShowAll(true)}
-              className="bg-[#FCCD2A] text-[#347928] font-semibold px-6 py-3 rounded-lg w-full sm:w-auto hover:brightness-95 transition"
+              className="
+                bg-[var(--b2)]
+                text-[var(--b1)]
+                font-semibold font-sans
+                px-6 py-3 rounded-lg
+                w-full sm:w-auto
+                hover:bg-[var(--b1-mid)] hover:text-[var(--fg)]
+                transition
+              "
             >
               Show all Property
             </button>
           ) : (
             <button
               onClick={() => setShowAll(false)}
-              className="bg-[#C0EBA6] text-[#347928] font-semibold px-6 py-3 rounded-lg w-full sm:w-auto hover:brightness-95 transition"
+              className="
+                bg-[var(--b2-soft)]
+                text-[var(--b1)]
+                font-semibold font-sans
+                px-6 py-3 rounded-lg
+                w-full sm:w-auto
+                hover:bg-[var(--b1-mid)] hover:text-[var(--fg)]
+                transition
+              "
             >
               ✕ Close
             </button>
