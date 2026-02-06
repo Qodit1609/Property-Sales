@@ -159,9 +159,9 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           onChange={(e) => setMaxPrice(Number(e.target.value))}
           className="w-full accent-[var(--b2)]"
         />
-        <div className="flex justify-between text-xs mb-4">
+        <div className="flex justify-between text-xs text-[var(--b2)] mb-4">
           <span>1 Lac</span>
-          <span className="font-semibold text-[var(--b2)]">
+          <span className="font-semibold">
             {formatPrice(maxPrice)}
           </span>
           <span>100 Cr</span>
@@ -177,7 +177,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           onChange={(e) => setDistance(Number(e.target.value))}
           className="w-full accent-[var(--b2)]"
         />
-        <div className="flex justify-between text-sm mb-4">
+        <div className="flex justify-between text-sm text-[var(--b2)] mb-4">
           <span>0</span>
           <span className="font-semibold">{distance} km</span>
           <span>200</span>
@@ -193,7 +193,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           onChange={(e) => setSize(Number(e.target.value))}
           className="w-full accent-[var(--b2)]"
         />
-        <div className="flex justify-between text-sm mb-5">
+        <div className="flex justify-between text-sm text-[var(--b2)] mb-5">
           <span>0</span>
           <span className="font-semibold">
             {size.toLocaleString()} {sizeUnit}
@@ -202,7 +202,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
         </div>
 
         <p className={`${titleClass} mb-2`}>TAGS</p>
-        <div className="grid grid-cols-2 gap-2 mb-5">
+        <div className="grid grid-cols-2 gap-2 mb-5 text-[var(--b2)]">
           {["Hot", "Popular", "Latest", "Premium"].map((tag) => (
             <label key={tag} className="flex items-center gap-2 text-sm">
               <input
