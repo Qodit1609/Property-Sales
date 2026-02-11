@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import NavbarHeaderImage from "../../components/NavbarHeaderImage/NavbarHeaderImage";
 import PropertyFilterCard from "../../components/Propertycard/PropertyFilterCard";
-import type { Property } from "../../components/Data/properties";
+import type { Property } from "../../features/properties/propertyType";
 
 interface PropertyLayoutProps {
   allProperties: Property[];                          // full list for this page

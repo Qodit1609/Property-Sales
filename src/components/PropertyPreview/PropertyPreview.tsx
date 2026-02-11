@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { properties } from "../Data/properties";
+import { useNavigate } from "react-router-dom";
+import type { Property } from "../../features/properties/propertyType";
 
 type MediaType = "gallery" | "map" | "video";
 
-const PropertyPreview = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
+type Props = {
+  property: Property;
+};
 
-  const property = properties.find(p => p._id === id);
+const PropertyPreview = ({ property }: Props) => {
+  const navigate = useNavigate();
 
   const [activeMedia, setActiveMedia] = useState<MediaType>("gallery");
   const [currentImage, setCurrentImage] = useState(0);
@@ -16,6 +17,13 @@ const PropertyPreview = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
+
+  // Backend me images array aa raha hai
+  const gallery = property.images ?? [];
+
+  const googleMapEmbed = `https://www.google.com/maps?&q=${encodeURIComponent(
+    property.address
+  )}&z=15&output=embed`;
 
   if (!property) {
     return (
@@ -32,13 +40,6 @@ const PropertyPreview = () => {
       </div>
     );
   }
-
-  const gallery = property.media?.gallery ?? [];
-  const hasVideo = Boolean(property.media?.videoUrl);
-
-  const googleMapEmbed = `https://www.google.com/maps?&q=${encodeURIComponent(
-    property.address
-  )}&z=15&output=embed`;
 
   return (
     <div className="pt-20 sm:pt-24 bg-[var(--fg)]">
@@ -59,7 +60,7 @@ const PropertyPreview = () => {
                 <>
                   <button
                     onClick={() =>
-                      setCurrentImage(i =>
+                      setCurrentImage((i) =>
                         i === 0 ? gallery.length - 1 : i - 1
                       )
                     }
@@ -69,7 +70,7 @@ const PropertyPreview = () => {
                   </button>
                   <button
                     onClick={() =>
-                      setCurrentImage(i => (i + 1) % gallery.length)
+                      setCurrentImage((i) => (i + 1) % gallery.length)
                     }
                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-[var(--b2-soft)]/90 px-3 py-1 rounded-full text-sm"
                   >
@@ -88,14 +89,6 @@ const PropertyPreview = () => {
             />
           )}
 
-          {activeMedia === "video" && hasVideo && (
-            <video
-              src={property.media!.videoUrl}
-              controls
-              className="h-full w-full object-cover"
-            />
-          )}
-
           {/* Media Switcher */}
           <div className="absolute bottom-3 left-0 right-0 flex justify-center">
             <div className="flex gap-1 bg-[var(--b2-soft)]/90 p-1.5 rounded-full">
@@ -111,13 +104,6 @@ const PropertyPreview = () => {
                 active={activeMedia === "map"}
                 onClick={() => setActiveMedia("map")}
               />
-              {hasVideo && (
-                <MediaButton
-                  label="Video"
-                  active={activeMedia === "video"}
-                  onClick={() => setActiveMedia("video")}
-                />
-              )}
             </div>
           </div>
         </div>
@@ -139,71 +125,13 @@ const PropertyPreview = () => {
               ₹ {property.price.toLocaleString("en-IN")}
             </p>
 
-            {property.landSize && (
+            {property.size && (
               <p className="text-sm">
-                <span className="font-medium">Land size:</span>{" "}
-                {property.landSize}
+                <span className="font-medium">Size:</span> {property.size}
               </p>
             )}
           </div>
 
-          {/* Agent */}
-          {property.agent && (() => {
-            const agent = property.agent;
-
-            return (
-              <div className="bg-[var(--b2-soft)] text-[var(--b1)] rounded-xl p-5">
-                <h3 className="text-sm font-semibold mb-4">
-                  Contact agent
-                </h3>
-
-                <div className="flex items-start gap-4">
-                  <img
-                src={property.agent.image}
-                alt={property.agent.name}
-                className="h-14 w-14 rounded-full object-cover"
-              />
-
-
-                  <div className="space-y-1">
-                    <p className="text-base font-semibold">{agent.name}</p>
-                    <p className="text-sm">{agent.phone}</p>
-                    <p className="text-sm break-all">{agent.email}</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-        </div>
-
-        {/* About + Highlights */}
-        <div className="py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-          {property.aboutProperty && (
-            <div className="lg:col-span-2 space-y-3">
-              <h2 className="text-lg font-semibold">
-                About this property
-              </h2>
-              <p className="text-sm leading-relaxed">
-                {property.aboutProperty}
-              </p>
-            </div>
-          )}
-
-          {property.highlights && (
-            <div className="bg-[var(--b2-soft)] rounded-xl p-5 space-y-3">
-              <h3 className="text-sm font-semibold">
-                Property highlights
-              </h3>
-              <ul className="text-sm space-y-2">
-                <li>• Soil type: {property.highlights.soilType}</li>
-                <li>• Water availability: {property.highlights.waterAvailability ? "Yes" : "No"}</li>
-                <li>• Electricity: {property.highlights.electricityAvailable ? "Yes" : "No"}</li>
-                <li>• Road access: {property.highlights.roadAccess ? "Yes" : "No"}</li>
-                <li>• Land type: {property.highlights.landType}</li>
-              </ul>
-            </div>
-          )}
         </div>
 
       </div>

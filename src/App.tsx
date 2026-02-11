@@ -6,8 +6,16 @@ import ResortProperties from "./pages/ResortProperties/ResortProperties";
 import AgricultureLand from "./pages/AgricultureLand/AgricultureLand";
 import RentFarmhouse from "./pages/RentFarmhouse/RentFarmhouse";
 import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
+import { useEffect } from "react";
+import { useAppDispatch } from "./hooks/reduxHooks";
+import { fetchProperties } from "./features/properties/propertySlice";
 
 function App() {
+    const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchProperties({ page: 1, limit: 50 }));
+  }, [dispatch]);
   return (
     <BrowserRouter>
       <Routes>

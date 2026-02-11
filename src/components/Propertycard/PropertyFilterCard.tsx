@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { isSizeInAcres } from "../Data/properties";
-import type { Property } from "../Data/properties";
+import type { Property } from "../../features/properties/propertyType";
 
 interface PropertyFilterCardProps {
   properties: Property[];
@@ -21,7 +21,6 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
   const [distance, setDistance] = useState(200);
   const [size, setSize] = useState(isAgriPage ? 1000 : 40000);
   const [tags, setTags] = useState<string[]>([]);
-
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const sizeUnit = isAgriPage ? "Acres" : "Sq. Ft.";
@@ -36,7 +35,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
   const clearAll = () => {
     setSearch("");
     setMinPrice(0);
-    setMaxPrice(50000000);
+    setMaxPrice(1000000000);
     setDistance(200);
     setSize(sizeMax);
     setTags([]);
@@ -44,6 +43,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
 
   const filtered = useMemo(() => {
     return properties.filter((p) => {
+      // 🔍 Search
       if (search.trim()) {
         const q = search.toLowerCase();
         if (
@@ -52,13 +52,27 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
         )
           return false;
       }
+
+      // 💰 Price
       if (p.price < minPrice || p.price > maxPrice) return false;
-      if (p.distanceFromIndore > distance) return false;
-      if (isAgriPage && isSizeInAcres(p.propertyType) && p.size > size)
+
+      // 📍 Distance (safe access)
+      if ((p.distanceFromIndore ?? 0) > distance) return false;
+
+      // 📐 Size (safe access)
+      const propertySize = p.size ?? 0;
+
+      if (isAgriPage && isSizeInAcres(p.propertyType) && propertySize > size)
         return false;
-      if (!isAgriPage && !isSizeInAcres(p.propertyType) && p.size > size)
+
+      if (!isAgriPage && !isSizeInAcres(p.propertyType) && propertySize > size)
         return false;
-      if (tags.length > 0 && !tags.some((t) => p.tags.includes(t)))
+
+      // 🏷 Tags (safe access)
+      if (
+        tags.length > 0 &&
+        !tags.some((t) => p.tags?.includes(t))
+      )
         return false;
 
       return true;
@@ -67,7 +81,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
 
   useEffect(() => {
     onFiltered(filtered);
-  }, [filtered]);
+  }, [filtered, onFiltered]);
 
   const titleClass =
     "text-xs uppercase tracking-wide text-[var(--fg)]/80 mb-1 font-sans";
@@ -81,7 +95,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
 
   return (
     <>
-      {/* ===== MOBILE ACTION BAR ===== */}
+      {/* MOBILE ACTION BAR */}
       <div className="flex items-center gap-3 mb-4 lg:hidden">
         <button
           onClick={() => setIsFilterOpen(true)}
@@ -92,15 +106,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
 
         <button
           onClick={clearAll}
-          className="
-            px-4 py-2 rounded-md
-            border border-[var(--b2)]
-            text-[var(--b2)]
-            font-semibold
-            hover:bg-[var(--b2)]
-            hover:text-[var(--b1)]
-            transition
-          "
+          className="px-4 py-2 rounded-md border border-[var(--b2)] text-[var(--b2)] font-semibold hover:bg-[var(--b2)] hover:text-[var(--b1)] transition"
         >
           Clear
         </button>
@@ -113,19 +119,17 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
         />
       )}
 
-      {/* ===== FILTER PANEL ===== */}
+      {/* FILTER PANEL */}
       <div
         className={`
           fixed top-0 left-0 h-full w-[85%] max-w-[320px] z-50
           bg-[var(--b1)] shadow-xl p-5
           transform transition-transform duration-300
-          rounded-none
           ${isFilterOpen ? "translate-x-0" : "-translate-x-full"}
           lg:static lg:translate-x-0 lg:shadow-none lg:w-full
           lg:rounded-2xl
         `}
       >
-
         <div className="flex justify-between items-center mb-4 lg:hidden">
           <h3 className="font-semibold text-lg">Filters</h3>
           <button
@@ -136,6 +140,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           </button>
         </div>
 
+        {/* SEARCH */}
         <div className="flex mb-5">
           <input
             type="text"
@@ -149,6 +154,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           </span>
         </div>
 
+        {/* PRICE */}
         <p className={titleClass}>PRICE (₹)</p>
         <input
           type="range"
@@ -161,12 +167,11 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
         />
         <div className="flex justify-between text-xs text-[var(--b2)] mb-4">
           <span>1 Lac</span>
-          <span className="font-semibold">
-            {formatPrice(maxPrice)}
-          </span>
+          <span className="font-semibold">{formatPrice(maxPrice)}</span>
           <span>100 Cr</span>
         </div>
 
+        {/* DISTANCE */}
         <p className={titleClass}>DISTANCE FROM INDORE (KM)</p>
         <input
           type="range"
@@ -183,6 +188,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           <span>200</span>
         </div>
 
+        {/* SIZE */}
         <p className={titleClass}>SIZE ({sizeUnit.toUpperCase()})</p>
         <input
           type="range"
@@ -201,6 +207,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           <span>{sizeMax.toLocaleString()}</span>
         </div>
 
+        {/* TAGS */}
         <p className={`${titleClass} mb-2`}>TAGS</p>
         <div className="grid grid-cols-2 gap-2 mb-5 text-[var(--b2)]">
           {["Hot", "Popular", "Latest", "Premium"].map((tag) => (

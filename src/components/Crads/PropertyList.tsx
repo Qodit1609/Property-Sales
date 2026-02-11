@@ -1,10 +1,24 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyCard from "../Crads/PropertyCard";
-import { properties } from "../Data/properties";
+
+// ⭐ Redux imports (from OLD file)
+import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
+import { fetchProperties } from "../../features/properties/propertySlice";
 
 const PropertyList = () => {
   const sliderRef = useRef<HTMLDivElement>(null);
+
+  const dispatch = useAppDispatch();
+
+  const { data, loading, error } = useAppSelector(
+    (state) => state.properties
+  );
+
+  // ⭐ API call (same as OLD)
+  useEffect(() => {
+    dispatch(fetchProperties({ page: 1, limit: 10 }));
+  }, [dispatch]);
 
   const scrollLeft = () => {
     sliderRef.current?.scrollBy({ left: -320, behavior: "smooth" });
@@ -13,6 +27,23 @@ const PropertyList = () => {
   const scrollRight = () => {
     sliderRef.current?.scrollBy({ left: 320, behavior: "smooth" });
   };
+
+  // ⭐ Loading & Error (logic from OLD, UI minimal)
+  if (loading) {
+    return (
+      <p className="text-center pt-16 text-[var(--b1-mid)]">
+        Loading properties...
+      </p>
+    );
+  }
+
+  if (error) {
+    return (
+      <p className="text-center pt-16 text-red-500">
+        {error}
+      </p>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 pt-16">
@@ -49,7 +80,7 @@ const PropertyList = () => {
           ref={sliderRef}
           className="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth no-scrollbar touch-pan-x px-1"
         >
-          {properties.map((property) => (
+          {data.map((property) => (
             <div
               key={property._id}
               className="min-w-[240px] sm:min-w-[280px] md:min-w-[300px]"
