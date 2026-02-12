@@ -1,21 +1,41 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Camera, Star, BedDouble, Bath, Car } from "lucide-react";
+
+// ⭐ Redux backend property type (from OLD file)
+import type { Property as BackendProperty } from "../../features/properties/propertyType";
+
+// ⭐ UI helper (same as NEW file)
 import { isSizeInAcres } from "../Data/properties";
-import type { Property } from "../Data/properties";
 
 interface Props {
-  property: Property;
+  property: BackendProperty;
 }
 
 const PropertyCard: React.FC<Props> = ({ property }) => {
   const navigate = useNavigate();
-  const isRent = property.propertyType === "Rent Farmhouse";
-  const sizeAcres = isSizeInAcres(property.propertyType);
+
+  // ⭐ Backend → UI mapping (pattern taken from OLD file)
+  const mappedProperty = {
+    _id: property._id,
+    title: property.title,
+    address: property.address,
+    images: property.images || [],
+    price: property.price,
+    propertyType: property.propertyType,
+    status: property.status,
+    size: property.size,
+    beds: property.beds,
+    baths: property.baths,
+    parking: property.parking
+  };
+
+  const isRent = mappedProperty.propertyType === "Rent Farmhouse";
+  const sizeAcres = isSizeInAcres(mappedProperty.propertyType);
 
   return (
     <div
-      onClick={() => navigate(`/properties/${property._id}`)}
+      onClick={() => navigate(`/properties/${mappedProperty._id}`)}
       className="
         bg-[var(--white)]
         border border-[var(--b2-soft)]
@@ -28,19 +48,19 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
       {/* Image */}
       <div className="relative">
         <img
-          src={property.images?.[0]}
-          alt={property.title}
+          src={mappedProperty.images?.[0]}
+          alt={mappedProperty.title}
           className="h-[220px] w-full object-cover"
         />
 
-        {property.status === "approved" && (
+        {mappedProperty.status === "approved" && (
           <span className="absolute top-3 left-3 bg-[var(--b1)] text-[var(--fg)] text-xs font-semibold px-3 py-1">
             Available
           </span>
         )}
 
         <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-black/70 text-white text-xs px-2 py-1 rounded-md">
-          <Camera size={14} /> {property.images.length}
+          <Camera size={14} /> {mappedProperty.images.length}
         </div>
 
         <div className="absolute bottom-3 right-3 text-[var(--b2)]">
@@ -51,33 +71,33 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
       {/* Content */}
       <div className="p-4 flex flex-col flex-1">
         <p className="text-xs text-[var(--b1-mid)] font-sans">
-          {property.propertyType}
+          {mappedProperty.propertyType}
         </p>
 
         <h2 className="text-2xl text-[var(--b1)] mt-1 font-sans">
-          ₹ {property.price.toLocaleString("en-IN")}
+          ₹ {mappedProperty.price.toLocaleString("en-IN")}
           {isRent && (
             <span className="text-sm font-normal text-gray-500"> /mo</span>
           )}
         </h2>
 
         <h3
-          title={property.title}
+          title={mappedProperty.title}
           className="text-lg font-serif mt-1 text-[var(--b1)] line-clamp-2"
         >
-          {property.title}
+          {mappedProperty.title}
         </h3>
 
         <p
-          title={property.address}
+          title={mappedProperty.address}
           className="text-sm text-gray-600 font-sans mt-1 truncate"
         >
-          {property.address}
+          {mappedProperty.address}
         </p>
 
         {/* Size */}
         <p className="text-xs text-[var(--b1-mid)] font-medium mt-2 font-sans">
-          {property.size.toLocaleString()}{" "}
+          {mappedProperty.size?.toLocaleString()}{" "}
           {sizeAcres ? "Acres" : "Sq. Ft."}
         </p>
 
@@ -87,13 +107,13 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
           {/* Meta info */}
           <div className="flex justify-end gap-6 text-sm text-[var(--b1-mid)] font-sans">
             <div className="flex items-center gap-1">
-              <BedDouble size={14} /> {property.beds || "–"}
+              <BedDouble size={14} /> {mappedProperty.beds || "–"}
             </div>
             <div className="flex items-center gap-1">
-              <Bath size={14} /> {property.baths || "–"}
+              <Bath size={14} /> {mappedProperty.baths || "–"}
             </div>
             <div className="flex items-center gap-1">
-              <Car size={14} /> {property.parking || "–"}
+              <Car size={14} /> {mappedProperty.parking || "–"}
             </div>
           </div>
         </div>
