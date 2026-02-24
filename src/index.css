@@ -20,6 +20,15 @@
   --fg: #F8F9F1;        /* off-white */
   --white: #ffffff;
   --brown: #6D4C41;
+
+  /* Semantic status colors (brand-aligned) */
+  --success: var(--b1);
+  --success-bg: var(--b2-soft);
+  --error: #b91c1c;
+  --error-bg: #fef2f2;
+  --warning: #b45309;
+  --warning-bg: #fffbeb;
+  --muted: var(--brown);
 }
 
 /* ===== BASE STYLES ===== */

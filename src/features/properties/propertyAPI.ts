@@ -1,13 +1,20 @@
-import axios from "axios";
-
-const BASE_URL = "http://localhost:5000/api/properties";
+import api from "../../lib/apiClient";
 
 export const fetchPropertiesAPI = async (page: number, limit: number) => {
-  const res = await axios.get(`${BASE_URL}?page=${page}&limit=${limit}`);
-  return res.data.data;
+  const res = await api.get("/properties", {
+    params: { page, limit },
+  });
+
+  // Backend may return { data: [...] } or plain array
+  return res.data.data ?? res.data;
 };
 
 export const fetchPropertyByIdAPI = async (id: string) => {
-  const res = await axios.get(`${BASE_URL}/${id}`);
-  return res.data.data; // IMPORTANT: backend returns inside data
+  const res = await api.get(`/properties/${id}`);
+  return res.data.data ?? res.data; // IMPORTANT: backend may wrap inside data
 };
+export const approvePropertyAPI = async (id: string) => {
+  const res = await api.get(`/properties/${id}/approve`);
+  return res.data.data ?? res.data; // IMPORTANT: backend may wrap inside data
+};
+

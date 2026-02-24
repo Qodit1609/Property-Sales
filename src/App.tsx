@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import MainLayout from "./layout/MainLayout";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Farmhouse from "./pages/Farmhouse/Farmhouse";
@@ -6,16 +7,20 @@ import ResortProperties from "./pages/ResortProperties/ResortProperties";
 import AgricultureLand from "./pages/AgricultureLand/AgricultureLand";
 import RentFarmhouse from "./pages/RentFarmhouse/RentFarmhouse";
 import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
-import { useEffect } from "react";
+import Login from "./pages/Auth/Login";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+import SellerDashboard from "./pages/Seller/SellerDashboard";
+import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import { useAppDispatch } from "./hooks/reduxHooks";
 import { fetchProperties } from "./features/properties/propertySlice";
 
 function App() {
-    const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(fetchProperties({ page: 1, limit: 50 }));
   }, [dispatch]);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -26,6 +31,17 @@ function App() {
           <Route path="/resort-properties" element={<ResortProperties />} />
           <Route path="/rent-farmhouse" element={<RentFarmhouse />} />
           <Route path="/properties/:id" element={<PropertyDetails />} />
+          <Route path="/login" element={<Login />} />
+        </Route>
+
+        {/* Admin protected routes */}
+        <Route element={<ProtectedRoute requiredRole="admin" />}>
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Route>
+
+        {/* Seller protected routes */}
+        <Route element={<ProtectedRoute requiredRole="seller" />}>
+          <Route path="/seller" element={<SellerDashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>
