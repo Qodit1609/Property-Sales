@@ -1,0 +1,110 @@
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import type { User } from "../users/userType";
+import { loginAPI } from "./authAPI";
+import type { LoginPayload, AuthResponse } from "./authAPI";
+
+interface AuthUser extends User {
+  role: NonNullable<User["role"]>;
+}
+
+interface AuthState {
+  token: string | null;
+  user: AuthUser | null;
+  loading: boolean;
+  error: string | null;
+}
+
+const getInitialState = (): AuthState => {
+  if (typeof window === "undefined") {
+    return {
+      token: null,
+      user: null,
+      loading: false,
+      error: null,
+    };
+  }
+
+  try {
+    const storedToken = localStorage.getItem("auth_token");
+    const storedUser = localStorage.getItem("auth_user");
+
+    return {
+      token: storedToken,
+      user: storedUser ? (JSON.parse(storedUser) as AuthUser) : null,
+      loading: false,
+      error: null,
+    };
+  } catch {
+    return {
+      token: null,
+      user: null,
+      loading: false,
+      error: null,
+    };
+  }
+};
+
+export const login = createAsyncThunk<
+  AuthResponse,
+  LoginPayload,
+  { rejectValue: string }
+>("auth/login", async (payload, { rejectWithValue }) => {
+  try {
+    return await loginAPI(payload);
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } } };
+    const message = err.response?.data?.message ?? "Failed to login";
+    return rejectWithValue(message);
+  }
+});
+
+const authSlice = createSlice({
+  name: "auth",
+  initialState: getInitialState(),
+  reducers: {
+    logout(state) {
+      state.token = null;
+      state.user = null;
+      state.error = null;
+
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("auth_user");
+      }
+    },
+    setAuthFromStorage(
+      state,
+      action: PayloadAction<{ token: string | null; user: AuthUser | null }>
+    ) {
+      state.token = action.payload.token;
+      state.user = action.payload.user;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(login.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(login.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
+
+        if (typeof window !== "undefined") {
+          localStorage.setItem("auth_token", action.payload.token);
+          localStorage.setItem("auth_user", JSON.stringify(action.payload.user));
+        }
+      })
+      .addCase(login.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload ?? "Failed to login";
+      });
+  },
+});
+
+export const { logout, setAuthFromStorage } = authSlice.actions;
+
+export default authSlice.reducer;
+
