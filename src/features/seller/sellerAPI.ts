@@ -11,6 +11,10 @@ export interface SellerListingPayload {
   beds?: number | string;
   baths?: number | string;
   parking?: number | string;
+  description?: string;
+  latitude?: number | string;
+  longitude?: number | string;
+  location?: string;
 }
 
 export const fetchMyListingsAPI = async (): Promise<Property[]> => {

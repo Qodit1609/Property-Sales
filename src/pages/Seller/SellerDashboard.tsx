@@ -15,7 +15,12 @@ import type { SellerListingPayload } from "../../features/seller/sellerAPI";
 
 type FormState = SellerListingPayload;
 
-const emptyForm: FormState = {
+const emptyForm: FormState & {
+  description?: string;
+  latitude?: string;
+  longitude?: string;
+  location?: string;
+} = {
   title: "",
   address: "",
   price: 0,
@@ -25,6 +30,10 @@ const emptyForm: FormState = {
   beds: undefined,
   baths: undefined,
   parking: undefined,
+  description: "",
+  latitude: "",
+  longitude: "",
+  location: "",
 };
 
 const SellerDashboard: React.FC = () => {
@@ -67,7 +76,7 @@ const SellerDashboard: React.FC = () => {
   const closeModal = () => setIsModalOpen(false);
 
   const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = event.target;
 
@@ -266,7 +275,6 @@ const SellerDashboard: React.FC = () => {
               className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
               required
             />
-
             <select
               name="propertyType"
               value={form.propertyType}
@@ -280,13 +288,67 @@ const SellerDashboard: React.FC = () => {
             </select>
           </div>
 
-          <input
-            name="address"
-            value={form.address}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <input
+              name="price"
+              type="number"
+              value={form.price}
+              onChange={handleChange}
+              placeholder="Price"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
+              required
+            />
+            <input
+              name="location"
+              value={form.location}
+              onChange={handleChange}
+              placeholder="Location"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <input
+              name="image0"
+              value={form.images[0]}
+              onChange={handleChange}
+              placeholder="Image URL"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
+            />
+            <input
+              name="address"
+              value={form.address}
+              onChange={handleChange}
+              placeholder="Address"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <input
+              name="latitude"
+              value={form.latitude}
+              onChange={handleChange}
+              placeholder="Latitude"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
+            />
+            <input
+              name="longitude"
+              value={form.longitude}
+              onChange={handleChange}
+              placeholder="Longitude"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
+            />
+          </div>
+
+          <textarea
+            name="description"
+            value={form.description}
             onChange={handleChange}
-            placeholder="Address"
+            placeholder="Description"
             className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
-            required
+            rows={3}
           />
 
           <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
@@ -297,7 +359,6 @@ const SellerDashboard: React.FC = () => {
             >
               Cancel
             </button>
-
             <button
               type="submit"
               disabled={actionLoading}

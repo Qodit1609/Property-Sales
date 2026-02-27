@@ -24,6 +24,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* Public routes WITH header/footer */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/farmhouse" element={<Farmhouse />} />
@@ -31,8 +33,10 @@ function App() {
           <Route path="/resort-properties" element={<ResortProperties />} />
           <Route path="/rent-farmhouse" element={<RentFarmhouse />} />
           <Route path="/properties/:id" element={<PropertyDetails />} />
-          <Route path="/login" element={<Login />} />
         </Route>
+
+        {/* Login route WITHOUT header/footer */}
+        <Route path="/login" element={<Login />} />
 
         {/* Admin protected routes */}
         <Route element={<ProtectedRoute requiredRole="admin" />}>
@@ -43,6 +47,7 @@ function App() {
         <Route element={<ProtectedRoute requiredRole="seller" />}>
           <Route path="/seller" element={<SellerDashboard />} />
         </Route>
+
       </Routes>
     </BrowserRouter>
   );
