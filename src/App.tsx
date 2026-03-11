@@ -11,6 +11,7 @@ import Login from "./pages/Auth/Login";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import SellerDashboard from "./pages/Seller/SellerDashboard";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import Chatbot from "./components/Chatbot/Chatbot";
 import { useAppDispatch } from "./hooks/reduxHooks";
 import { fetchProperties } from "./features/properties/propertySlice";
 
@@ -23,6 +24,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <Chatbot />
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Dashboard />} />
