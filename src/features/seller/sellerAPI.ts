@@ -7,9 +7,14 @@ export interface SellerListingPayload {
   price: number;
   images: string[];
   propertyType: string;
-  description: string;
-  latitude: number | string;
-  longitude: number | string;
+  description?: string;
+  latitude?: number | string;
+  longitude?: number | string;
+  location?: string;
+  size?: number;
+  beds?: string | number;
+  baths?: string | number;
+  parking?: string | number;
 }
 
 export const fetchMyListingsAPI = async (): Promise<Property[]> => {

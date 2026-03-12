@@ -14,6 +14,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: "Agriculture Land", href: "/agriculture-land" },
   { label: "Resort Properties", href: "/resort-properties" },
   { label: "Rent Farmhouse", href: "/rent-farmhouse" },
+  { label: "Post Property", href: "/post-property/basic" },
 ];
 
 const HeaderNav: React.FC<{

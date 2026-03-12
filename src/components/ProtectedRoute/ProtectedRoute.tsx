@@ -1,14 +1,17 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAppSelector } from "../../hooks/reduxHooks";
-
-type Role = "admin" | "seller";
+import type { UserRole } from "../../features/users/userType";
 
 interface ProtectedRouteProps {
-  requiredRole?: Role;
+  requiredRole?: UserRole;
+  requiredRoles?: UserRole[];
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  requiredRole,
+  requiredRoles,
+}) => {
   const location = useLocation();
   const { token, user } = useAppSelector((state) => state.auth);
 
@@ -22,13 +25,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRole }) => {
     );
   }
 
-  if (requiredRole && user.role !== requiredRole) {
-    if (user.role === "admin") {
-      return <Navigate to="/admin" replace />;
-    }
-    if (user.role === "seller") {
-      return <Navigate to="/seller" replace />;
-    }
+  const allowedRoles = requiredRoles ?? (requiredRole ? [requiredRole] : null);
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />;
   }
 

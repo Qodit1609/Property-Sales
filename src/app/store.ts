@@ -4,6 +4,8 @@ import userReducer from "../features/users/userSlice";
 import authReducer from "../features/auth/authSlice";
 import adminReducer from "../features/admin/adminSlice";
 import sellerReducer from "../features/seller/sellerSlice";
+import postPropertyReducer from "../features/postProperty/postPropertySlice";
+import buyerReducer from "../features/buyer/buyerSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +14,8 @@ export const store = configureStore({
     auth: authReducer,
     admin: adminReducer,
     seller: sellerReducer,
+    postProperty: postPropertyReducer,
+    buyer: buyerReducer,
   },
 });
 
