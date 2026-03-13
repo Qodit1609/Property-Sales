@@ -11,7 +11,7 @@ const items = [
 
 const AdminSidebar: React.FC = () => {
   return (
-    <nav className="space-y-1 text-sm">
+    <nav className="space-y-1">
       {items.map((item) => {
         const Icon = item.icon;
         return (

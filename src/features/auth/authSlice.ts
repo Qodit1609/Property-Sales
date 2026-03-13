@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { User } from "../users/userType";
-import { loginAPI } from "./authAPI";
-import type { LoginPayload, AuthResponse } from "./authAPI";
+import { loginAPI, registerAPI } from "./authAPI";
+import type { LoginPayload, AuthResponse, RegisterPayload } from "./authAPI";
 
 interface AuthUser extends User {
   role: NonNullable<User["role"]>;
@@ -11,6 +11,7 @@ interface AuthUser extends User {
 interface AuthState {
   token: string | null;
   user: AuthUser | null;
+  isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
 }
@@ -20,6 +21,7 @@ const getInitialState = (): AuthState => {
     return {
       token: null,
       user: null,
+      isAuthenticated: false,
       loading: false,
       error: null,
     };
@@ -32,6 +34,7 @@ const getInitialState = (): AuthState => {
     return {
       token: storedToken,
       user: storedUser ? (JSON.parse(storedUser) as AuthUser) : null,
+      isAuthenticated: Boolean(storedToken && storedUser),
       loading: false,
       error: null,
     };
@@ -39,6 +42,7 @@ const getInitialState = (): AuthState => {
     return {
       token: null,
       user: null,
+      isAuthenticated: false,
       loading: false,
       error: null,
     };
@@ -59,6 +63,20 @@ export const login = createAsyncThunk<
   }
 });
 
+export const register = createAsyncThunk<
+  AuthResponse,
+  RegisterPayload,
+  { rejectValue: string }
+>("auth/register", async (payload, { rejectWithValue }) => {
+  try {
+    return await registerAPI(payload);
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } } };
+    const message = err.response?.data?.message ?? "Failed to register";
+    return rejectWithValue(message);
+  }
+});
+
 const authSlice = createSlice({
   name: "auth",
   initialState: getInitialState(),
@@ -66,6 +84,7 @@ const authSlice = createSlice({
     logout(state) {
       state.token = null;
       state.user = null;
+      state.isAuthenticated = false;
       state.error = null;
 
       if (typeof window !== "undefined") {
@@ -79,6 +98,7 @@ const authSlice = createSlice({
     ) {
       state.token = action.payload.token;
       state.user = action.payload.user;
+      state.isAuthenticated = Boolean(action.payload.token && action.payload.user);
     },
   },
   extraReducers: (builder) => {
@@ -91,6 +111,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.token = action.payload.token;
         state.user = action.payload.user;
+        state.isAuthenticated = true;
 
         if (typeof window !== "undefined") {
           localStorage.setItem("auth_token", action.payload.token);
@@ -100,6 +121,27 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload ?? "Failed to login";
+      });
+
+    builder
+      .addCase(register.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload.token;
+        state.user = action.payload.user;
+        state.isAuthenticated = true;
+
+        if (typeof window !== "undefined") {
+          localStorage.setItem("auth_token", action.payload.token);
+          localStorage.setItem("auth_user", JSON.stringify(action.payload.user));
+        }
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload ?? "Failed to register";
       });
   },
 });

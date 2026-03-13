@@ -3,6 +3,7 @@ import { useAppSelector, useAppDispatch } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
 import BuyerSidebar from "./BuyerSidebar";
 import BuyerHeaderActions from "./BuyerHeaderActions";
+import Header from "../Header/Header";
 
 interface BuyerLayoutProps {
   children: React.ReactNode;
@@ -18,7 +19,8 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-[var(--b2-soft)] text-[var(--b1)]">
-      <div className="mx-auto flex min-h-screen max-w-7xl">
+      <Header />
+      <div className="pt-[68px] mx-auto flex min-h-screen max-w-7xl">
         <aside className="hidden w-64 flex-shrink-0 border-r border-[var(--b2)] bg-[var(--white)] px-4 py-6 lg:block">
           <div className="mb-6 flex items-center justify-between">
             <div>

@@ -8,6 +8,7 @@ import AgricultureLand from "./pages/AgricultureLand/AgricultureLand";
 import RentFarmhouse from "./pages/RentFarmhouse/RentFarmhouse";
 import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
 import Login from "./pages/Auth/Login";
+import Register from "./pages/Auth/Register";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import SellerDashboard from "./pages/Seller/SellerDashboard";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
@@ -22,6 +23,14 @@ import BuyerAccountPage from "./pages/Buyer/BuyerAccountPage";
 import BuyerActivityPage from "./pages/Buyer/BuyerActivityPage";
 import BuyerEnquiriesPage from "./pages/Buyer/BuyerEnquiriesPage";
 import BuyerNotificationsPage from "./pages/Buyer/BuyerNotificationsPage";
+import AgentDashboard from "./pages/Agent/AgentDashboard";
+import AgentLayout from "./pages/Agent/AgentLayout";
+import AgentPropertiesPage from "./pages/Agent/AgentPropertiesPage";
+import AgentAddPropertyPage from "./pages/Agent/AgentAddPropertyPage";
+import AgentLeadsPage from "./pages/Agent/AgentLeadsPage";
+import AgentVisitsPage from "./pages/Agent/AgentVisitsPage";
+import AgentClientsPage from "./pages/Agent/AgentClientsPage";
+import AgentProfilePage from "./pages/Agent/AgentProfilePage";
 import { useAppDispatch } from "./hooks/reduxHooks";
 import { fetchProperties } from "./features/properties/propertySlice";
 import PostPropertyPage from "./pages/PostProperty/PostPropertyPage";
@@ -103,6 +112,19 @@ function App() {
           <Route path="/seller/dashboard" element={<SellerDashboard />} />
         </Route>
 
+        {/* Agent dashboard */}
+        <Route element={<ProtectedRoute requiredRole="agent" />}>
+          <Route element={<AgentLayout />}>
+            <Route path="/agent/dashboard" element={<AgentDashboard />} />
+            <Route path="/agent/properties" element={<AgentPropertiesPage />} />
+            <Route path="/agent/add-property" element={<AgentAddPropertyPage />} />
+            <Route path="/agent/leads" element={<AgentLeadsPage />} />
+            <Route path="/agent/visits" element={<AgentVisitsPage />} />
+            <Route path="/agent/clients" element={<AgentClientsPage />} />
+            <Route path="/agent/profile" element={<AgentProfilePage />} />
+          </Route>
+        </Route>
+
         {/* Admin dashboard */}
         <Route element={<ProtectedRoute requiredRole="admin" />}>
           <Route path="/admin" element={<AdminDashboard />} />
@@ -113,6 +135,9 @@ function App() {
 
         {/* Login route WITHOUT header/footer */}
         <Route path="/login" element={<Login />} />
+
+        {/* Register route WITHOUT header/footer */}
+        <Route path="/register" element={<Register />} />
 
       </Routes>
     </BrowserRouter>

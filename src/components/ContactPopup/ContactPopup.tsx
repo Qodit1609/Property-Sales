@@ -14,8 +14,11 @@ const ContactPopup: React.FC = () => {
   };
 
   return (
-    <div className="space-y-5 bg-[var(--b2-soft)] p-5 rounded-2xl">
-      <div className="flex bg-[var(--b2)]/40 rounded-full p-1">
+    <div className="space-y-6">
+
+      {/* Tabs */}
+      <div className="flex bg-[var(--b2)]/40 rounded-full p-1 max-w-md mx-auto">
+
         <button
           onClick={() => setActiveTab("details")}
           className={`flex-1 py-2 rounded-full text-sm font-medium transition ${
@@ -39,12 +42,27 @@ const ContactPopup: React.FC = () => {
         </button>
       </div>
 
+      {/* DETAILS FORM */}
+
       {activeTab === "details" && (
-        <form className="space-y-4">
+        <form className="space-y-5">
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <input className={inputClass} placeholder="you@example.com" />
-            <input className={inputClass} placeholder="Your name *" />
-            <input className={inputClass} placeholder="Phone *" />
+
+            <input
+              className={inputClass}
+              placeholder="you@example.com"
+            />
+
+            <input
+              className={inputClass}
+              placeholder="Your name *"
+            />
+
+            <input
+              className={inputClass}
+              placeholder="Phone *"
+            />
 
             <select
               value={propertyType}
@@ -58,6 +76,7 @@ const ContactPopup: React.FC = () => {
               <option value="" disabled>
                 Select property type
               </option>
+
               <option>Farmhouse</option>
               <option>Agriculture Land</option>
               <option>Resort Property</option>
@@ -79,7 +98,10 @@ const ContactPopup: React.FC = () => {
             Name and phone are required.
           </p>
 
+          {/* Buttons */}
+
           <div className="flex flex-col sm:flex-row sm:justify-end gap-3">
+
             <button
               type="reset"
               className="border border-[var(--b1-mid)] text-[var(--b1-mid)] px-4 py-2 rounded-full hover:bg-[var(--b2)]/40 transition"
@@ -89,37 +111,52 @@ const ContactPopup: React.FC = () => {
 
             <button
               type="submit"
-              className="bg-[var(--b1-mid)] text-[var(--white)] px-5 py-2 rounded-full hover:bg-[var(--b1)] transition"
+              className="bg-[var(--b1-mid)] text-[var(--white)] px-6 py-2 rounded-full hover:bg-[var(--b1)] transition"
             >
               Submit
             </button>
+
           </div>
+
         </form>
       )}
 
+      {/* WHATSAPP SECTION */}
+
       {activeTab === "whatsapp" && (
-        <div className="space-y-4">
-          <div className="border border-[var(--b2)] bg-[var(--fg)] rounded-xl p-4 text-sm space-y-2">
+
+        <div className="space-y-5 text-center">
+
+          <div className="border border-[var(--b2)] bg-[var(--fg)] rounded-xl p-5 text-sm space-y-3">
+
             <p className="font-medium text-[var(--b1)]">
-              Prefer a quick chat? Ping us on WhatsApp.
+              Prefer a quick chat?
             </p>
 
-            <ul className="list-disc pl-5 space-y-1 text-[var(--brown)]">
-              <li>Instant conversation with a specialist</li>
-              <li>Share images / location pins easily</li>
-              <li>Service hours: 9am – 7pm IST</li>
-              <li>We usually reply within a few minutes</li>
+            <p className="text-[var(--brown)]">
+              Connect with our property specialist instantly on WhatsApp.
+            </p>
+
+            <ul className="text-left list-disc pl-5 space-y-1 text-[var(--brown)]">
+              <li>Instant conversation with expert</li>
+              <li>Share images and locations</li>
+              <li>Service hours: 9AM – 7PM IST</li>
+              <li>Average reply within minutes</li>
             </ul>
+
           </div>
 
           <button
             onClick={openWhatsApp}
-            className="bg-[var(--b1-mid)] text-[var(--white)] px-5 py-2 rounded-full hover:bg-[var(--b1)] transition w-full sm:w-auto"
+            className="bg-[var(--b1-mid)] text-[var(--white)] px-6 py-3 rounded-full hover:bg-[var(--b1)] transition w-full sm:w-auto"
           >
-            Open WhatsApp
+            Open WhatsApp Chat
           </button>
+
         </div>
+
       )}
+
     </div>
   );
 };

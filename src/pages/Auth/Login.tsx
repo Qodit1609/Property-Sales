@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { login } from "../../features/auth/authSlice";
 import Dashboard from "../Dashboard/Dashboard";
@@ -13,8 +13,19 @@ const Login: React.FC = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const from = (location.state as { from?: string } | null)?.from ?? "/";
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        navigate("/", { replace: true });
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [navigate]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -52,6 +63,11 @@ const Login: React.FC = () => {
         return;
       }
 
+      if (role === "agent") {
+        navigate("/agent/dashboard", { replace: true });
+        return;
+      }
+
       // Fallback: keep existing behavior for other roles.
       navigate("/post-property/basic", { replace: true });
     }
@@ -69,20 +85,27 @@ const Login: React.FC = () => {
 
       {/* Login card */}
       <div className="fixed inset-0 z-20 flex items-center justify-center px-4 py-10">
-        <div className="pointer-events-auto w-full max-w-md rounded-3xl border border-[var(--b2)] bg-[var(--white)] p-8 shadow-2xl shadow-[var(--b1)]/20">
+        <div className="pointer-events-auto w-full max-w-md rounded-3xl border border-[var(--b2)] bg-[var(--white)] p-7 sm:p-8 shadow-2xl shadow-[var(--b1)]/20 relative">
+          <button
+            type="button"
+            onClick={() => navigate("/", { replace: true })}
+            aria-label="Close"
+            className="absolute right-4 top-4 h-8 w-8 flex items-center justify-center rounded-full bg-[var(--b2-soft)] text-[var(--b1)] hover:bg-[var(--b2)] transition"
+          >
+            ✕
+          </button>
+
           {/* logo / brand */}
-          <div className="mb-6 flex justify-center">
+          <div className="mb-5 flex justify-center">
             {/* replace with real logo if available */}
             <span className="text-2xl font-bold text-[var(--b1)]">
               BhoomiWala
             </span>
           </div>
 
-          <h1 className="mb-2 text-center text-2xl font-semibold">
-            Admin sign in
-          </h1>
-          <p className="mb-6 text-center text-xs text-[var(--muted)]">
-            Enterprise control panel access.
+          <h1 className="mb-1 text-center text-2xl font-semibold">Sign in</h1>
+          <p className="mb-5 text-center text-xs text-[var(--muted)]">
+            Access your dashboard and saved activity.
           </p>
 
           {error && (
@@ -97,15 +120,15 @@ const Login: React.FC = () => {
                 htmlFor="email"
                 className="mb-1 block text-sm font-medium"
               >
-                Email
+                Email / Mobile
               </label>
               <input
                 id="email"
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--b2)] focus:border-[var(--b2)]"
-                placeholder="you@example.com"
+                className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--b2)] focus:border-[var(--b2)] transition"
+                placeholder="you@example.com / 9999999999"
                 required
               />
             </div>
@@ -117,15 +140,25 @@ const Login: React.FC = () => {
               >
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--b2)] focus:border-[var(--b2)]"
-                placeholder="••••••••"
-                required
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2.5 pr-11 text-sm outline-none focus:ring-2 focus:ring-[var(--b2)] focus:border-[var(--b2)] transition"
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-xs text-[var(--b1-mid)] hover:text-[var(--b1)] hover:bg-black/5 transition"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center justify-between">
@@ -147,10 +180,20 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full inline-flex justify-center items-center rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] shadow-md hover:bg-[var(--b1)] transition disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full inline-flex justify-center items-center rounded-md bg-[var(--b1-mid)] px-4 py-2.5 text-sm font-semibold text-[var(--fg)] shadow-md hover:bg-[var(--b1)] transition disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>
+
+            <p className="pt-1 text-center text-xs text-[var(--muted)]">
+              New user?{" "}
+              <Link
+                to="/register"
+                className="text-[var(--b1-mid)] hover:text-[var(--b1)]"
+              >
+                Register here
+              </Link>
+            </p>
           </form>
         </div>
       </div>
