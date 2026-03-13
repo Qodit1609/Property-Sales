@@ -17,6 +17,10 @@ interface NavItem {
   mega?: MegaSection[];
 }
 
+interface HeaderProps {
+  forceSolid?: boolean;
+}
+
 const NAV_ITEMS: NavItem[] = [
   { label: "Home", href: "/" },
   {
@@ -83,7 +87,7 @@ const roleDashboardPath = (role: UserRole) => {
   return "/admin";
 };
 
-const Header: React.FC = () => {
+const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -143,9 +147,9 @@ const Header: React.FC = () => {
       <header className="fixed top-0 left-0 w-full z-50">
         <div
           className={`px-4 sm:px-6 md:px-10 transition-all duration-300 ${
-            scrolled
-              ? "header-bg shadow-xl backdrop-blur-md"
-              : "header-bg/80 backdrop-blur-sm"
+           scrolled || forceSolid
+  ? "header-bg shadow-xl backdrop-blur-md"
+  : "header-bg/80 backdrop-blur-sm"
           }`}
         >
           <div className="flex h-[68px] items-center justify-between">

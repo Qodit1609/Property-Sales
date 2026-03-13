@@ -26,7 +26,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-[var(--b2-soft)] text-[var(--b1)]">
-      <Header />
+      <Header forceSolid/>
       <div className="pt-[68px] flex min-h-screen">
       {/* Sidebar */}
       <aside className="hidden md:flex md:w-64 bg-[var(--white)] border-r border-[var(--b2)] flex-col">

@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { Bell, ChevronDown, LogOut, User2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../hooks/reduxHooks";
-
+ 
 interface BuyerHeaderActionsProps {
   onLogout: () => void;
 }
-
+ 
 const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
   onLogout,
 }) => {
@@ -15,7 +15,7 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
     (state) => state.buyer.notifications.filter((n) => !n.read).length
   );
   const [open, setOpen] = useState(false);
-
+ 
   return (
     <div className="flex items-center gap-3">
       <Link
@@ -29,7 +29,7 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
           </span>
         )}
       </Link>
-
+ 
       <div className="relative">
         <button
           type="button"
@@ -49,7 +49,7 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
           </div>
           <ChevronDown className="h-3 w-3 text-[var(--muted)]" />
         </button>
-
+ 
         {open && (
           <div className="absolute right-0 z-30 mt-2 w-52 overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--white)] text-xs shadow-lg shadow-[var(--b2)]/40">
             <div className="border-b border-[var(--b2-soft)] px-3 py-2">
@@ -87,6 +87,5 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
     </div>
   );
 };
-
+ 
 export default BuyerHeaderActions;
-

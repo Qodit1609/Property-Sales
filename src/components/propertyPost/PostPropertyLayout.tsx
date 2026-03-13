@@ -14,6 +14,7 @@ import {
   validateMedia,
   validateProfileDetails,
 } from "../../features/postProperty/postPropertyValidation";
+import Header from "../Header/Header";  // 👈 ADD THIS
 
 function nowId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -111,6 +112,7 @@ export default function PostPropertyLayout() {
 
   return (
     <>
+      <Header forceSolid />
       <ToastStack toasts={toasts} onDismiss={dismissToast} />
 
       <main className="pt-24 pb-12">

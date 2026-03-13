@@ -19,7 +19,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ title, children }) => {
 
   return (
     <div className="min-h-screen border-[var(--b2)] bg-[var(--b2-soft)] text-[var(--b1)]">
-      <Header />
+      <Header forceSolid/>
       <div className="pt-[68px] mx-auto flex min-h-screen max-w-7xl">
         <aside className="hidden w-64 flex-shrink-0 border-r border-[var(--b2)] bg-[var(--white)] px-4 py-5 lg:block">
           <div className="mb-6">

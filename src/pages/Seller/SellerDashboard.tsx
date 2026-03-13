@@ -9,7 +9,6 @@ import {
   fetchMyListings,
   updateListing,
 } from "../../features/seller/sellerSlice";
-import Modal from "../../components/Modal/Modal";
 import type { Property } from "../../features/properties/propertyType";
 import type { SellerListingPayload } from "../../features/seller/sellerAPI";
 
