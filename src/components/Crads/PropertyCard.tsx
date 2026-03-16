@@ -2,10 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Camera, Star, BedDouble, Bath, Car } from "lucide-react";
 
-// ⭐ Redux backend property type (from OLD file)
 import type { Property as BackendProperty } from "../../features/properties/propertyType";
-
-// ⭐ UI helper (same as NEW file)
 import { isSizeInAcres } from "../Data/properties";
 
 interface Props {
@@ -15,19 +12,19 @@ interface Props {
 const PropertyCard: React.FC<Props> = ({ property }) => {
   const navigate = useNavigate();
 
-  // ⭐ Backend → UI mapping (pattern taken from OLD file)
+  // ⭐ Safe Backend → UI mapping
   const mappedProperty = {
     _id: property._id,
-    title: property.title,
-    address: property.address,
+    title: property.title || "Untitled Property",
+    address: property.address || "Location not available",
     images: property.images || [],
-    price: property.price,
-    propertyType: property.propertyType,
-    status: property.status,
-    size: property.size,
-    beds: property.beds,
-    baths: property.baths,
-    parking: property.parking
+    price: property.price || 0,
+    propertyType: property.propertyType || "Property",
+    status: property.status || "pending",
+    size: property.size || 0,
+    beds: property.beds || null,
+    baths: property.baths || null,
+    parking: property.parking || null
   };
 
   const isRent = mappedProperty.propertyType === "Rent Farmhouse";
@@ -48,7 +45,10 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
       {/* Image */}
       <div className="relative">
         <img
-          src={mappedProperty.images?.[0] || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect fill='%23e0e0e0' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='24' fill='%23999'%3ENo Image%3C/text%3E%3C/svg%3E"}
+          src={
+            mappedProperty.images?.[0] ||
+            "https://via.placeholder.com/600x400?text=No+Image"
+          }
           alt={mappedProperty.title}
           className="h-[220px] w-full object-cover"
         />
@@ -70,6 +70,7 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
 
       {/* Content */}
       <div className="p-4 flex flex-col flex-1">
+
         <p className="text-xs text-[var(--b1-mid)] font-sans">
           {mappedProperty.propertyType}
         </p>
@@ -96,27 +97,34 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
         </p>
 
         {/* Size */}
-        <p className="text-xs text-[var(--b1-mid)] font-medium mt-2 font-sans">
-          {mappedProperty.size?.toLocaleString()}{" "}
-          {sizeAcres ? "Acres" : "Sq. Ft."}
-        </p>
+        {mappedProperty.size > 0 && (
+          <p className="text-xs text-[var(--b1-mid)] font-medium mt-2 font-sans">
+            {mappedProperty.size.toLocaleString()}{" "}
+            {sizeAcres ? "Acres" : "Sq. Ft."}
+          </p>
+        )}
 
         <div className="mt-auto">
           <div className="border-t border-[var(--b2-soft)] my-4"></div>
 
           {/* Meta info */}
           <div className="flex justify-end gap-6 text-sm text-[var(--b1-mid)] font-sans">
+
             <div className="flex items-center gap-1">
               <BedDouble size={14} /> {mappedProperty.beds || "–"}
             </div>
+
             <div className="flex items-center gap-1">
               <Bath size={14} /> {mappedProperty.baths || "–"}
             </div>
+
             <div className="flex items-center gap-1">
               <Car size={14} /> {mappedProperty.parking || "–"}
             </div>
+
           </div>
         </div>
+
       </div>
     </div>
   );

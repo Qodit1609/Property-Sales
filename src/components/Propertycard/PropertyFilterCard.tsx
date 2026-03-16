@@ -131,10 +131,10 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
         `}
       >
         <div className="flex justify-between items-center mb-4 lg:hidden">
-          <h3 className="font-semibold text-lg">Filters</h3>
+          <h3 className="font-semibold text-lg text-[var(--b2)]">Filters</h3>
           <button
             onClick={() => setIsFilterOpen(false)}
-            className="text-xl font-bold"
+            className="text-xl font-bold text-[var(--b2)]"
           >
             ✕
           </button>

@@ -3,7 +3,7 @@ import axios, { type InternalAxiosRequestConfig } from "axios";
 // Shared Axios client that automatically attaches JWT token
 // from localStorage as Authorization: Bearer <token>
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "http://bhoomiwala-api.com.therapidhire.com/api",
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {

@@ -9,13 +9,18 @@ import {
   fetchMyListings,
   updateListing,
 } from "../../features/seller/sellerSlice";
-import Modal from "../../components/Modal/Modal";
 import type { Property } from "../../features/properties/propertyType";
 import type { SellerListingPayload } from "../../features/seller/sellerAPI";
 
 type FormState = SellerListingPayload;
 
-const emptyForm: FormState = {
+
+const emptyForm: FormState & {
+  description?: string;
+  latitude?: string;
+  longitude?: string;
+  location?: string;
+} = {
   title: "",
   address: "",
   price: 0,
@@ -25,6 +30,10 @@ const emptyForm: FormState = {
   beds: undefined,
   baths: undefined,
   parking: undefined,
+  description: "",
+  latitude: "",
+  longitude: "",
+  location: "",
 };
 
 const SellerDashboard: React.FC = () => {
@@ -67,7 +76,7 @@ const SellerDashboard: React.FC = () => {
   const closeModal = () => setIsModalOpen(false);
 
   const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = event.target;
 
@@ -116,41 +125,23 @@ const SellerDashboard: React.FC = () => {
   const sidebar = (
     <ul className="space-y-2">
       <li>
-        <button
-          type="button"
-          className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium bg-[var(--b2-soft)] text-[var(--b1)] hover:bg-[var(--b2)] transition"
-          onClick={openCreateModal}
-        >
-          <Plus size={16} />
-          New Listing
-        </button>
-      </li>
-      <li>
         <div className="mt-4 text-xs font-semibold text-[var(--b1)] uppercase px-2">
-          My Listings
+          My Properties
         </div>
       </li>
     </ul>
   );
+  const { user } = useAppSelector((state: RootState) => state.auth);
 
   return (
     <>
-      <DashboardLayout title="Seller Panel" sidebar={sidebar}>
+      <DashboardLayout title={user?.name || "Seller Panel"} sidebar={sidebar}>
         <section className="space-y-6 px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <h1 className="text-xl sm:text-2xl font-semibold text-[var(--b1)] flex items-center gap-2">
               <ListChecks size={20} />
-              My Listings
+              My Properties
             </h1>
-
-            <button
-              type="button"
-              onClick={openCreateModal}
-              className="w-full sm:w-auto inline-flex justify-center items-center gap-2 rounded-lg bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] shadow hover:bg-[var(--b1)] transition"
-            >
-              <Plus size={16} />
-              Add Listing
-            </button>
           </div>
 
           {loading && (
@@ -251,67 +242,6 @@ const SellerDashboard: React.FC = () => {
         </section>
       </DashboardLayout>
 
-      <Modal
-        open={isModalOpen}
-        onClose={closeModal}
-        title={editingListing ? "Edit Listing" : "Add New Listing"}
-      >
-        <form className="space-y-5" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <input
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              placeholder="Title"
-              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
-              required
-            />
-
-            <select
-              name="propertyType"
-              value={form.propertyType}
-              onChange={handleChange}
-              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
-            >
-              <option value="Farmhouse">Farmhouse</option>
-              <option value="Agriculture Land">Agriculture Land</option>
-              <option value="Resort">Resort</option>
-              <option value="Rent Farmhouse">Rent Farmhouse</option>
-            </select>
-          </div>
-
-          <input
-            name="address"
-            value={form.address}
-            onChange={handleChange}
-            placeholder="Address"
-            className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
-            required
-          />
-
-          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
-            <button
-              type="button"
-              onClick={closeModal}
-              className="w-full sm:w-auto rounded-md border border-[var(--b2)] px-4 py-2 text-sm"
-            >
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              disabled={actionLoading}
-              className="w-full sm:w-auto rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] hover:bg-[var(--b1)] disabled:opacity-70"
-            >
-              {actionLoading
-                ? "Saving..."
-                : editingListing
-                ? "Update Listing"
-                : "Create Listing"}
-            </button>
-          </div>
-        </form>
-      </Modal>
     </>
   );
 };

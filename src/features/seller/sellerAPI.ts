@@ -7,21 +7,29 @@ export interface SellerListingPayload {
   price: number;
   images: string[];
   propertyType: string;
+  description?: string;
+  latitude?: number | string;
+  longitude?: number | string;
+  location?: string;
   size?: number;
-  beds?: number | string;
-  baths?: number | string;
-  parking?: number | string;
+  beds?: string | number;
+  baths?: string | number;
+  parking?: string | number;
 }
 
 export const fetchMyListingsAPI = async (): Promise<Property[]> => {
-  const res = await api.get("/properties");
+  
+  const res = await api.get("/properties/my-properties/list");
+
   return res.data.data ?? res.data;
 };
 
 export const createListingAPI = async (
   payload: SellerListingPayload
 ): Promise<Property> => {
+
   const res = await api.post("/properties", payload);
+
   return res.data.data ?? res.data;
 };
 
@@ -29,11 +37,13 @@ export const updateListingAPI = async (
   id: string,
   payload: Partial<SellerListingPayload>
 ): Promise<Property> => {
+
   const res = await api.put(`/properties/${id}`, payload);
+
   return res.data.data ?? res.data;
 };
 
 export const deleteMyListingAPI = async (id: string): Promise<void> => {
+
   await api.delete(`/properties/${id}`);
 };
-

@@ -2,31 +2,84 @@ import api from "../../lib/apiClient";
 import type { User } from "../users/userType";
 import type { Property } from "../properties/propertyType";
 
+
+/* =========================
+   USERS
+========================= */
+
 export const fetchAdminUsersAPI = async (): Promise<User[]> => {
+
   const res = await api.get("/admin/users");
+
   return res.data.data ?? res.data;
+
 };
 
-export const deleteAdminUserAPI = async (userId: string): Promise<void> => {
+export const deleteAdminUserAPI = async (
+  userId: string
+): Promise<void> => {
+
   await api.delete(`/admin/users/${userId}`);
+
 };
+
+
+
+/* =========================
+   ALL PROPERTIES (ADMIN)
+========================= */
 
 export const fetchAdminListingsAPI = async (): Promise<Property[]> => {
-  const res = await api.get("/properties");
+
+  // IMPORTANT CHANGE
+  const res = await api.get("/properties/admin/all");
+
   return res.data.data ?? res.data;
+
 };
 
-export const approveListingAPI = async (id: string): Promise<Property> => {
-  const res = await api.patch(`/admin/listings/${id}/approve`);
+
+
+/* =========================
+   APPROVE PROPERTY
+========================= */
+
+export const approveListingAPI = async (
+  id: string
+): Promise<Property> => {
+
+  const res = await api.put(`/properties/${id}/approve`);
+
   return res.data.data ?? res.data;
+
 };
 
-export const rejectListingAPI = async (id: string): Promise<Property> => {
-  const res = await api.patch(`/admin/listings/${id}/reject`);
+
+
+/* =========================
+   REJECT PROPERTY
+========================= */
+
+export const rejectListingAPI = async (
+  id: string
+): Promise<Property> => {
+
+  const res = await api.put(`/properties/${id}/reject`);
+
   return res.data.data ?? res.data;
+
 };
 
-export const deleteListingAPI = async (id: string): Promise<void> => {
-  await api.delete(`/admin/listings/${id}`);
-};
 
+
+/* =========================
+   DELETE PROPERTY
+========================= */
+
+export const deleteListingAPI = async (
+  id: string
+): Promise<void> => {
+
+  await api.delete(`/properties/${id}`);
+
+};
