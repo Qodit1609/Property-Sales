@@ -8,6 +8,7 @@ import {
 import type { AmenityKey } from "../../features/postProperty/postPropertyTypes";
 import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
+import { Input } from "@/components/common";
 
 const OPTIONS: Array<{ key: AmenityKey; label: string; desc: string }> = [
   { key: "borewell", label: "Borewell", desc: "Reliable groundwater source" },
@@ -47,7 +48,7 @@ export default function AmenitiesForm() {
                   : "border-[var(--b2)] bg-[var(--white)] hover:bg-[var(--b2-soft)]"
               }`}
             >
-              <input
+              <Input
                 type="checkbox"
                 checked={checked}
                 onChange={(e) =>
@@ -81,4 +82,3 @@ export default function AmenitiesForm() {
     </div>
   );
 }
-

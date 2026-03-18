@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Property } from "../../features/properties/propertyType";
+import { Input, Button } from "@/components/common";
 
 type MediaType = "gallery" | "map" | "video";
 
@@ -31,12 +32,12 @@ const PropertyPreview = ({ property }: Props) => {
         <p className="text-lg font-semibold text-[var(--b1)]">
           Property not found
         </p>
-        <button
+        <Button
           onClick={() => navigate("/")}
           className="mt-4 px-4 py-2 rounded-full bg-[var(--b1-mid)] text-[var(--fg)] text-sm"
         >
           Go back
-        </button>
+        </Button>
       </div>
     );
   }
@@ -58,7 +59,7 @@ const PropertyPreview = ({ property }: Props) => {
 
               {gallery.length > 1 && (
                 <>
-                  <button
+                  <Button
                     onClick={() =>
                       setCurrentImage((i) =>
                         i === 0 ? gallery.length - 1 : i - 1
@@ -67,15 +68,15 @@ const PropertyPreview = ({ property }: Props) => {
                     className="absolute left-2 top-1/2 -translate-y-1/2 bg-[var(--b2-soft)]/90 px-3 py-1 rounded-full text-sm"
                   >
                     ‹
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() =>
                       setCurrentImage((i) => (i + 1) % gallery.length)
                     }
                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-[var(--b2-soft)]/90 px-3 py-1 rounded-full text-sm"
                   >
                     ›
-                  </button>
+                  </Button>
                 </>
               )}
             </>
@@ -150,7 +151,7 @@ const MediaButton = ({
   active: boolean;
   onClick: () => void;
 }) => (
-  <button
+  <Button
     onClick={onClick}
     className={`px-3 py-1 rounded-full text-[11px] font-medium transition ${
       active
@@ -159,5 +160,5 @@ const MediaButton = ({
     }`}
   >
     {label}
-  </button>
+  </Button>
 );

@@ -1,4 +1,5 @@
 import React from "react";
+import { Button, Input } from "@/components/common";
 
 const SecuritySettings: React.FC = () => {
   return (
@@ -20,47 +21,55 @@ const SecuritySettings: React.FC = () => {
             <label className="text-[11px] font-medium text-[var(--muted)]">
               Current password
             </label>
-            <input
+
+            <Input
               type="password"
-              className="mt-1 w-full rounded-lg border border-[var(--b2-soft)] bg-[var(--white)] px-3 py-2 text-sm text-[var(--b1)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
               placeholder="••••••••"
+              className="mt-1 text-sm"
             />
           </div>
+
           <div>
             <label className="text-[11px] font-medium text-[var(--muted)]">
               New password
             </label>
-            <input
+
+            <Input
               type="password"
-              className="mt-1 w-full rounded-lg border border-[var(--b2-soft)] bg-[var(--white)] px-3 py-2 text-sm text-[var(--b1)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
               placeholder="Strong password"
+              className="mt-1 text-sm"
             />
           </div>
+
           <div>
             <label className="text-[11px] font-medium text-[var(--muted)]">
               Confirm password
             </label>
-            <input
+
+            <Input
               type="password"
-              className="mt-1 w-full rounded-lg border border-[var(--b2-soft)] bg-[var(--white)] px-3 py-2 text-sm text-[var(--b1)] placeholder:text-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
               placeholder="Repeat new password"
+              className="mt-1 text-sm"
             />
           </div>
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-          <button
+          <Button
             type="button"
-            className="rounded-lg bg-[var(--b1-mid)] px-4 py-2 text-[11px] font-semibold text-[var(--fg)] shadow ring-1 ring-[var(--b2)] hover:bg-[var(--b1)]"
+            variant="primary"
+            className="text-[11px] px-4 py-2"
           >
             Update password
-          </button>
-          <button
+          </Button>
+
+          <Button
             type="button"
-            className="text-[11px] font-medium text-[var(--b1-mid)] underline-offset-2 hover:underline"
+            variant="ghost"
+            className="text-[11px] font-medium underline-offset-2 hover:underline"
           >
             Forgot password? Start OTP flow
-          </button>
+          </Button>
         </div>
       </form>
     </div>
@@ -68,4 +77,3 @@ const SecuritySettings: React.FC = () => {
 };
 
 export default SecuritySettings;
-

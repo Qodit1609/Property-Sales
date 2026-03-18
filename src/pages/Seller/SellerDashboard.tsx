@@ -11,9 +11,9 @@ import {
 } from "../../features/seller/sellerSlice";
 import type { Property } from "../../features/properties/propertyType";
 import type { SellerListingPayload } from "../../features/seller/sellerAPI";
+import { Button } from "@/components/common";
 
 type FormState = SellerListingPayload;
-
 
 const emptyForm: FormState & {
   description?: string;
@@ -204,23 +204,23 @@ const SellerDashboard: React.FC = () => {
 
                     <td className="px-4 py-3 text-right">
                       <div className="flex flex-wrap justify-end gap-2">
-                        <button
+                        <Button
                           disabled={actionLoading}
                           onClick={() => openEditModal(listing)}
                           className="inline-flex items-center gap-1 rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-1 text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
                         >
                           <Pencil size={14} />
                           Edit
-                        </button>
+                        </Button>
 
-                        <button
+                        <Button
                           disabled={actionLoading}
                           onClick={() => handleDelete(listing._id)}
                           className="inline-flex items-center gap-1 rounded-md border border-[var(--error)] bg-[var(--error-bg)] px-3 py-1 text-xs font-medium text-[var(--error)] hover:opacity-80 transition"
                         >
                           <Trash2 size={14} />
                           Delete
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -241,7 +241,6 @@ const SellerDashboard: React.FC = () => {
           </div>
         </section>
       </DashboardLayout>
-
     </>
   );
 };

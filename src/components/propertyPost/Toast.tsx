@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { CheckCircle2, Info, XCircle, X } from "lucide-react";
+import { Button } from "@/components/common";
 
 export type ToastKind = "success" | "error" | "info";
 
@@ -80,14 +81,14 @@ export function ToastStack({
               )}
             </div>
 
-            <button
+            <Button
               type="button"
               onClick={() => onDismiss(t.id)}
               className="shrink-0 rounded-md p-1 text-[var(--muted)] hover:bg-black/5 hover:text-[var(--b1)] transition"
               aria-label="Dismiss"
             >
               <X className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
       ))}

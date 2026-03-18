@@ -3,6 +3,7 @@ import { Search, TrendingUp, Sparkles } from "lucide-react";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import BuyerLayout from "../../components/buyer/BuyerLayout";
 import PropertyCard from "../../components/Crads/PropertyCard";
+import { Input, Button } from "@/components/common";
 
 const trendingLocations = [
   "Indore Bypass",
@@ -60,7 +61,7 @@ const BuyerDashboard: React.FC = () => {
           <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,2.3fr)_minmax(0,1.2fr)]">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[var(--b1-mid)]" />
-              <input
+              <Input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -73,7 +74,7 @@ const BuyerDashboard: React.FC = () => {
                 <p className="text-[10px] font-medium uppercase tracking-wide text-[var(--muted)]">
                   Budget ceiling
                 </p>
-                <input
+                <Input
                   type="range"
                   min={1000000}
                   max={100000000}
@@ -98,14 +99,14 @@ const BuyerDashboard: React.FC = () => {
               Trending corridors:
             </div>
             {trendingLocations.map((loc) => (
-              <button
+              <Button
                 key={loc}
                 type="button"
                 onClick={() => setQuery(loc)}
                 className="rounded-full bg-[var(--white)] px-2.5 py-1 text-[10px] text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2-soft)]"
               >
                 {loc}
-              </button>
+              </Button>
             ))}
           </div>
         </section>
@@ -120,7 +121,7 @@ const BuyerDashboard: React.FC = () => {
             </p>
           </div>
 
-              {loading ? (
+          {loading ? (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {shimmerCards.map((_, idx) => (
                 <div
@@ -143,4 +144,3 @@ const BuyerDashboard: React.FC = () => {
 };
 
 export default BuyerDashboard;
-

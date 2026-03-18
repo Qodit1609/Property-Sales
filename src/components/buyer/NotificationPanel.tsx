@@ -5,6 +5,7 @@ import {
   markAllNotificationsRead,
   markNotificationRead,
 } from "../../features/buyer/buyerSlice";
+import { Button } from "@/components/common";
 
 const NotificationPanel: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -26,15 +27,17 @@ const NotificationPanel: React.FC = () => {
             </p>
           </div>
         </div>
+
         {notifications.length > 0 && (
-          <button
+          <Button
             type="button"
             onClick={() => dispatch(markAllNotificationsRead())}
-            className="inline-flex items-center gap-1.5 rounded-full bg-[var(--b2-soft)] px-3 py-1 text-[11px] font-medium text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2)]"
+            variant="ghost"
+            className="rounded-full px-3 py-1 text-[11px] font-medium text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2)]"
           >
             <CheckCircle2 className="h-3.5 w-3.5" />
             Mark all read
-          </button>
+          </Button>
         )}
       </div>
 
@@ -51,12 +54,13 @@ const NotificationPanel: React.FC = () => {
       ) : (
         <div className="mt-1 space-y-2 text-xs text-[var(--b1)]">
           {notifications.map((n) => (
-            <button
+            <Button
               key={n.id}
               type="button"
               onClick={() => dispatch(markNotificationRead(n.id))}
+              variant="ghost"
               className={[
-                "flex w-full items-start gap-3 rounded-xl border px-3 py-2 text-left transition",
+                "w-full items-start gap-3 rounded-xl border px-3 py-2 text-left",
                 n.read
                   ? "border-[var(--b2-soft)] bg-[var(--b2-soft)]"
                   : "border-[var(--b2)] bg-[var(--white)] shadow-sm",
@@ -74,7 +78,7 @@ const NotificationPanel: React.FC = () => {
                   {new Date(n.createdAt).toLocaleString()}
                 </p>
               </div>
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -83,4 +87,3 @@ const NotificationPanel: React.FC = () => {
 };
 
 export default NotificationPanel;
-

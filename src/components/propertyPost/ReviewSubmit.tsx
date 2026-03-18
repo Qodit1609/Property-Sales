@@ -13,6 +13,7 @@ import {
 } from "../../features/postProperty/postPropertyValidation";
 import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
+import { Button } from "@/components/common";
 
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
@@ -92,7 +93,7 @@ export default function ReviewSubmit() {
           </p>
         </div>
 
-        <button
+        <Button
           type="button"
           onClick={() => {
             dispatch(saveDraftNow());
@@ -101,7 +102,7 @@ export default function ReviewSubmit() {
           className="rounded-md border border-[var(--b2)] px-4 py-2 text-sm font-semibold text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
         >
           Save draft
-        </button>
+        </Button>
       </div>
 
       {!isReadyToSubmit && (
@@ -119,13 +120,13 @@ export default function ReviewSubmit() {
         <section className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-5">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-[var(--b1)]">Basic details</p>
-            <button
+            <Button
               type="button"
               onClick={() => navigate("/post-property/basic")}
               className="text-xs font-semibold text-[var(--b1-mid)] hover:text-[var(--b1)]"
             >
               Edit
-            </button>
+            </Button>
           </div>
           <div className="mt-3 divide-y divide-[var(--b2)]">
             <SummaryRow label="Listing type" value={post.basicDetails.listingType} />
@@ -139,13 +140,13 @@ export default function ReviewSubmit() {
         <section className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-5">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-[var(--b1)]">Location</p>
-            <button
+            <Button
               type="button"
               onClick={() => navigate("/post-property/location")}
               className="text-xs font-semibold text-[var(--b1-mid)] hover:text-[var(--b1)]"
             >
               Edit
-            </button>
+            </Button>
           </div>
           <div className="mt-3 divide-y divide-[var(--b2)]">
             <SummaryRow label="State" value={post.locationDetails.state} />
@@ -161,13 +162,13 @@ export default function ReviewSubmit() {
         <section className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-5">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-[var(--b1)]">Profile</p>
-            <button
+            <Button
               type="button"
               onClick={() => navigate("/post-property/profile")}
               className="text-xs font-semibold text-[var(--b1-mid)] hover:text-[var(--b1)]"
             >
               Edit
-            </button>
+            </Button>
           </div>
           <div className="mt-3 divide-y divide-[var(--b2)]">
             <SummaryRow
@@ -200,13 +201,13 @@ export default function ReviewSubmit() {
         <section className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-5">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm font-semibold text-[var(--b1)]">Media & amenities</p>
-            <button
+            <Button
               type="button"
               onClick={() => navigate("/post-property/media")}
               className="text-xs font-semibold text-[var(--b1-mid)] hover:text-[var(--b1)]"
             >
               Edit
-            </button>
+            </Button>
           </div>
           <div className="mt-3 divide-y divide-[var(--b2)]">
             <SummaryRow label="Images" value={`${post.media.images.length}`} />
@@ -229,13 +230,13 @@ export default function ReviewSubmit() {
         nextDisabled={!isReadyToSubmit}
         nextLoading={post.submitLoading}
         rightExtra={
-          <button
+          <Button
             type="button"
             onClick={() => navigate("/post-property/basic")}
             className="w-full sm:w-auto rounded-md border border-[var(--b2)] px-4 py-2 text-sm font-semibold text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
           >
             Edit details
-          </button>
+          </Button>
         }
       />
     </div>

@@ -15,6 +15,7 @@ import {
   removeFromCart,
 } from "../../features/buyer/buyerSlice";
 import PropertyCard from "../Crads/PropertyCard";
+import { Button } from "@/components/common";
 
 const Cart: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -63,15 +64,18 @@ const Cart: React.FC = () => {
                   <p className="text-xs font-semibold uppercase tracking-wide text-[var(--b1-mid)]">
                     Negotiation workspace
                   </p>
-                  <button
+
+                  <Button
                     type="button"
                     onClick={() => dispatch(removeFromCart(property._id))}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-[var(--error-bg)] px-3 py-1 text-[11px] font-medium text-[var(--error)] ring-1 ring-[var(--error)]/40 hover:bg-[var(--error-bg)]/80"
+                    variant="ghost"
+                    className="rounded-full bg-[var(--error-bg)] px-3 py-1 text-[11px] font-medium text-[var(--error)] ring-1 ring-[var(--error)]/40 hover:bg-[var(--error-bg)]/80"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Remove
-                  </button>
+                  </Button>
                 </div>
+
                 <p className="text-xs text-slate-400">
                   Coordinate with the seller or agent directly from here. Keep
                   your communication, visits and documents organized.
@@ -79,57 +83,70 @@ const Cart: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-[11px] text-[var(--b1)]">
-                <button
+                <Button
                   type="button"
-                  className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--b1-mid)] px-3 py-2 font-semibold text-[var(--fg)] shadow ring-1 ring-[var(--b2)] hover:bg-[var(--b1)]"
+                  variant="primary"
+                  className="justify-center px-3 py-2"
                 >
                   <PhoneCall className="h-3.5 w-3.5" />
                   Request callback
-                </button>
-                <button
+                </Button>
+
+                <Button
                   type="button"
-                  className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--b2-soft)] px-3 py-2 font-medium text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2)] hover:text-[var(--b1)]"
+                  variant="outline"
+                  className="justify-center px-3 py-2"
                 >
                   <CalendarClock className="h-3.5 w-3.5" />
                   Schedule visit
-                </button>
-                <button
+                </Button>
+
+                <Button
                   type="button"
-                  className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--b2-soft)] px-3 py-2 font-medium text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2)] hover:text-[var(--b1)]"
+                  variant="outline"
+                  className="justify-center px-3 py-2"
                 >
                   <MessageCircle className="h-3.5 w-3.5" />
                   Send enquiry
-                </button>
-                <button
+                </Button>
+
+                <Button
                   type="button"
-                  className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--b2-soft)] px-3 py-2 font-medium text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2)] hover:text-[var(--b1)]"
+                  variant="outline"
+                  className="justify-center px-3 py-2"
                 >
                   <Download className="h-3.5 w-3.5" />
                   Download brochure
-                </button>
-                <button
+                </Button>
+
+                <Button
                   type="button"
-                  className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[var(--b2-soft)] px-3 py-2 font-medium text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2)] hover:text-[var(--b1)]"
+                  variant="outline"
+                  className="justify-center px-3 py-2"
                 >
                   <Share2 className="h-3.5 w-3.5" />
                   Share property
-                </button>
+                </Button>
+
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => dispatch(addToCompare(property))}
-                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--b2-soft)] px-3 py-2 font-medium text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2)] hover:text-[var(--b1)]"
+                    variant="outline"
+                    className="flex-1 justify-center px-3 py-2"
                   >
                     <Scale className="h-3.5 w-3.5" />
                     Add to compare
-                  </button>
-                  <button
+                  </Button>
+
+                  <Button
                     type="button"
                     onClick={() => dispatch(addToWishlist(property))}
-                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[var(--white)] px-3 py-2 font-medium text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2-soft)]"
+                    variant="ghost"
+                    className="flex-1 justify-center px-3 py-2"
                   >
                     Save for later
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -141,4 +158,3 @@ const Cart: React.FC = () => {
 };
 
 export default Cart;
-

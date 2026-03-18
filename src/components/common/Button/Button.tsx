@@ -1,0 +1,66 @@
+import React from "react";
+
+type ButtonProps = {
+  children: React.ReactNode;
+  variant?: "primary" | "secondary" | "outline" | "ghost";
+  size?: "sm" | "md" | "lg";
+  loading?: boolean;
+  disabled?: boolean;
+  fullWidth?: boolean;
+  className?: string;
+
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+
+  type?: "button" | "submit" | "reset";
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
+
+const base =
+  "rounded-lg font-medium transition-all duration-200 focus:outline-none flex items-center justify-center";
+
+const variants = {
+  primary: "bg-primary text-white hover:opacity-90",
+  secondary: "bg-secondary text-white hover:opacity-90",
+  outline: "border border-border text-foreground hover:bg-muted",
+  ghost: "text-foreground hover:bg-muted",
+};
+
+const sizes = {
+  sm: "px-3 py-1 text-sm",
+  md: "px-4 py-2",
+  lg: "px-6 py-3 text-lg",
+};
+
+const Button: React.FC<ButtonProps> = ({
+  children,
+  variant = "primary",
+  size = "md",
+  loading,
+  disabled,
+  fullWidth,
+  className = "",
+  type = "button",
+  onClick, // ✅ FIX: destructured here
+  ...props
+}) => {
+  return (
+    <button
+      type={type}
+      onClick={(e) => onClick?.(e)} // ✅ now works
+      disabled={disabled || loading}
+      className={`
+        ${base}
+        ${variants[variant]}
+        ${sizes[size]}
+        ${fullWidth ? "w-full" : ""}
+        ${disabled ? "opacity-50 cursor-not-allowed" : ""}
+        active:scale-95
+        ${className}
+      `}
+      {...props}
+    >
+      {loading ? "Loading..." : children}
+    </button>
+  );
+};
+
+export default Button;

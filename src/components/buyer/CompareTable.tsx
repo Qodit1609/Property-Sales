@@ -1,7 +1,15 @@
 import React, { useMemo } from "react";
-import { MapPin, Ruler, BedDouble, Bath, Car, IndianRupee } from "lucide-react";
+import {
+  MapPin,
+  Ruler,
+  BedDouble,
+  Bath,
+  Car,
+  IndianRupee,
+} from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { removeFromCompare } from "../../features/buyer/buyerSlice";
+import { Button } from "@/components/common";
 
 const CompareTable: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -51,6 +59,7 @@ const CompareTable: React.FC = () => {
               <th className="w-40 border-b border-r border-[var(--b2-soft)] bg-[var(--b2-soft)] px-4 py-3 text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
                 Metric
               </th>
+
               {compareList.map((p) => (
                 <th
                   key={p._id}
@@ -65,18 +74,21 @@ const CompareTable: React.FC = () => {
                         {p.address}
                       </p>
                     </div>
-                    <button
+
+                    <Button
                       type="button"
                       onClick={() => dispatch(removeFromCompare(p._id))}
-                      className="rounded-full bg-[var(--white)] px-2 py-1 text-[10px] text-[var(--muted)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2-soft)]"
+                      variant="ghost"
+                      className="rounded-full px-2 py-1 text-[10px] text-[var(--muted)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2-soft)]"
                     >
                       Remove
-                    </button>
+                    </Button>
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
+
           <tbody>
             {metrics.map(({ key, label, icon: Icon }) => (
               <tr
@@ -91,8 +103,10 @@ const CompareTable: React.FC = () => {
                     <span>{label}</span>
                   </div>
                 </td>
+
                 {compareList.map((p) => {
                   let value: React.ReactNode = "-";
+
                   if (key === "price") {
                     value =
                       p.price != null
@@ -100,11 +114,12 @@ const CompareTable: React.FC = () => {
                         : "-";
                   } else if (key === "size") {
                     value =
-                      p.size != null ? `${p.size.toLocaleString()} sq.ft` : "-";
+                      p.size != null
+                        ? `${p.size.toLocaleString()} sq.ft`
+                        : "-";
                   } else if (key === "address") {
                     value = p.address ?? "-";
                   } else {
-                    // beds, baths, parking as generic access
                     const v = (p as any)[key];
                     value = v ?? "-";
                   }
@@ -128,4 +143,3 @@ const CompareTable: React.FC = () => {
 };
 
 export default CompareTable;
-

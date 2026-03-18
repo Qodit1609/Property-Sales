@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import PropertyCard from "../Crads/PropertyCard";
 import { properties } from "../Data/properties";
+import { Button } from "@/components/common";
 
 const PropertySection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -59,7 +60,7 @@ const PropertySection = () => {
 
         <div className="mt-10 flex justify-center">
           {!showAll ? (
-            <button
+            <Button
               onClick={() => setShowAll(true)}
               className="
                 bg-[var(--b2)]
@@ -72,9 +73,9 @@ const PropertySection = () => {
               "
             >
               Show all Property
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               onClick={() => setShowAll(false)}
               className="
                 bg-[var(--b2-soft)]
@@ -87,7 +88,7 @@ const PropertySection = () => {
               "
             >
               ✕ Close
-            </button>
+            </Button>
           )}
         </div>
       </div>

@@ -13,6 +13,7 @@ import type {
 import { validateBasicDetails } from "../../features/postProperty/postPropertyValidation";
 import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
+import { Input, Button } from "@/components/common";
 
 const CATEGORY_OPTIONS: PropertyCategory[] = [
   "Agriculture Land",
@@ -178,7 +179,7 @@ export default function BasicDetailsForm() {
           <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
             Listing title *
           </label>
-          <input
+          <Input
             value={basic.title}
             onBlur={() => setTouched((p) => ({ ...p, title: true }))}
             onChange={(e) => dispatch(updateBasicDetails({ title: e.target.value }))}
@@ -206,7 +207,7 @@ export default function BasicDetailsForm() {
             <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
               Name *
             </label>
-            <input
+            <Input
               value={basic.contactName}
               onBlur={() => setTouched((p) => ({ ...p, contactName: true }))}
               onChange={(e) =>
@@ -228,7 +229,7 @@ export default function BasicDetailsForm() {
             <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
               Email *
             </label>
-            <input
+            <Input
               value={basic.contactEmail}
               onBlur={() => setTouched((p) => ({ ...p, contactEmail: true }))}
               onChange={(e) =>
@@ -251,7 +252,7 @@ export default function BasicDetailsForm() {
               Mobile number *
             </label>
             <div className="flex gap-2">
-              <input
+              <Input
                 value={basic.contactMobile}
                 onBlur={() => setTouched((p) => ({ ...p, contactMobile: true }))}
                 onChange={(e) =>
@@ -264,7 +265,7 @@ export default function BasicDetailsForm() {
                 }`}
                 placeholder="10-digit mobile"
               />
-              <button
+              <Button
                 type="button"
                 onClick={() =>
                   pushToast({
@@ -276,7 +277,7 @@ export default function BasicDetailsForm() {
                 className="rounded-md border border-[var(--b2)] px-3 py-2 text-xs font-semibold text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
               >
                 Verify
-              </button>
+              </Button>
             </div>
             {showError("contactMobile") && (
               <p className="mt-1 text-xs text-[var(--error)]">

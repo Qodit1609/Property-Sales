@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { POST_PROPERTY_STEPS } from "./stepConfig";
 import { Check } from "lucide-react";
+import { Button } from "@/components/common";
 
 type StepStatus = "done" | "current" | "todo";
 
@@ -85,7 +86,7 @@ export default memo(function Stepper({
 
               return (
                 <li key={step.key}>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       if (clickable) onNavigate(step.path);
@@ -150,7 +151,7 @@ export default memo(function Stepper({
                         </p>
                       </div>
                     </div>
-                  </button>
+                  </Button>
                 </li>
               );
             })}

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAppSelector } from "../../hooks/reduxHooks";
+import { Input, Button } from "@/components/common";
 
 const AgentProfilePage: React.FC = () => {
   const { user } = useAppSelector((state) => state.auth);
@@ -31,7 +32,7 @@ const AgentProfilePage: React.FC = () => {
               <label className="mb-1 block text-sm font-medium" htmlFor="name">
                 Name
               </label>
-              <input
+              <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -45,7 +46,7 @@ const AgentProfilePage: React.FC = () => {
               >
                 Experience (years)
               </label>
-              <input
+              <Input
                 id="experienceYears"
                 value={experienceYears}
                 onChange={(e) => setExperienceYears(e.target.value)}
@@ -63,7 +64,7 @@ const AgentProfilePage: React.FC = () => {
             >
               Specialization
             </label>
-            <input
+            <Input
               id="specialization"
               value={specialization}
               onChange={(e) => setSpecialization(e.target.value)}
@@ -73,12 +74,12 @@ const AgentProfilePage: React.FC = () => {
           </div>
 
           <div className="flex justify-end">
-            <button
+            <Button
               type="submit"
               className="rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] hover:bg-[var(--b1)] transition"
             >
               Save
-            </button>
+            </Button>
           </div>
         </form>
       </div>

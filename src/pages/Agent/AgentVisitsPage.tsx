@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import Modal from "../../components/Modal/Modal";
+import { Input, Button } from "@/components/common";
 
 type VisitStatus = "scheduled" | "rescheduled" | "cancelled";
 
@@ -42,13 +43,13 @@ const AgentVisitsPage: React.FC = () => {
             {active} active visits
           </p>
         </div>
-        <button
+        <Button
           type="button"
           onClick={() => setCreating(true)}
           className="w-full sm:w-auto inline-flex justify-center items-center rounded-lg bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] shadow hover:bg-[var(--b1)] transition"
         >
           Create visit
-        </button>
+        </Button>
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-sm">
@@ -77,20 +78,20 @@ const AgentVisitsPage: React.FC = () => {
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex flex-wrap justify-end gap-2">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setEditing(v)}
                       className="inline-flex items-center rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-1 text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
                     >
                       Reschedule
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => setCancelling(v)}
                       className="inline-flex items-center rounded-md border border-[var(--error)] bg-[var(--error-bg)] px-3 py-1 text-xs font-medium text-[var(--error)] hover:opacity-80 transition"
                     >
                       Cancel
-                    </button>
+                    </Button>
                   </div>
                 </td>
               </tr>
@@ -163,14 +164,14 @@ const AgentVisitsPage: React.FC = () => {
               <span className="font-semibold">{cancelling.clientName}</span>?
             </p>
             <div className="flex justify-end gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={() => setCancelling(null)}
                 className="rounded-md border border-[var(--b2)] bg-[var(--white)] px-4 py-2 text-sm"
               >
                 Keep
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => {
                   setVisits((prev) =>
@@ -183,7 +184,7 @@ const AgentVisitsPage: React.FC = () => {
                 className="rounded-md border border-[var(--error)] bg-[var(--error-bg)] px-4 py-2 text-sm font-semibold text-[var(--error)] hover:opacity-80 transition"
               >
                 Cancel visit
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -220,7 +221,7 @@ function VisitForm({
           <label className="mb-1 block text-sm font-medium" htmlFor="clientName">
             Client name
           </label>
-          <input
+          <Input
             id="clientName"
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
@@ -232,7 +233,7 @@ function VisitForm({
           <label className="mb-1 block text-sm font-medium" htmlFor="when">
             Date & time
           </label>
-          <input
+          <Input
             id="when"
             value={when}
             onChange={(e) => setWhen(e.target.value)}
@@ -247,7 +248,7 @@ function VisitForm({
         <label className="mb-1 block text-sm font-medium" htmlFor="property">
           Property
         </label>
-        <input
+        <Input
           id="property"
           value={property}
           onChange={(e) => setProperty(e.target.value)}
@@ -258,19 +259,19 @@ function VisitForm({
       </div>
 
       <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
-        <button
+        <Button
           type="button"
           onClick={onCancel}
           className="w-full sm:w-auto rounded-md border border-[var(--b2)] px-4 py-2 text-sm"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
           className="w-full sm:w-auto rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] hover:bg-[var(--b1)] transition"
         >
           {submitLabel}
-        </button>
+        </Button>
       </div>
     </form>
   );

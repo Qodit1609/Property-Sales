@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 type LinkItem = {
   label: string;
@@ -36,9 +37,10 @@ const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4 text-center lg:text-left">
           
+          {/* LOGO */}
           <div className="flex flex-col items-center lg:items-start">
-            <a
-              href="/"
+            <Link
+              to="/"
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               className="
                 mb-4
@@ -52,13 +54,14 @@ const Footer: React.FC = () => {
               "
             >
               Bhoomi Wala
-            </a>
+            </Link>
 
             <p className="text-sm text-fg/80 max-w-xs">
               The easiest way to find, buy, and invest in your dream land.
             </p>
           </div>
 
+          {/* QUICK LINKS */}
           <div className="flex flex-col items-center lg:items-start">
             <h3 className="text-base font-semibold mb-4 tracking-wide">
               Quick Links
@@ -66,17 +69,18 @@ const Footer: React.FC = () => {
             <ul className="space-y-2">
               {quickLinks.map((item) => (
                 <li key={item.label}>
-                  <a
-                    href={item.href}
+                  <Link
+                    to={item.href}
                     className="text-sm text-fg/80 hover:text-fg transition"
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </div>
 
+          {/* CONTACT */}
           <div className="flex flex-col items-center lg:items-start max-w-xs mx-auto lg:mx-0">
             <h3 className="text-base font-semibold mb-4 tracking-wide">
               Contact
@@ -97,6 +101,7 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
+          {/* SOCIAL */}
           <div className="flex flex-col items-center lg:items-start">
             <h3 className="text-base font-semibold mb-4 tracking-wide">
               Follow Us
@@ -125,6 +130,7 @@ const Footer: React.FC = () => {
         </div>
       </div>
 
+      {/* COPYRIGHT */}
       <div className="border-t border-white/30 py-4 text-center text-xs sm:text-sm text-fg/80 px-4">
         © 2026 abc.com · All Rights Reserved · Developed by{" "}
         <span className="text-fg font-semibold">TRH</span>

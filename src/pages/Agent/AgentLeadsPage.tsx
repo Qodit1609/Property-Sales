@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import Modal from "../../components/Modal/Modal";
+import { Input, Button } from "@/components/common";
 
 type LeadStatus = "new" | "contacted" | "qualified" | "closed";
 
@@ -96,13 +97,13 @@ const AgentLeadsPage: React.FC = () => {
                   </select>
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => setScheduling(l)}
                     className="inline-flex items-center rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-1 text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
                   >
                     Schedule visit
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -217,7 +218,7 @@ function ScheduleForm({
         <label className="mb-1 block text-sm font-medium" htmlFor="when">
           Date & time
         </label>
-        <input
+        <Input
           id="when"
           value={when}
           onChange={(e) => setWhen(e.target.value)}
@@ -242,19 +243,19 @@ function ScheduleForm({
       </div>
 
       <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
-        <button
+        <Button
           type="button"
           onClick={onCancel}
           className="w-full sm:w-auto rounded-md border border-[var(--b2)] px-4 py-2 text-sm"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
           className="w-full sm:w-auto rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] hover:bg-[var(--b1)] transition"
         >
           Create visit
-        </button>
+        </Button>
       </div>
     </form>
   );

@@ -9,6 +9,7 @@ import {
 import { validateLocationDetails } from "../../features/postProperty/postPropertyValidation";
 import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
+import { Input, Button } from "@/components/common";
 
 function Field({
   label,
@@ -32,7 +33,7 @@ function Field({
       <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
         {label} {required ? "*" : ""}
       </label>
-      <input
+      <Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onBlur={onBlur}
@@ -184,7 +185,7 @@ export default function LocationForm() {
             <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
               Latitude
             </label>
-            <input
+            <Input
               value={location.latitude ?? ""}
               onChange={(e) =>
                 dispatch(
@@ -201,7 +202,7 @@ export default function LocationForm() {
             <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
               Longitude
             </label>
-            <input
+            <Input
               value={location.longitude ?? ""}
               onChange={(e) =>
                 dispatch(

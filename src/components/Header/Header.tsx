@@ -5,6 +5,7 @@ import ContactPopup from "../ContactPopup/ContactPopup";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
 import type { UserRole } from "../../features/users/userType";
+import { Button } from "@/components/common";
 
 interface MegaSection {
   title: string;
@@ -255,19 +256,19 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               </Link>
 
               {/* Contact button keeps existing modal behavior */}
-              <button
+              <Button
                 onClick={() => setContactOpen(true)}
-                className="hidden sm:flex w-7 h-7 rounded-full border-2 border-[var(--fg)] items-center justify-center text-[var(--fg)]"
+                className="hidden sm:flex w-8 h-8 rounded-lg border-2 border-[var(--fg)] items-center justify-center text-[var(--fg)] p-0"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-4 h-4"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
+          <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-4 h-4 flex-shrink-0"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
                   <path d="M6.6 10.8c1.5 3 3.6 5.1 6.6 6.6l2.2-2.2c.3-.3.8-.4 1.2-.3 1 .3 2.1.5 3.2.5.7 0 1.2.5 1.2 1.2V21c0 .7-.5 1.2-1.2 1.2C10.6 22.2 1.8 13.4 1.8 2.2 1.8 1.5 2.3 1 3 1h3.6c.7 0 1.2.5 1.2 1.2 0 1.1.2 2.2.5 3.2.1.4 0 .9-.3 1.2l-2.4 2.4z" />
                 </svg>
-              </button>
+              </Button>
 
               {!isAuthenticated ? (
                 <Link
@@ -282,7 +283,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                   onMouseEnter={openLogin}
                   onMouseLeave={closeLogin}
                 >
-                  <button className="inline-flex items-center gap-2 rounded-full border-2 border-[var(--fg)] px-3 py-1.5 text-[var(--fg)]">
+                  <Button className="inline-flex items-center gap-2 rounded-full border-2 border-[var(--fg)] px-3 py-1.5 text-[var(--fg)]">
                     <span className="w-7 h-7 rounded-full border border-[var(--fg)] flex items-center justify-center">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -297,7 +298,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                     <span className="text-sm font-medium max-w-[140px] truncate">
                       {user?.name}
                     </span>
-                  </button>
+                  </Button>
 
                   {loginOpen && (
                     <div className="absolute right-0 mt-3 w-48 bg-[var(--white)] rounded-lg shadow-xl p-3 space-y-2">
@@ -319,26 +320,26 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         Dashboard
                       </Link>
 
-                      <button
+                      <Button
                         type="button"
                         onClick={handleLogout}
                         className="w-full text-left block text-sm text-[var(--error)] hover:opacity-80"
                       >
                         Logout
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </div>
               )}
 
               {/* Mobile menu toggle */}
-              <button
+              <Button
                 className="lg:hidden text-[var(--fg)] text-2xl"
                 onClick={() => setMenuOpen(true)}
                 aria-label="Toggle Menu"
               >
                 ☰
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -365,12 +366,12 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               BhoomiWala
             </span>
 
-            <button
+            <Button
               onClick={() => setMenuOpen(false)}
               className="text-xl text-[var(--b1)]"
             >
               ✕
-            </button>
+            </Button>
           </div>
 
           <div className="flex flex-col p-6 space-y-6">
@@ -406,7 +407,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                     Dashboard
                   </Link>
 
-                  <button
+                  <Button
                     type="button"
                     onClick={() => {
                       setMenuOpen(false);
@@ -415,11 +416,11 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                     className="w-full border border-[var(--error)] text-[var(--error)] py-2 rounded-lg"
                   >
                     Logout
-                  </button>
+                  </Button>
                 </>
               )}
 
-              <button
+              <Button
                 onClick={() => {
                   setMenuOpen(false);
                   setContactOpen(true);
@@ -427,7 +428,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                 className="w-full border border-[var(--b1-mid)] text-[var(--b1-mid)] py-2 rounded-lg"
               >
                 Contact Us
-              </button>
+              </Button>
             </div>
           </div>
         </div>

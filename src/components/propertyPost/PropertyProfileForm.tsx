@@ -16,6 +16,7 @@ import type {
 import { validateProfileDetails } from "../../features/postProperty/postPropertyValidation";
 import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
+import { Input, Button } from "@/components/common";
 
 const OWNERSHIP: OwnershipType[] = [
   "Freehold",
@@ -82,7 +83,7 @@ export default function PropertyProfileForm() {
             Total land area *
           </label>
           <div className="flex gap-2">
-            <input
+            <Input
               value={profile.totalArea ?? ""}
               onBlur={() => setTouched((p) => ({ ...p, totalArea: true }))}
               onChange={(e) =>
@@ -120,7 +121,7 @@ export default function PropertyProfileForm() {
           <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
             Price *
           </label>
-          <input
+          <Input
             value={profile.price ?? ""}
             onBlur={() => setTouched((p) => ({ ...p, price: true }))}
             onChange={(e) =>
@@ -138,7 +139,7 @@ export default function PropertyProfileForm() {
             placeholder="e.g. 4500000"
           />
           <div className="mt-2 flex items-center gap-2">
-            <input
+            <Input
               id="negotiable"
               type="checkbox"
               checked={profile.negotiable}
@@ -255,7 +256,7 @@ export default function PropertyProfileForm() {
             {SUITABLE.map((x) => {
               const active = profile.suitableFor.includes(x);
               return (
-                <button
+                <Button
                   key={x}
                   type="button"
                   onClick={() => toggleSuitable(x)}
@@ -266,7 +267,7 @@ export default function PropertyProfileForm() {
                   }`}
                 >
                   {x}
-                </button>
+                </Button>
               );
             })}
           </div>

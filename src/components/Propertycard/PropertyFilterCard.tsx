@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { isSizeInAcres } from "../Data/properties";
 import type { Property } from "../../features/properties/propertyType";
+import { Button, Input } from "@/components/common";
 
 interface PropertyFilterCardProps {
   properties: Property[];
@@ -43,7 +44,6 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
 
   const filtered = useMemo(() => {
     return properties.filter((p) => {
-      // 🔍 Search
       if (search.trim()) {
         const q = search.toLowerCase();
         if (
@@ -53,13 +53,10 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           return false;
       }
 
-      // 💰 Price
       if (p.price < minPrice || p.price > maxPrice) return false;
 
-      // 📍 Distance (safe access)
       if ((p.distanceFromIndore ?? 0) > distance) return false;
 
-      // 📐 Size (safe access)
       const propertySize = p.size ?? 0;
 
       if (isAgriPage && isSizeInAcres(p.propertyType) && propertySize > size)
@@ -68,7 +65,6 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
       if (!isAgriPage && !isSizeInAcres(p.propertyType) && propertySize > size)
         return false;
 
-      // 🏷 Tags (safe access)
       if (
         tags.length > 0 &&
         !tags.some((t) => p.tags?.includes(t))
@@ -97,19 +93,19 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
     <>
       {/* MOBILE ACTION BAR */}
       <div className="flex items-center gap-3 mb-4 lg:hidden">
-        <button
+        <Button
           onClick={() => setIsFilterOpen(true)}
           className="px-4 py-2 rounded-md bg-[var(--b2)] text-[var(--b1)] font-semibold"
         >
           Filters
-        </button>
+        </Button>
 
-        <button
+        <Button
           onClick={clearAll}
           className="px-4 py-2 rounded-md border border-[var(--b2)] text-[var(--b2)] font-semibold hover:bg-[var(--b2)] hover:text-[var(--b1)] transition"
         >
           Clear
-        </button>
+        </Button>
       </div>
 
       {isFilterOpen && (
@@ -132,17 +128,17 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
       >
         <div className="flex justify-between items-center mb-4 lg:hidden">
           <h3 className="font-semibold text-lg text-[var(--b2)]">Filters</h3>
-          <button
+          <Button
             onClick={() => setIsFilterOpen(false)}
             className="text-xl font-bold text-[var(--b2)]"
           >
             ✕
-          </button>
+          </Button>
         </div>
 
         {/* SEARCH */}
         <div className="flex mb-5">
-          <input
+          <Input
             type="text"
             placeholder="Search property…"
             value={search}
@@ -156,7 +152,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
 
         {/* PRICE */}
         <p className={titleClass}>PRICE (₹)</p>
-        <input
+        <Input
           type="range"
           min={100000}
           max={1000000000}
@@ -173,7 +169,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
 
         {/* DISTANCE */}
         <p className={titleClass}>DISTANCE FROM INDORE (KM)</p>
-        <input
+        <Input
           type="range"
           min={0}
           max={200}
@@ -190,7 +186,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
 
         {/* SIZE */}
         <p className={titleClass}>SIZE ({sizeUnit.toUpperCase()})</p>
-        <input
+        <Input
           type="range"
           min={0}
           max={sizeMax}
@@ -212,7 +208,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
         <div className="grid grid-cols-2 gap-2 mb-5 text-[var(--b2)]">
           {["Hot", "Popular", "Latest", "Premium"].map((tag) => (
             <label key={tag} className="flex items-center gap-2 text-sm">
-              <input
+              <Input
                 type="checkbox"
                 checked={tags.includes(tag)}
                 onChange={() => toggleTag(tag)}
@@ -223,12 +219,12 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           ))}
         </div>
 
-        <button
+        <Button
           onClick={clearAll}
           className="w-full py-2 rounded-md bg-[var(--b2)] text-[var(--b1)] font-semibold"
         >
           Clear All
-        </button>
+        </Button>
       </div>
     </>
   );

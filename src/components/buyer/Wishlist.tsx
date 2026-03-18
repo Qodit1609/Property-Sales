@@ -6,6 +6,7 @@ import {
   removeFromWishlist,
 } from "../../features/buyer/buyerSlice";
 import PropertyCard from "../Crads/PropertyCard";
+import { Button } from "@/components/common";
 
 const Wishlist: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -50,24 +51,28 @@ const Wishlist: React.FC = () => {
             <div className="p-3 pb-0">
               <PropertyCard property={property} />
             </div>
+
             <div className="flex items-center justify-between gap-2 border-t border-[var(--b2-soft)] bg-[var(--b2-soft)] px-4 py-3">
-              <button
+              <Button
                 type="button"
                 onClick={() => dispatch(removeFromWishlist(property._id))}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[var(--white)] px-3 py-1 text-[11px] font-medium text-[var(--muted)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2-soft)]"
+                variant="ghost"
+                className="rounded-full px-3 py-1 text-[11px] font-medium text-[var(--muted)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2-soft)]"
               >
                 <HeartCrack className="h-3.5 w-3.5" />
                 Remove
-              </button>
-              <button
+              </Button>
+
+              <Button
                 type="button"
                 onClick={() => dispatch(moveWishlistToCart(property._id))}
-                className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500 px-3 py-1 text-[11px] font-semibold text-slate-950 shadow ring-1 ring-emerald-400 hover:bg-emerald-400"
+                variant="primary"
+                className="rounded-full px-3 py-1 text-[11px] font-semibold"
               >
                 <ShoppingCart className="h-3.5 w-3.5" />
                 Move to cart
                 <MoveRight className="h-3 w-3" />
-              </button>
+              </Button>
             </div>
           </div>
         ))}
@@ -77,4 +82,3 @@ const Wishlist: React.FC = () => {
 };
 
 export default Wishlist;
-

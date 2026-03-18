@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { FileClock } from "lucide-react";
+import { Input} from "@/components/common";
 
 const mockLogs = [
   {
@@ -51,7 +52,7 @@ const AdminLogsPage: React.FC = () => {
               </p>
             </div>
           </div>
-          <input
+          <Input
             type="text"
             placeholder="Search logs..."
             value={search}

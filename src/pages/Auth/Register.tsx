@@ -5,6 +5,7 @@ import { register } from "../../features/auth/authSlice";
 import type { RegisterRole } from "../../features/auth/authAPI";
 import Dashboard from "../Dashboard/Dashboard";
 import { ToastStack, type ToastMessage } from "../../components/propertyPost/Toast";
+import { Input, Button } from "@/components/common";
 
 type Role = RegisterRole;
 
@@ -111,14 +112,14 @@ const Register: React.FC = () => {
 
         <div className="pointer-events-auto w-full max-w-2xl rounded-3xl border border-[var(--b2)] bg-[var(--white)] p-7 sm:p-8 shadow-2xl shadow-[var(--b1)]/20 relative">
 
-          <button
+          <Button
             type="button"
             onClick={() => navigate("/", { replace: true })}
             aria-label="Close"
             className="absolute right-4 top-4 h-8 w-8 flex items-center justify-center rounded-full bg-[var(--b2-soft)] text-[var(--b1)] hover:bg-[var(--b2)] transition"
           >
             ✕
-          </button>
+          </Button>
 
           <div className="mb-6 flex justify-center mt-2">
             <span className="text-2xl font-bold text-[var(--b1)]">
@@ -156,7 +157,7 @@ const Register: React.FC = () => {
                         : "border-[var(--b2)] bg-[var(--white)] text-[var(--b1-mid)] hover:bg-[var(--b2-soft)]"
                     }`}
                   >
-                    <input
+                    <Input
                       type="radio"
                       name="role"
                       value={r}
@@ -177,7 +178,7 @@ const Register: React.FC = () => {
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium">Name</label>
-                <input
+                <Input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
@@ -188,7 +189,7 @@ const Register: React.FC = () => {
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium">Email</label>
-                <input
+                <Input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -200,7 +201,7 @@ const Register: React.FC = () => {
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium">Mobile</label>
-                <input
+                <Input
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value)}
                   className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
@@ -213,7 +214,7 @@ const Register: React.FC = () => {
                   <label className="text-sm font-medium">
                     Investment Interest
                   </label>
-                  <input
+                  <Input
                     value={investmentInterest}
                     onChange={(e) => setInvestmentInterest(e.target.value)}
                     className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
@@ -227,7 +228,7 @@ const Register: React.FC = () => {
                   <label className="text-sm font-medium">
                     Property focus type
                   </label>
-                  <input
+                  <Input
                     value={propertyFocusType}
                     onChange={(e) => setPropertyFocusType(e.target.value)}
                     className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
@@ -241,7 +242,7 @@ const Register: React.FC = () => {
                   <label className="text-sm font-medium">
                     Experience (years)
                   </label>
-                  <input
+                  <Input
                     value={experienceYears}
                     onChange={(e) => setExperienceYears(e.target.value)}
                     className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
@@ -252,7 +253,7 @@ const Register: React.FC = () => {
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium">Password</label>
-                <input
+                <Input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -263,7 +264,7 @@ const Register: React.FC = () => {
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium">Confirm Password</label>
-                <input
+                <Input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -274,21 +275,21 @@ const Register: React.FC = () => {
 
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loading}
               className="w-full inline-flex justify-center items-center rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] shadow-md hover:bg-[var(--b1)] transition disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? "Creating account..." : "Register"}
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="button"
               onClick={() => navigate("/login")}
               className="w-full inline-flex justify-center items-center rounded-md border border-[var(--b2)] bg-[var(--white)] px-4 py-2 text-sm font-semibold text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
             >
               Already have an account? Sign in
-            </button>
+            </Button>
 
             <div className="pt-1 text-center text-xs text-[var(--muted)]">
               By registering, you agree to our{" "}

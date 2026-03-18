@@ -4,12 +4,14 @@ import React from "react";
 import ServiceSection from "../ServiceSection/ServiceSection";
 import PropertyList from "../../components/Crads/PropertyList";
 import StatsSection from "../../components/StatsSection/StatsSection";
+import NewlyLaunchedProjects from "../../components/NewlyLaunchedProjects/NewlyLaunchedProjects";
 
 const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Home />
       <PropertyList/>
+      <NewlyLaunchedProjects />
       <ServiceSection />
       <StatsSection/>  
     </div>

@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { Bell, ChevronDown, LogOut, User2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../hooks/reduxHooks";
- 
+import { Button } from "@/components/common";
+
 interface BuyerHeaderActionsProps {
   onLogout: () => void;
 }
- 
+
 const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
   onLogout,
 }) => {
@@ -15,7 +16,7 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
     (state) => state.buyer.notifications.filter((n) => !n.read).length
   );
   const [open, setOpen] = useState(false);
- 
+
   return (
     <div className="flex items-center gap-3">
       <Link
@@ -29,16 +30,18 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
           </span>
         )}
       </Link>
- 
+
       <div className="relative">
-        <button
+        <Button
           type="button"
           onClick={() => setOpen((prev) => !prev)}
-          className="flex items-center gap-2 rounded-full bg-[var(--white)] px-3 py-1.5 text-xs font-medium text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2-soft)]"
+          variant="ghost"
+          className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2-soft)]"
         >
           <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--b2)] text-[var(--b1)] text-xs font-bold">
             {user?.name?.[0]?.toUpperCase() ?? "B"}
           </span>
+
           <div className="hidden text-left sm:block">
             <p className="text-[11px] leading-tight text-[var(--b1)]">
               {user?.name ?? "Buyer"}
@@ -47,9 +50,10 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
               Buyer
             </p>
           </div>
+
           <ChevronDown className="h-3 w-3 text-[var(--muted)]" />
-        </button>
- 
+        </Button>
+
         {open && (
           <div className="absolute right-0 z-30 mt-2 w-52 overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--white)] text-xs shadow-lg shadow-[var(--b2)]/40">
             <div className="border-b border-[var(--b2-soft)] px-3 py-2">
@@ -60,6 +64,7 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
                 {user?.email ?? "Signed in"}
               </p>
             </div>
+
             <div className="px-1 py-1">
               <Link
                 to="/buyer/account"
@@ -70,22 +75,24 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
                 <span>Account settings</span>
               </Link>
             </div>
-            <button
+
+            <Button
               type="button"
               onClick={() => {
                 setOpen(false);
                 onLogout();
               }}
+              variant="ghost"
               className="flex w-full items-center gap-2 border-t border-[var(--b2-soft)] px-3 py-2 text-[11px] font-medium text-[var(--error)] hover:bg-[var(--error-bg)]"
             >
               <LogOut className="h-3.5 w-3.5" />
               <span>Logout</span>
-            </button>
+            </Button>
           </div>
         )}
       </div>
     </div>
   );
 };
- 
+
 export default BuyerHeaderActions;

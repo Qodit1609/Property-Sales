@@ -1,5 +1,6 @@
 import React from "react";
 import { Home, ListChecks, Users, ShieldCheck } from "lucide-react";
+
 import type { Property } from "../../features/properties/propertyType";
 import type { User } from "../../features/users/userType";
 
@@ -113,6 +114,7 @@ const AdminStats: React.FC<AdminStatsProps> = ({ users, listings }) => {
       {cards.map((card) => {
         const Icon = card.icon;
         const tone = toneClasses[card.tone];
+
         return (
           <div
             key={card.label}
@@ -128,9 +130,11 @@ const AdminStats: React.FC<AdminStatsProps> = ({ users, listings }) => {
             >
               <Icon className="h-4 w-4" />
             </div>
+
             <p className="mt-3 text-[11px] font-medium uppercase tracking-wide text-[var(--b1-mid)]">
               {card.label}
             </p>
+
             <p className={`mt-1 text-xl font-semibold ${tone.text}`}>
               {card.value}
             </p>
@@ -142,4 +146,3 @@ const AdminStats: React.FC<AdminStatsProps> = ({ users, listings }) => {
 };
 
 export default AdminStats;
-

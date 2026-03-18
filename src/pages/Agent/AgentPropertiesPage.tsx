@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import Modal from "../../components/Modal/Modal";
 import { useAppSelector } from "../../hooks/reduxHooks";
+import { Input, Button } from "@/components/common";
 
 type LocalStatus = "active" | "inactive" | "sold";
 
@@ -102,20 +103,20 @@ const AgentPropertiesPage: React.FC = () => {
                 </td>
                 <td className="px-4 py-3 text-right">
                   <div className="flex flex-wrap justify-end gap-2">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => onEdit(r)}
                       className="inline-flex items-center gap-1 rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-1 text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
                     >
                       Edit
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => onDelete(r)}
                       className="inline-flex items-center gap-1 rounded-md border border-[var(--error)] bg-[var(--error-bg)] px-3 py-1 text-xs font-medium text-[var(--error)] hover:opacity-80 transition"
                     >
                       Delete
-                    </button>
+                    </Button>
                   </div>
                 </td>
               </tr>
@@ -160,20 +161,20 @@ const AgentPropertiesPage: React.FC = () => {
               <span className="font-semibold">{confirmDelete.title}</span>?
             </p>
             <div className="flex justify-end gap-2">
-              <button
+              <Button
                 type="button"
                 onClick={() => setConfirmDelete(null)}
                 className="rounded-md border border-[var(--b2)] bg-[var(--white)] px-4 py-2 text-sm"
               >
                 Cancel
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => applyDelete(confirmDelete.id)}
                 className="rounded-md border border-[var(--error)] bg-[var(--error-bg)] px-4 py-2 text-sm font-semibold text-[var(--error)] hover:opacity-80 transition"
               >
                 Delete
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -209,14 +210,14 @@ function EditForm({
       }}
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <input
+        <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Title"
           className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
           required
         />
-        <input
+        <Input
           value={price}
           onChange={(e) => setPrice(e.target.value)}
           placeholder="Price"
@@ -225,7 +226,7 @@ function EditForm({
           required
         />
       </div>
-      <input
+      <Input
         value={address}
         onChange={(e) => setAddress(e.target.value)}
         placeholder="Address"
@@ -233,19 +234,19 @@ function EditForm({
       />
 
       <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
-        <button
+        <Button
           type="button"
           onClick={onCancel}
           className="w-full sm:w-auto rounded-md border border-[var(--b2)] px-4 py-2 text-sm"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
           className="w-full sm:w-auto rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] hover:bg-[var(--b1)] transition"
         >
           Save
-        </button>
+        </Button>
       </div>
     </form>
   );

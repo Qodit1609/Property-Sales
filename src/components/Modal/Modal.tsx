@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Button } from "@/components/common";
 
 interface ModalProps {
   open: boolean;
@@ -35,13 +36,13 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, title, children }) => {
         <div className="flex items-center justify-between px-6 py-4 rounded-t-2xl bg-[var(--b1)] text-[var(--white)]">
           <h2 className="text-lg font-semibold">{title}</h2>
 
-          <button
+          <Button
             onClick={onClose}
             aria-label="Close modal"
             className="h-9 w-9 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition"
           >
             ✕
-          </button>
+          </Button>
         </div>
 
         {/* Body */}
