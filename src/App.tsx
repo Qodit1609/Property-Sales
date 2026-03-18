@@ -33,6 +33,7 @@ import AgentClientsPage from "./pages/Agent/AgentClientsPage";
 import AgentProfilePage from "./pages/Agent/AgentProfilePage";
 import { useAppDispatch } from "./hooks/reduxHooks";
 import { fetchProperties } from "./features/properties/propertySlice";
+import { fetchUIConfig } from "./features/uiConfig/uiConfigSlice";
 import PostPropertyPage from "./pages/PostProperty/PostPropertyPage";
 import React from "react";
 
@@ -60,6 +61,7 @@ function App() {
 
   useEffect(() => {
     dispatch(fetchProperties({ page: 1, limit: 50 }));
+    dispatch(fetchUIConfig()); // Load UI config on app startup
   }, [dispatch]);
 
   return (

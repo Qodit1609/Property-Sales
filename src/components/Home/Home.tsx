@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAppSelector } from "../../hooks/reduxHooks";
 
 const Home: React.FC = () => {
- const images = [
-  "https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=1920", // indian farmer field landscape // rural farming village field
-  "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=1920", // green farmland landscape
-  "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?q=80&w=1920"  // agriculture countryside
-];
+  const uiConfig = useAppSelector((state) => state.uiConfig.values);
+
+  // Get hero images from config or use defaults
+  const images = [
+    uiConfig?.HERO_IMAGE_1 || "https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=1920",
+    uiConfig?.HERO_IMAGE_2 || "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=1920",
+    uiConfig?.HERO_IMAGE_3 || "https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?q=80&w=1920",
+  ];
+
+  // Get hero texts from config or use defaults
+  const heroHeadingMain = uiConfig?.HERO_HEADING_MAIN || "Your Piece of";
+  const heroHeadingHighlight = uiConfig?.HERO_HEADING_HIGHLIGHT || "Earth Awaits";
+  const heroSubheading = uiConfig?.HERO_SUBHEADING || "Discover premium land investments in Indore. More valuable than gold, more lasting than time.";
+  const btnPostPropertyLabel = uiConfig?.BTN_POST_PROPERTY || "Post Property";
 
   const [current, setCurrent] = useState(0);
   const [search, setSearch] = useState("");
@@ -16,7 +26,7 @@ const Home: React.FC = () => {
       setCurrent((prev) => (prev + 1) % images.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [images.length]);
 
   return (
     <section className="relative min-h-[120vh] pt-[80px] pb-[220px]">
@@ -39,22 +49,21 @@ const Home: React.FC = () => {
       <div className="relative z-10 w-[94%] max-w-[1320px] mx-auto px-4 sm:px-6 md:px-10 min-h-[75vh] flex items-center">
         <div className="max-w-2xl w-full text-fg text-center sm:text-left">
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold leading-snug mb-4">
-            Your Piece of{" "}
+            {heroHeadingMain}{" "}
             <span className="block sm:inline text-[var(--b2)]">
-              Earth Awaits
+              {heroHeadingHighlight}
             </span>
           </h1>
 
           <p className="text-sm sm:text-base md:text-lg text-[var(--b2-soft)] mb-6">
-            Discover premium land investments in Indore. More valuable than gold,
-            more lasting than time.
+            {heroSubheading}
           </p>
 
          <Link
   to="/post-property/basic"
   className="inline-flex items-center justify-center bg-[var(--b2)] hover:bg-[var(--b1-mid)] hover:text-[var(--fg)] transition text-fg font-semibold px-6 py-3 rounded-xl shadow-lg"
 >
-  Post Property
+  {btnPostPropertyLabel}
 </Link>
         </div>
       </div>

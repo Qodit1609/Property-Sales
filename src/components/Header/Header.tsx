@@ -93,7 +93,13 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { user, token } = useAppSelector((state) => state.auth);
+  const uiConfig = useAppSelector((state) => state.uiConfig.values);
   const isAuthenticated = Boolean(token && user);
+
+  // Get values from config or use fallbacks
+  const appName = uiConfig?.APP_NAME || "BhoomiWala";
+  const appLogoUrl = uiConfig?.APP_LOGO_URL;
+  const btnPostPropertyLabel = uiConfig?.BTN_POST_PROPERTY || "Post Property";
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
@@ -156,9 +162,19 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
           <div className="flex h-[68px] items-center justify-between">
             <Link
               to="/"
-              className="font-semibold text-lg sm:text-xl lg:text-2xl text-[var(--fg)] tracking-wide"
+              className="flex items-center gap-2"
             >
-              BhoomiWala
+              {appLogoUrl ? (
+                <img 
+                  src={appLogoUrl} 
+                  alt={appName}
+                  className="h-10 w-auto"
+                />
+              ) : (
+                <span className="font-semibold text-lg sm:text-xl lg:text-2xl text-[var(--fg)] tracking-wide">
+                  {appName}
+                </span>
+              )}
             </Link>
 
             {/* Desktop Navigation with Mega Menu */}
@@ -232,7 +248,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                             to="/post-property/basic"
                             className="mt-4 btn-brand px-4 py-2 rounded-lg shadow text-center"
                           >
-                            Post Property
+                            {btnPostPropertyLabel}
                           </Link>
                         </div>
                       </div>
