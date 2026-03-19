@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Search, TrendingUp, Sparkles } from "lucide-react";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import BuyerLayout from "../../components/buyer/BuyerLayout";
-import PropertyCard from "../../components/Crads/PropertyCard";
+import PropertyCard from "../../components/Cards/PropertyCard";
 import { Input, Button } from "@/components/common";
 
 const trendingLocations = [

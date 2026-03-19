@@ -14,7 +14,7 @@ import {
   addToWishlist,
   removeFromCart,
 } from "../../features/buyer/buyerSlice";
-import PropertyCard from "../Crads/PropertyCard";
+import PropertyCard from "../Cards/PropertyCard";
 import { Button } from "@/components/common";
 
 const Cart: React.FC = () => {

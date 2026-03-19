@@ -1,7 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Property } from "../../features/properties/propertyType";
 import { Input, Button } from "@/components/common";
+import Header from "../Header/Header";
+
+const FALLBACK_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400' fill='%23e2e8f0'%3E%3Crect width='600' height='400'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' fill='%2394a3b8'%3EImage Not Available%3C/text%3E%3C/svg%3E";
 
 type MediaType = "gallery" | "map" | "video";
 
@@ -14,12 +18,17 @@ const PropertyPreview = ({ property }: Props) => {
 
   const [activeMedia, setActiveMedia] = useState<MediaType>("gallery");
   const [currentImage, setCurrentImage] = useState(0);
+  const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
+
+  const handleImageError = useCallback(
+    (src: string) => setBrokenImages((prev) => new Set(prev).add(src)),
+    []
+  );
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // Backend me images array aa raha hai
   const gallery = property.images ?? [];
 
   const googleMapEmbed = `https://www.google.com/maps?&q=${encodeURIComponent(
@@ -44,6 +53,7 @@ const PropertyPreview = ({ property }: Props) => {
 
   return (
     <div className="pt-20 sm:pt-24 bg-[var(--fg)]">
+      <Header forceSolid/>
       <div className="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-10">
 
         {/* Media Section */}
@@ -52,8 +62,13 @@ const PropertyPreview = ({ property }: Props) => {
           {activeMedia === "gallery" && gallery.length > 0 && (
             <>
               <img
-                src={gallery[currentImage]}
+                src={
+                  brokenImages.has(gallery[currentImage])
+                    ? FALLBACK_IMAGE
+                    : gallery[currentImage]
+                }
                 alt={property.title}
+                onError={() => handleImageError(gallery[currentImage])}
                 className="h-full w-full object-cover"
               />
 

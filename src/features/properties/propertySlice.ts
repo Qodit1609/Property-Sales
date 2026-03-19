@@ -22,19 +22,33 @@ const initialState: PropertyState = {
   selectedError: null,
 };
 
-export const fetchProperties = createAsyncThunk(
-  "properties/fetchProperties",
-  async ({ page, limit }: { page: number; limit: number }) => {
+export const fetchProperties = createAsyncThunk<
+  Property[],
+  { page: number; limit: number },
+  { rejectValue: string }
+>("properties/fetchProperties", async ({ page, limit }, { rejectWithValue }) => {
+  try {
     return await fetchPropertiesAPI(page, limit);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch properties";
+    return rejectWithValue(message);
   }
-);
+});
 
-export const fetchPropertyById = createAsyncThunk(
-  "properties/fetchPropertyById",
-  async (id: string) => {
+export const fetchPropertyById = createAsyncThunk<
+  Property,
+  string,
+  { rejectValue: string }
+>("properties/fetchPropertyById", async (id, { rejectWithValue }) => {
+  try {
     return await fetchPropertyByIdAPI(id);
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Failed to fetch property details";
+    return rejectWithValue(message);
   }
-);
+});
 
 const propertySlice = createSlice({
   name: "properties",
@@ -53,7 +67,7 @@ const propertySlice = createSlice({
       })
       .addCase(fetchProperties.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message || "Failed to fetch properties";
+        state.error = action.payload ?? "Failed to fetch properties";
       })
 
       // Single Property
@@ -68,7 +82,7 @@ const propertySlice = createSlice({
       .addCase(fetchPropertyById.rejected, (state, action) => {
         state.selectedLoading = false;
         state.selectedError =
-          action.error.message || "Failed to fetch property";
+          action.payload ?? "Failed to fetch property details";
       });
   },
 });

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import PropertyCard from "../Crads/PropertyCard";
+import PropertyCard from "../Cards/PropertyCard";
 import { properties } from "../Data/properties";
 import { Button } from "@/components/common";
 

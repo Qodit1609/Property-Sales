@@ -11,7 +11,7 @@ const staticProjects: Project[] = [
     type: "Apartment",
     builder: "ABC Developers",
     image:
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=900&q=80",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpf6r7s5dnSi6AFkbMIHed_-cN0uBg-08UeA&s",
   },
   {
     id: 2,
@@ -21,7 +21,7 @@ const staticProjects: Project[] = [
     type: "Apartment",
     builder: "Skyline Group",
     image:
-      "https://images.unsplash.com/photo-1505843513577-22bb7d21e455?auto=format&fit=crop&w=900&q=80",
+      "https://farmlandindia.com/wp-content/uploads/2026/01/f6eda407-3eef-4a5d-9449-5836e72a7d8b.jpg",
   },
   {
     id: 3,
@@ -31,7 +31,7 @@ const staticProjects: Project[] = [
     type: "Villa",
     builder: "Lakefront Estates",
     image:
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=900&q=80",
+      "https://media-cdn.tripadvisor.com/media/photo-s/01/6d/df/32/unser-traumhaus.jpg",
   },
   {
     id: 4,
@@ -41,7 +41,7 @@ const staticProjects: Project[] = [
     type: "Plot",
     builder: "Meadowland Properties",
     image:
-      "https://images.unsplash.com/photo-1523217582562-09d0def993a6?auto=format&fit=crop&w=900&q=80",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1lqksli_fdU9CNYPfzEct_xi10P7xn6vieg&s",
   },
   {
     id: 5,
@@ -51,7 +51,7 @@ const staticProjects: Project[] = [
     type: "Apartment",
     builder: "Crest Builders",
     image:
-      "https://images.unsplash.com/photo-1448630360428-65456885c650?auto=format&fit=crop&w=900&q=80",
+      "https://thumbs.dreamstime.com/b/farmland-3037482.jpg",
   },
   {
     id: 6,
@@ -61,7 +61,7 @@ const staticProjects: Project[] = [
     type: "Villa",
     builder: "Royal Estates",
     image:
-      "https://images.unsplash.com/photo-1605276374104-dee2a0ed3cd6?auto=format&fit=crop&w=900&q=80",
+      "https://media.gettyimages.com/id/991061138/photo/indian-farm-house.jpg?s=1024x1024&w=gi&k=20&c=nve09L8C_4xkKKYyjzk-LhId_QsJGo8Cn7UsWIYPcOo=",
   },
 ];
 

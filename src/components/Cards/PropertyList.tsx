@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import PropertyCard, { PropertyCardSkeleton } from "../Crads/PropertyCard";
+import PropertyCard, { PropertyCardSkeleton } from "../Cards/PropertyCard";
 import { Button } from "@/components/common";
 
 // Redux
@@ -30,7 +30,7 @@ const PropertyList = () => {
 
   if (error) {
     return (
-      <p className="text-center pt-16 text-red-500">
+      <p className="text-center pt-16 text-[var(--error)]">
         {error}
       </p>
     );

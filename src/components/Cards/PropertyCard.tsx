@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Camera,
@@ -24,6 +24,12 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
   const navigate = useNavigate();
   const [liked, setLiked] = useState(false);
   const [index, setIndex] = useState(0);
+  const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
+
+  const handleImageError = useCallback(
+    (src: string) => setBrokenImages((prev) => new Set(prev).add(src)),
+    []
+  );
 
   const mappedProperty = {
     _id: property._id,
@@ -81,8 +87,8 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
       <div className="relative h-44 sm:h-52 overflow-hidden bg-gray-100 rounded-t-xl">
 
         <AnimatePresence mode="wait">
-          {images[index] === "no-image" ? (
-            <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">
+          {images[index] === "no-image" || brokenImages.has(images[index]) ? (
+            <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm bg-gray-100">
               Image Not Available
             </div>
           ) : (
@@ -91,6 +97,7 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
               src={images[index]}
               alt={mappedProperty.title}
               loading="lazy"
+              onError={() => handleImageError(images[index])}
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
               onDragEnd={(_, info) => {
