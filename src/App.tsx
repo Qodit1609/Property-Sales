@@ -7,6 +7,7 @@ import ResortProperties from "./pages/ResortProperties/ResortProperties";
 import AgricultureLand from "./pages/AgricultureLand/AgricultureLand";
 import RentFarmhouse from "./pages/RentFarmhouse/RentFarmhouse";
 import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
+
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";

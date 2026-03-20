@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/common";
+import { OptimizedImage } from "@/components/common/OptimizedImage";
 
 import type { Property as BackendProperty } from "../../features/properties/propertyType";
 import { isSizeInAcres } from "../Data/properties";
@@ -85,19 +86,15 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
     >
       {/* IMAGE */}
       <div className="relative h-44 sm:h-52 overflow-hidden bg-gray-100 rounded-t-xl">
-
         <AnimatePresence mode="wait">
-          {images[index] === "no-image" || brokenImages.has(images[index]) ? (
+          {images[index] === "no-image" ? (
             <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm bg-gray-100">
               Image Not Available
             </div>
           ) : (
-            <motion.img
+            <motion.div
               key={images[index]}
-              src={images[index]}
-              alt={mappedProperty.title}
-              loading="lazy"
-              onError={() => handleImageError(images[index])}
+              className="w-full h-full"
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
               onDragEnd={(_, info) => {
@@ -108,8 +105,18 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            />
+            >
+              <OptimizedImage
+                src={images[index]}
+                preset="medium"
+                alt={mappedProperty.title}
+                lazy={true}
+                aspectRatio="16/9"
+                radius="rounded-t-xl"
+                containerClass="w-full h-full"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            </motion.div>
           )}
         </AnimatePresence>
 

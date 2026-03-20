@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Property } from "../../features/properties/propertyType";
 import { Input, Button } from "@/components/common";
+import { OptimizedImage } from "@/components/common/OptimizedImage";
 import Header from "../Header/Header";
 
 const FALLBACK_IMAGE =
@@ -61,15 +62,13 @@ const PropertyPreview = ({ property }: Props) => {
 
           {activeMedia === "gallery" && gallery.length > 0 && (
             <>
-              <img
-                src={
-                  brokenImages.has(gallery[currentImage])
-                    ? FALLBACK_IMAGE
-                    : gallery[currentImage]
-                }
+              <OptimizedImage
+                src={gallery[currentImage]}
+                preset="large"
                 alt={property.title}
-                onError={() => handleImageError(gallery[currentImage])}
-                className="h-full w-full object-cover"
+                lazy={false}
+                containerClass="w-full h-full"
+                onImageError={() => handleImageError(gallery[currentImage])}
               />
 
               {gallery.length > 1 && (

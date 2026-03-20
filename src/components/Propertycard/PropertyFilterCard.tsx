@@ -9,7 +9,9 @@ import {
   MapPin,
   Ruler,
   Tag,
+  Navigation,
 } from "lucide-react";
+import { NearbyPropertiesModal } from "../common/NearbyPropertiesModal";
 import type { Property } from "../../features/properties/propertyType";
 
 interface PropertyFilterCardProps {
@@ -50,6 +52,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [nearbyOpen, setNearbyOpen] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const propertyTypes = useMemo(() => {
@@ -202,6 +205,15 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           )}
         </div>
       </div>
+
+      {/* Nearby Properties Button */}
+      <button
+        onClick={() => setNearbyOpen(true)}
+        className="w-full rounded-lg bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white py-2.5 px-4 font-semibold transition shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+      >
+        <Navigation size={16} />
+        Find Nearby Properties
+      </button>
 
       {/* Property Type */}
       {propertyTypes.length > 1 && (
@@ -398,6 +410,12 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
         </h3>
         {filterContent}
       </div>
+
+      {/* Nearby Properties Modal */}
+      <NearbyPropertiesModal
+        isOpen={nearbyOpen}
+        onClose={() => setNearbyOpen(false)}
+      />
     </>
   );
 };
