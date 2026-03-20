@@ -205,22 +205,22 @@ const SellerDashboard: React.FC = () => {
                     <td className="px-4 py-3 text-right">
                       <div className="flex flex-wrap justify-end gap-2">
                         <Button
-                          disabled={actionLoading}
-                          onClick={() => openEditModal(listing)}
-                          className="inline-flex items-center gap-1 rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-1 text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
-                        >
-                          <Pencil size={14} />
-                          Edit
-                        </Button>
+  disabled={actionLoading}
+  onClick={() => openEditModal(listing)}
+  className="!flex !items-center gap-1 !rounded-md !border !border-[var(--b2)] !bg-white !px-3 !py-1 !text-xs !font-medium !text-[var(--b1)] hover:!bg-[var(--b2-soft)]"
+>
+  <Pencil size={14} />
+  Edit
+</Button>
 
-                        <Button
-                          disabled={actionLoading}
-                          onClick={() => handleDelete(listing._id)}
-                          className="inline-flex items-center gap-1 rounded-md border border-[var(--error)] bg-[var(--error-bg)] px-3 py-1 text-xs font-medium text-[var(--error)] hover:opacity-80 transition"
-                        >
-                          <Trash2 size={14} />
-                          Delete
-                        </Button>
+<Button
+  disabled={actionLoading}
+  onClick={() => handleDelete(listing._id)}
+  className="!flex !items-center gap-1 !rounded-md !border !border-red-500 !bg-red-50 !px-3 !py-1 !text-xs !font-medium !text-red-600 hover:!opacity-80"
+>
+  <Trash2 size={14} />
+  Delete
+</Button>
                       </div>
                     </td>
                   </tr>
