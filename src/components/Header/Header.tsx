@@ -347,10 +347,10 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
                 <Link
                   to="/post-property/basic"
-                  className="hidden md:flex items-center gap-1.5 bg-[var(--white)] text-[var(--b1)] px-3 py-1.5 rounded-lg text-xs sm:text-sm shadow"
+                  className="hidden md:inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[var(--white)] px-4 text-sm text-[var(--b1)] shadow"
                 >
                   Post Property
-                  <span className="text-[9px] bg-[var(--b2)] text-[var(--b1)] px-1.5 py-[1px] rounded">
+                  <span className="inline-flex h-5 items-center justify-center rounded bg-[var(--b2)] px-1.5 text-[10px] leading-none text-[var(--b1)]">
                     FREE
                   </span>
                 </Link>
@@ -360,7 +360,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1, scale: 1.03 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}>
                 <Button
                   onClick={() => setContactOpen(true)}
-                  className="hidden md:flex w-8 h-8 rounded-lg border-2 border-[var(--fg)] items-center justify-center text-[var(--fg)] p-0"
+                  className="hidden md:flex h-10 w-10 items-center justify-center rounded-lg border-2 border-[var(--fg)] p-0 text-[var(--fg)]"
                   aria-label="Open contact form"
                 >
                   <svg
@@ -390,8 +390,8 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                   onMouseLeave={closeLogin}
                 >
                   <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
-                    <Button className="inline-flex items-center gap-2 rounded-full border-2 border-[var(--fg)] px-3 py-1.5 text-[var(--fg)]">
-                      <span className="w-7 h-7 rounded-full border border-[var(--fg)] flex items-center justify-center">
+                    <Button className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border-2 border-[var(--fg)] px-4 py-0 text-[var(--fg)]">
+                      <span className="flex h-6 w-6 items-center justify-center rounded-full border border-[var(--fg)]">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className="w-4 h-4"
@@ -402,20 +402,22 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                           <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
                         </svg>
                       </span>
-                      <span className="text-sm font-medium max-w-[140px] truncate">
+                      <span className="max-w-[140px] truncate text-sm font-medium leading-none">
                         {user?.name}
                       </span>
                     </Button>
                   </motion.div>
 
-                  <AnimatePresence>
+                  <AnimatePresence initial={false}>
                     {loginOpen && (
                       <motion.div
-                        initial={prefersReducedMotion ? false : { opacity: 0, y: 10, scale: 0.98 }}
+                        initial={prefersReducedMotion ? false : { opacity: 0, y: 12, scale: 0.98 }}
                         animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-                        exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.98 }}
-                        transition={{ duration: 0.18 }}
-                        className="absolute right-0 mt-3 w-48 bg-[var(--white)] rounded-lg shadow-xl p-3 space-y-2 border border-[var(--b2-soft)]/70"
+                        exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
+                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                        className="absolute right-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-xl border border-[var(--b2-soft)]/70 bg-[var(--white)] p-2 shadow-xl"
+                        onMouseEnter={openLogin}
+                        onMouseLeave={closeLogin}
                       >
                         <Link
                           to={
@@ -423,25 +425,25 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                               ? "/buyer/account"
                               : roleDashboardPath(user?.role ?? "buyer")
                           }
-                          className="block text-sm text-[var(--b1)] hover:text-[var(--b1-mid)]"
+                          className="flex h-10 items-center rounded-md px-3 text-sm font-medium text-[var(--b1)] transition-colors hover:bg-[var(--b2-soft)]/50 hover:text-[var(--b1-mid)]"
                         >
                           My Account
                         </Link>
 
                         <Link
                           to={roleDashboardPath(user?.role ?? "buyer")}
-                          className="block text-sm text-[var(--b1)] hover:text-[var(--b1-mid)]"
+                          className="flex h-10 items-center rounded-md px-3 text-sm font-medium text-[var(--b1)] transition-colors hover:bg-[var(--b2-soft)]/50 hover:text-[var(--b1-mid)]"
                         >
                           Dashboard
                         </Link>
 
-                        <Button
+                        <button
                           type="button"
                           onClick={handleLogout}
-                          className="w-full text-left block text-sm text-[var(--error)] hover:opacity-80"
+                          className="flex h-10 w-full items-center rounded-md px-3 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
                         >
                           Logout
-                        </Button>
+                        </button>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -572,7 +574,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                   <Link
                     to="/post-property/basic"
                     onClick={closeMobileMenu}
-                    className="w-full block text-center bg-[var(--b1)] text-[var(--white)] py-2.5 rounded-lg font-medium"
+                    className="flex h-11 w-full items-center justify-center rounded-lg bg-[var(--b1)] px-4 text-center font-medium text-[var(--white)]"
                   >
                     Post Property
                   </Link>
@@ -582,7 +584,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                       <Link
                         to="/login"
                         onClick={closeMobileMenu}
-                        className="w-full block text-center border border-[var(--b1-mid)] text-[var(--b1-mid)] py-2 rounded-lg"
+                        className="flex h-11 w-full items-center justify-center rounded-lg border border-[var(--b1-mid)] px-4 text-center font-medium text-[var(--b1-mid)]"
                       >
                         Login / Register
                       </Link>
@@ -592,21 +594,21 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                       <Link
                         to={roleDashboardPath(user?.role ?? "buyer")}
                         onClick={closeMobileMenu}
-                        className="w-full block text-center border border-[var(--b1-mid)] text-[var(--b1-mid)] py-2 rounded-lg"
+                        className="flex h-11 w-full items-center justify-center rounded-lg border border-[var(--b1-mid)] px-4 text-center font-medium text-[var(--b1-mid)]"
                       >
                         Dashboard
                       </Link>
 
-                      <Button
+                      <button
                         type="button"
                         onClick={() => {
                           closeMobileMenu();
                           handleLogout();
                         }}
-                        className="w-full border border-[var(--error)] text-[var(--error)] py-2 rounded-lg"
+                        className="flex h-11 w-full items-center justify-center rounded-lg border border-red-500 bg-white px-4 text-center font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
                       >
                         Logout
-                      </Button>
+                      </button>
                     </>
                   )}
 
@@ -617,7 +619,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         setContactOpen(true);
                       });
                     }}
-                    className="w-full bg-[var(--b1-mid)] text-white py-2 rounded-lg hover:opacity-90 transition-all duration-200 border border-[var(--b1-mid)]"
+                    className="h-11 w-full rounded-lg border border-[var(--b1-mid)] bg-[var(--b1-mid)] px-4 text-white transition-all duration-200 hover:opacity-90"
                   >
                     Contact Us
                   </Button>

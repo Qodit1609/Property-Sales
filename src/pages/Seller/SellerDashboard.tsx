@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ListChecks, Pencil, Plus, Trash2 } from "lucide-react";
+import { ListChecks, Pencil, Trash2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import type { RootState } from "../../app/store";
 import DashboardLayout from "../../layout/DashboardLayout";
@@ -156,8 +156,82 @@ const SellerDashboard: React.FC = () => {
             </p>
           )}
 
-          <div className="overflow-x-auto rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-sm">
-            <table className="min-w-[900px] w-full text-sm">
+          <div className="space-y-4 md:hidden">
+            {(listings as Property[]).map((listing) => (
+              <article
+                key={listing._id}
+                className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-medium text-[var(--b1)] break-words">
+                      {listing.title || "Untitled"}
+                    </p>
+                    <p className="text-xs text-[var(--muted)] break-words">
+                      {listing.address}
+                    </p>
+                  </div>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold whitespace-nowrap ${
+                      listing.status === "approved"
+                        ? "bg-[var(--success-bg)] text-[var(--success)]"
+                        : listing.status === "rejected"
+                        ? "bg-[var(--error-bg)] text-[var(--error)]"
+                        : "bg-[var(--warning-bg)] text-[var(--warning)]"
+                    }`}
+                  >
+                    {listing.status ?? "pending"}
+                  </span>
+                </div>
+
+                <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                  <div className="rounded-lg bg-[var(--b2-soft)] px-3 py-2">
+                    <p className="text-[11px] uppercase tracking-wide text-[var(--muted)]">
+                      Type
+                    </p>
+                    <p className="text-[var(--b1)]">{listing.propertyType}</p>
+                  </div>
+                  <div className="rounded-lg bg-[var(--b2-soft)] px-3 py-2">
+                    <p className="text-[11px] uppercase tracking-wide text-[var(--muted)]">
+                      Price
+                    </p>
+                    <p className="text-[var(--b1)]">
+                      ₹ {listing.price?.toLocaleString("en-IN") ?? "N/A"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Button
+                    disabled={actionLoading}
+                    onClick={() => openEditModal(listing)}
+                    className="!flex !items-center gap-1 !rounded-md !border !border-[var(--b2)] !bg-white !px-3 !py-1 !text-xs !font-medium !text-[var(--b1)] hover:!bg-[var(--b2-soft)]"
+                  >
+                    <Pencil size={14} />
+                    Edit
+                  </Button>
+
+                  <Button
+                    disabled={actionLoading}
+                    onClick={() => handleDelete(listing._id)}
+                    className="!flex !items-center gap-1 !rounded-md !border !border-red-500 !bg-red-50 !px-3 !py-1 !text-xs !font-medium !text-red-600 hover:!opacity-80"
+                  >
+                    <Trash2 size={14} />
+                    Delete
+                  </Button>
+                </div>
+              </article>
+            ))}
+
+            {listings.length === 0 && (
+              <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] px-4 py-6 text-center text-sm text-[var(--muted)] shadow-sm">
+                You have no listings yet.
+              </div>
+            )}
+          </div>
+
+          <div className="hidden overflow-x-auto rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-sm md:block">
+            <table className="w-full min-w-[720px] text-sm">
               <thead className="bg-[var(--b2-soft)] text-[var(--b1)]">
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold">Property</th>
@@ -180,9 +254,7 @@ const SellerDashboard: React.FC = () => {
                       </p>
                     </td>
 
-                    <td className="px-4 py-3">
-                      {listing.propertyType}
-                    </td>
+                    <td className="px-4 py-3">{listing.propertyType}</td>
 
                     <td className="px-4 py-3">
                       ₹ {listing.price?.toLocaleString("en-IN") ?? "N/A"}
@@ -205,22 +277,22 @@ const SellerDashboard: React.FC = () => {
                     <td className="px-4 py-3 text-right">
                       <div className="flex flex-wrap justify-end gap-2">
                         <Button
-  disabled={actionLoading}
-  onClick={() => openEditModal(listing)}
-  className="!flex !items-center gap-1 !rounded-md !border !border-[var(--b2)] !bg-white !px-3 !py-1 !text-xs !font-medium !text-[var(--b1)] hover:!bg-[var(--b2-soft)]"
->
-  <Pencil size={14} />
-  Edit
-</Button>
+                          disabled={actionLoading}
+                          onClick={() => openEditModal(listing)}
+                          className="!flex !items-center gap-1 !rounded-md !border !border-[var(--b2)] !bg-white !px-3 !py-1 !text-xs !font-medium !text-[var(--b1)] hover:!bg-[var(--b2-soft)]"
+                        >
+                          <Pencil size={14} />
+                          Edit
+                        </Button>
 
-<Button
-  disabled={actionLoading}
-  onClick={() => handleDelete(listing._id)}
-  className="!flex !items-center gap-1 !rounded-md !border !border-red-500 !bg-red-50 !px-3 !py-1 !text-xs !font-medium !text-red-600 hover:!opacity-80"
->
-  <Trash2 size={14} />
-  Delete
-</Button>
+                        <Button
+                          disabled={actionLoading}
+                          onClick={() => handleDelete(listing._id)}
+                          className="!flex !items-center gap-1 !rounded-md !border !border-red-500 !bg-red-50 !px-3 !py-1 !text-xs !font-medium !text-red-600 hover:!opacity-80"
+                        >
+                          <Trash2 size={14} />
+                          Delete
+                        </Button>
                       </div>
                     </td>
                   </tr>
