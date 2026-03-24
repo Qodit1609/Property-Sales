@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
-import { login } from "../../features/auth/authSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { loginUser } from "../../features/auth/authSlice";
 import Dashboard from "../Dashboard/Dashboard";
 import { Input, Button } from "@/components/common";
 
@@ -32,13 +32,18 @@ const Login: React.FC = () => {
     event.preventDefault();
 
     const result = await dispatch(
-      login({
+      loginUser({
         email,
         password,
       })
     );
 
-    if (login.fulfilled.match(result)) {
+    if (loginUser.fulfilled.match(result)) {
+      if (!result.payload.user) {
+        navigate("/", { replace: true });
+        return;
+      }
+
       // If we were redirected here (e.g. trying to access a protected route),
       // always send the user back to that route after login.
       if (from && from !== "/") {
@@ -49,7 +54,7 @@ const Login: React.FC = () => {
       // Role-based default redirects for direct login.
       const role = result.payload.user.role;
 
-      if (role === "buyer") {
+      if (role === "buyer" || role === "user") {
         navigate("/buyer/dashboard", { replace: true });
         return;
       }
@@ -121,15 +126,15 @@ const Login: React.FC = () => {
                 htmlFor="email"
                 className="mb-1 block text-sm font-medium"
               >
-                Email / Mobile
+                Email
               </label>
               <Input
                 id="email"
-                type="text"
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--b2)] focus:border-[var(--b2)] transition"
-                placeholder="you@example.com / 9999999999"
+                placeholder="you@example.com"
                 required
               />
             </div>

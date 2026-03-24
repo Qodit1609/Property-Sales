@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Camera,
   Heart,
@@ -15,29 +16,57 @@ import { Button } from "@/components/common";
 
 import type { Property as BackendProperty } from "../../features/properties/propertyType";
 import { isSizeInAcres } from "../Data/properties";
+import {
+  formatINRCurrency,
+  translateDynamic,
+  type LocalizedValue,
+} from "../../lib/i18nHelpers";
 
 interface Props {
   property: BackendProperty;
 }
 
 const PropertyCard: React.FC<Props> = ({ property }) => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [liked, setLiked] = useState(false);
   const [index, setIndex] = useState(0);
   const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
+  const language = i18n.resolvedLanguage ?? i18n.language;
 
   const handleImageError = useCallback(
     (src: string) => setBrokenImages((prev) => new Set(prev).add(src)),
     []
   );
 
-  const mappedProperty = {
+  const sourceProperty = property as unknown as Record<string, unknown>;
+  const toLocalizedValue = (value: unknown, fallback: string): LocalizedValue => {
+    if (value === null || value === undefined) return fallback;
+    if (typeof value === "string" || typeof value === "number") return value;
+    if (typeof value === "object" && !Array.isArray(value)) {
+      return value as Record<string, unknown>;
+    }
+    return fallback;
+  };
+
+  const mappedProperty: {
+    _id: string;
+    title: LocalizedValue;
+    address: LocalizedValue;
+    images: string[];
+    price: number;
+    propertyType: LocalizedValue;
+    size: number;
+    beds: number | string | null;
+    baths: number | string | null;
+    parking: number | string | null;
+  } = {
     _id: property._id,
-    title: property.title || "Untitled Property",
-    address: property.address || "Location not available",
+    title: toLocalizedValue(sourceProperty.title, t("propertyCard.untitledProperty")),
+    address: toLocalizedValue(sourceProperty.address, t("propertyCard.locationNotAvailable")),
     images: property.images || [],
     price: property.price || 0,
-    propertyType: property.propertyType || "Property",
+    propertyType: toLocalizedValue(sourceProperty.propertyType, t("propertyCard.propertyFallbackType")),
     size: property.size || 0,
     beds: property.beds || null,
     baths: property.baths || null,
@@ -49,12 +78,19 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
       ? mappedProperty.images
       : ["no-image"];
 
-  const isRent = mappedProperty.propertyType
+  const translatedPropertyType = translateDynamic(mappedProperty.propertyType, language);
+  const translatedTitle = translateDynamic(mappedProperty.title, language);
+  const translatedAddress = translateDynamic(mappedProperty.address, language);
+  const sizeBasisPropertyType =
+    typeof mappedProperty.propertyType === "string"
+      ? mappedProperty.propertyType
+      : translatedPropertyType;
+  const isRent = translatedPropertyType
     .toLowerCase()
     .includes("rent");
 
-  const sizeAcres = isSizeInAcres(mappedProperty.propertyType);
-  const tag = isRent ? "Rent" : "Sale";
+  const sizeAcres = isSizeInAcres(sizeBasisPropertyType);
+  const tag = isRent ? t("propertyCard.rentTag") : t("propertyCard.saleTag");
 
   useEffect(() => {
     if (images.length <= 1) return;
@@ -89,13 +125,13 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
         <AnimatePresence mode="wait">
           {images[index] === "no-image" || brokenImages.has(images[index]) ? (
             <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm bg-gray-100">
-              Image Not Available
+              {t("propertyCard.imageNotAvailable")}
             </div>
           ) : (
             <motion.img
               key={images[index]}
               src={images[index]}
-              alt={mappedProperty.title}
+              alt={translatedTitle}
               loading="lazy"
               onError={() => handleImageError(images[index])}
               drag="x"
@@ -138,7 +174,7 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
 
         {/* PRICE */}
         <span className="absolute bottom-3 left-3 rounded-md bg-[var(--white)] px-3 py-1 text-sm font-semibold text-[var(--b1)] shadow">
-          ₹ {mappedProperty.price.toLocaleString("en-IN")}
+          {formatINRCurrency(mappedProperty.price, language)}
         </span>
 
         {/* IMAGE COUNT */}
@@ -174,17 +210,17 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
 
         {/* TYPE */}
         <p className="text-[11px] uppercase tracking-wide text-[var(--b1-mid)] font-sans">
-          {mappedProperty.propertyType}
+          {translatedPropertyType}
         </p>
 
         {/* TITLE */}
         <h3 className="text-[15px] font-semibold text-[var(--b1)] line-clamp-2 font-[Playfair_Display]">
-          {mappedProperty.title}
+          {translatedTitle}
         </h3>
 
         {/* ADDRESS */}
         <p className="mt-1 text-[13px] text-[var(--muted)] truncate font-sans">
-          {mappedProperty.address}
+          {translatedAddress}
         </p>
 
         {/* FEATURES */}
@@ -214,7 +250,9 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
             <div className="flex items-center gap-1">
               <Ruler size={14} />
               {mappedProperty.size}
-              {sizeAcres ? " ac" : " sqft"}
+              {sizeAcres
+                ? ` ${t("propertyCard.sizeUnitAc")}`
+                : ` ${t("propertyCard.sizeUnitSqft")}`}
             </div>
           )}
         </div>
@@ -226,7 +264,7 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
             size="sm"
             className="w-full bg-[var(--b1)] text-[var(--fg)] py-2 rounded-md font-medium hover:bg-[var(--b1-mid)] transition"
           >
-            View Details
+            {t("propertyCard.viewDetails")}
           </Button>
         </div>
       </div>

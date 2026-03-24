@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 const Home: React.FC = () => {
+ const { t } = useTranslation();
  const images = [
   "https://images.unsplash.com/photo-1560493676-04071c5f467b?q=80&w=1920", // indian farmer field landscape // rural farming village field
   "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?q=80&w=1920", // green farmland landscape
@@ -39,22 +41,21 @@ const Home: React.FC = () => {
       <div className="relative z-10 w-[94%] max-w-[1320px] mx-auto px-4 sm:px-6 md:px-10 min-h-[75vh] flex items-center">
         <div className="max-w-2xl w-full text-fg text-center sm:text-left">
           <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold leading-snug mb-4">
-            Your Piece of{" "}
+            {t("homePage.heroTitlePrefix")}{" "}
             <span className="block sm:inline text-[var(--b2)]">
-              Earth Awaits
+              {t("homePage.heroTitleHighlight")}
             </span>
           </h1>
 
           <p className="text-sm sm:text-base md:text-lg text-[var(--b2-soft)] mb-6">
-            Discover premium land investments in Indore. More valuable than gold,
-            more lasting than time.
+            {t("homePage.heroSubtitle")}
           </p>
 
          <Link
   to="/post-property/basic"
   className="inline-flex items-center justify-center bg-[var(--b2)] hover:bg-[var(--b1-mid)] hover:text-[var(--fg)] transition text-fg font-semibold px-6 py-3 rounded-xl shadow-lg"
 >
-  Post Property
+  {t("homePage.postProperty")}
 </Link>
         </div>
       </div>
@@ -73,9 +74,9 @@ const Home: React.FC = () => {
           </svg>
         </span>
         <select className="bg-transparent outline-none w-full py-2 text-sm">
-          <option>Location</option>
-          <option>Indore</option>
-          <option>Bhopal</option>
+          <option>{t("homePage.location")}</option>
+          <option>{t("homePage.indore")}</option>
+          <option>{t("homePage.bhopal")}</option>
         </select>
       </div>
 
@@ -87,9 +88,9 @@ const Home: React.FC = () => {
           </svg>
         </span>
         <select className="bg-transparent outline-none w-full py-2 text-sm">
-          <option>Category</option>
-          <option>Farmhouse</option>
-          <option>Farmland</option>
+          <option>{t("homePage.category")}</option>
+          <option>{t("homePage.farmhouse")}</option>
+          <option>{t("homePage.farmland")}</option>
         </select>
       </div>
 
@@ -101,9 +102,9 @@ const Home: React.FC = () => {
           </svg>
         </span>
         <select className="bg-transparent outline-none w-full py-2 text-sm">
-          <option>Type</option>
-          <option>Buy</option>
-          <option>Rent</option>
+          <option>{t("homePage.type")}</option>
+          <option>{t("homePage.buy")}</option>
+          <option>{t("homePage.rent")}</option>
         </select>
       </div>
 
@@ -116,7 +117,7 @@ const Home: React.FC = () => {
         </span>
         <input
           type="text"
-          placeholder="Search"
+          placeholder={t("homePage.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="bg-transparent outline-none w-full py-2 text-sm"
@@ -131,7 +132,7 @@ const Home: React.FC = () => {
         <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
-        Search
+        {t("homePage.searchAction")}
       </button>
 
     </form>

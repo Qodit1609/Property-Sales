@@ -1,12 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Modal from "../Modal/Modal";
 import ContactPopup from "../ContactPopup/ContactPopup";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
 import type { UserRole } from "../../features/users/userType";
 import { Button } from "@/components/common";
+import { normalizeLanguage, preloadLanguage } from "../../i18n";
 
 interface MegaSection {
   title: string;
@@ -82,6 +84,71 @@ const NAV_ITEMS: NavItem[] = [
   },
 ];
 
+const NAV_LABEL_KEY_MAP: Record<string, string> = {
+  Home: "header.home",
+  "Farmhouse / Farmland": "header.farmhouseFarmland",
+  "Agriculture Land": "header.agricultureLand",
+  "Resort Properties": "header.resortProperties",
+  "Rent Farmhouse": "header.rentFarmhouse",
+};
+
+const SECTION_TITLE_KEY_MAP: Record<string, string> = {
+  "Popular Locations": "header.popularLocations",
+  "Property Type": "header.propertyType",
+  Budget: "header.budget",
+  Explore: "header.explore",
+  "Land Types": "header.landTypes",
+  Investment: "header.investment",
+  Locations: "header.locations",
+  Guides: "header.guides",
+  "Resort Type": "header.resortType",
+  Insights: "header.insights",
+  Occasion: "header.occasion",
+};
+
+const SECTION_ITEM_KEY_MAP: Record<string, string> = {
+  Goa: "header.goa",
+  Lonavala: "header.lonavala",
+  Pune: "header.pune",
+  Alibaug: "header.alibaug",
+  "Luxury Farmhouse": "header.luxuryFarmhouse",
+  "Weekend Farmhouse": "header.weekendFarmhouse",
+  "Organic Farm": "header.organicFarm",
+  "Under 50L": "header.under50L",
+  "Under 1Cr": "header.under1Cr",
+  "Under 2Cr": "header.under2Cr",
+  "New Listings": "header.newListings",
+  "Premium Farms": "header.premiumFarms",
+  "Top Deals": "header.topDeals",
+  "Organic Land": "header.organicLand",
+  "Dry Land": "header.dryLand",
+  "Irrigated Land": "header.irrigatedLand",
+  "Short Term": "header.shortTerm",
+  "Long Term": "header.longTerm",
+  Maharashtra: "header.maharashtra",
+  Gujarat: "header.gujarat",
+  Karnataka: "header.karnataka",
+  "Buying Guide": "header.buyingGuide",
+  "Legal Documents": "header.legalDocuments",
+  "Luxury Resort": "header.luxuryResort",
+  "Boutique Resort": "header.boutiqueResort",
+  "Beach Resorts": "header.beachResorts",
+  "Hill Resorts": "header.hillResorts",
+  "Under 5Cr": "header.under5Cr",
+  "Under 10Cr": "header.under10Cr",
+  "ROI Guide": "header.roiGuide",
+  "Investment Tips": "header.investmentTips",
+  Wedding: "header.wedding",
+  Party: "header.party",
+  Weekend: "header.weekend",
+  "Under 10k": "header.under10k",
+  "Under 25k": "header.under25k",
+  Delhi: "header.delhi",
+  Mumbai: "header.mumbai",
+  Featured: "header.featured",
+  Trending: "header.trending",
+};
+
 const roleDashboardPath = (role: UserRole) => {
   if (role === "buyer" || role === "user") return "/buyer/dashboard";
   if (role === "seller") return "/seller/dashboard";
@@ -109,12 +176,14 @@ const navItemMotion = {
 };
 
 const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const prefersReducedMotion = useReducedMotion();
   const { user, token } = useAppSelector((state) => state.auth);
   const isAuthenticated = Boolean(token && user);
+  const activeLanguage = normalizeLanguage(i18n.resolvedLanguage ?? i18n.language);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
@@ -203,9 +272,23 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
     );
   };
 
-  const closeContactModal = useCallback(() => {
+  const closeContactModal = () => {
     setContactOpen(false);
-  }, []);
+  };
+
+  const translateHeaderValue = (value: string) => {
+    const key = NAV_LABEL_KEY_MAP[value] ?? SECTION_TITLE_KEY_MAP[value] ?? SECTION_ITEM_KEY_MAP[value];
+    return key ? t(key) : value;
+  };
+
+  const changeLanguage = (language: "en" | "hi") => {
+    if (activeLanguage === language) return;
+
+    void (async () => {
+      await preloadLanguage(language);
+      await i18n.changeLanguage(language);
+    })();
+  };
 
   return (
     <>
@@ -214,13 +297,13 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
           initial={prefersReducedMotion ? false : { y: -24, opacity: 0 }}
           animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className={`px-3 sm:px-6 lg:px-10 transition-all duration-300 ${
+          className={`px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 transition-all duration-300 ${
            scrolled || forceSolid
   ? "header-bg shadow-xl backdrop-blur-md"
   : "header-bg/80 backdrop-blur-sm"
           }`}
         >
-          <div className="flex h-14 sm:h-[68px] items-center justify-between gap-2 sm:gap-4">
+          <div className="mx-auto flex h-14 sm:h-[68px] w-full max-w-[1480px] items-center justify-between gap-2 sm:gap-4">
             <motion.div
               whileHover={
                 prefersReducedMotion
@@ -242,7 +325,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               initial="hidden"
               animate="visible"
               variants={navStagger}
-              className="hidden xl:flex items-center gap-6 2xl:gap-8"
+              className="hidden xl:flex min-w-0 flex-1 items-center justify-center gap-4 2xl:gap-8 px-3"
             >
               {visibleNavItems.map((item) => {
                 const isActive = location.pathname === item.href;
@@ -261,13 +344,13 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                     >
                       <Link
                         to={item.href}
-                        className={`relative inline-flex pb-1 font-medium transition-colors duration-300 ${
+                        className={`relative inline-flex whitespace-nowrap pb-1 text-sm 2xl:text-[15px] font-medium transition-colors duration-300 ${
                           isActive
                             ? "text-[var(--b2)]"
                             : "text-[var(--fg)]"
                         } hover:text-[var(--b2)]`}
                       >
-                        {item.label}
+                        {translateHeaderValue(item.label)}
                         {isActive && (
                           <motion.span
                             layoutId="active-nav-pill"
@@ -289,15 +372,15 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                           onMouseLeave={closeMega}
                         >
                         <div className="bg-[var(--b2-soft)] p-6 space-y-4 text-[var(--b1)]">
-                          <div className="font-semibold">OWNER OFFERINGS</div>
-                          <div>Articles &amp; News</div>
+                          <div className="font-semibold">{t("header.ownerOfferings")}</div>
+                          <div>{t("header.articlesNews")}</div>
                         </div>
 
                         <div className="p-8 grid grid-cols-2 gap-8 text-[var(--b1)]">
                           {item.mega.map((section) => (
                             <div key={section.title}>
                               <h4 className="font-semibold mb-3 text-[14px] uppercase tracking-wide">
-                                {section.title}
+                                {translateHeaderValue(section.title)}
                               </h4>
                               <ul className="space-y-2 text-sm">
                                 {section.items.map((sub) => (
@@ -306,7 +389,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                                       type="button"
                                       className="hover:text-[var(--b1-mid)] transition"
                                     >
-                                      {sub}
+                                      {translateHeaderValue(sub)}
                                     </button>
                                   </li>
                                 ))}
@@ -318,10 +401,10 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         <div className="bg-[var(--b2-soft)] p-6 flex flex-col justify-between">
                           <div>
                             <h3 className="font-semibold text-lg text-[var(--b1)]">
-                              Sell or rent faster
+                              {t("header.sellOrRentFaster")}
                             </h3>
                             <p className="text-sm text-[var(--brown)] mt-2">
-                              List your property now for FREE
+                              {t("header.listPropertyFree")}
                             </p>
                           </div>
 
@@ -330,7 +413,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                             to="/post-property/basic"
                             className="mt-4 btn-brand px-4 py-2 rounded-lg shadow text-center"
                           >
-                            Post Property
+                            {t("header.postProperty")}
                           </Link>
                         </div>
                         </motion.div>
@@ -342,16 +425,44 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
             </motion.nav>
 
             {/* Right Section */}
-            <div className="flex items-center gap-1.5 sm:gap-2.5">
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+              <div className="inline-flex h-8 min-w-[86px] items-center justify-center rounded-lg border border-[var(--b2-soft)] bg-[var(--white)] px-1">
+                <button
+                  type="button"
+                  onClick={() => changeLanguage("en")}
+                  className={`inline-flex items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors ${
+                    activeLanguage === "en"
+                      ? "bg-[var(--b2)] text-[var(--b1)]"
+                      : "text-[var(--b1-mid)] hover:text-[var(--b1)]"
+                  }`}
+                  aria-pressed={activeLanguage === "en"}
+                >
+                  {t("language.en")}
+                </button>
+                <span className="px-0.5 text-[var(--muted)]">|</span>
+                <button
+                  type="button"
+                  onClick={() => changeLanguage("hi")}
+                  className={`inline-flex items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors ${
+                    activeLanguage === "hi"
+                      ? "bg-[var(--b2)] text-[var(--b1)]"
+                      : "text-[var(--b1-mid)] hover:text-[var(--b1)]"
+                  }`}
+                  aria-pressed={activeLanguage === "hi"}
+                >
+                  {t("language.hi")}
+                </button>
+              </div>
+
               {/* Post Property CTA restored (button only, not in nav) */}
               <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
                 <Link
                   to="/post-property/basic"
-                  className="hidden md:inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-[var(--white)] px-4 text-sm text-[var(--b1)] shadow"
+                  className="hidden lg:inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-[var(--white)] px-2.5 xl:px-3 text-[13px] text-[var(--b1)] shadow"
                 >
-                  Post Property
-                  <span className="inline-flex h-5 items-center justify-center rounded bg-[var(--b2)] px-1.5 text-[10px] leading-none text-[var(--b1)]">
-                    FREE
+                  {t("header.postProperty")}
+                  <span className="inline-flex h-4 items-center justify-center rounded bg-[var(--b2)] px-1 text-[9px] leading-none text-[var(--b1)]">
+                    {t("header.freeTag")}
                   </span>
                 </Link>
               </motion.div>
@@ -360,12 +471,12 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1, scale: 1.03 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}>
                 <Button
                   onClick={() => setContactOpen(true)}
-                  className="hidden md:flex h-10 w-10 items-center justify-center rounded-lg border-2 border-[var(--fg)] p-0 text-[var(--fg)]"
-                  aria-label="Open contact form"
+                  className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg border-2 border-[var(--fg)] p-0 text-[var(--fg)]"
+                  aria-label={t("header.openContactForm")}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    className="w-4 h-4 flex-shrink-0"
+                    className="w-3.5 h-3.5 flex-shrink-0"
                     viewBox="0 0 24 24"
                     fill="currentColor"
                   >
@@ -378,23 +489,23 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                 <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
                   <Link
                     to="/login"
-                    className="hidden md:inline-flex px-3 py-1.5 rounded-full btn-brand text-xs sm:text-sm font-semibold shadow-md transition"
+                    className="hidden lg:inline-flex px-2.5 py-1 rounded-full btn-brand text-xs font-semibold shadow-md transition"
                   >
-                    Login / Register
+                    {t("header.loginRegister")}
                   </Link>
                 </motion.div>
               ) : (
                 <div
-                  className="relative hidden md:block"
+                  className="relative hidden lg:block"
                   onMouseEnter={openLogin}
                   onMouseLeave={closeLogin}
                 >
                   <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
-                    <Button className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border-2 border-[var(--fg)] px-4 py-0 text-[var(--fg)]">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full border border-[var(--fg)]">
+                    <Button className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border-2 border-[var(--fg)] px-3 py-0 text-[var(--fg)]">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full border border-[var(--fg)]">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="w-4 h-4"
+                          className="w-3.5 h-3.5"
                           viewBox="0 0 24 24"
                           fill="currentColor"
                         >
@@ -402,7 +513,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                           <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
                         </svg>
                       </span>
-                      <span className="max-w-[140px] truncate text-sm font-medium leading-none">
+                      <span className="max-w-[110px] truncate text-xs font-medium leading-none">
                         {user?.name}
                       </span>
                     </Button>
@@ -427,14 +538,14 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                           }
                           className="flex h-10 items-center rounded-md px-3 text-sm font-medium text-[var(--b1)] transition-colors hover:bg-[var(--b2-soft)]/50 hover:text-[var(--b1-mid)]"
                         >
-                          My Account
+                          {t("header.myAccount")}
                         </Link>
 
                         <Link
                           to={roleDashboardPath(user?.role ?? "buyer")}
                           className="flex h-10 items-center rounded-md px-3 text-sm font-medium text-[var(--b1)] transition-colors hover:bg-[var(--b2-soft)]/50 hover:text-[var(--b1-mid)]"
                         >
-                          Dashboard
+                          {t("header.dashboard")}
                         </Link>
 
                         <button
@@ -442,7 +553,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                           onClick={handleLogout}
                           className="flex h-10 w-full items-center rounded-md px-3 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
                         >
-                          Logout
+                          {t("header.logout")}
                         </button>
                       </motion.div>
                     )}
@@ -454,7 +565,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               <Button
                 className="xl:hidden text-[var(--fg)] text-2xl p-1 leading-none"
                 onClick={() => setMenuOpen(true)}
-                aria-label="Toggle Menu"
+                aria-label={t("header.toggleMenu")}
                 aria-expanded={menuOpen}
                 aria-controls="mobile-header-menu"
               >
@@ -501,7 +612,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                   size="sm"
                   onClick={closeMobileMenu}
                   className="absolute right-5 sm:right-6 top-1/2 -translate-y-1/2 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--b2-soft)] bg-[var(--white)] text-[var(--b1)] hover:bg-[var(--b2-soft)]/60 transition-colors p-0"
-                  aria-label="Close menu"
+                  aria-label={t("header.closeMenu")}
                 >
                   <span className="text-xl leading-none font-semibold" aria-hidden="true">
                     ×
@@ -523,7 +634,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         onClick={closeMobileMenu}
                         className="text-[16px] font-medium text-[var(--b1)] hover:text-[var(--b1-mid)]"
                       >
-                        {item.label}
+                        {translateHeaderValue(item.label)}
                       </Link>
 
                       {item.mega && (
@@ -531,7 +642,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                           type="button"
                           onClick={() => toggleMobileSection(item.label)}
                           className="text-[var(--b1)] text-base leading-none"
-                          aria-label={`Toggle ${item.label} options`}
+                          aria-label={t("header.toggleOptions", { item: translateHeaderValue(item.label) })}
                           aria-expanded={mobileActiveSections.includes(item.label)}
                         >
                           {mobileActiveSections.includes(item.label) ? "−" : "+"}
@@ -552,12 +663,12 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                             {item.mega.map((section) => (
                               <div key={section.title} className="space-y-1.5">
                                 <div className="text-xs uppercase tracking-wide font-semibold text-[var(--brown)]">
-                                  {section.title}
+                                  {translateHeaderValue(section.title)}
                                 </div>
                                 <ul className="space-y-1">
                                   {section.items.map((sub) => (
                                     <li key={sub} className="text-sm text-[var(--b1-mid)]">
-                                      {sub}
+                                      {translateHeaderValue(sub)}
                                     </li>
                                   ))}
                                 </ul>
@@ -576,7 +687,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                     onClick={closeMobileMenu}
                     className="flex h-11 w-full items-center justify-center rounded-lg bg-[var(--b1)] px-4 text-center font-medium text-[var(--white)]"
                   >
-                    Post Property
+                    {t("header.postProperty")}
                   </Link>
 
                   {!isAuthenticated ? (
@@ -586,7 +697,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         onClick={closeMobileMenu}
                         className="flex h-11 w-full items-center justify-center rounded-lg border border-[var(--b1-mid)] px-4 text-center font-medium text-[var(--b1-mid)]"
                       >
-                        Login / Register
+                        {t("header.loginRegister")}
                       </Link>
                     </>
                   ) : (
@@ -596,7 +707,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         onClick={closeMobileMenu}
                         className="flex h-11 w-full items-center justify-center rounded-lg border border-[var(--b1-mid)] px-4 text-center font-medium text-[var(--b1-mid)]"
                       >
-                        Dashboard
+                        {t("header.dashboard")}
                       </Link>
 
                       <button
@@ -607,7 +718,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         }}
                         className="flex h-11 w-full items-center justify-center rounded-lg border border-red-500 bg-white px-4 text-center font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
                       >
-                        Logout
+                        {t("header.logout")}
                       </button>
                     </>
                   )}
@@ -621,7 +732,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                     }}
                     className="h-11 w-full rounded-lg border border-[var(--b1-mid)] bg-[var(--b1-mid)] px-4 text-white transition-all duration-200 hover:opacity-90"
                   >
-                    Contact Us
+                    {t("header.contactUs")}
                   </Button>
                 </motion.div>
               </motion.div>

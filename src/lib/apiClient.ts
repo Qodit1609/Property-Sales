@@ -1,7 +1,21 @@
-import axios, { type InternalAxiosRequestConfig, type AxiosError } from "axios";
+import axios, {
+  type InternalAxiosRequestConfig,
+  type AxiosError,
+  type AxiosRequestConfig,
+} from "axios";
+
+const PRODUCT_API_BASE_URL = "http://bhoomiwala-api.com.therapidhire.com/api";
+const AUTH_API_BASE_URL = "http://localhost:5000/api";
 
 const api = axios.create({
-  baseURL: "http://bhoomiwala-api.com.therapidhire.com/api",
+  baseURL: PRODUCT_API_BASE_URL,
+});
+
+export const withAuthApi = (
+  config: AxiosRequestConfig = {}
+): AxiosRequestConfig => ({
+  ...config,
+  baseURL: AUTH_API_BASE_URL,
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {

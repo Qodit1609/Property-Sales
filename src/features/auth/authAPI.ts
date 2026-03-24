@@ -1,53 +1,30 @@
-import api from "../../lib/apiClient";
-import type { User } from "../users/userType";
+import api, { withAuthApi } from "../../lib/apiClient";
+import type { AuthResponse, LoginRequest, RegisterRequest } from "./authTypes";
 
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
-
-export type RegisterRole = "buyer" | "seller" | "agent";
-
-export interface RegisterPayload {
-  name: string;
-  email: string;
-  mobile?: string;
-  password: string;
-  role: RegisterRole;
-  // Optional role-specific fields (backend may ignore if unsupported)
-  propertyFocusType?: string; // seller
-  experienceYears?: number; // agent
-  investmentInterest?: string; // buyer
-}
-
-export interface AuthResponse {
-  token: string;
-  user: User & { role: NonNullable<User["role"]> };
-}
-
-export const loginAPI = async (payload: LoginPayload): Promise<AuthResponse> => {
-  const res = await api.post("/auth/login", payload);
-
-  // Expecting shape: { token, user } (optionally wrapped in data)
-  const data = res.data?.data ?? res.data;
-
+const unwrapAuthResponse = (payload: AuthResponse) => {
+  const root = payload.data ?? payload;
   return {
-    token: data.token,
-    user: data.user,
+    token: root.token ?? root.accessToken ?? null,
+    user: root.user ?? null,
   };
 };
 
-export const registerAPI = async (
-  payload: RegisterPayload
-): Promise<AuthResponse> => {
-  const res = await api.post("/auth/register", payload);
+export const loginUser = async (data: LoginRequest) => {
+  const response = await api.post<AuthResponse>("/auth/login", data, withAuthApi());
+  return unwrapAuthResponse(response.data);
+};
 
-  // Expecting shape: { token, user } (optionally wrapped in data)
-  const data = res.data?.data ?? res.data;
-
-  return {
-    token: data.token,
-    user: data.user,
+export const registerUser = async (data: RegisterRequest) => {
+  const payload = {
+    ...data,
+    role: data.role === "buyer" ? "user" : data.role,
   };
+
+  const response = await api.post<AuthResponse>(
+    "/auth/register",
+    payload,
+    withAuthApi()
+  );
+  return unwrapAuthResponse(response.data);
 };
 
