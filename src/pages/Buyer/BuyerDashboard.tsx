@@ -103,7 +103,7 @@ const BuyerDashboard: React.FC = () => {
                 key={loc}
                 type="button"
                 onClick={() => setQuery(loc)}
-                className="rounded-full bg-[var(--white)] px-2.5 py-1 text-[10px] text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2-soft)]"
+                className="rounded-full bg-[var(--b1)] px-2.5 py-1 text-[10px] text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2)] hover:text-[var(--b1)] "
               >
                 {loc}
               </Button>

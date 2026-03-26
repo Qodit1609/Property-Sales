@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ListChecks, Pencil, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import type { RootState } from "../../app/store";
 import DashboardLayout from "../../layout/DashboardLayout";
@@ -12,6 +13,7 @@ import {
 import type { Property } from "../../features/properties/propertyType";
 import type { SellerListingPayload } from "../../features/seller/sellerAPI";
 import { Button } from "@/components/common";
+import { formatINRCurrency, translateDynamic, translateStatus } from "../../lib/i18nHelpers";
 
 type FormState = SellerListingPayload;
 
@@ -37,7 +39,9 @@ const emptyForm: FormState & {
 };
 
 const SellerDashboard: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
+  const language = i18n.resolvedLanguage ?? i18n.language;
 
   const { listings, loading, error, actionLoading } = useAppSelector(
     (state: RootState) => state.seller
@@ -126,7 +130,7 @@ const SellerDashboard: React.FC = () => {
     <ul className="space-y-2">
       <li>
         <div className="mt-4 text-xs font-semibold text-[var(--b1)] uppercase px-2">
-          My Properties
+          {t("sellerDashboard.myProperties")}
         </div>
       </li>
     </ul>
@@ -135,18 +139,21 @@ const SellerDashboard: React.FC = () => {
 
   return (
     <>
-      <DashboardLayout title={user?.name || "Seller Panel"} sidebar={sidebar}>
+      <DashboardLayout
+        title={translateDynamic(user?.name, language) || t("sellerDashboard.sellerPanel")}
+        sidebar={sidebar}
+      >
         <section className="space-y-6 px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <h1 className="text-xl sm:text-2xl font-semibold text-[var(--b1)] flex items-center gap-2">
               <ListChecks size={20} />
-              My Properties
+              {t("sellerDashboard.myProperties")}
             </h1>
           </div>
 
           {loading && (
             <p className="text-sm text-[var(--muted)]">
-              Loading your listings...
+              {t("sellerDashboard.loadingListings")}
             </p>
           )}
 
@@ -165,10 +172,10 @@ const SellerDashboard: React.FC = () => {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-medium text-[var(--b1)] break-words">
-                      {listing.title || "Untitled"}
+                      {translateDynamic(listing.title, language) || t("sellerDashboard.untitled")}
                     </p>
                     <p className="text-xs text-[var(--muted)] break-words">
-                      {listing.address}
+                      {translateDynamic(listing.address, language)}
                     </p>
                   </div>
                   <span
@@ -180,23 +187,25 @@ const SellerDashboard: React.FC = () => {
                         : "bg-[var(--warning-bg)] text-[var(--warning)]"
                     }`}
                   >
-                    {listing.status ?? "pending"}
+                    {translateStatus(listing.status, language)}
                   </span>
                 </div>
 
                 <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                   <div className="rounded-lg bg-[var(--b2-soft)] px-3 py-2">
                     <p className="text-[11px] uppercase tracking-wide text-[var(--muted)]">
-                      Type
+                      {t("sellerDashboard.type")}
                     </p>
-                    <p className="text-[var(--b1)]">{listing.propertyType}</p>
+                    <p className="text-[var(--b1)]">{translateDynamic(listing.propertyType, language)}</p>
                   </div>
                   <div className="rounded-lg bg-[var(--b2-soft)] px-3 py-2">
                     <p className="text-[11px] uppercase tracking-wide text-[var(--muted)]">
-                      Price
+                      {t("sellerDashboard.price")}
                     </p>
                     <p className="text-[var(--b1)]">
-                      ₹ {listing.price?.toLocaleString("en-IN") ?? "N/A"}
+                      {listing.price !== null && listing.price !== undefined
+                        ? formatINRCurrency(listing.price, language)
+                        : t("sellerDashboard.na")}
                     </p>
                   </div>
                 </div>
@@ -208,7 +217,7 @@ const SellerDashboard: React.FC = () => {
                     className="!flex !items-center gap-1 !rounded-md !border !border-[var(--b2)] !bg-white !px-3 !py-1 !text-xs !font-medium !text-[var(--b1)] hover:!bg-[var(--b2-soft)]"
                   >
                     <Pencil size={14} />
-                    Edit
+                    {t("sellerDashboard.edit")}
                   </Button>
 
                   <Button
@@ -217,7 +226,7 @@ const SellerDashboard: React.FC = () => {
                     className="!flex !items-center gap-1 !rounded-md !border !border-red-500 !bg-red-50 !px-3 !py-1 !text-xs !font-medium !text-red-600 hover:!opacity-80"
                   >
                     <Trash2 size={14} />
-                    Delete
+                    {t("sellerDashboard.delete")}
                   </Button>
                 </div>
               </article>
@@ -225,7 +234,7 @@ const SellerDashboard: React.FC = () => {
 
             {listings.length === 0 && (
               <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] px-4 py-6 text-center text-sm text-[var(--muted)] shadow-sm">
-                You have no listings yet.
+                {t("sellerDashboard.noListingsYet")}
               </div>
             )}
           </div>
@@ -234,11 +243,11 @@ const SellerDashboard: React.FC = () => {
             <table className="w-full min-w-[720px] text-sm">
               <thead className="bg-[var(--b2-soft)] text-[var(--b1)]">
                 <tr>
-                  <th className="px-4 py-3 text-left font-semibold">Property</th>
-                  <th className="px-4 py-3 text-left font-semibold">Type</th>
-                  <th className="px-4 py-3 text-left font-semibold">Price</th>
-                  <th className="px-4 py-3 text-left font-semibold">Status</th>
-                  <th className="px-4 py-3 text-right font-semibold">Actions</th>
+                  <th className="px-4 py-3 text-left font-semibold">{t("sellerDashboard.property")}</th>
+                  <th className="px-4 py-3 text-left font-semibold">{t("sellerDashboard.type")}</th>
+                  <th className="px-4 py-3 text-left font-semibold">{t("sellerDashboard.price")}</th>
+                  <th className="px-4 py-3 text-left font-semibold">{t("sellerDashboard.status")}</th>
+                  <th className="px-4 py-3 text-right font-semibold">{t("sellerDashboard.actions")}</th>
                 </tr>
               </thead>
 
@@ -247,17 +256,19 @@ const SellerDashboard: React.FC = () => {
                   <tr key={listing._id} className="hover:bg-[var(--b2-soft)]">
                     <td className="px-4 py-3">
                       <p className="font-medium text-[var(--b1)]">
-                        {listing.title || "Untitled"}
+                        {translateDynamic(listing.title, language) || t("sellerDashboard.untitled")}
                       </p>
                       <p className="text-xs text-[var(--muted)] line-clamp-1">
-                        {listing.address}
+                        {translateDynamic(listing.address, language)}
                       </p>
                     </td>
 
-                    <td className="px-4 py-3">{listing.propertyType}</td>
+                    <td className="px-4 py-3">{translateDynamic(listing.propertyType, language)}</td>
 
                     <td className="px-4 py-3">
-                      ₹ {listing.price?.toLocaleString("en-IN") ?? "N/A"}
+                      {listing.price !== null && listing.price !== undefined
+                        ? formatINRCurrency(listing.price, language)
+                        : t("sellerDashboard.na")}
                     </td>
 
                     <td className="px-4 py-3">
@@ -270,7 +281,7 @@ const SellerDashboard: React.FC = () => {
                             : "bg-[var(--warning-bg)] text-[var(--warning)]"
                         }`}
                       >
-                        {listing.status ?? "pending"}
+                        {translateStatus(listing.status, language)}
                       </span>
                     </td>
 
@@ -282,7 +293,7 @@ const SellerDashboard: React.FC = () => {
                           className="!flex !items-center gap-1 !rounded-md !border !border-[var(--b2)] !bg-white !px-3 !py-1 !text-xs !font-medium !text-[var(--b1)] hover:!bg-[var(--b2-soft)]"
                         >
                           <Pencil size={14} />
-                          Edit
+                          {t("sellerDashboard.edit")}
                         </Button>
 
                         <Button
@@ -291,7 +302,7 @@ const SellerDashboard: React.FC = () => {
                           className="!flex !items-center gap-1 !rounded-md !border !border-red-500 !bg-red-50 !px-3 !py-1 !text-xs !font-medium !text-red-600 hover:!opacity-80"
                         >
                           <Trash2 size={14} />
-                          Delete
+                          {t("sellerDashboard.delete")}
                         </Button>
                       </div>
                     </td>
@@ -304,7 +315,7 @@ const SellerDashboard: React.FC = () => {
                       colSpan={5}
                       className="px-4 py-6 text-center text-sm text-[var(--muted)]"
                     >
-                      You have no listings yet.
+                      {t("sellerDashboard.noListingsYet")}
                     </td>
                   </tr>
                 )}

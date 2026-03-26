@@ -1,18 +1,25 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
-import { register } from "../../features/auth/authSlice";
-import type { RegisterRole } from "../../features/auth/authAPI";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { registerUser } from "../../features/auth/authSlice";
+import type { RegisterRequest } from "../../features/auth/authTypes";
 import Dashboard from "../Dashboard/Dashboard";
 import { ToastStack, type ToastMessage } from "../../components/propertyPost/Toast";
 import { Input, Button } from "@/components/common";
 
-type Role = RegisterRole;
+type Role = RegisterRequest["role"];
 
 const roleToDashboard = (role: Role) => {
   if (role === "buyer") return "/buyer/dashboard";
   if (role === "seller") return "/seller/dashboard";
   return "/agent/dashboard";
+};
+
+const backendRoleToUiRole = (role: string | undefined, fallback: Role): Role => {
+  if (role === "user" || role === "buyer") return "buyer";
+  if (role === "seller") return "seller";
+  if (role === "agent") return "agent";
+  return fallback;
 };
 
 const Register: React.FC = () => {
@@ -53,7 +60,7 @@ const Register: React.FC = () => {
   const roleHint = useMemo(() => {
     if (role === "seller") return "Seller: tell us your property focus.";
     if (role === "agent") return "Agent: share your experience level.";
-    return "Buyer: choose your investment interest.";
+    return "User: choose your investment interest.";
   }, [role]);
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -74,7 +81,7 @@ const Register: React.FC = () => {
         : undefined;
 
     const result = await dispatch(
-      register({
+      registerUser({
         name,
         email,
         mobile: mobile.trim() ? mobile : undefined,
@@ -86,14 +93,15 @@ const Register: React.FC = () => {
       })
     );
 
-    if (register.fulfilled.match(result)) {
+    if (registerUser.fulfilled.match(result)) {
       pushToast({
         kind: "success",
         title: "Registration successful",
         detail: "Signing you in and redirecting…",
       });
 
-      navigate(roleToDashboard(result.payload.user.role as Role), {
+      const resolvedRole = backendRoleToUiRole(result.payload.user?.role, role);
+      navigate(roleToDashboard(resolvedRole), {
         replace: true,
       });
     }
@@ -165,7 +173,7 @@ const Register: React.FC = () => {
                       onChange={() => setRole(r)}
                       className="sr-only"
                     />
-                    {r.toUpperCase()}
+                    {r === "buyer" ? "USER" : r.toUpperCase()}
                   </label>
                 ))}
               </div>

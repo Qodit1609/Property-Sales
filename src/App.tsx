@@ -31,7 +31,7 @@ import AgentLeadsPage from "./pages/Agent/AgentLeadsPage";
 import AgentVisitsPage from "./pages/Agent/AgentVisitsPage";
 import AgentClientsPage from "./pages/Agent/AgentClientsPage";
 import AgentProfilePage from "./pages/Agent/AgentProfilePage";
-import { useAppDispatch } from "./hooks/reduxHooks";
+import { useAppDispatch } from "./store/hooks";
 import { fetchProperties } from "./features/properties/propertySlice";
 import PostPropertyPage from "./pages/PostProperty/PostPropertyPage";
 import React from "react";

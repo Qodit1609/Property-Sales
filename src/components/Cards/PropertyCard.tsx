@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Heart, BedDouble, Bath, Ruler, ShieldCheck, Star } from "lucide-react";
 import { Button } from "@/components/common";
 
 import type { Property as BackendProperty } from "../../features/properties/propertyType";
+import { formatINRCurrency } from "../../lib/i18nHelpers";
 import {
   FALLBACK_PROPERTY_IMAGE,
   formatArea,
-  formatPrice,
   truncateText,
 } from "../../utils/propertyFormatters";
 
@@ -16,9 +17,11 @@ interface Props {
 }
 
 const PropertyCard: React.FC<Props> = ({ property }) => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [liked, setLiked] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
+  const language = i18n.resolvedLanguage ?? i18n.language;
 
   const primaryImage = property.images?.[0] || FALLBACK_PROPERTY_IMAGE;
   const beds = Number(property.beds ?? property.bedrooms ?? 0);
@@ -30,7 +33,7 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
     120
   );
   const isRent = property.listingType === "rent";
-  const tag = isRent ? "Rent" : "Sale";
+  const tag = isRent ? t("propertyCard.rentTag") : t("propertyCard.saleTag");
   const showFeatured = property.featured || property.tags?.includes("Featured");
   const showVerified = property.verified || property.tags?.includes("Verified");
 
@@ -47,7 +50,6 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
           onError={() => setImageFailed(true)}
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-
         <span className="absolute left-3 top-3 rounded-full bg-[var(--b1)] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--fg)] shadow-sm">
           {tag}
         </span>
@@ -85,7 +87,7 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
         </button>
 
         <span className="absolute bottom-3 left-3 rounded-md bg-white/95 px-3 py-1 text-sm font-bold text-[var(--b1)] shadow">
-          {formatPrice(property.price, property.listingType)}
+          {formatINRCurrency(property.price || 0, language)}
         </span>
       </div>
 
@@ -133,7 +135,7 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
             size="sm"
             className="w-full rounded-md bg-[var(--b1)] py-2 text-[var(--fg)] font-medium hover:bg-[var(--b1-mid)] transition"
           >
-            View Details
+            {t("propertyCard.viewDetails")}
           </Button>
         </div>
       </div>

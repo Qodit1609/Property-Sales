@@ -1,8 +1,14 @@
-import axios, { type InternalAxiosRequestConfig, type AxiosError } from "axios";
+import axios, {
+  type InternalAxiosRequestConfig,
+  type AxiosError,
+  type AxiosRequestConfig,
+} from "axios";
 
 const PRODUCT_API_BASE_URL =
   import.meta.env.VITE_PRODUCT_API_BASE_URL ??
   "http://bhoomiwala-api.com.therapidhire.com/api";
+const AUTH_API_BASE_URL =
+  import.meta.env.VITE_AUTH_API_BASE_URL ?? "http://localhost:5000/api";
 export const TEMP_PROPERTY_API = "http://localhost:5000/api";
 export const BASE_URL =
   import.meta.env.VITE_API_BASE_URL ??
@@ -10,6 +16,11 @@ export const BASE_URL =
 
 const api = axios.create({
   baseURL: BASE_URL,
+});
+
+export const withAuthApi = (config: AxiosRequestConfig = {}): AxiosRequestConfig => ({
+  ...config,
+  baseURL: AUTH_API_BASE_URL,
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {

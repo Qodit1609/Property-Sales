@@ -1,6 +1,6 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
-import { useAppSelector } from "../../hooks/reduxHooks";
+import { useAppSelector } from "../../store/hooks";
 import type { UserRole } from "../../features/users/userType";
 
 interface ProtectedRouteProps {
@@ -13,9 +13,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRoles,
 }) => {
   const location = useLocation();
-  const { token, user } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
 
-  if (!token || !user) {
+  if (!isAuthenticated || !user) {
     return (
       <Navigate
         to="/login"
@@ -26,8 +26,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   const allowedRoles = requiredRoles ?? (requiredRole ? [requiredRole] : null);
+  const userRole = user.role;
 
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
+  if (allowedRoles && (!userRole || !allowedRoles.includes(userRole))) {
     return <Navigate to="/" replace />;
   }
 
