@@ -30,7 +30,7 @@ const PropertyLayout: React.FC<PropertyLayoutProps> = ({ allProperties, children
           </div>
 
           {/* Cards grid – children is a function now */}
-          <div className="lg:col-span-3 order-2 grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-4 lg:pl-6 lg:border-l lg:border-gray-300">
+          <div className="lg:col-span-3 order-2 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-y-6 gap-x-4 lg:pl-6 lg:border-l lg:border-gray-300">
             {children(filtered)}
           </div>
 

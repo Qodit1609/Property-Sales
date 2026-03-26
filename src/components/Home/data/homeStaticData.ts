@@ -21,7 +21,7 @@ export const defaultHomeSectionsData: HomeSectionsPayload = {
       location: "Tarana, Ujjain",
       districtSlug: "ujjain",
       image:
-        "https://is1-2.housingcdn.com/01c16c28/954721e510e77e46c875021caa64bbb6/v0/medium/agricultural_land-for-sale-ghatiya-Ujjain-plot_view.jpg",
+        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1770&auto=format&fit=crop",
       priceLabel: "INR 41L",
       landSizeAcres: 7.8,
       soilQuality: "Alluvial Soil",

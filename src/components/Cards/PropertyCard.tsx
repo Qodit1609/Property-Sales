@@ -1,20 +1,15 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Camera,
-  Heart,
-  ChevronLeft,
-  ChevronRight,
-  BedDouble,
-  Bath,
-  Car,
-  Ruler
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Heart, BedDouble, Bath, Ruler, ShieldCheck, Star } from "lucide-react";
 import { Button } from "@/components/common";
 
 import type { Property as BackendProperty } from "../../features/properties/propertyType";
-import { isSizeInAcres } from "../Data/properties";
+import {
+  FALLBACK_PROPERTY_IMAGE,
+  formatArea,
+  formatPrice,
+  truncateText,
+} from "../../utils/propertyFormatters";
 
 interface Props {
   property: BackendProperty;
@@ -23,208 +18,120 @@ interface Props {
 const PropertyCard: React.FC<Props> = ({ property }) => {
   const navigate = useNavigate();
   const [liked, setLiked] = useState(false);
-  const [index, setIndex] = useState(0);
-  const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
+  const [imageFailed, setImageFailed] = useState(false);
 
-  const handleImageError = useCallback(
-    (src: string) => setBrokenImages((prev) => new Set(prev).add(src)),
-    []
+  const primaryImage = property.images?.[0] || FALLBACK_PROPERTY_IMAGE;
+  const beds = Number(property.beds ?? property.bedrooms ?? 0);
+  const baths = Number(property.baths ?? property.bathrooms ?? 0);
+  const areaValue = property.area ?? property.size ?? property.landSize;
+  const areaUnit = property.areaUnit ?? property.landUnit;
+  const shortDescription = truncateText(
+    property.shortDescription || property.description,
+    120
   );
-
-  const mappedProperty = {
-    _id: property._id,
-    title: property.title || "Untitled Property",
-    address: property.address || "Location not available",
-    images: property.images || [],
-    price: property.price || 0,
-    propertyType: property.propertyType || "Property",
-    size: property.size || 0,
-    beds: property.beds || null,
-    baths: property.baths || null,
-    parking: property.parking || null
-  };
-
-  const images =
-    mappedProperty.images.length > 0
-      ? mappedProperty.images
-      : ["no-image"];
-
-  const isRent = mappedProperty.propertyType
-    .toLowerCase()
-    .includes("rent");
-
-  const sizeAcres = isSizeInAcres(mappedProperty.propertyType);
+  const isRent = property.listingType === "rent";
   const tag = isRent ? "Rent" : "Sale";
-
-  useEffect(() => {
-    if (images.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % images.length);
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [images.length]);
-
-  const next = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const prev = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setIndex((prev) =>
-      prev === 0 ? images.length - 1 : prev - 1
-    );
-  };
+  const showFeatured = property.featured || property.tags?.includes("Featured");
+  const showVerified = property.verified || property.tags?.includes("Verified");
 
   return (
     <div
-      onClick={() => navigate(`/properties/${mappedProperty._id}`)}
-      className="group flex h-full flex-col rounded-xl bg-[var(--white)] shadow-md hover:shadow-xl hover:scale-[1.02] transition-all duration-300 border border-[var(--b2-soft)] hover:border-[var(--b1-mid)] cursor-pointer"
+      onClick={() => navigate(`/properties/${property._id}`)}
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-[var(--b1-mid)] cursor-pointer"
     >
-      {/* IMAGE */}
-      <div className="relative h-44 sm:h-52 overflow-hidden bg-gray-100 rounded-t-xl">
+      <div className="relative h-48 sm:h-52 md:h-56 overflow-hidden bg-gray-100">
+        <img
+          src={imageFailed ? FALLBACK_PROPERTY_IMAGE : primaryImage}
+          alt={property.title}
+          loading="lazy"
+          onError={() => setImageFailed(true)}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
 
-        <AnimatePresence mode="wait">
-          {images[index] === "no-image" || brokenImages.has(images[index]) ? (
-            <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm bg-gray-100">
-              Image Not Available
-            </div>
-          ) : (
-            <motion.img
-              key={images[index]}
-              src={images[index]}
-              alt={mappedProperty.title}
-              loading="lazy"
-              onError={() => handleImageError(images[index])}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              onDragEnd={(_, info) => {
-                if (info.offset.x < -50) next();
-                if (info.offset.x > 50) prev();
-              }}
-              initial={{ opacity: 0, scale: 1.1 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            />
-          )}
-        </AnimatePresence>
-
-        {/* TAG */}
-        <span className="absolute left-3 top-3 rounded-full bg-[var(--b1)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[var(--fg)] shadow-sm">
+        <span className="absolute left-3 top-3 rounded-full bg-[var(--b1)] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--fg)] shadow-sm">
           {tag}
         </span>
 
-        {/* ❤️ HEART */}
+        {showFeatured && (
+          <span className="absolute top-3 left-20 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-semibold text-amber-700">
+            <Star size={11} className="fill-amber-500 text-amber-500" />
+            Featured
+          </span>
+        )}
+
+        {showVerified && (
+          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">
+            <ShieldCheck size={11} />
+            Verified
+          </span>
+        )}
+
         <button
           onClick={(e) => {
             e.stopPropagation();
             setLiked(!liked);
           }}
-          className="absolute top-3 right-3 p-2 rounded-full bg-black/30 backdrop-blur-md hover:bg-black/50 transition"
+          className={`absolute bottom-12 right-3 p-2 rounded-full backdrop-blur-md transition ${
+            liked ? "bg-red-100/95" : "bg-black/35 hover:bg-black/55"
+          }`}
+          aria-label="Toggle favourite"
         >
           <Heart
             size={18}
             className={`transition ${
-              liked
-                ? "fill-red-500 text-red-500"
-                : "text-white"
+              liked ? "fill-red-500 text-red-500" : "text-white"
             }`}
           />
         </button>
 
-        {/* PRICE */}
-        <span className="absolute bottom-3 left-3 rounded-md bg-[var(--white)] px-3 py-1 text-sm font-semibold text-[var(--b1)] shadow">
-          ₹ {mappedProperty.price.toLocaleString("en-IN")}
+        <span className="absolute bottom-3 left-3 rounded-md bg-white/95 px-3 py-1 text-sm font-bold text-[var(--b1)] shadow">
+          {formatPrice(property.price, property.listingType)}
         </span>
-
-        {/* IMAGE COUNT */}
-        <div className="absolute bottom-3 right-14 flex items-center gap-1 rounded bg-black/70 px-2 py-1 text-xs text-white">
-          <Camera size={13} />
-          {mappedProperty.images.length}
-        </div>
-
-        {/* ARROWS */}
-        {images.length > 1 && (
-          <>
-            <Button
-              variant="ghost"
-              onClick={prev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 bg-white/80 backdrop-blur"
-            >
-              <ChevronLeft size={16} />
-            </Button>
-
-            <Button
-              variant="ghost"
-              onClick={next}
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1.5 bg-white/80 backdrop-blur"
-            >
-              <ChevronRight size={16} />
-            </Button>
-          </>
-        )}
       </div>
 
-      {/* CONTENT */}
-      <div className="flex flex-1 flex-col gap-2 p-4">
-
-        {/* TYPE */}
-        <p className="text-[11px] uppercase tracking-wide text-[var(--b1-mid)] font-sans">
-          {mappedProperty.propertyType}
+      <div className="flex flex-1 flex-col gap-2.5 p-4">
+        <p className="text-[11px] uppercase tracking-wide text-[var(--b1-mid)] font-semibold">
+          {property.propertyType}
         </p>
 
-        {/* TITLE */}
-        <h3 className="text-[15px] font-semibold text-[var(--b1)] line-clamp-2 font-[Playfair_Display]">
-          {mappedProperty.title}
+        <h3 className="text-[15px] font-semibold text-[var(--b1)] line-clamp-2 leading-5">
+          {property.title}
         </h3>
 
-        {/* ADDRESS */}
-        <p className="mt-1 text-[13px] text-[var(--muted)] truncate font-sans">
-          {mappedProperty.address}
+        <p className="text-[13px] text-[var(--muted)] truncate">
+          {property.locationText || property.address}
         </p>
 
-        {/* FEATURES */}
-        <div className="mt-3 flex items-center gap-4 text-xs text-[var(--muted)] font-sans">
-          {mappedProperty.beds && (
-            <div className="flex items-center gap-1">
+        <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-[var(--muted)]">
+          {beds > 0 && (
+            <div className="flex items-center gap-1.5">
               <BedDouble size={14} />
-              {mappedProperty.beds}
+              {beds} Beds
             </div>
           )}
 
-          {mappedProperty.baths && (
-            <div className="flex items-center gap-1">
+          {baths > 0 && (
+            <div className="flex items-center gap-1.5">
               <Bath size={14} />
-              {mappedProperty.baths}
+              {baths} Baths
             </div>
           )}
 
-          {mappedProperty.parking && (
-            <div className="flex items-center gap-1">
-              <Car size={14} />
-              {mappedProperty.parking}
-            </div>
-          )}
-
-          {mappedProperty.size > 0 && (
-            <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
               <Ruler size={14} />
-              {mappedProperty.size}
-              {sizeAcres ? " ac" : " sqft"}
+              {formatArea(areaValue, areaUnit)}
             </div>
-          )}
         </div>
 
-        {/* BUTTON */}
+        <p className="text-[13px] leading-5 text-[var(--muted)] line-clamp-2">
+          {shortDescription}
+        </p>
+
         <div className="mt-auto pt-4">
           <Button
             type="button"
             size="sm"
-            className="w-full bg-[var(--b1)] text-[var(--fg)] py-2 rounded-md font-medium hover:bg-[var(--b1-mid)] transition"
+            className="w-full rounded-md bg-[var(--b1)] py-2 text-[var(--fg)] font-medium hover:bg-[var(--b1-mid)] transition"
           >
             View Details
           </Button>
@@ -240,24 +147,24 @@ export default PropertyCard;
 
 export const PropertyCardSkeleton = () => {
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl bg-[var(--white)] shadow-md border border-[var(--b2-soft)] animate-pulse">
-      
-      <div className="h-44 sm:h-52 bg-gray-200"></div>
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] shadow-sm animate-pulse">
+      <div className="h-48 sm:h-52 md:h-56 bg-gray-200"></div>
 
       <div className="p-4 flex flex-col flex-1">
-        <div className="h-3 w-24 bg-gray-200 rounded mb-3"></div>
-        <div className="h-4 w-3/4 bg-gray-200 rounded mb-2"></div>
-        <div className="h-3 w-1/2 bg-gray-200 rounded mb-4"></div>
+        <div className="mb-3 h-3 w-20 rounded bg-gray-200"></div>
+        <div className="mb-2 h-4 w-3/4 rounded bg-gray-200"></div>
+        <div className="mb-4 h-3 w-2/3 rounded bg-gray-200"></div>
 
-        <div className="flex gap-4 mb-4">
-          <div className="h-3 w-12 bg-gray-200 rounded"></div>
-          <div className="h-3 w-12 bg-gray-200 rounded"></div>
-          <div className="h-3 w-12 bg-gray-200 rounded"></div>
+        <div className="mb-4 flex gap-3">
+          <div className="h-3 w-16 rounded bg-gray-200"></div>
+          <div className="h-3 w-16 rounded bg-gray-200"></div>
         </div>
+        <div className="mb-4 h-3 w-full rounded bg-gray-200"></div>
+        <div className="mb-2 h-3 w-5/6 rounded bg-gray-200"></div>
 
         <div className="mt-auto">
-          <div className="border-t border-gray-200 my-3"></div>
-          <div className="h-9 bg-gray-200 rounded-md"></div>
+          <div className="my-3 border-t border-gray-200"></div>
+          <div className="h-9 rounded-md bg-gray-200"></div>
         </div>
       </div>
     </div>

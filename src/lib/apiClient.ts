@@ -1,7 +1,15 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosError } from "axios";
 
+const PRODUCT_API_BASE_URL =
+  import.meta.env.VITE_PRODUCT_API_BASE_URL ??
+  "http://bhoomiwala-api.com.therapidhire.com/api";
+export const TEMP_PROPERTY_API = "http://localhost:5000/api";
+export const BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ??
+  (import.meta.env.DEV ? TEMP_PROPERTY_API : PRODUCT_API_BASE_URL);
+
 const api = axios.create({
-  baseURL: "http://bhoomiwala-api.com.therapidhire.com/api",
+  baseURL: BASE_URL,
 });
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -28,4 +36,5 @@ api.interceptors.response.use(
 );
 
 export default api;
+export { PRODUCT_API_BASE_URL };
 
