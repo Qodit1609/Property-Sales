@@ -489,7 +489,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                 <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
                   <Link
                     to="/login"
-                    className="hidden lg:inline-flex px-2.5 py-1 rounded-full btn-brand text-xs font-semibold shadow-md transition"
+                    className="hidden lg:inline-flex h-8 items-center justify-center rounded-full btn-brand px-3 text-[13px] font-semibold leading-none shadow-md transition"
                   >
                     {t("header.loginRegister")}
                   </Link>

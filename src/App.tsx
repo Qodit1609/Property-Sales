@@ -1,4 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { useEffect } from "react";
 import MainLayout from "./layout/MainLayout";
 import Dashboard from "./pages/Dashboard/Dashboard";
@@ -55,6 +61,16 @@ const ReviewSubmit = React.lazy(
   () => import("./components/propertyPost/ReviewSubmit")
 );
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   const dispatch = useAppDispatch();
 
@@ -64,6 +80,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
 
         {/* Public routes WITH header/footer */}

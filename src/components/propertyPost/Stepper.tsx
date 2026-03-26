@@ -20,49 +20,84 @@ export default memo(function Stepper({
     0,
     POST_PROPERTY_STEPS.findIndex((s) => s.path === activePath)
   );
+  const safeCompletion = Math.min(100, Math.max(0, completionPercent));
+  const ringSize = 40;
+  const ringStroke = 3.5;
+  const ringRadius = (ringSize - ringStroke) / 2;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+  const ringOffset =
+    ringCircumference - (safeCompletion / 100) * ringCircumference;
 
   return (
-    <aside className="w-full lg:w-[320px] shrink-0">
+    <aside className="w-full lg:w-[236px] shrink-0">
       <div className="glass-card border border-white/50 shadow-lg">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start justify-between gap-2.5">
           <div>
-            <p className="text-sm font-semibold text-[var(--b1)]">Post a Property</p>
-            <p className="mt-1 text-xs text-[var(--muted)]">
+            <p className="text-xs font-semibold text-[var(--b1)]">Post a Property</p>
+            <p className="mt-0.5 text-[9px] text-[var(--muted)]">
               Complete steps to publish your listing
             </p>
           </div>
           <div className="text-right">
-            <p className="text-xs font-semibold text-[var(--b1-mid)]">
-              {completionPercent}%
-            </p>
-            <p className="mt-2 text-xs text-[var(--muted)]">
+            <div className="ml-auto relative h-10 w-10">
+              <svg
+                className="-rotate-90 h-10 w-10"
+                viewBox={`0 0 ${ringSize} ${ringSize}`}
+                aria-hidden="true"
+              >
+                <circle
+                  cx={ringSize / 2}
+                  cy={ringSize / 2}
+                  r={ringRadius}
+                  fill="none"
+                  stroke="rgba(45,106,79,0.2)"
+                  strokeWidth={ringStroke}
+                />
+                <circle
+                  cx={ringSize / 2}
+                  cy={ringSize / 2}
+                  r={ringRadius}
+                  fill="none"
+                  stroke="var(--b1-mid)"
+                  strokeWidth={ringStroke}
+                  strokeLinecap="round"
+                  strokeDasharray={ringCircumference}
+                  strokeDashoffset={ringOffset}
+                  className="transition-all duration-500 ease-out"
+                />
+              </svg>
+              <p className="absolute inset-0 flex items-center justify-center text-[10px] font-semibold text-[var(--b1-mid)]">
+                {safeCompletion}%
+              </p>
+            </div>
+            <p className="mt-1 text-[9px] text-[var(--muted)]">
               Step   {activeIndex + 1}/{POST_PROPERTY_STEPS.length}
             </p>
           </div>
         </div>
 
-        <div className="mt-4 h-2 w-full rounded-full bg-white/50 overflow-hidden">
+        <div className="mt-3 h-1.5 w-full rounded-full bg-white/50 overflow-hidden">
           <div
             className="h-full transition-all"
             style={{
-              width: `${completionPercent}%`,
+              width: `${safeCompletion}%`,
               background:
                 "linear-gradient(90deg, var(--b1-mid), var(--b2), var(--b1-mid))",
             }}
           />
         </div>
 
-        <div className="mt-6 relative">
+        <div className="mt-4 relative">
           {/* Gradient rail */}
           <div
-            className="absolute left-[6px] top-1 bottom-1 w-[3px] rounded-full"
+            className="absolute left-[5px] top-1 bottom-1 w-[2px] rounded-full"
             style={{
               background:
                 "linear-gradient(180deg, rgba(45,106,79,0.12), rgba(149,213,178,0.95), rgba(45,106,79,0.12))",
             }}
           />
 
-          <ul className="space-y-3 ml-4">
+          <ul className="space-y-2 ml-3">
             {POST_PROPERTY_STEPS.map((step, index) => {
               const status = stepStatuses[step.key] ?? "todo";
               const isActive = activePath === step.path;
@@ -92,7 +127,7 @@ export default memo(function Stepper({
                       if (clickable) onNavigate(step.path);
                     }}
                     disabled={!clickable}
-                    className={`group w-full rounded-2xl border px-4 py-3 text-left transition ${
+                    className={`group w-full rounded-xl border px-2.5 py-2 text-left transition ${
                       isActive
                         ? "border-[var(--b1-mid)] bg-white/70 shadow-sm"
                         : "border-white/50 bg-white/55 hover:bg-white/70"
@@ -105,20 +140,20 @@ export default memo(function Stepper({
                         : "Complete this step to unlock"
                     }
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-2.5">
                       <div className="relative">
                         <div
-                          className={`h-7 w-7 rounded-full flex items-center justify-center ${circleBg} ${ring}`}
+                          className={`h-5 w-5 rounded-full flex items-center justify-center ${circleBg} ${ring}`}
                         >
                           {status === "done" ? (
-                            <Check size={16} />
+                            <Check size={11} />
                           ) : (
-                            <span className="text-xs font-bold">{index + 1}</span>
+                            <span className="text-[9px] font-bold">{index + 1}</span>
                           )}
                         </div>
                         {isActive && (
                           <div
-                            className="absolute -inset-2 rounded-full blur-md opacity-70"
+                            className="absolute -inset-1.5 rounded-full blur-md opacity-70"
                             style={{
                               background:
                                 "radial-gradient(circle, rgba(149,213,178,0.8), rgba(149,213,178,0) 70%)",
@@ -129,7 +164,7 @@ export default memo(function Stepper({
 
                       <div className="min-w-0 flex-1">
                         <p
-                          className={`text-sm font-semibold truncate ${
+                          className={`text-xs font-semibold truncate ${
                             isActive
                               ? "text-[var(--b1)]"
                               : status === "done"
@@ -139,7 +174,7 @@ export default memo(function Stepper({
                         >
                           {step.label}
                         </p>
-                        <p className="mt-0.5 text-[11px] text-[var(--muted)]">
+                        <p className="mt-0.5 text-[9px] text-[var(--muted)]">
                           Step {index + 1}
                           {status === "done"
                             ? " • Completed"

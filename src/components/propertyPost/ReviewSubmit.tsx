@@ -15,15 +15,34 @@ import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
 import { Button } from "@/components/common";
 
-function SummaryRow({ label, value }: { label: string; value: string }) {
+function SummaryRow({
+  label,
+  value,
+  singleLine = false,
+}: {
+  label: string;
+  value: string;
+  singleLine?: boolean;
+}) {
   return (
     <div className="flex items-start justify-between gap-4 py-2">
-      <span className="text-xs font-semibold text-[var(--muted)]">{label}</span>
-      <span className="text-sm font-medium text-[var(--b1)] text-right break-words">
+      <span className="shrink-0 text-xs font-semibold text-[var(--muted)]">{label}</span>
+      <span
+        className={`min-w-0 flex-1 text-sm font-medium text-[var(--b1)] text-right ${
+          singleLine ? "truncate whitespace-nowrap" : "break-words"
+        }`}
+      >
         {value || "—"}
       </span>
     </div>
   );
+}
+
+function formatVideoPreview(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (trimmed.length <= 60) return trimmed;
+  return `${trimmed.slice(0, 35)}...${trimmed.slice(-20)}`;
 }
 
 export default function ReviewSubmit() {
@@ -211,7 +230,11 @@ export default function ReviewSubmit() {
           </div>
           <div className="mt-3 divide-y divide-[var(--b2)]">
             <SummaryRow label="Images" value={`${post.media.images.length}`} />
-            <SummaryRow label="Video" value={post.media.videoUrl ?? ""} />
+            <SummaryRow
+              label="Video"
+              value={formatVideoPreview(post.media.videoUrl ?? "")}
+              singleLine
+            />
             <SummaryRow
               label="Amenities selected"
               value={Object.entries(post.amenities)

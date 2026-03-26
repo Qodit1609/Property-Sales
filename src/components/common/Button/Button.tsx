@@ -1,4 +1,5 @@
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
 type ButtonProps = {
   children: React.ReactNode;
@@ -42,20 +43,22 @@ const Button: React.FC<ButtonProps> = ({
   onClick, // ✅ FIX: destructured here
   ...props
 }) => {
+  const buttonClassName = twMerge(
+    base,
+    variants[variant],
+    sizes[size],
+    fullWidth ? "w-full" : "",
+    disabled ? "opacity-50 cursor-not-allowed" : "",
+    "active:scale-95",
+    className
+  );
+
   return (
     <button
       type={type}
       onClick={(e) => onClick?.(e)} // ✅ now works
       disabled={disabled || loading}
-      className={`
-        ${base}
-        ${variants[variant]}
-        ${sizes[size]}
-        ${fullWidth ? "w-full" : ""}
-        ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-        active:scale-95
-        ${className}
-      `}
+      className={buttonClassName}
       {...props}
     >
       {loading ? "Loading..." : children}

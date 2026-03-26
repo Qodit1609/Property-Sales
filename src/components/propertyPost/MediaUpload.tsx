@@ -125,9 +125,9 @@ export default function MediaUpload() {
                 </p>
               </div>
 
-              <label className="inline-flex cursor-pointer items-center rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] hover:bg-[var(--b1)] transition">
+              <label className="inline-flex min-w-[116px] shrink-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] transition hover:bg-[var(--b1)]">
                 Select files
-                <Input type="file" accept="image/*" multiple className="hidden" onChange={onInputChange} />
+                <input type="file" accept="image/*" multiple className="hidden" onChange={onInputChange} />
               </label>
             </div>
 
@@ -172,7 +172,7 @@ export default function MediaUpload() {
                   setImageUrl("");
                   pushToast({ kind: "success", title: "Image URL added" });
                 }}
-                className="rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] hover:bg-[var(--b1)] transition"
+                className="min-w-[104px] shrink-0 whitespace-nowrap rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] transition hover:bg-[var(--b1)]"
               >
                 Add URL
               </Button>
