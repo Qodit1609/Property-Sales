@@ -1,21 +1,13 @@
-import { useEffect } from "react";
 import PropertyCard, { PropertyCardSkeleton } from "../Cards/PropertyCard";
 
 // Redux
-import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
-import { fetchProperties } from "../../features/properties/propertySlice";
+import { useAppSelector } from "../../hooks/reduxHooks";
 
 const PropertyList = () => {
-  const dispatch = useAppDispatch();
-
   const { data, loading, error } = useAppSelector(
     (state) => state.properties
   );
   const properties = Array.isArray(data) ? data : [];
-
-  useEffect(() => {
-    dispatch(fetchProperties({ page: 1, limit: 10 }));
-  }, [dispatch]);
 
   if (error) {
     return (

@@ -8,11 +8,30 @@ const PRODUCT_API_BASE_URL =
   import.meta.env.VITE_PRODUCT_API_BASE_URL ??
   "http://bhoomiwala-api.com.therapidhire.com/api";
 const AUTH_API_BASE_URL =
-  import.meta.env.VITE_AUTH_API_BASE_URL ?? "http://localhost:5000/api";
+  import.meta.env.VITE_AUTH_API_BASE_URL ?? "http://localhost:5000/api/properties?page=1&limit=50";
 export const TEMP_PROPERTY_API = "http://localhost:5000/api";
 export const BASE_URL =
   import.meta.env.VITE_API_BASE_URL ??
   (import.meta.env.DEV ? TEMP_PROPERTY_API : PRODUCT_API_BASE_URL);
+
+export const API_ENDPOINTS = {
+  AUTH: {
+    LOGIN: "/auth/login",
+    REGISTER: "/auth/register",
+  },
+  PROPERTY: {
+    LIST: "/properties",
+    MY_PROPERTIES: "/properties/my-properties/list",
+    BY_ID: (id: string) => `/properties/${id}`,
+    APPROVE: (id: string) => `/properties/${id}/approve`,
+  },
+  NEW: {
+    PROPERTIES: "/property-cards/new",
+  },
+  HOME: {
+    SECTIONS: "/home/sections",
+  },
+} as const;
 
 const api = axios.create({
   baseURL: BASE_URL,

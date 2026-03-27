@@ -1,4 +1,4 @@
-import api, { withAuthApi } from "../../lib/apiClient";
+import api, { API_ENDPOINTS, withAuthApi } from "../../lib/apiClient";
 import type { AuthResponse, LoginRequest, RegisterRequest } from "./authTypes";
 
 const unwrapAuthResponse = (payload: AuthResponse) => {
@@ -10,7 +10,7 @@ const unwrapAuthResponse = (payload: AuthResponse) => {
 };
 
 export const loginUser = async (data: LoginRequest) => {
-  const response = await api.post<AuthResponse>("/auth/login", data, withAuthApi());
+  const response = await api.post<AuthResponse>(API_ENDPOINTS.AUTH.LOGIN, data, withAuthApi());
   return unwrapAuthResponse(response.data);
 };
 
@@ -21,7 +21,7 @@ export const registerUser = async (data: RegisterRequest) => {
   };
 
   const response = await api.post<AuthResponse>(
-    "/auth/register",
+    API_ENDPOINTS.AUTH.REGISTER,
     payload,
     withAuthApi()
   );

@@ -1,4 +1,4 @@
-import api from "../../lib/apiClient";
+import api, { API_ENDPOINTS } from "../../lib/apiClient";
 import type { Property } from "./propertyType";
 import { FALLBACK_PROPERTY_IMAGE } from "../../utils/propertyFormatters";
 
@@ -528,7 +528,7 @@ const extractArray = (payload: unknown): unknown[] => {
 };
 
 export const fetchPropertiesAPI = async (page: number, limit: number) => {
-  const res = await api.get("/properties", {
+  const res = await api.get(API_ENDPOINTS.PROPERTY.LIST, {
     params: {
       page,
       limit,
@@ -542,7 +542,7 @@ export const fetchPropertiesAPI = async (page: number, limit: number) => {
 
   // Fallback for authenticated users whose data is scoped to their account.
   try {
-    const myRes = await api.get("/properties/my-properties/list");
+    const myRes = await api.get(API_ENDPOINTS.PROPERTY.MY_PROPERTIES);
     const myProperties = extractArray(myRes.data).map(normalizeProperty);
     if (myProperties.length > 0) {
       return myProperties;
@@ -555,17 +555,17 @@ export const fetchPropertiesAPI = async (page: number, limit: number) => {
 };
 
 export const fetchPropertyByIdAPI = async (id: string) => {
-  const res = await api.get(`/properties/${id}`);
+  const res = await api.get(API_ENDPOINTS.PROPERTY.BY_ID(id));
   return normalizeProperty(res.data.data ?? res.data); // IMPORTANT: backend may wrap inside data
 };
 
 export const getNewProjects = async (): Promise<Property[]> => {
-  const res = await api.get("/property-cards/new");
+  const res = await api.get(API_ENDPOINTS.NEW.PROPERTIES);
   return extractArray(res.data).map(normalizeProperty);
 };
 
 export const approvePropertyAPI = async (id: string) => {
-  const res = await api.get(`/properties/${id}/approve`);
+  const res = await api.get(API_ENDPOINTS.PROPERTY.APPROVE(id));
   return normalizeProperty(res.data.data ?? res.data); // IMPORTANT: backend may wrap inside data
 };
 
