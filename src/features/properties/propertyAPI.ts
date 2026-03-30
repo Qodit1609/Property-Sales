@@ -527,6 +527,11 @@ const extractArray = (payload: unknown): unknown[] => {
   return [];
 };
 
+/** Normalizes list endpoints that return arrays or wrapped shapes like `{ data: { properties } }`. */
+export function mapPropertyListPayload(payload: unknown): Property[] {
+  return extractArray(payload).map(normalizeProperty);
+}
+
 export const fetchPropertiesAPI = async (page: number, limit: number) => {
   const res = await api.get(API_ENDPOINTS.PROPERTY.LIST, {
     params: {
@@ -534,7 +539,7 @@ export const fetchPropertiesAPI = async (page: number, limit: number) => {
       limit,
     },
   });
-  const publicProperties = extractArray(res.data).map(normalizeProperty);
+  const publicProperties = mapPropertyListPayload(res.data);
 
   if (publicProperties.length > 0) {
     return publicProperties;
@@ -543,7 +548,7 @@ export const fetchPropertiesAPI = async (page: number, limit: number) => {
   // Fallback for authenticated users whose data is scoped to their account.
   try {
     const myRes = await api.get(API_ENDPOINTS.PROPERTY.MY_PROPERTIES);
-    const myProperties = extractArray(myRes.data).map(normalizeProperty);
+    const myProperties = mapPropertyListPayload(myRes.data);
     if (myProperties.length > 0) {
       return myProperties;
     }
@@ -561,7 +566,7 @@ export const fetchPropertyByIdAPI = async (id: string) => {
 
 export const getNewProjects = async (): Promise<Property[]> => {
   const res = await api.get(API_ENDPOINTS.NEW.PROPERTIES);
-  return extractArray(res.data).map(normalizeProperty);
+  return mapPropertyListPayload(res.data);
 };
 
 export const approvePropertyAPI = async (id: string) => {

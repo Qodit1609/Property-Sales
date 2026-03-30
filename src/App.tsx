@@ -17,10 +17,14 @@ import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import SellerDashboard from "./pages/Seller/SellerDashboard";
+import SellerPropertiesPage from "./pages/Seller/SellerPropertiesPage";
+import SellerLayout from "./components/seller/SellerLayout";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminPropertiesPage from "./pages/Admin/AdminPropertiesPage";
 import AdminUsersPage from "./pages/Admin/AdminUsersPage";
 import AdminLogsPage from "./pages/Admin/AdminLogsPage";
+import AdminSellersPage from "./pages/Admin/AdminSellersPage";
+import AdminAccountPage from "./pages/Admin/AdminAccountPage";
 import BuyerDashboard from "./pages/Buyer/BuyerDashboard";
 import BuyerWishlistPage from "./pages/Buyer/BuyerWishlistPage";
 import BuyerComparePage from "./pages/Buyer/BuyerComparePage";
@@ -94,7 +98,7 @@ function App() {
 
           {/* Post Property (Seller/User/Agent) */}
           <Route
-            element={<ProtectedRoute requiredRoles={["seller", "user", "agent"]} />}
+            element={<ProtectedRoute requiredRoles={["seller", "buyer", "agent"]} />}
           >
             <Route path="/post-property" element={<PostPropertyPage />}>
               <Route index element={<Navigate to="basic" replace />} />
@@ -108,26 +112,44 @@ function App() {
           </Route>
         </Route>
 
-        {/* Buyer area WITHOUT main header/footer
-            Allow both explicit 'buyer' role and legacy 'user' role (treated as buyer). */}
-        <Route element={<ProtectedRoute requiredRoles={["buyer", "user"]} />}>
-          <Route path="/buyer/dashboard" element={<BuyerDashboard />} />
-          <Route path="/buyer/wishlist" element={<BuyerWishlistPage />} />
-          <Route path="/buyer/compare" element={<BuyerComparePage />} />
-          <Route path="/buyer/cart" element={<BuyerCartPage />} />
-          <Route path="/buyer/account" element={<BuyerAccountPage />} />
-          <Route path="/buyer/activity" element={<BuyerActivityPage />} />
-          <Route path="/buyer/enquiries" element={<BuyerEnquiriesPage />} />
-          <Route
-            path="/buyer/notifications"
-            element={<BuyerNotificationsPage />}
-          />
+        {/* Buyer area (no MainLayout) */}
+        <Route path="/buyer" element={<ProtectedRoute requiredRoles={["buyer"]} />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<BuyerDashboard />} />
+          <Route path="wishlist" element={<BuyerWishlistPage />} />
+          <Route path="compare" element={<BuyerComparePage />} />
+          <Route path="cart" element={<BuyerCartPage />} />
+          <Route path="account" element={<BuyerAccountPage />} />
+          <Route path="activity" element={<BuyerActivityPage />} />
+          <Route path="enquiries" element={<BuyerEnquiriesPage />} />
+          <Route path="notifications" element={<BuyerNotificationsPage />} />
         </Route>
 
-        {/* Seller dashboard */}
-        <Route element={<ProtectedRoute requiredRole="seller" />}>
-          <Route path="/seller/dashboard" element={<SellerDashboard />} />
-        </Route>
+        {/* Seller area — explicit routes (RR7 + nested pathless layouts can render nothing) */}
+        <Route
+          path="/seller"
+          element={<Navigate to="/seller/dashboard" replace />}
+        />
+        <Route
+          path="/seller/dashboard"
+          element={
+            <ProtectedRoute requiredRoles={["seller"]}>
+              <SellerLayout>
+                <SellerDashboard />
+              </SellerLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/seller/properties"
+          element={
+            <ProtectedRoute requiredRoles={["seller"]}>
+              <SellerLayout>
+                <SellerPropertiesPage />
+              </SellerLayout>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Agent dashboard */}
         <Route element={<ProtectedRoute requiredRole="agent" />}>
@@ -145,7 +167,9 @@ function App() {
         {/* Admin dashboard */}
         <Route element={<ProtectedRoute requiredRole="admin" />}>
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/account" element={<AdminAccountPage />} />
           <Route path="/admin/properties" element={<AdminPropertiesPage />} />
+          <Route path="/admin/sellers" element={<AdminSellersPage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="/admin/logs" element={<AdminLogsPage />} />
         </Route>

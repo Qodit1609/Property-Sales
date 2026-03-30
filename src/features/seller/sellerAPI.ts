@@ -1,5 +1,6 @@
 import api from "../../lib/apiClient";
 import type { Property } from "../properties/propertyType";
+import { mapPropertyListPayload } from "../properties/propertyAPI";
 
 export interface SellerListingPayload {
   title: string;
@@ -7,6 +8,8 @@ export interface SellerListingPayload {
   price: number;
   images: string[];
   propertyType: string;
+  /** Backend expects `sale` | `rent` (UI uses sell/rent) */
+  listingType: "sale" | "rent";
   description?: string;
   latitude?: number | string;
   longitude?: number | string;
@@ -18,10 +21,8 @@ export interface SellerListingPayload {
 }
 
 export const fetchMyListingsAPI = async (): Promise<Property[]> => {
-  
   const res = await api.get("/properties/my-properties/list");
-
-  return res.data.data ?? res.data;
+  return mapPropertyListPayload(res.data);
 };
 
 export const createListingAPI = async (

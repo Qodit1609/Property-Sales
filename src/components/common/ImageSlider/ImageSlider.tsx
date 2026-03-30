@@ -33,9 +33,8 @@ const ImageSlider = ({
     return images;
   }, [images, fallbackImage]);
 
-  useEffect(() => {
-    setIndex((prev) => (prev >= safeImages.length ? 0 : prev));
-  }, [safeImages.length]);
+  const displayIndex =
+    safeImages.length === 0 ? 0 : Math.min(index, safeImages.length - 1);
 
   useEffect(() => {
     if (autoPlayMs <= 0 || safeImages.length <= 1) {
@@ -49,9 +48,20 @@ const ImageSlider = ({
     return () => window.clearInterval(intervalId);
   }, [autoPlayMs, safeImages.length]);
 
-  const goNext = () => setIndex((prev) => (prev + 1) % safeImages.length);
+  const goNext = () =>
+    setIndex((prev) => {
+      const len = safeImages.length;
+      if (len <= 1) return 0;
+      const cur = Math.min(prev, len - 1);
+      return (cur + 1) % len;
+    });
   const goPrev = () =>
-    setIndex((prev) => (prev === 0 ? safeImages.length - 1 : prev - 1));
+    setIndex((prev) => {
+      const len = safeImages.length;
+      if (len <= 1) return 0;
+      const cur = Math.min(prev, len - 1);
+      return cur === 0 ? len - 1 : cur - 1;
+    });
 
   const onTouchStart = (event: React.TouchEvent) => {
     touchStartX.current = event.touches[0]?.clientX ?? null;
@@ -94,7 +104,7 @@ const ImageSlider = ({
     }
   };
 
-  const activeSource = safeImages[index];
+  const activeSource = safeImages[displayIndex];
   const shouldShowFallback = brokenImages.has(activeSource);
 
   return (
@@ -112,9 +122,9 @@ const ImageSlider = ({
       >
         <img
           src={shouldShowFallback ? fallbackImage : activeSource}
-          alt={`${alt} - image ${index + 1}`}
-          loading={index === 0 ? "eager" : "lazy"}
-          fetchPriority={index === 0 ? "high" : "auto"}
+          alt={`${alt} - image ${displayIndex + 1}`}
+          loading={displayIndex === 0 ? "eager" : "lazy"}
+          fetchPriority={displayIndex === 0 ? "high" : "auto"}
           onError={() =>
             setBrokenImages((prev) => new Set(prev).add(activeSource))
           }
@@ -144,7 +154,7 @@ const ImageSlider = ({
 
             <div className="absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1 text-xs font-medium text-white">
               <Images size={13} />
-              {index + 1} / {safeImages.length}
+              {displayIndex + 1} / {safeImages.length}
             </div>
           </>
         )}
@@ -160,7 +170,7 @@ const ImageSlider = ({
                 type="button"
                 onClick={() => setIndex(imageIndex)}
                 className={`shrink-0 overflow-hidden rounded-lg border-2 transition ${
-                  imageIndex === index
+                  imageIndex === displayIndex
                     ? "border-[var(--b1-mid)]"
                     : "border-transparent"
                 }`}

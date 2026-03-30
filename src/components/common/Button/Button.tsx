@@ -20,9 +20,10 @@ const base =
 
 const variants = {
   primary: "bg-primary text-white hover:opacity-90",
-  secondary: "bg-secondary text-white hover:opacity-90",
-  outline: "border border-border text-foreground hover:bg-muted",
-  ghost: "text-foreground hover:bg-muted",
+  /* Light green bg: dark text for contrast (was white-on-b2, hard to see) */
+  secondary: "bg-secondary text-b1 hover:opacity-90",
+  outline: "border border-border text-foreground hover:bg-muted/30",
+  ghost: "text-foreground hover:bg-muted/30",
 };
 
 const sizes = {

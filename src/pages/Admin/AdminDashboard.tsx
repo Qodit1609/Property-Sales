@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import AdminLayout from "../../components/admin/AdminLayout";
 import AdminStats from "../../components/admin/AdminStats";
 import PropertyModeration from "../../components/admin/PropertyModeration";
-import UserManagement from "../../components/admin/UserManagement";
+import AccountManagement from "../../components/admin/AccountManagement";
 import {
   approveListing,
   deleteListingById,
@@ -70,19 +70,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialTab }) => {
               Admin overview
             </h1>
             <p className="text-[11px] text-[var(--muted)]">
-              Portfolio health across inventory and users.
+              Portfolio health across inventory and accounts.
             </p>
           </div>
         </div>
       </div>
 
-      <AdminStats users={users} listings={listings} />
+      <AdminStats accounts={users} listings={listings} />
     </div>
   );
 
   const renderUsers = () => (
-    <UserManagement
-      users={users}
+    <AccountManagement
+      accounts={users}
       loading={usersLoading}
       error={usersError}
       actionLoading={actionLoading}

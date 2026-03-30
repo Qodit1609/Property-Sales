@@ -2,18 +2,18 @@ import React from "react";
 import { Home, ListChecks, Users, ShieldCheck } from "lucide-react";
 
 import type { Property } from "../../features/properties/propertyType";
-import type { User } from "../../features/users/userType";
+import type { ManagedAccount } from "../../features/auth/roleTypes";
 
 interface AdminStatsProps {
-  users: User[];
+  accounts: ManagedAccount[];
   listings: Property[];
 }
 
-const AdminStats: React.FC<AdminStatsProps> = ({ users, listings }) => {
-  const totalUsers = users.length;
-  const buyers = users.filter((u) => u.role === "buyer").length;
-  const sellers = users.filter((u) => u.role === "seller").length;
-  const agents = users.filter((u) => u.role === "agent").length;
+const AdminStats: React.FC<AdminStatsProps> = ({ accounts, listings }) => {
+  const totalAccounts = accounts.length;
+  const buyers = accounts.filter((u) => u.role === "buyer").length;
+  const sellers = accounts.filter((u) => u.role === "seller").length;
+  const agents = accounts.filter((u) => u.role === "agent").length;
 
   const totalListings = listings.length;
   const approvedListings = listings.filter((l) => l.status === "approved")
@@ -48,8 +48,8 @@ const AdminStats: React.FC<AdminStatsProps> = ({ users, listings }) => {
       tone: "rose",
     },
     {
-      label: "Total users",
-      value: totalUsers,
+      label: "Total accounts",
+      value: totalAccounts,
       icon: Users,
       tone: "slate",
     },

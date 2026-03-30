@@ -1,8 +1,6 @@
 import React from "react";
 import AdminSidebar from "./AdminSidebar";
-import { useAppSelector, useAppDispatch } from "../../hooks/reduxHooks";
-import { logout } from "../../features/auth/authSlice";
-import { LogOut } from "lucide-react";
+import { useAppSelector } from "../../hooks/reduxHooks";
 import Header from "../Header/Header";
 
 interface AdminLayoutProps {
@@ -12,10 +10,6 @@ interface AdminLayoutProps {
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ title, children }) => {
   const { user } = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
-  const handleLogout = () => {
-    dispatch(logout());
-  };
 
   return (
     <div className="min-h-screen border-[var(--b2)] bg-[var(--b2-soft)] text-[var(--b1)]">
@@ -24,7 +18,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ title, children }) => {
         <aside className="hidden w-64 flex-shrink-0 border-r border-[var(--b2)] bg-[var(--white)] px-4 py-5 lg:block">
           <div className="mb-6">
             <p className="text-[15px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-              ADMIN
+              {title}
             </p>
             <p className="mt-1 text-sm font-medium text-[var(--b1)]">
               {user?.email ?? "Admin"}

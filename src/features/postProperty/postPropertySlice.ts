@@ -132,14 +132,23 @@ export const submitPostProperty = createAsyncThunk<
       );
     }
 
+    // Map UI category/subtype → backend enum (see Property-Sales-BE propertyModel.propertyType)
     const propertyType = (() => {
-      if (state.basicDetails.listingType === "rent") return "Rent Farmhouse";
-      if (state.basicDetails.category === "Farmhouse") return "Farmhouse";
-      if (state.basicDetails.category === "Agriculture Land") return "Agriculture Land";
-      if (state.basicDetails.category === "Agri Resort") return "Resort";
-      // Backend currently supports a limited set. Keep safe default.
+      const cat = state.basicDetails.category;
+      const pt = state.basicDetails.propertyType;
+      if (cat === "Agriculture Land") return "Agriculture Land";
+      if (cat === "Farmhouse") return "Farmhouse";
+      if (cat === "Agri Resort") return "Resort";
+      if (cat === "Residential") {
+        if (pt === "Plot" || pt === "House" || pt === "Apartment") return pt;
+        return "House";
+      }
+      if (cat === "Commercial") return "Commercial";
       return "Farmhouse";
     })();
+
+    const listingType =
+      state.basicDetails.listingType === "rent" ? "rent" : "sale";
 
     // Map to existing backend payload shape used by seller listings.
     // Extended fields are persisted in the draft for now; backend integration
@@ -159,6 +168,7 @@ export const submitPostProperty = createAsyncThunk<
       price: state.profileDetails.price ?? 0,
       images: remoteImages,
       propertyType,
+      listingType,
       description: state.profileDetails.description,
       latitude: state.locationDetails.latitude ?? 0,
       longitude: state.locationDetails.longitude ?? 0,
@@ -174,12 +184,14 @@ export const submitPostProperty = createAsyncThunk<
     };
 
     const data = err.response?.data;
-    const serverMessage =
-      data && typeof data === "object" && "message" in data && typeof (data as any).message === "string"
-        ? String((data as any).message)
-        : typeof err.message === "string"
-        ? err.message
-        : null;
+    const serverMessage = (() => {
+      if (data && typeof data === "object" && data !== null && "message" in data) {
+        const m = (data as { message?: unknown }).message;
+        if (typeof m === "string") return m;
+      }
+      if (typeof err.message === "string") return err.message;
+      return null;
+    })();
 
     const serverDataText = (() => {
       if (data == null) return null;

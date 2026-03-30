@@ -22,15 +22,18 @@ export default {
         b2: "var(--b2)",
         fg: "var(--fg)",
 
-        /* Semantic colors used by common components */
+        /* Semantic colors used by common components (Button, Input, admin forms) */
         primary: "var(--b1)",
         secondary: "var(--b2)",
         muted: "var(--muted)",
+        foreground: "var(--b1)",
+        border: "var(--b2)",
       },
       backdropBlur: {
         xs: "2px",
       },
     },
   },
-  plugins: [require("@tailwindcss/line-clamp")],
+  /* line-clamp utilities are built into Tailwind v4 */
+  plugins: [],
 };

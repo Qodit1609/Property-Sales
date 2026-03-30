@@ -2,18 +2,18 @@ import React, { useState, useMemo } from "react";
 import { Trash2 } from "lucide-react";
 import { Button, Input } from "@/components/common";
 
-import type { User } from "../../features/users/userType";
+import type { ManagedAccount } from "../../features/auth/roleTypes";
 
-interface UserManagementProps {
-  users: User[];
+interface AccountManagementProps {
+  accounts: ManagedAccount[];
   loading: boolean;
   error: string | null;
   actionLoading: boolean;
   onDelete: (id: string | number) => void;
 }
 
-const UserManagement: React.FC<UserManagementProps> = ({
-  users,
+const AccountManagement: React.FC<AccountManagementProps> = ({
+  accounts,
   loading,
   error,
   actionLoading,
@@ -21,22 +21,22 @@ const UserManagement: React.FC<UserManagementProps> = ({
 }) => {
   const [query, setQuery] = useState("");
 
-  const filteredUsers = useMemo(() => {
-    if (!query) return users;
+  const filtered = useMemo(() => {
+    if (!query) return accounts;
     const lower = query.toLowerCase();
-    return users.filter(
+    return accounts.filter(
       (u) =>
         u.name.toLowerCase().includes(lower) ||
         u.email.toLowerCase().includes(lower) ||
         (u.role && u.role.toLowerCase().includes(lower))
     );
-  }, [users, query]);
+  }, [accounts, query]);
 
   return (
     <div className="space-y-3 rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-sm font-semibold text-[var(--b1)]">Users</h2>
+          <h2 className="text-sm font-semibold text-[var(--b1)]">Accounts</h2>
           <p className="text-[11px] text-[var(--muted)]">
             Buyers, sellers, agents and admins with moderation controls.
           </p>
@@ -44,7 +44,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
 
         <div className="flex items-center gap-2">
           <Input
-            placeholder="Search users..."
+            placeholder="Search accounts..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-48 text-sm"
@@ -55,11 +55,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
             onClick={() => {
               const csv = [
                 ["Name", "Email", "Role"],
-                ...filteredUsers.map((u) => [
-                  u.name,
-                  u.email,
-                  u.role || "",
-                ]),
+                ...filtered.map((u) => [u.name, u.email, u.role || ""]),
               ]
                 .map((row) => row.join(","))
                 .join("\n");
@@ -68,7 +64,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
               const url = URL.createObjectURL(blob);
               const a = document.createElement("a");
               a.href = url;
-              a.download = "users.csv";
+              a.download = "accounts.csv";
               a.click();
               URL.revokeObjectURL(url);
             }}
@@ -81,7 +77,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
       </div>
 
       {loading && (
-        <p className="text-[11px] text-[var(--muted)]">Loading users…</p>
+        <p className="text-[11px] text-[var(--muted)]">Loading accounts…</p>
       )}
       {error && <p className="text-[11px] text-rose-400">{error}</p>}
 
@@ -97,22 +93,22 @@ const UserManagement: React.FC<UserManagementProps> = ({
           </thead>
 
           <tbody className="divide-y divide-[var(--b2)]">
-            {filteredUsers.map((user) => (
+            {filtered.map((row) => (
               <tr
-                key={user.id}
+                key={String(row.id)}
                 className="hover:bg-[var(--b2-soft)] transition-colors"
               >
                 <td className="px-4 py-3 text-xs text-[var(--b1)]">
-                  {user.name}
+                  {row.name}
                 </td>
 
                 <td className="px-4 py-3 text-[11px] text-[var(--b1-mid)]">
-                  {user.email}
+                  {row.email}
                 </td>
 
                 <td className="px-4 py-3 text-[11px] text-[var(--b1)]">
                   <span className="inline-flex items-center rounded-full bg-[var(--b2-soft)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--b1)] ring-1 ring-[var(--b2)]">
-                    {user.role ?? "N/A"}
+                    {row.role ?? "N/A"}
                   </span>
                 </td>
 
@@ -120,7 +116,7 @@ const UserManagement: React.FC<UserManagementProps> = ({
                   <Button
                     type="button"
                     disabled={actionLoading}
-                    onClick={() => onDelete(user.id)}
+                    onClick={() => onDelete(row.id)}
                     variant="outline"
                     className="text-rose-600 border-rose-500/40 hover:bg-rose-500/20 text-[11px] px-3 py-1"
                   >
@@ -131,13 +127,13 @@ const UserManagement: React.FC<UserManagementProps> = ({
               </tr>
             ))}
 
-            {filteredUsers.length === 0 && !loading && (
+            {filtered.length === 0 && !loading && (
               <tr>
                 <td
                   colSpan={4}
                   className="px-4 py-8 text-center text-[11px] text-[var(--muted)]"
                 >
-                  No users available.
+                  No accounts available.
                 </td>
               </tr>
             )}
@@ -148,4 +144,4 @@ const UserManagement: React.FC<UserManagementProps> = ({
   );
 };
 
-export default UserManagement;
+export default AccountManagement;

@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { loginUser as loginUserAPI, registerUser as registerUserAPI } from "./authAPI";
-import type { LoginRequest, RegisterRequest, User } from "./authTypes";
+import type { LoginRequest, RegisterRequest, AuthUser } from "./authTypes";
+import { normalizeAuthUser } from "./roleUtils";
 
 interface AuthState {
-  user: User | null;
+  user: AuthUser | null;
   token: string | null;
   loading: boolean;
   error: string | null;
@@ -15,20 +16,21 @@ const AUTH_USER_KEY = "auth_user";
 
 const readPersistedAuth = () => {
   if (typeof window === "undefined") {
-    return { token: null as string | null, user: null as User | null };
+    return { token: null as string | null, user: null as AuthUser | null };
   }
 
   try {
     const token = localStorage.getItem(AUTH_TOKEN_KEY);
     const rawUser = localStorage.getItem(AUTH_USER_KEY);
-    const user = rawUser ? (JSON.parse(rawUser) as User) : null;
+    const parsed = rawUser ? (JSON.parse(rawUser) as AuthUser) : null;
+    const user = normalizeAuthUser(parsed);
     return { token, user };
   } catch {
     return { token: null, user: null };
   }
 };
 
-const persistAuth = (token: string | null, user: User | null) => {
+const persistAuth = (token: string | null, user: AuthUser | null) => {
   if (typeof window === "undefined") return;
 
   if (token) {
@@ -38,7 +40,8 @@ const persistAuth = (token: string | null, user: User | null) => {
   }
 
   if (user) {
-    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+    const normalized = normalizeAuthUser(user);
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalized));
   } else {
     localStorage.removeItem(AUTH_USER_KEY);
   }
@@ -62,7 +65,7 @@ const getErrorMessage = (error: unknown, fallback: string) => {
 };
 
 export const registerUser = createAsyncThunk<
-  { token: string | null; user: User | null },
+  { token: string | null; user: AuthUser | null },
   RegisterRequest,
   { rejectValue: string }
 >("auth/registerUser", async (data, { rejectWithValue }) => {
@@ -74,7 +77,7 @@ export const registerUser = createAsyncThunk<
 });
 
 export const loginUser = createAsyncThunk<
-  { token: string | null; user: User | null },
+  { token: string | null; user: AuthUser | null },
   LoginRequest,
   { rejectValue: string }
 >("auth/loginUser", async (data, { rejectWithValue }) => {
@@ -109,10 +112,10 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = normalizeAuthUser(action.payload.user);
         state.token = action.payload.token;
         state.isAuthenticated = Boolean(action.payload.token && action.payload.user);
-        persistAuth(action.payload.token, action.payload.user);
+        persistAuth(action.payload.token, state.user);
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
@@ -124,10 +127,10 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = normalizeAuthUser(action.payload.user);
         state.token = action.payload.token;
         state.isAuthenticated = Boolean(action.payload.token && action.payload.user);
-        persistAuth(action.payload.token, action.payload.user);
+        persistAuth(action.payload.token, state.user);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -138,8 +141,6 @@ const authSlice = createSlice({
 
 export const { logout, resetError } = authSlice.actions;
 
-// Backward compatible aliases for existing imports.
 export { loginUser as login, registerUser as register };
 
 export default authSlice.reducer;
-

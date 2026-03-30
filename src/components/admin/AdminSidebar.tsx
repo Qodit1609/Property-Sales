@@ -1,10 +1,19 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, ListChecks, Users, FileClock } from "lucide-react";
+import {
+  LayoutDashboard,
+  ListChecks,
+  Users,
+  FileClock,
+  UserCircle,
+  Store,
+} from "lucide-react";
 
 const items = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/admin/account", label: "My Account", icon: UserCircle },
   { to: "/admin/properties", label: "Properties", icon: ListChecks },
+  { to: "/admin/sellers", label: "Sellers", icon: Store },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/logs", label: "Activity logs", icon: FileClock },
 ];
@@ -18,6 +27,7 @@ const AdminSidebar: React.FC = () => {
           <NavLink
             key={item.to}
             to={item.to}
+            end={item.to === "/admin"}
             className={({ isActive }) =>
               [
                 "group flex items-center gap-2 rounded-lg px-3 py-2 transition-all",

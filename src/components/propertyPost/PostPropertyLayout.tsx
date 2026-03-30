@@ -74,13 +74,25 @@ export default function PostPropertyLayout() {
 
     const locOk = locationBaseOk && surveyOk;
 
+    const allContentStepsDone =
+      basicOk &&
+      post.completedSteps.basic &&
+      locOk &&
+      post.completedSteps.location &&
+      profileOk &&
+      post.completedSteps.profile &&
+      mediaOk &&
+      post.completedSteps.media &&
+      post.completedSteps.amenities;
+
     const doneMap: Record<string, boolean> = {
       basic: basicOk && post.completedSteps.basic,
       location: locOk && post.completedSteps.location,
       profile: profileOk && post.completedSteps.profile,
       media: mediaOk && post.completedSteps.media,
       amenities: post.completedSteps.amenities,
-      review: false,
+      // Review is complete when every prior step is valid and marked completed (ready for submit)
+      review: allContentStepsDone,
     };
 
     const statuses: Record<string, "done" | "current" | "todo"> = {};
@@ -95,6 +107,7 @@ export default function PostPropertyLayout() {
     post.locationDetails,
     post.media,
     post.profileDetails,
+    post.completedSteps,
   ]);
 
   const completionPercent = useMemo(() => {

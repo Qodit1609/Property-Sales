@@ -9,7 +9,7 @@ import {
 import { validateLocationDetails } from "../../features/postProperty/postPropertyValidation";
 import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
-import { Input, Button } from "@/components/common";
+import { Input } from "@/components/common";
 
 function Field({
   label,

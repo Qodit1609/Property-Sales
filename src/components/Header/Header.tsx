@@ -6,7 +6,7 @@ import Modal from "../Modal/Modal";
 import ContactPopup from "../ContactPopup/ContactPopup";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
-import type { UserRole } from "../../features/users/userType";
+import type { AppRole } from "../../features/auth/roleTypes";
 import { Button } from "@/components/common";
 import { normalizeLanguage, preloadLanguage } from "../../i18n";
 
@@ -149,8 +149,8 @@ const SECTION_ITEM_KEY_MAP: Record<string, string> = {
   Trending: "header.trending",
 };
 
-const roleDashboardPath = (role: UserRole) => {
-  if (role === "buyer" || role === "user") return "/buyer/dashboard";
+const roleDashboardPath = (role: AppRole) => {
+  if (role === "buyer") return "/buyer/dashboard";
   if (role === "seller") return "/seller/dashboard";
   if (role === "agent") return "/agent/dashboard";
   return "/admin";
@@ -532,7 +532,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                       >
                         <Link
                           to={
-                            user?.role === "buyer" || user?.role === "user"
+                            user?.role === "buyer"
                               ? "/buyer/account"
                               : roleDashboardPath(user?.role ?? "buyer")
                           }

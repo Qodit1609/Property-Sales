@@ -1,7 +1,5 @@
 import React from "react";
-import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
-import { logout } from "../features/auth/authSlice";
-import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../hooks/reduxHooks";
 import Header from "../components/Header/Header";
 
 interface DashboardLayoutProps {
@@ -15,14 +13,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   sidebar,
   children,
 }) => {
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/", { replace: true });
-  };
 
   return (
     <div className="min-h-screen bg-[var(--b2-soft)] text-[var(--b1)]">

@@ -18,7 +18,7 @@ const Home: React.FC = () => {
       setCurrent((prev) => (prev + 1) % images.length);
     }, 4000);
     return () => clearInterval(timer);
-  }, []);
+  }, [images.length]);
 
   return (
     <section className="relative min-h-[120vh] pt-[80px] pb-[220px]">

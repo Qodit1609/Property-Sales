@@ -60,7 +60,7 @@ const Register: React.FC = () => {
   const roleHint = useMemo(() => {
     if (role === "seller") return "Seller: tell us your property focus.";
     if (role === "agent") return "Agent: share your experience level.";
-    return "User: choose your investment interest.";
+    return "Buyer: choose your investment interest.";
   }, [role]);
 
   const handleSubmit = async (event: React.FormEvent) => {

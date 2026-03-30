@@ -1,5 +1,7 @@
 export interface Property {
   _id: string;
+  /** Owner user id when present (admin APIs, seeded data). */
+  sellerId?: string | null;
   title: string;
   description: string;
   shortDescription?: string;

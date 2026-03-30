@@ -7,9 +7,10 @@ import axios, {
 const PRODUCT_API_BASE_URL =
   import.meta.env.VITE_PRODUCT_API_BASE_URL ??
   "http://bhoomiwala-api.com.therapidhire.com/api";
-const AUTH_API_BASE_URL =
-  import.meta.env.VITE_AUTH_API_BASE_URL ?? "http://localhost:5000/api/properties?page=1&limit=50";
 export const TEMP_PROPERTY_API = "http://localhost:5000/api";
+const AUTH_API_BASE_URL =
+  import.meta.env.VITE_AUTH_API_BASE_URL ??
+  (import.meta.env.DEV ? TEMP_PROPERTY_API : PRODUCT_API_BASE_URL);
 export const BASE_URL =
   import.meta.env.VITE_API_BASE_URL ??
   (import.meta.env.DEV ? TEMP_PROPERTY_API : PRODUCT_API_BASE_URL);
@@ -55,11 +56,17 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<{ message?: string; code?: number }>) => {
+  (error: AxiosError<{ message?: string; code?: number; errors?: unknown }>) => {
     const data = error.response?.data;
-    const message =
+    const base =
       data?.message ??
       (data?.code ? `Server error (code: ${data.code})` : error.message);
+    const errs = data?.errors;
+    const detail =
+      Array.isArray(errs) && errs.length
+        ? errs.map((e) => String(e)).join("; ")
+        : null;
+    const message = detail ? `${base}: ${detail}` : base;
 
     return Promise.reject(new Error(message));
   }

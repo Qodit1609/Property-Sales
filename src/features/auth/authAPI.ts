@@ -1,11 +1,12 @@
 import api, { API_ENDPOINTS, withAuthApi } from "../../lib/apiClient";
 import type { AuthResponse, LoginRequest, RegisterRequest } from "./authTypes";
+import { normalizeAuthUser } from "./roleUtils";
 
 const unwrapAuthResponse = (payload: AuthResponse) => {
   const root = payload.data ?? payload;
   return {
     token: root.token ?? root.accessToken ?? null,
-    user: root.user ?? null,
+    user: normalizeAuthUser(root.user ?? null),
   };
 };
 
@@ -15,16 +16,10 @@ export const loginUser = async (data: LoginRequest) => {
 };
 
 export const registerUser = async (data: RegisterRequest) => {
-  const payload = {
-    ...data,
-    role: data.role === "buyer" ? "user" : data.role,
-  };
-
   const response = await api.post<AuthResponse>(
     API_ENDPOINTS.AUTH.REGISTER,
-    payload,
+    data,
     withAuthApi()
   );
   return unwrapAuthResponse(response.data);
 };
-
