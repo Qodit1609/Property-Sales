@@ -1,12 +1,12 @@
-import type { UserRole } from "../users/userType";
+import type { AppRole } from "./roleTypes";
 
-export interface User {
+export interface AuthUser {
   id?: string | number;
   _id?: string;
   name?: string;
   email?: string;
   mobile?: string;
-  role?: UserRole;
+  role?: AppRole;
   [key: string]: unknown;
 }
 
@@ -28,11 +28,11 @@ export interface RegisterRequest {
 export interface AuthResponse {
   token?: string;
   accessToken?: string;
-  user?: User;
+  user?: AuthUser;
   data?: {
     token?: string;
     accessToken?: string;
-    user?: User;
+    user?: AuthUser;
     [key: string]: unknown;
   };
   message?: string;

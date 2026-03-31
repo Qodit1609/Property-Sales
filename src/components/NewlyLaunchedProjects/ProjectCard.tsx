@@ -3,13 +3,14 @@ import { Button } from "@/components/common";
 import Card from "@/components/common/Card/Card";
 
 export type Project = {
-  id: number;
-  name: string;
-  location: string;
-  price: string;
-  type: string;
-  builder: string;
-  image: string;
+  id: string;
+  title?: string;
+  propertyType?: string;
+  city?: string;
+  price?: number;
+  coverImage?: string;
+  dealerName?: string;
+  postedTime?: string;
 };
 
 type ProjectCardProps = {
@@ -17,51 +18,77 @@ type ProjectCardProps = {
 };
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
+  const formattedPrice =
+    typeof project.price === "number" ? `₹${project.price.toLocaleString("en-IN")}` : undefined;
+  const formattedPostedDate = project.postedTime
+    ? new Date(project.postedTime).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : undefined;
+
   return (
     <Card className="h-full flex flex-col rounded-xl border border-[var(--b2-soft)] shadow-md hover:shadow-xl hover:scale-[1.02] hover:border-[var(--b1-mid)] transition-all duration-300">
       
       {/* IMAGE */}
       <div className="relative rounded-t-xl overflow-hidden">
         <Card.Image
-          src={project.image}
-          alt={project.name}
+          src={project.coverImage}
+          alt={project.title}
           className="h-40 sm:h-44 md:h-52 w-full object-cover"
         />
 
         {/* TAG */}
-        <div className="absolute left-2 top-2 sm:left-3 sm:top-3 rounded-full bg-[var(--b1)] px-2.5 py-1 sm:px-3 text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-[var(--fg)] shadow-sm">
-          {project.type}
-        </div>
+        {project.propertyType && (
+          <div className="absolute left-2 top-2 sm:left-3 sm:top-3 rounded-full bg-[var(--b1)] px-2.5 py-1 sm:px-3 text-[10px] sm:text-xs font-semibold uppercase tracking-wide text-[var(--fg)] shadow-sm">
+            {project.propertyType}
+          </div>
+        )}
       </div>
 
       {/* CONTENT */}
       <Card.Content className="flex-1 flex flex-col p-3 sm:p-4">
 
         {/* TITLE */}
-        <h3 className="text-sm sm:text-base font-semibold text-[var(--b1)] line-clamp-2 font-[Playfair_Display]">
-          {project.name}
-        </h3>
+        {project.title && (
+          <h3 className="text-sm sm:text-base font-semibold text-[var(--b1)] line-clamp-2 font-[Playfair_Display]">
+            {project.title}
+          </h3>
+        )}
 
-        {/* LOCATION */}
-        <p className="text-[11px] sm:text-xs text-[var(--muted)] font-sans mt-1 truncate">
-          {project.location}
-        </p>
+        {/* CITY */}
+        {project.city && (
+          <p className="text-[11px] sm:text-xs text-[var(--muted)] font-sans mt-1 truncate">
+            {project.city}
+          </p>
+        )}
 
-        {/* PRICE + BUILDER */}
+        {/* PRICE + DEALER */}
         <div className="mt-2 flex items-start sm:items-center justify-between gap-2">
           <div className="min-w-0">
             <p className="text-[10px] sm:text-[11px] uppercase tracking-wide text-[var(--muted)]/80 font-sans">
               Starting from
             </p>
-            <p className="text-xs sm:text-sm font-semibold text-[var(--b1)] truncate">
-              {project.price}
-            </p>
+            {formattedPrice && (
+              <p className="text-xs sm:text-sm font-semibold text-[var(--b1)] truncate">
+                {formattedPrice}
+              </p>
+            )}
           </div>
 
-          <span className="shrink-0 whitespace-nowrap rounded-full bg-[var(--b2-soft)] px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-medium text-[var(--b1)] border border-[var(--b2)]">
-            {project.builder}
-          </span>
+          {project.dealerName && (
+            <span className="shrink-0 whitespace-nowrap rounded-full bg-[var(--b2-soft)] px-2.5 sm:px-3 py-1 text-[10px] sm:text-[11px] font-medium text-[var(--b1)] border border-[var(--b2)]">
+              {project.dealerName}
+            </span>
+          )}
         </div>
+
+        {formattedPostedDate && (
+          <p className="text-[10px] sm:text-[11px] text-[var(--muted)] mt-2">
+            Posted: {formattedPostedDate}
+          </p>
+        )}
 
         {/* BUTTON */}
         <div className="mt-auto pt-3 sm:pt-4">

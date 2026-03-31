@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { FileClock } from "lucide-react";
-import { Input} from "@/components/common";
+import { FileClock, ScrollText } from "lucide-react";
+import { Input } from "@/components/common";
 
 const mockLogs = [
   {
@@ -35,47 +35,48 @@ const AdminLogsPage: React.FC = () => {
   }, [search]);
 
   return (
-    <AdminLayout title="Admin Activity Logs">
-      <section className="space-y-4 rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--b2-soft)] text-sky-500">
-              <FileClock className="h-4 w-4" />
+    <AdminLayout title="Activity logs">
+      <section className="space-y-5 rounded-2xl border border-[var(--b2)]/90 bg-[var(--white)] p-4 shadow-md shadow-[var(--b1)]/5 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--b2-soft)] text-sky-600">
+              <FileClock className="h-5 w-5" aria-hidden />
             </div>
             <div>
-              <h2 className="text-sm font-semibold text-[var(--b1)]">
-                Moderation activity trail
+              <h2 className="font-sans text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
+                Activity trail
               </h2>
-              <p className="text-[11px] text-[var(--muted)]">
-                Approvals, rejections and user actions (structure ready for
-                backend wiring).
+              <p className="mt-1 max-w-xl text-sm text-[var(--muted)]">
+                Moderation and account events. Connect your backend to stream
+                live audit data.
               </p>
             </div>
           </div>
           <Input
-            type="text"
-            placeholder="Search logs..."
+            type="search"
+            placeholder="Search logs…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="rounded-md border border-[var(--b2)] px-2 py-1 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-[var(--b1-mid)]"
+            className="w-full min-w-0 border-[var(--b2)] text-sm shadow-sm sm:max-w-xs"
           />
         </div>
 
-        <div className="mt-2 space-y-2 text-xs text-[var(--b1)]">
+        <ul className="space-y-3">
           {filtered.map((log) => (
-            <div
+            <li
               key={log.id}
-              className="flex items-start gap-3 rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)] px-3 py-2"
+              className="flex gap-3 rounded-xl border border-[var(--b2)]/80 bg-gradient-to-r from-[var(--b2-soft)]/50 to-[var(--white)] p-4 shadow-sm transition hover:border-[var(--b1-mid)]/30"
             >
-              <div className="mt-0.5 h-8 w-0.5 rounded-full bg-gradient-to-b from-sky-400 to-emerald-400" />
-              <div className="flex-1">
-                <p className="text-[11px] font-medium text-[var(--b1)]">
+              <div
+                className="mt-1 h-10 w-1 shrink-0 rounded-full bg-gradient-to-b from-sky-400 to-emerald-500"
+                aria-hidden
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-[var(--b1)]">
                   {log.action}
                 </p>
-                <p className="mt-0.5 text-[11px] text-[var(--b1-mid)]">
-                  {log.target}
-                </p>
-                <p className="mt-0.5 text-[10px] text-[var(--muted)]">
+                <p className="mt-1 text-sm text-[var(--b1-mid)]">{log.target}</p>
+                <p className="mt-2 text-xs text-[var(--muted)]">
                   {log.actor} ·{" "}
                   {new Date(log.timestamp).toLocaleString(undefined, {
                     dateStyle: "medium",
@@ -83,13 +84,20 @@ const AdminLogsPage: React.FC = () => {
                   })}
                 </p>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
+
+        {filtered.length === 0 && (
+          <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--b2)] bg-[var(--b2-soft)]/30 py-14 text-center">
+            <ScrollText className="h-10 w-10 text-[var(--b1-mid)]" />
+            <p className="font-medium text-[var(--b1)]">No logs match your search</p>
+            <p className="text-sm text-[var(--muted)]">Try a different keyword.</p>
+          </div>
+        )}
       </section>
     </AdminLayout>
   );
 };
 
 export default AdminLogsPage;
-

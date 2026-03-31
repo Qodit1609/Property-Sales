@@ -2,8 +2,32 @@ import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { loginUser } from "../../features/auth/authSlice";
+import type { AppRole } from "../../features/auth/roleTypes";
 import Dashboard from "../Dashboard/Dashboard";
 import { Input, Button } from "@/components/common";
+
+const AUTH_ONLY_PATHS = new Set(["/login", "/register"]);
+
+function pathAllowedForRole(pathname: string, role: AppRole | undefined): boolean {
+  if (AUTH_ONLY_PATHS.has(pathname)) return false;
+  const r = role ?? "";
+  if (pathname.startsWith("/buyer/")) return r === "buyer";
+  if (pathname.startsWith("/seller/")) return r === "seller";
+  if (pathname.startsWith("/agent/")) return r === "agent";
+  if (pathname.startsWith("/admin")) return r === "admin";
+  if (pathname.startsWith("/post-property"))
+    return r === "seller" || r === "buyer" || r === "agent" || r === "admin";
+  return true;
+}
+
+function dashboardPathForRole(role: AppRole | undefined): string {
+  const r = role ?? "";
+  if (r === "buyer") return "/buyer/dashboard";
+  if (r === "admin") return "/admin";
+  if (r === "seller") return "/seller/dashboard";
+  if (r === "agent") return "/agent/dashboard";
+  return "/post-property/basic";
+}
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -44,38 +68,16 @@ const Login: React.FC = () => {
         return;
       }
 
-      // If we were redirected here (e.g. trying to access a protected route),
-      // always send the user back to that route after login.
-      if (from && from !== "/") {
+      const role = result.payload.user.role;
+
+      // Only honor `from` when this role is allowed on that route. Otherwise a
+      // buyer who hit login via a seller URL would be bounced to "/" by ProtectedRoute.
+      if (from && from !== "/" && pathAllowedForRole(from, role)) {
         navigate(from, { replace: true });
         return;
       }
 
-      // Role-based default redirects for direct login.
-      const role = result.payload.user.role;
-
-      if (role === "buyer" || role === "user") {
-        navigate("/buyer/dashboard", { replace: true });
-        return;
-      }
-
-      if (role === "admin") {
-        navigate("/admin", { replace: true });
-        return;
-      }
-
-      if (role === "seller") {
-        navigate("/seller/dashboard", { replace: true });
-        return;
-      }
-
-      if (role === "agent") {
-        navigate("/agent/dashboard", { replace: true });
-        return;
-      }
-
-      // Fallback: keep existing behavior for other roles.
-      navigate("/post-property/basic", { replace: true });
+      navigate(dashboardPathForRole(role), { replace: true });
     }
   };
 
@@ -93,13 +95,13 @@ const Login: React.FC = () => {
       <div className="fixed inset-0 z-20 flex items-center justify-center px-4 py-10">
         <div className="pointer-events-auto w-full max-w-md rounded-3xl border border-[var(--b2)] bg-[var(--white)] p-7 sm:p-8 shadow-2xl shadow-[var(--b1)]/20 relative">
           <Button
-            type="button"
-            onClick={() => navigate("/", { replace: true })}
-            aria-label="Close"
-            className="absolute right-4 top-4 h-8 w-8 flex items-center justify-center rounded-full bg-[var(--b2-soft)] text-[var(--b1)] hover:bg-[var(--b2)] transition"
-          >
-            ✕
-          </Button>
+                      type="button"
+                      onClick={() => navigate("/", { replace: true })}
+                      aria-label="Close"
+                      className="absolute right-4 top-4 h-8 w-8 flex items-center justify-center rounded-full bg-[var(--b2-soft)] text-[var(--b1)] hover:bg-[var(--b2)] transition"
+                    >
+                      ✕
+                    </Button>
 
           {/* logo / brand */}
           <div className="mb-5 flex justify-center">
@@ -152,14 +154,14 @@ const Login: React.FC = () => {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2.5 pr-11 text-sm outline-none focus:ring-2 focus:ring-[var(--b2)] focus:border-[var(--b2)] transition"
+                  className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2.5 pr-16 text-sm outline-none focus:ring-2 focus:ring-[var(--b2)] focus:border-[var(--b2)] transition"
                   placeholder="••••••••"
                   required
                 />
                 <Button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md px-2 py-1 text-xs text-[var(--b1-mid)] hover:text-[var(--b1)] hover:bg-black/5 transition"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-transparent px-2 py-1 text-sm font-medium hover:border-[var(--b2)] hover:bg-[var(--b1-mid)] transition"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? "Hide" : "Show"}
@@ -167,17 +169,17 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="inline-flex items-center text-xs">
-                <Input
+            <div className="flex items-center justify-between gap-3">
+              <label className="inline-flex shrink-0 items-center gap-2 text-xs whitespace-nowrap">
+                <input
                   type="checkbox"
-                  className="mr-2 rounded border-[var(--b2)] text-[var(--b1)] focus:ring-[var(--b2)]"
+                  className="h-4 w-4 rounded border border-[var(--b2)] text-[var(--b1)] accent-[var(--b1)] focus:ring-[var(--b2)]"
                 />
                 Remember me
               </label>
               <a
                 href="#"
-                className="text-xs text-[var(--b1-mid)] hover:text-[var(--b1)]"
+                className="text-xs text-[var(--b1-mid)] hover:text-[var(--b1)] whitespace-nowrap"
               >
                 Forgot password?
               </a>
@@ -192,7 +194,7 @@ const Login: React.FC = () => {
             </Button>
 
             <p className="pt-1 text-center text-xs text-[var(--muted)]">
-              New user?{" "}
+              New here?{" "}
               <Link
                 to="/register"
                 className="text-[var(--b1-mid)] hover:text-[var(--b1)]"

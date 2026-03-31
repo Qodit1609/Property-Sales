@@ -1,32 +1,21 @@
-import { useRef, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyCard, { PropertyCardSkeleton } from "../Cards/PropertyCard";
-import { Button } from "@/components/common";
 
 // Redux
-import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
-import { fetchProperties } from "../../features/properties/propertySlice";
+import { useAppSelector } from "../../hooks/reduxHooks";
+import {
+  selectMediaError,
+  selectMediaLoading,
+  selectPropertyImagesMap,
+} from "../../features/media/mediaSelectors";
 
 const PropertyList = () => {
-  const sliderRef = useRef<HTMLDivElement>(null);
-
-  const dispatch = useAppDispatch();
-
   const { data, loading, error } = useAppSelector(
     (state) => state.properties
   );
-
-  useEffect(() => {
-    dispatch(fetchProperties({ page: 1, limit: 10 }));
-  }, [dispatch]);
-
-  const scrollLeft = () => {
-    sliderRef.current?.scrollBy({ left: -320, behavior: "smooth" });
-  };
-
-  const scrollRight = () => {
-    sliderRef.current?.scrollBy({ left: 320, behavior: "smooth" });
-  };
+  const properties = Array.isArray(data) ? data : [];
+  const propertyImagesMap = useAppSelector(selectPropertyImagesMap);
+  const mediaLoading = useAppSelector(selectMediaLoading);
+  const mediaError = useAppSelector(selectMediaError);
 
   if (error) {
     return (
@@ -54,51 +43,71 @@ const PropertyList = () => {
         Ensuring high returns and dependable investment growth.
       </p>
 
+      {mediaError && (
+        <p className="mb-4 text-center text-xs text-[var(--muted)]" role="status">
+          Gallery images could not be refreshed; showing listing images when available.
+        </p>
+      )}
+
+      {/* Width calcs must match gap: gap-4=1rem, sm:gap-6=1.5rem, lg+:gap-8=2rem (3 gaps for 4 cols = 6rem). */}
       <div className="relative">
-
-        {/* LEFT BUTTON */}
-        <Button
-          onClick={scrollLeft}
-          variant="ghost"
-          className="hidden md:flex absolute -left-5 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-[var(--white)] shadow-md hover:bg-[var(--b2-soft)]"
-        >
-          <ChevronLeft size={22} />
-        </Button>
-
-        {/* RIGHT BUTTON */}
-        <Button
-          onClick={scrollRight}
-          variant="ghost"
-          className="hidden md:flex absolute -right-5 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-[var(--white)] shadow-md hover:bg-[var(--b2-soft)]"
-        >
-          <ChevronRight size={22} />
-        </Button>
-
-        {/* SLIDER */}
         <div
-          ref={sliderRef}
-          className="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth no-scrollbar touch-pan-x px-1"
+          className="
+            flex items-stretch gap-4 sm:gap-6 lg:gap-8
+            overflow-x-auto
+            pt-3 pb-4 sm:pt-4 sm:pb-5
+            snap-x snap-mandatory scroll-smooth
+            scroll-pt-3 sm:scroll-pt-4
+            [scrollbar-width:thin]
+            [&::-webkit-scrollbar]:h-2
+            [&::-webkit-scrollbar-track]:rounded-full
+            [&::-webkit-scrollbar-track]:bg-[var(--b2-soft)]
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            [&::-webkit-scrollbar-thumb]:bg-[var(--b1-mid)]/50
+            hover:[&::-webkit-scrollbar-thumb]:bg-[var(--b1-mid)]/80
+          "
+          aria-label="Property listings horizontal scroller"
         >
           {loading
-            ? Array.from({ length: 6 }).map((_, i) => (
+            ? Array.from({ length: 8 }).map((_, i) => (
                 <div
                   key={i}
-                  className="min-w-[240px] sm:min-w-[280px] md:min-w-[300px]"
+                  className="
+                    flex snap-start shrink-0 min-w-0
+                    w-[calc(100%-1rem)]
+                    sm:w-[calc((100%-1.5rem)/2)]
+                    lg:w-[calc((100%-4rem)/3)]
+                    xl:w-[calc((100%-6rem)/4)]
+                  "
                 >
                   <PropertyCardSkeleton />
                 </div>
               ))
-            : data.map((property) => (
+            : properties.map((property) => (
                 <div
                   key={property._id}
-                  className="min-w-[240px] sm:min-w-[280px] md:min-w-[300px]"
+                  className="
+                    flex snap-start shrink-0 min-w-0
+                    w-[calc(100%-1rem)]
+                    sm:w-[calc((100%-1.5rem)/2)]
+                    lg:w-[calc((100%-4rem)/3)]
+                    xl:w-[calc((100%-6rem)/4)]
+                  "
                 >
-                  <PropertyCard property={property} />
+                  <PropertyCard
+                    property={property}
+                    propertyImagesMap={propertyImagesMap}
+                    mediaLoading={mediaLoading}
+                  />
                 </div>
               ))}
         </div>
-
       </div>
+      {!loading && !error && properties.length === 0 && (
+        <p className="mt-6 text-center text-sm text-[var(--muted)]">
+          No properties found right now. Please try again shortly.
+        </p>
+      )}
     </div>
   );
 };

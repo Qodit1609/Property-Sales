@@ -139,12 +139,12 @@ export default function PropertyProfileForm() {
             placeholder="e.g. 4500000"
           />
           <div className="mt-2 flex items-center gap-2">
-            <Input
+            <input
               id="negotiable"
               type="checkbox"
               checked={profile.negotiable}
               onChange={(e) => dispatch(updateProfileDetails({ negotiable: e.target.checked }))}
-              className="h-4 w-4"
+              className="h-4 w-4 cursor-pointer accent-[var(--b1)]"
             />
             <label htmlFor="negotiable" className="text-sm text-[var(--b1)]">
               Negotiable
@@ -263,7 +263,7 @@ export default function PropertyProfileForm() {
                   className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
                     active
                       ? "border-[var(--b1-mid)] bg-[var(--b2-soft)] text-[var(--b1)]"
-                      : "border-[var(--b2)] bg-[var(--white)] text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                      : "border-[var(--b2)] bg-[var(--b1)] text-[var(--fg)] hover:bg-[var(--b2-soft)] hover:text-[var(--b1)]"
                   }`}
                 >
                   {x}

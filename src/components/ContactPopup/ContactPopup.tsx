@@ -190,8 +190,9 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
       if (submitStatus !== "idle") setSubmitStatus("idle");
       setErrors((prev) => {
         if (!prev[field]) return prev;
-        const { [field]: _removed, ...rest } = prev;
-        return rest;
+        const next = { ...prev };
+        delete next[field];
+        return next;
       });
     },
     [submitStatus]

@@ -1,16 +1,18 @@
 import React from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
-import type { UserRole } from "../../features/users/userType";
+import type { AppRole } from "../../features/auth/roleTypes";
 
 interface ProtectedRouteProps {
-  requiredRole?: UserRole;
-  requiredRoles?: UserRole[];
+  requiredRole?: AppRole;
+  requiredRoles?: AppRole[];
+  children?: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRole,
   requiredRoles,
+  children,
 }) => {
   const location = useLocation();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
@@ -32,8 +34,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/" replace />;
   }
 
+  if (children != null) {
+    return <>{children}</>;
+  }
+
   return <Outlet />;
 };
 
 export default ProtectedRoute;
-

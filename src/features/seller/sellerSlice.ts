@@ -91,7 +91,7 @@ const sellerSlice = createSlice({
       })
       .addCase(fetchMyListings.fulfilled, (state, action) => {
         state.loading = false;
-        state.listings = action.payload;
+        state.listings = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchMyListings.rejected, (state, action) => {
         state.loading = false;

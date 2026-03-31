@@ -1,4 +1,5 @@
 import React from "react";
+import { twMerge } from "tailwind-merge";
 
 type ButtonProps = {
   children: React.ReactNode;
@@ -19,9 +20,10 @@ const base =
 
 const variants = {
   primary: "bg-primary text-white hover:opacity-90",
-  secondary: "bg-secondary text-white hover:opacity-90",
-  outline: "border border-border text-foreground hover:bg-muted",
-  ghost: "text-foreground hover:bg-muted",
+  /* Light green bg: dark text for contrast (was white-on-b2, hard to see) */
+  secondary: "bg-secondary text-b1 hover:opacity-90",
+  outline: "border border-border text-foreground hover:bg-muted/30",
+  ghost: "text-foreground hover:bg-muted/30",
 };
 
 const sizes = {
@@ -42,20 +44,22 @@ const Button: React.FC<ButtonProps> = ({
   onClick, // ✅ FIX: destructured here
   ...props
 }) => {
+  const buttonClassName = twMerge(
+    base,
+    variants[variant],
+    sizes[size],
+    fullWidth ? "w-full" : "",
+    disabled ? "opacity-50 cursor-not-allowed" : "",
+    "active:scale-95",
+    className
+  );
+
   return (
     <button
       type={type}
       onClick={(e) => onClick?.(e)} // ✅ now works
       disabled={disabled || loading}
-      className={`
-        ${base}
-        ${variants[variant]}
-        ${sizes[size]}
-        ${fullWidth ? "w-full" : ""}
-        ${disabled ? "opacity-50 cursor-not-allowed" : ""}
-        active:scale-95
-        ${className}
-      `}
+      className={buttonClassName}
       {...props}
     >
       {loading ? "Loading..." : children}

@@ -26,7 +26,7 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
           <div className="mb-6 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-xs font-bold text-white">
-                {user?.name?.charAt(0) || "U"}
+                {user?.name?.charAt(0) || "B"}
               </div>
  
               <p className="text-sm font-medium text-[var(--b1)]">

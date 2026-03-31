@@ -17,8 +17,6 @@ const BuyerDashboard: React.FC = () => {
   const { data, loading } = useAppSelector((state) => state.properties);
   const [query, setQuery] = useState("");
 
-  const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
-
   const filtered = useMemo(() => {
     return data.filter((p) => {
       if (p.status !== "approved") return false;
@@ -31,10 +29,9 @@ const BuyerDashboard: React.FC = () => {
           return false;
         }
       }
-      if (maxPrice != null && p.price > maxPrice) return false;
       return true;
     });
-  }, [data, query, maxPrice]);
+  }, [data, query]);
 
   const shimmerCards = Array.from({ length: 6 });
 
@@ -58,7 +55,7 @@ const BuyerDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,2.3fr)_minmax(0,1.2fr)]">
+          <div className="mt-4">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[var(--b1-mid)]" />
               <Input
@@ -68,28 +65,6 @@ const BuyerDashboard: React.FC = () => {
                 placeholder="Search by village, highway, landmark or project name"
                 className="w-full rounded-2xl border border-[var(--b2)] bg-[var(--white)] px-9 py-2.5 text-xs text-[var(--b1)] placeholder:text-[var(--muted)]/70 shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
               />
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="flex-1">
-                <p className="text-[10px] font-medium uppercase tracking-wide text-[var(--muted)]">
-                  Budget ceiling
-                </p>
-                <Input
-                  type="range"
-                  min={1000000}
-                  max={100000000}
-                  step={500000}
-                  value={maxPrice ?? 100000000}
-                  onChange={(e) => setMaxPrice(Number(e.target.value))}
-                  className="mt-1 w-full accent-emerald-400"
-                />
-                <p className="mt-0.5 text-[11px] text-[var(--b1-mid)]">
-                  Up to ₹{" "}
-                  {(maxPrice ?? 100000000).toLocaleString("en-IN", {
-                    maximumFractionDigits: 0,
-                  })}
-                </p>
-              </div>
             </div>
           </div>
 
@@ -103,7 +78,7 @@ const BuyerDashboard: React.FC = () => {
                 key={loc}
                 type="button"
                 onClick={() => setQuery(loc)}
-                className="rounded-full bg-[var(--b1)] px-2.5 py-1 text-[10px] text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2)] hover:text-[var(--b1)] "
+                className="rounded-full border border-transparent bg-[var(--b1)] px-2.5 py-1 text-[10px] text-[var(--white)] transition-colors hover:border-[var(--b1)] hover:bg-[var(--b2-soft)] hover:text-[var(--b1)]"
               >
                 {loc}
               </Button>

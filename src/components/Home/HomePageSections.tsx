@@ -20,12 +20,7 @@ const SectionFallback: React.FC = () => (
 );
 
 const HomePageSections: React.FC = () => {
-  const { sections, error } = useHomePageSections();
-
-  if (error) {
-    // Keep UX resilient while fallback data renders.
-    console.warn(error);
-  }
+  const { sections } = useHomePageSections();
 
   return (
     <>

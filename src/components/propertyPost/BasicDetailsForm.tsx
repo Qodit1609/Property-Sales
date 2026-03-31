@@ -274,7 +274,7 @@ export default function BasicDetailsForm() {
                     detail: "Hook is ready—backend OTP can be integrated next.",
                   })
                 }
-                className="rounded-md border border-[var(--b2)] px-3 py-2 text-xs font-semibold text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
+                className="rounded-md border border-[var(--b2)] px-3 py-2 text-xs font-semibold hover:bg-[var(--b1-mid)] transition"
               >
                 Verify
               </Button>

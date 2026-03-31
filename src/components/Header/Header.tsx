@@ -7,7 +7,7 @@ import ContactPopup from "../ContactPopup/ContactPopup";
 import ChatIcon from "../Chat/ChatIcon";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
-import type { UserRole } from "../../features/users/userType";
+import type { AppRole } from "../../features/auth/roleTypes";
 import { Button } from "@/components/common";
 import { normalizeLanguage, preloadLanguage } from "../../i18n";
 
@@ -150,8 +150,8 @@ const SECTION_ITEM_KEY_MAP: Record<string, string> = {
   Trending: "header.trending",
 };
 
-const roleDashboardPath = (role: UserRole) => {
-  if (role === "buyer" || role === "user") return "/buyer/dashboard";
+const roleDashboardPath = (role: AppRole) => {
+  if (role === "buyer") return "/buyer/dashboard";
   if (role === "seller") return "/seller/dashboard";
   if (role === "agent") return "/agent/dashboard";
   return "/admin";
@@ -427,27 +427,29 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
 
             {/* Right Section */}
             <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-              <div className="inline-flex h-8 min-w-[86px] items-center justify-center rounded-lg border border-[var(--b2-soft)] bg-[var(--white)] px-1">
+              <div className="inline-flex h-8 min-w-[86px] items-center justify-center gap-0.5 rounded-lg border border-[var(--fg)]/50 bg-transparent px-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[2px]">
                 <button
                   type="button"
                   onClick={() => changeLanguage("en")}
-                  className={`inline-flex items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors ${
+                  className={`inline-flex min-h-[26px] min-w-[2rem] items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors duration-200 ${
                     activeLanguage === "en"
-                      ? "bg-[var(--b2)] text-[var(--b1)]"
-                      : "text-[var(--b1-mid)] hover:text-[var(--b1)]"
+                      ? "bg-[var(--b1-mid)] text-[var(--fg)] shadow-sm ring-1 ring-[var(--fg)]/20"
+                      : "text-[var(--fg)]/75 hover:bg-[var(--fg)]/10 hover:text-[var(--fg)]"
                   }`}
                   aria-pressed={activeLanguage === "en"}
                 >
                   {t("language.en")}
                 </button>
-                <span className="px-0.5 text-[var(--muted)]">|</span>
+                <span className="shrink-0 text-[var(--fg)]/35 select-none" aria-hidden>
+                  |
+                </span>
                 <button
                   type="button"
                   onClick={() => changeLanguage("hi")}
-                  className={`inline-flex items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors ${
+                  className={`inline-flex min-h-[26px] min-w-[2rem] items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors duration-200 ${
                     activeLanguage === "hi"
-                      ? "bg-[var(--b2)] text-[var(--b1)]"
-                      : "text-[var(--b1-mid)] hover:text-[var(--b1)]"
+                      ? "bg-[var(--b1-mid)] text-[var(--fg)] shadow-sm ring-1 ring-[var(--fg)]/20"
+                      : "text-[var(--fg)]/75 hover:bg-[var(--fg)]/10 hover:text-[var(--fg)]"
                   }`}
                   aria-pressed={activeLanguage === "hi"}
                 >
@@ -459,10 +461,10 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
                 <Link
                   to="/post-property/basic"
-                  className="hidden lg:inline-flex h-8 items-center justify-center gap-1.5 rounded-lg bg-[var(--white)] px-2.5 xl:px-3 text-[13px] text-[var(--b1)] shadow"
+                  className="hidden lg:inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-[var(--fg)]/50 bg-transparent px-2.5 xl:px-3 text-[13px] text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)]/70 hover:bg-[var(--fg)]/8"
                 >
                   {t("header.postProperty")}
-                  <span className="inline-flex h-4 items-center justify-center rounded bg-[var(--b2)] px-1 text-[9px] leading-none text-[var(--b1)]">
+                  <span className="inline-flex h-[18px] min-w-[2rem] items-center justify-center rounded-md border border-[var(--fg)]/25 bg-[var(--b1-mid)] px-1.5 text-[9px] font-bold leading-none tracking-wide text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
                     {t("header.freeTag")}
                   </span>
                 </Link>
@@ -475,7 +477,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1, scale: 1.03 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}>
                 <Button
                   onClick={() => setContactOpen(true)}
-                  className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg border-2 border-[var(--fg)] p-0 text-[var(--fg)]"
+                  className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg border-2 border-[var(--fg)]/90 bg-transparent p-0 text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[2px] hover:bg-[var(--fg)]/12"
                   aria-label={t("header.openContactForm")}
                 >
                   <svg
@@ -493,7 +495,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                 <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
                   <Link
                     to="/login"
-                    className="hidden lg:inline-flex px-2.5 py-1 rounded-full btn-brand text-xs font-semibold shadow-md transition"
+                    className="hidden lg:inline-flex h-8 items-center justify-center rounded-full border-2 border-[var(--fg)]/90 bg-transparent px-3 text-[13px] font-semibold leading-none text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)] hover:bg-[var(--fg)]/12"
                   >
                     {t("header.loginRegister")}
                   </Link>
@@ -505,7 +507,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                   onMouseLeave={closeLogin}
                 >
                   <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
-                    <Button className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border-2 border-[var(--fg)] px-3 py-0 text-[var(--fg)]">
+                    <Button className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-3 py-0 text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[2px] hover:bg-[var(--fg)]/12">
                       <span className="flex h-5 w-5 items-center justify-center rounded-full border border-[var(--fg)]">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -536,7 +538,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                       >
                         <Link
                           to={
-                            user?.role === "buyer" || user?.role === "user"
+                            user?.role === "buyer"
                               ? "/buyer/account"
                               : roleDashboardPath(user?.role ?? "buyer")
                           }
@@ -645,7 +647,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         <Button
                           type="button"
                           onClick={() => toggleMobileSection(item.label)}
-                          className="text-[var(--b1)] text-base leading-none"
+                          className="text-[var(--fg)] text-base leading-none"
                           aria-label={t("header.toggleOptions", { item: translateHeaderValue(item.label) })}
                           aria-expanded={mobileActiveSections.includes(item.label)}
                         >

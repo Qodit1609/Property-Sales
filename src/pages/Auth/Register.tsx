@@ -358,7 +358,7 @@ const Register: React.FC = () => {
             <Button
               type="button"
               onClick={() => navigate("/login")}
-              className="w-full inline-flex justify-center items-center rounded-md border border-[var(--b2)] bg-[var(--white)] px-4 py-2 text-sm font-semibold text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
+              className="w-full inline-flex justify-center items-center rounded-md border border-[var(--b2)] bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] shadow-md hover:bg-[var(--b1)]  transition"
             >
               Already have an account? Sign in
             </Button>

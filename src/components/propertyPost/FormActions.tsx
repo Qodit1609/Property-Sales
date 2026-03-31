@@ -25,7 +25,7 @@ export default memo(function FormActions({
           <Button
             type="button"
             onClick={onBack}
-            className="w-full sm:w-auto rounded-md border border-[var(--b2)] px-4 py-2 text-sm font-semibold text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
+            className="w-full sm:w-auto rounded-md border border-[var(--b2)] px-4 py-2 text-sm font-semibold bg-[var(--b1)] text-[var(--fg)] hover:bg-[var(--b1-mid)] hover:text-[var( --b2-soft)] transition"
           >
             {backLabel}
           </Button>
