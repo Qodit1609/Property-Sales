@@ -1,8 +1,10 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import io, { Socket } from 'socket.io-client';
 import chatService from '../services/chatService';
 import { addNotification, setUnreadCount } from '../features/chat/chatSlice';
+import { syncUnreadSummary } from '../features/chat/chatThunks';
+import { useAppDispatch } from '../store/hooks';
 
 interface UserRef {
   _id: string;
@@ -41,7 +43,7 @@ interface UseChatReturn {
  * Handles message sending/receiving, typing indicators, read receipts, etc.
  */
 export const useChat = (conversationId: string): UseChatReturn => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const token = useSelector((state: any) => state.auth?.token);
   const userId = useSelector((state: any) => state.auth?.user?._id || state.auth?.user?.id);
 
@@ -111,6 +113,7 @@ export const useChat = (conversationId: string): UseChatReturn => {
       setIsConnected(true);
       setError(null);
       newSocket.emit('conversation:join', conversationId);
+      dispatch(syncUnreadSummary());
     });
 
     newSocket.on('disconnect', () => setIsConnected(false));
@@ -129,6 +132,7 @@ export const useChat = (conversationId: string): UseChatReturn => {
 
     newSocket.on('newNotification', ({ notification }) => {
       dispatch(addNotification(notification));
+      dispatch(syncUnreadSummary());
     });
 
     newSocket.on('chat:unread-count', ({ count }) => {
@@ -237,9 +241,18 @@ export const useChat = (conversationId: string): UseChatReturn => {
   );
 
   const markAsRead = useCallback(() => {
-    if (!socket) return;
+    if (!conversationId) return;
+
+    if (!socket || !isConnected) {
+      chatService
+        .markMessagesAsSeen(conversationId)
+        .then(() => dispatch(syncUnreadSummary()))
+        .catch(() => undefined);
+      return;
+    }
+
     socket.emit('message:markRead', conversationId);
-  }, [socket, conversationId]);
+  }, [socket, conversationId, isConnected, dispatch]);
 
   return {
     messages,

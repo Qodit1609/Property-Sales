@@ -6,7 +6,7 @@ interface ChatNotification {
   userId: string;
   type: "message";
   title: string;
-  referenceId: string;
+  referenceId: string | { _id?: string };
   isRead: boolean;
   createdAt: string;
 }

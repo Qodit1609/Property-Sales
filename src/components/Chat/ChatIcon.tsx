@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
-import chatService from '../../services/chatService';
 import { setUnreadCount } from '../../features/chat/chatSlice';
+import { syncUnreadSummary } from '../../features/chat/chatThunks';
+import { useAppDispatch } from '../../store/hooks';
 
 /**
  * ChatIcon Component
@@ -11,7 +12,7 @@ import { setUnreadCount } from '../../features/chat/chatSlice';
  */
 const ChatIcon: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const isAuthenticated = useSelector((state: any) => state.auth?.isAuthenticated);
   const unreadCount = useSelector((state: any) => state.chat?.unreadCount || 0);
   const [hasUnread, setHasUnread] = useState<boolean>(false);
@@ -22,21 +23,12 @@ const ChatIcon: React.FC = () => {
       return;
     }
 
-    let mounted = true;
-    const syncUnread = async () => {
-      try {
-        const summary = await chatService.getUnreadSummary();
-        if (!mounted) return;
-        dispatch(setUnreadCount(summary.unreadTotal));
-      } catch {
-        // Keep icon non-blocking even if unread API fails.
-      }
-    };
+    dispatch(syncUnreadSummary());
+    const interval = setInterval(() => {
+      dispatch(syncUnreadSummary());
+    }, 30000);
 
-    syncUnread();
-    const interval = setInterval(syncUnread, 30000);
     return () => {
-      mounted = false;
       clearInterval(interval);
     };
   }, [dispatch, isAuthenticated]);
