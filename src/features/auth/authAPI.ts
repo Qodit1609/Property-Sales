@@ -15,14 +15,26 @@ export const loginUser = async (data: LoginRequest) => {
 };
 
 export const registerUser = async (data: RegisterRequest) => {
-  const payload = {
-    ...data,
-    role: data.role === "buyer" ? "user" : data.role,
-  };
+  // Validate role before sending
+  const validRoles: RegisterRequest['role'][] = ['buyer', 'seller', 'agent'];
+  if (!validRoles.includes(data.role)) {
+    throw new Error(`Invalid role: ${data.role}. Must be one of: ${validRoles.join(', ')}`);
+  }
+
+  // Validate required fields
+  if (!data.name?.trim()) {
+    throw new Error('Name is required');
+  }
+  if (!data.email?.trim()) {
+    throw new Error('Email is required');
+  }
+  if (!data.password || data.password.length < 6) {
+    throw new Error('Password must be at least 6 characters');
+  }
 
   const response = await api.post<AuthResponse>(
     "/auth/register",
-    payload,
+    data,
     withAuthApi()
   );
   return unwrapAuthResponse(response.data);

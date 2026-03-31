@@ -164,7 +164,7 @@ const SellerDashboard: React.FC = () => {
           )}
 
           <div className="space-y-4 md:hidden">
-            {(listings as Property[]).map((listing) => (
+            {Array.isArray(listings) && listings.map((listing) => (
               <article
                 key={listing._id}
                 className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm"
@@ -232,7 +232,7 @@ const SellerDashboard: React.FC = () => {
               </article>
             ))}
 
-            {listings.length === 0 && (
+            {(!Array.isArray(listings) || listings.length === 0) && (
               <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] px-4 py-6 text-center text-sm text-[var(--muted)] shadow-sm">
                 {t("sellerDashboard.noListingsYet")}
               </div>
@@ -252,7 +252,7 @@ const SellerDashboard: React.FC = () => {
               </thead>
 
               <tbody className="divide-y divide-[var(--b2)]">
-                {(listings as Property[]).map((listing) => (
+                {Array.isArray(listings) && listings.map((listing) => (
                   <tr key={listing._id} className="hover:bg-[var(--b2-soft)]">
                     <td className="px-4 py-3">
                       <p className="font-medium text-[var(--b1)]">
@@ -309,7 +309,7 @@ const SellerDashboard: React.FC = () => {
                   </tr>
                 ))}
 
-                {listings.length === 0 && (
+                {(!Array.isArray(listings) || listings.length === 0) && (
                   <tr>
                     <td
                       colSpan={5}

@@ -60,21 +60,79 @@ const Register: React.FC = () => {
   const roleHint = useMemo(() => {
     if (role === "seller") return "Seller: tell us your property focus.";
     if (role === "agent") return "Agent: share your experience level.";
-    return "User: choose your investment interest.";
+    return "Buyer: choose your investment interest.";
   }, [role]);
+
+  const validateForm = (): string | null => {
+    // Validate name
+    if (!name.trim()) {
+      return "Name is required";
+    }
+    if (name.trim().length < 2) {
+      return "Name must be at least 2 characters";
+    }
+
+    // Validate email
+    if (!email.trim()) {
+      return "Email is required";
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      return "Please enter a valid email address";
+    }
+
+    // Validate password
+    if (!password) {
+      return "Password is required";
+    }
+    if (password.length < 6) {
+      return "Password must be at least 6 characters";
+    }
+
+    // Validate password confirmation
+    if (password !== confirmPassword) {
+      return "Passwords do not match";
+    }
+
+    // Validate mobile if provided
+    if (mobile.trim()) {
+      const phoneRegex = /^[0-9-+\s()]{10,}$/;
+      if (!phoneRegex.test(mobile.trim())) {
+        return "Please enter a valid mobile number";
+      }
+    }
+
+    // Role-specific validations
+    if (role === "seller" && !propertyFocusType.trim()) {
+      return "Please specify your property focus type";
+    }
+
+    if (role === "agent" && !experienceYears.trim()) {
+      return "Please specify your experience years";
+    }
+
+    if (role === "buyer" && !investmentInterest.trim()) {
+      return "Please specify your investment interest";
+    }
+
+    return null;
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (password !== confirmPassword) {
+    // Client-side validation
+    const validationError = validateForm();
+    if (validationError) {
       pushToast({
         kind: "error",
-        title: "Passwords do not match",
-        detail: "Please confirm your password again.",
+        title: "Validation Error",
+        detail: validationError,
       });
       return;
     }
 
+    // Parse experience years for agent
     const exp =
       role === "agent" && experienceYears.trim() !== ""
         ? Number(experienceYears)
@@ -82,14 +140,14 @@ const Register: React.FC = () => {
 
     const result = await dispatch(
       registerUser({
-        name,
-        email,
-        mobile: mobile.trim() ? mobile : undefined,
+        name: name.trim(),
+        email: email.trim(),
+        mobile: mobile.trim() || undefined,
         password,
         role,
-        propertyFocusType: role === "seller" ? propertyFocusType : undefined,
+        propertyFocusType: role === "seller" ? propertyFocusType.trim() : undefined,
         experienceYears: role === "agent" ? exp : undefined,
-        investmentInterest: role === "buyer" ? investmentInterest : undefined,
+        investmentInterest: role === "buyer" ? investmentInterest.trim() : undefined,
       })
     );
 
@@ -103,6 +161,12 @@ const Register: React.FC = () => {
       const resolvedRole = backendRoleToUiRole(result.payload.user?.role, role);
       navigate(roleToDashboard(resolvedRole), {
         replace: true,
+      });
+    } else if (registerUser.rejected.match(result)) {
+      pushToast({
+        kind: "error",
+        title: "Registration Failed",
+        detail: result.payload || "An error occurred during registration",
       });
     }
   };
@@ -173,7 +237,7 @@ const Register: React.FC = () => {
                       onChange={() => setRole(r)}
                       className="sr-only"
                     />
-                    {r === "buyer" ? "USER" : r.toUpperCase()}
+                    {r.toUpperCase()}
                   </label>
                 ))}
               </div>

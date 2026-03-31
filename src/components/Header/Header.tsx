@@ -4,6 +4,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Modal from "../Modal/Modal";
 import ContactPopup from "../ContactPopup/ContactPopup";
+import ChatIcon from "../Chat/ChatIcon";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
 import type { UserRole } from "../../features/users/userType";
@@ -466,6 +467,9 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                   </span>
                 </Link>
               </motion.div>
+
+              {/* Chat Icon */}
+              <ChatIcon />
 
               {/* Contact button keeps existing modal behavior */}
               <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1, scale: 1.03 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}>

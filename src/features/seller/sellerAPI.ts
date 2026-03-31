@@ -21,7 +21,11 @@ export const fetchMyListingsAPI = async (): Promise<Property[]> => {
   
   const res = await api.get("/properties/my-properties/list");
 
-  return res.data.data ?? res.data;
+  // Response format: { success, message, data: { count, properties } }
+  const responseData = res.data?.data ?? res.data;
+  
+  // Return properties array or empty array as fallback
+  return Array.isArray(responseData?.properties) ? responseData.properties : (Array.isArray(responseData) ? responseData : []);
 };
 
 export const createListingAPI = async (

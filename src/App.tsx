@@ -7,6 +7,7 @@ import ResortProperties from "./pages/ResortProperties/ResortProperties";
 import AgricultureLand from "./pages/AgricultureLand/AgricultureLand";
 import RentFarmhouse from "./pages/RentFarmhouse/RentFarmhouse";
 import PropertyDetails from "./pages/PropertyDetails/PropertyDetails";
+import ChatPage from "./pages/Chat/ChatPage";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
@@ -74,6 +75,12 @@ function App() {
           <Route path="/resort-properties" element={<ResortProperties />} />
           <Route path="/rent-farmhouse" element={<RentFarmhouse />} />
           <Route path="/properties/:id" element={<PropertyDetails />} />
+
+          {/* Chat - Available to authenticated users */}
+          <Route element={<ProtectedRoute requiredRoles={["buyer", "seller", "agent", "user"]} />}>
+            <Route path="/chat" element={<ChatPage />} />
+            <Route path="/chat/:conversationId" element={<ChatPage />} />
+          </Route>
 
           {/* Post Property (Seller/User/Agent) */}
           <Route
