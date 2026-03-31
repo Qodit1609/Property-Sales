@@ -1,9 +1,8 @@
 import ReactDOM from "react-dom/client";
 import App from "./App";
-import { store } from "./store";
+import { store } from "./app/store.ts";
 import { Provider } from "react-redux";
 import "./index.css";
-import "./i18n";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
    <Provider store={store}>

@@ -2,7 +2,7 @@ import React from "react";
 import AdminDashboard from "./AdminDashboard";
 
 const AdminUsersPage: React.FC = () => {
-  return <AdminDashboard initialTab="users" />;
+  return <AdminDashboard initialTab="users" layoutTitle="Users" />;
 };
 
 export default AdminUsersPage;

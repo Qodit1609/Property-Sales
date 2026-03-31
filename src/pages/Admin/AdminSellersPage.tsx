@@ -58,20 +58,22 @@ const AdminSellersPage: React.FC = () => {
 
   return (
     <AdminLayout title="Sellers">
-      <div className="mx-auto max-w-7xl space-y-4">
+      <div className="mx-auto max-w-7xl space-y-5">
         <div>
-          <h2 className="text-base font-semibold text-[var(--b1)]">Sellers</h2>
-          <p className="text-xs text-[var(--muted)]">
-            All accounts with the seller role and how many listings they own.
+          <h2 className="font-sans text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
+            Sellers
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">
+            Accounts with the seller role and how many listings each has posted.
           </p>
         </div>
 
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Input
             placeholder="Search by name, email, or ID…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full sm:max-w-xs text-sm"
+            className="w-full border-[var(--b2)] text-sm shadow-sm sm:max-w-md"
           />
           {!loading && countsMayBePartial && (
             <p className="text-[11px] text-amber-700">
@@ -99,55 +101,95 @@ const AdminSellersPage: React.FC = () => {
         )}
 
         {!loading && !blockingError && (
-          <div className="overflow-x-auto rounded-xl border border-[var(--b2)] bg-[var(--white)]">
-            <table className="min-w-[640px] w-full text-xs text-[var(--b1)]">
-              <thead className="sticky top-0 bg-[var(--b2-soft)] text-[11px] uppercase tracking-wide text-[var(--b1)]">
-                <tr>
-                  <th className="px-4 py-3 text-left font-medium">Name</th>
-                  <th className="px-4 py-3 text-left font-medium">Email</th>
-                  <th className="px-4 py-3 text-left font-medium">User ID</th>
-                  <th className="px-4 py-3 text-right font-medium">Properties posted</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--b2)]">
-                {sellers.map((row) => {
-                  const n = propertyCountBySeller.get(String(row.id)) ?? 0;
-                  return (
-                    <tr
-                      key={String(row.id)}
-                      className="hover:bg-[var(--b2-soft)] transition-colors"
-                    >
-                      <td className="px-4 py-3 text-xs font-medium text-[var(--b1)]">
-                        {row.name || "—"}
-                      </td>
-                      <td className="px-4 py-3 text-[11px] text-[var(--b1-mid)]">
-                        {row.email}
-                      </td>
-                      <td className="px-4 py-3 font-mono text-[11px] text-[var(--b1-mid)]">
-                        {String(row.id)}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <span className="inline-flex min-w-[2rem] justify-end rounded-full bg-[var(--b2-soft)] px-2.5 py-1 text-[11px] font-semibold tabular-nums text-[var(--b1)] ring-1 ring-[var(--b2)]">
-                          {n}
-                        </span>
+          <>
+            <div className="space-y-3 md:hidden">
+              {sellers.map((row) => {
+                const n = propertyCountBySeller.get(String(row.id)) ?? 0;
+                return (
+                  <article
+                    key={String(row.id)}
+                    className="rounded-xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm"
+                  >
+                    <p className="font-semibold text-[var(--b1)]">
+                      {row.name || "—"}
+                    </p>
+                    <p className="mt-1 break-all text-sm text-[var(--b1-mid)]">
+                      {row.email}
+                    </p>
+                    <p className="mt-2 font-mono text-xs text-[var(--muted)]">
+                      ID: {String(row.id)}
+                    </p>
+                    <div className="mt-3 flex items-center justify-between border-t border-[var(--b2)]/80 pt-3">
+                      <span className="text-xs font-medium text-[var(--muted)]">
+                        Properties posted
+                      </span>
+                      <span className="inline-flex min-w-[2rem] justify-center rounded-full bg-[var(--b2-soft)] px-2.5 py-1 text-sm font-semibold tabular-nums text-[var(--b1)] ring-1 ring-[var(--b2)]">
+                        {n}
+                      </span>
+                    </div>
+                  </article>
+                );
+              })}
+              {sellers.length === 0 && (
+                <p className="rounded-xl border border-dashed border-[var(--b2)] py-12 text-center text-sm text-[var(--muted)]">
+                  No seller accounts found.
+                </p>
+              )}
+            </div>
+
+            <div className="hidden overflow-x-auto rounded-xl border border-[var(--b2)] bg-[var(--white)] shadow-inner md:block">
+              <table className="min-w-[640px] w-full text-sm text-[var(--b1)]">
+                <thead className="sticky top-0 z-10 bg-gradient-to-r from-[var(--b2-soft)] to-[var(--white)] text-xs font-semibold uppercase tracking-wider shadow-sm">
+                  <tr>
+                    <th className="px-4 py-3.5 text-left">Name</th>
+                    <th className="px-4 py-3.5 text-left">Email</th>
+                    <th className="px-4 py-3.5 text-left">User ID</th>
+                    <th className="px-4 py-3.5 text-right">Properties posted</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[var(--b2)]/80">
+                  {sellers.map((row, index) => {
+                    const n = propertyCountBySeller.get(String(row.id)) ?? 0;
+                    return (
+                      <tr
+                        key={String(row.id)}
+                        className={[
+                          "transition-colors hover:bg-[var(--b2-soft)]/70",
+                          index % 2 === 1 ? "bg-[var(--b2-soft)]/20" : "",
+                        ].join(" ")}
+                      >
+                        <td className="px-4 py-3.5 font-medium text-[var(--b1)]">
+                          {row.name || "—"}
+                        </td>
+                        <td className="max-w-[200px] truncate px-4 py-3.5 text-[var(--b1-mid)]">
+                          {row.email}
+                        </td>
+                        <td className="px-4 py-3.5 font-mono text-xs text-[var(--b1-mid)]">
+                          {String(row.id)}
+                        </td>
+                        <td className="px-4 py-3.5 text-right">
+                          <span className="inline-flex min-w-[2rem] justify-end rounded-full bg-[var(--b2-soft)] px-2.5 py-1 text-xs font-semibold tabular-nums text-[var(--b1)] ring-1 ring-[var(--b2)]">
+                            {n}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  {sellers.length === 0 && (
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="px-4 py-12 text-center text-[var(--muted)]"
+                      >
+                        No seller accounts found.
                       </td>
                     </tr>
-                  );
-                })}
-
-                {sellers.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={4}
-                      className="px-4 py-10 text-center text-[11px] text-[var(--muted)]"
-                    >
-                      No seller accounts found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </AdminLayout>

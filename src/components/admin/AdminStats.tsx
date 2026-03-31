@@ -1,5 +1,14 @@
 import React from "react";
-import { Home, ListChecks, Users, ShieldCheck } from "lucide-react";
+import {
+  Building2,
+  ShieldCheck,
+  Clock,
+  XCircle,
+  Users,
+  UserRound,
+  Store,
+  UserCog,
+} from "lucide-react";
 
 import type { Property } from "../../features/properties/propertyType";
 import type { ManagedAccount } from "../../features/auth/roleTypes";
@@ -7,6 +16,21 @@ import type { ManagedAccount } from "../../features/auth/roleTypes";
 interface AdminStatsProps {
   accounts: ManagedAccount[];
   listings: Property[];
+}
+
+type Tone = "emerald" | "sky" | "amber" | "rose" | "slate";
+
+interface StatItem {
+  label: string;
+  value: number;
+  icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+  tone: Tone;
+}
+
+interface StatSection {
+  title: string;
+  description: string;
+  items: StatItem[];
 }
 
 const AdminStats: React.FC<AdminStatsProps> = ({ accounts, listings }) => {
@@ -22,125 +46,152 @@ const AdminStats: React.FC<AdminStatsProps> = ({ accounts, listings }) => {
   const rejectedListings = listings.filter((l) => l.status === "rejected")
     .length;
 
-  const cards = [
+  const sections: StatSection[] = [
     {
-      label: "Total properties",
-      value: totalListings,
-      icon: Home,
-      tone: "emerald",
+      title: "Property listings",
+      description: "Moderation pipeline and inventory counts",
+      items: [
+        {
+          label: "Total properties",
+          value: totalListings,
+          icon: Building2,
+          tone: "emerald",
+        },
+        {
+          label: "Approved",
+          value: approvedListings,
+          icon: ShieldCheck,
+          tone: "sky",
+        },
+        {
+          label: "Pending review",
+          value: pendingListings,
+          icon: Clock,
+          tone: "amber",
+        },
+        {
+          label: "Rejected",
+          value: rejectedListings,
+          icon: XCircle,
+          tone: "rose",
+        },
+      ],
     },
     {
-      label: "Approved",
-      value: approvedListings,
-      icon: ShieldCheck,
-      tone: "sky",
-    },
-    {
-      label: "Pending",
-      value: pendingListings,
-      icon: ListChecks,
-      tone: "amber",
-    },
-    {
-      label: "Rejected",
-      value: rejectedListings,
-      icon: ListChecks,
-      tone: "rose",
-    },
-    {
-      label: "Total accounts",
-      value: totalAccounts,
-      icon: Users,
-      tone: "slate",
-    },
-    {
-      label: "Buyers",
-      value: buyers,
-      icon: Users,
-      tone: "emerald",
-    },
-    {
-      label: "Sellers",
-      value: sellers,
-      icon: Users,
-      tone: "sky",
-    },
-    {
-      label: "Agents",
-      value: agents,
-      icon: Users,
-      tone: "amber",
+      title: "User accounts",
+      description: "Roles across your platform",
+      items: [
+        {
+          label: "Total accounts",
+          value: totalAccounts,
+          icon: Users,
+          tone: "slate",
+        },
+        {
+          label: "Buyers",
+          value: buyers,
+          icon: UserRound,
+          tone: "emerald",
+        },
+        {
+          label: "Sellers",
+          value: sellers,
+          icon: Store,
+          tone: "sky",
+        },
+        {
+          label: "Agents",
+          value: agents,
+          icon: UserCog,
+          tone: "amber",
+        },
+      ],
     },
   ];
 
-  const toneClasses: Record<
-    string,
-    { bg: string; ring: string; text: string; icon: string }
+  const toneStyles: Record<
+    Tone,
+    {
+      iconGradient: string;
+      iconShadow: string;
+      glow: string;
+    }
   > = {
     emerald: {
-      bg: "from-emerald-500/20 to-emerald-400/5",
-      ring: "ring-emerald-500/40",
-      text: "text-emerald-100",
-      icon: "text-emerald-300",
+      iconGradient: "from-emerald-500 to-emerald-600",
+      iconShadow: "shadow-emerald-500/30",
+      glow: "from-emerald-400/20",
     },
     sky: {
-      bg: "from-sky-500/20 to-sky-400/5",
-      ring: "ring-sky-500/40",
-      text: "text-sky-100",
-      icon: "text-sky-300",
+      iconGradient: "from-sky-500 to-blue-600",
+      iconShadow: "shadow-sky-500/30",
+      glow: "from-sky-400/20",
     },
     amber: {
-      bg: "from-amber-500/20 to-amber-400/5",
-      ring: "ring-amber-500/40",
-      text: "text-amber-100",
-      icon: "text-amber-300",
+      iconGradient: "from-amber-500 to-orange-500",
+      iconShadow: "shadow-amber-500/30",
+      glow: "from-amber-400/20",
     },
     rose: {
-      bg: "from-rose-500/20 to-rose-400/5",
-      ring: "ring-rose-500/40",
-      text: "text-rose-100",
-      icon: "text-rose-300",
+      iconGradient: "from-rose-500 to-rose-600",
+      iconShadow: "shadow-rose-500/30",
+      glow: "from-rose-400/20",
     },
     slate: {
-      bg: "from-slate-500/25 to-slate-800/60",
-      ring: "ring-slate-500/40",
-      text: "text-slate-100",
-      icon: "text-slate-300",
+      iconGradient: "from-slate-500 to-slate-700",
+      iconShadow: "shadow-slate-500/25",
+      glow: "from-slate-400/15",
     },
   };
 
   return (
-    <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-      {cards.map((card) => {
-        const Icon = card.icon;
-        const tone = toneClasses[card.tone];
-
-        return (
-          <div
-            key={card.label}
-            className={[
-              "relative overflow-hidden rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow",
-              tone.bg,
-              "ring-1",
-              tone.ring,
-            ].join(" ")}
-          >
-            <div
-              className={`flex h-8 w-8 items-center justify-center rounded-xl bg-[var(--white)] ${tone.icon}`}
-            >
-              <Icon className="h-4 w-4" />
-            </div>
-
-            <p className="mt-3 text-[11px] font-medium uppercase tracking-wide text-[var(--b1-mid)]">
-              {card.label}
-            </p>
-
-            <p className={`mt-1 text-xl font-semibold ${tone.text}`}>
-              {card.value}
-            </p>
+    <div className="space-y-10">
+      {sections.map((section) => (
+        <section key={section.title} className="space-y-4">
+          <div className="border-b border-[var(--b2)]/40 pb-3">
+            <h2 className="font-sans text-sm font-semibold tracking-tight text-[var(--b1)]">
+              {section.title}
+            </h2>
+            <p className="mt-0.5 text-xs text-[var(--muted)]">{section.description}</p>
           </div>
-        );
-      })}
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            {section.items.map((card) => {
+              const Icon = card.icon;
+              const t = toneStyles[card.tone];
+
+              return (
+                <article
+                  key={card.label}
+                  className="group relative overflow-hidden rounded-2xl border border-[var(--b2)]/50 bg-[var(--white)] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--b2)] hover:shadow-[0_12px_28px_rgba(27,67,50,0.12)]"
+                >
+                  <div
+                    className={`pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-gradient-to-br ${t.glow} to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-100`}
+                    aria-hidden
+                  />
+
+                  <div className="relative flex gap-4">
+                    <div
+                      className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${t.iconGradient} text-white shadow-lg ${t.iconShadow}`}
+                    >
+                      <Icon className="h-7 w-7" aria-hidden />
+                    </div>
+
+                    <div className="min-w-0 flex-1 pt-0.5">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
+                        {card.label}
+                      </p>
+                      <p className="mt-1.5 font-sans text-3xl font-bold tabular-nums tracking-tight text-[var(--b1)]">
+                        {card.value}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      ))}
     </div>
   );
 };

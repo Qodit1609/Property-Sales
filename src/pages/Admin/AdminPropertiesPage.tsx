@@ -1,11 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
   Pencil,
-  Plus,
   Trash2,
   XCircle,
 } from "lucide-react";
@@ -17,7 +15,6 @@ import type { Property } from "../../features/properties/propertyType";
 import {
   approveListing,
   clearAdminMutationError,
-  createAdminProperty,
   deleteListingById,
   fetchAdminListings,
   rejectListing,
@@ -58,7 +55,6 @@ function statusBadgeClass(status: string | undefined): string {
 
 const AdminPropertiesPage: React.FC = () => {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const {
     listings,
     listingsLoading,
@@ -85,18 +81,9 @@ const AdminPropertiesPage: React.FC = () => {
     setToasts((prev) => prev.filter((x) => x.id !== id));
   }, []);
 
-  const [addOpen, setAddOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-
-  const [addForm, setAddForm] = useState({
-    title: "",
-    description: "",
-    price: "",
-    propertyType: "Farmhouse",
-    listingType: "sale" as "sale" | "rent",
-  });
 
   const [editForm, setEditForm] = useState({
     title: "",
@@ -188,51 +175,6 @@ const AdminPropertiesPage: React.FC = () => {
       });
   };
 
-  const submitAdd = () => {
-    const price = Number(addForm.price);
-    if (
-      !addForm.title.trim() ||
-      !addForm.description.trim() ||
-      !Number.isFinite(price)
-    ) {
-      pushToast({
-        kind: "error",
-        title: "Please fill title, description, and a valid price",
-      });
-      return;
-    }
-    dispatch(
-      createAdminProperty({
-        title: addForm.title,
-        description: addForm.description,
-        price,
-        propertyType: addForm.propertyType,
-        listingType: addForm.listingType,
-      })
-    )
-      .unwrap()
-      .then(() => {
-        pushToast({ kind: "success", title: "Property created" });
-        setAddOpen(false);
-        setAddForm({
-          title: "",
-          description: "",
-          price: "",
-          propertyType: "Farmhouse",
-          listingType: "sale",
-        });
-        setPage(1);
-        dispatch(
-          fetchAdminListings({
-            page: 1,
-            limit: PER_PAGE,
-            ...(filterStatus ? { status: filterStatus } : {}),
-            ...(filterType ? { propertyType: filterType } : {}),
-          })
-        );
-      });
-  };
-
   const submitEdit = () => {
     if (!editId) return;
     const price = Number(editForm.price);
@@ -274,36 +216,13 @@ const AdminPropertiesPage: React.FC = () => {
       <div className="mx-auto max-w-7xl space-y-4">
         <ToastStack toasts={toasts} onDismiss={dismissToast} />
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h2 className="text-base font-semibold text-[var(--b1)]">
-              All properties
-            </h2>
-            <p className="text-xs text-[var(--muted)]">
-              CRUD and moderation for every listing.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => navigate("/post-property/basic")}
-              className="gap-1"
-            >
-              <Plus className="h-4 w-4" />
-              Full wizard
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => setAddOpen(true)}
-              className="gap-1"
-            >
-              <Plus className="h-4 w-4" />
-              Quick add
-            </Button>
-          </div>
+        <div>
+          <h2 className="text-base font-semibold text-[var(--b1)]">
+            All properties
+          </h2>
+          <p className="text-xs text-[var(--muted)]">
+            CRUD and moderation for every listing.
+          </p>
         </div>
 
         <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-end">
@@ -515,86 +434,6 @@ const AdminPropertiesPage: React.FC = () => {
               </div>
             )}
           </>
-        )}
-
-        {addOpen && (
-          <Modal
-            title="Quick add property"
-            onClose={() => setAddOpen(false)}
-            footer={
-              <>
-                <Button variant="outline" onClick={() => setAddOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={submitAdd} disabled={actionLoading}>
-                  {actionLoading ? "Saving…" : "Create"}
-                </Button>
-              </>
-            }
-          >
-            <div className="space-y-3">
-              <Input
-                label="Title"
-                value={addForm.title}
-                onChange={(e) =>
-                  setAddForm((f) => ({ ...f, title: e.target.value }))
-                }
-              />
-              <div>
-                <label className="mb-1 block text-sm">Description</label>
-                <textarea
-                  className="w-full min-h-[88px] rounded-lg border border-border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  value={addForm.description}
-                  onChange={(e) =>
-                    setAddForm((f) => ({ ...f, description: e.target.value }))
-                  }
-                />
-              </div>
-              <Input
-                label="Price (₹)"
-                type="number"
-                min={0}
-                value={addForm.price}
-                onChange={(e) =>
-                  setAddForm((f) => ({ ...f, price: e.target.value }))
-                }
-              />
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1 block text-sm">Property type</label>
-                  <select
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                    value={addForm.propertyType}
-                    onChange={(e) =>
-                      setAddForm((f) => ({ ...f, propertyType: e.target.value }))
-                    }
-                  >
-                    {PROPERTY_TYPES.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm">Listing type</label>
-                  <select
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                    value={addForm.listingType}
-                    onChange={(e) =>
-                      setAddForm((f) => ({
-                        ...f,
-                        listingType: e.target.value as "sale" | "rent",
-                      }))
-                    }
-                  >
-                    <option value="sale">Sale</option>
-                    <option value="rent">Rent</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </Modal>
         )}
 
         {editId && editing && (

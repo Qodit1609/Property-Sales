@@ -23,6 +23,7 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminPropertiesPage from "./pages/Admin/AdminPropertiesPage";
 import AdminUsersPage from "./pages/Admin/AdminUsersPage";
 import AdminLogsPage from "./pages/Admin/AdminLogsPage";
+import AdminNotificationsPage from "./pages/Admin/AdminNotificationsPage";
 import AdminSellersPage from "./pages/Admin/AdminSellersPage";
 import AdminAccountPage from "./pages/Admin/AdminAccountPage";
 import BuyerDashboard from "./pages/Buyer/BuyerDashboard";
@@ -172,6 +173,10 @@ function App() {
           <Route path="/admin/sellers" element={<AdminSellersPage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="/admin/logs" element={<AdminLogsPage />} />
+          <Route
+            path="/admin/notifications"
+            element={<AdminNotificationsPage />}
+          />
         </Route>
 
         {/* Login route WITHOUT header/footer */}

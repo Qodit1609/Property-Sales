@@ -1,4 +1,5 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
 import type { ManagedAccount } from "../auth/roleTypes";
 import type { Property } from "../properties/propertyType";
 import {
@@ -17,6 +18,14 @@ import {
   type AdminUpdatePropertyPayload,
 } from "./adminAPI";
 
+export interface AdminNotification {
+  id: string;
+  title: string;
+  message: string;
+  createdAt: string;
+  read: boolean;
+}
+
 interface AdminState {
   users: ManagedAccount[];
   usersLoading: boolean;
@@ -29,6 +38,8 @@ interface AdminState {
 
   actionLoading: boolean;
   mutationError: string | null;
+
+  notifications: AdminNotification[];
 }
 
 const defaultPagination = (): AdminListingsPagination => ({
@@ -50,6 +61,8 @@ const initialState: AdminState = {
 
   actionLoading: false,
   mutationError: null,
+
+  notifications: [],
 };
 
 export const fetchAdminUsers = createAsyncThunk<
@@ -190,6 +203,29 @@ const adminSlice = createSlice({
     clearAdminMutationError(state) {
       state.mutationError = null;
     },
+    addAdminNotification(
+      state,
+      action: PayloadAction<Omit<AdminNotification, "id" | "createdAt" | "read">>
+    ) {
+      state.notifications.unshift({
+        ...action.payload,
+        id: nanoid(),
+        createdAt: new Date().toISOString(),
+        read: false,
+      });
+      if (state.notifications.length > 200) {
+        state.notifications = state.notifications.slice(0, 200);
+      }
+    },
+    markAdminNotificationRead(state, action: PayloadAction<string>) {
+      const n = state.notifications.find((x) => x.id === action.payload);
+      if (n) n.read = true;
+    },
+    markAllAdminNotificationsRead(state) {
+      state.notifications.forEach((n) => {
+        n.read = true;
+      });
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -289,8 +325,19 @@ const adminSlice = createSlice({
         state.actionLoading = true;
         state.mutationError = null;
       })
-      .addCase(createAdminProperty.fulfilled, (state) => {
+      .addCase(createAdminProperty.fulfilled, (state, action) => {
         state.actionLoading = false;
+        const p = action.payload;
+        state.notifications.unshift({
+          id: nanoid(),
+          title: "New property added",
+          message: `${p.title ?? "A listing"} has been added.`,
+          createdAt: new Date().toISOString(),
+          read: false,
+        });
+        if (state.notifications.length > 200) {
+          state.notifications = state.notifications.slice(0, 200);
+        }
       })
       .addCase(createAdminProperty.rejected, (state, action) => {
         state.actionLoading = false;
@@ -328,5 +375,10 @@ const adminSlice = createSlice({
   },
 });
 
-export const { clearAdminMutationError } = adminSlice.actions;
+export const {
+  clearAdminMutationError,
+  addAdminNotification,
+  markAdminNotificationRead,
+  markAllAdminNotificationsRead,
+} = adminSlice.actions;
 export default adminSlice.reducer;

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../app/store";
-import { createListingAPI } from "../seller/sellerAPI";
+import { createListingAPI, type SellerListingPayload } from "../seller/sellerAPI";
 import {
   clearPostPropertyDraft,
   loadPostPropertyDraft,
@@ -147,13 +147,13 @@ export const submitPostProperty = createAsyncThunk<
       return "Farmhouse";
     })();
 
-    const listingType =
+    const listingType: "sale" | "rent" =
       state.basicDetails.listingType === "rent" ? "rent" : "sale";
 
     // Map to existing backend payload shape used by seller listings.
     // Extended fields are persisted in the draft for now; backend integration
     // can be expanded later without changing the UI contract.
-    const payload = {
+    const payload: SellerListingPayload = {
       title: state.basicDetails.title,
       address: [
         state.locationDetails.locality,

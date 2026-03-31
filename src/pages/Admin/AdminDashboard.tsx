@@ -18,9 +18,14 @@ type Tab = "overview" | "users" | "listings";
 
 interface AdminDashboardProps {
   initialTab?: Tab;
+  /** Sidebar section title (e.g. "Users" on /admin/users). */
+  layoutTitle?: string;
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialTab }) => {
+const AdminDashboard: React.FC<AdminDashboardProps> = ({
+  initialTab,
+  layoutTitle,
+}) => {
   const dispatch = useAppDispatch();
   const activeTab: Tab = initialTab ?? "overview";
 
@@ -59,22 +64,28 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialTab }) => {
   };
 
   const renderOverview = () => (
-    <div className="space-y-5">
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--b2-soft)] text-emerald-500">
-            <Home size={16} />
-          </div>
-          <div>
-            <h1 className="text-sm font-semibold text-[var(--b1)]">
-              Admin overview
-            </h1>
-            <p className="text-[11px] text-[var(--muted)]">
-              Portfolio health across inventory and accounts.
-            </p>
+    <div className="space-y-6">
+      <header className="relative overflow-hidden rounded-2xl border border-[var(--b2)]/60 bg-[var(--white)] p-5 shadow-[0_2px_16px_rgba(27,67,50,0.07)] sm:p-6">
+        <div
+          className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-gradient-to-br from-[var(--b2-soft)]/90 to-transparent"
+          aria-hidden
+        />
+        <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--b1-mid)] to-[var(--b1)] text-white shadow-lg shadow-[var(--b1)]/25">
+              <Home className="h-6 w-6" aria-hidden />
+            </div>
+            <div>
+              <h1 className="font-sans text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
+                Overview
+              </h1>
+              <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
+                Portfolio health across listings and user accounts at a glance.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
       <AdminStats accounts={users} listings={listings} />
     </div>
@@ -108,7 +119,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ initialTab }) => {
   if (activeTab === "users") content = renderUsers();
   if (activeTab === "listings") content = renderListings();
 
-  return <AdminLayout title="Admin Panel">{content}</AdminLayout>;
+  return (
+    <AdminLayout title={layoutTitle ?? "Admin Panel"}>{content}</AdminLayout>
+  );
 };
 
 export default AdminDashboard;
