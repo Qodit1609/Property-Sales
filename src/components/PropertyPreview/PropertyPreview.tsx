@@ -226,7 +226,7 @@ const PropertyPreview = ({ property }: Props) => {
                       </a>
                     )}
                     <Button
-                      className="rounded-lg bg-[var(--b1)] px-4 py-2 text-sm text-[var(--fg)] shadow-sm hover:bg-[var(--b1-mid)]"
+                      className="gap-2 rounded-lg bg-[var(--b1)] px-4 py-2 text-sm text-[var(--fg)] shadow-sm hover:bg-[var(--b1-mid)]"
                       onClick={() => {
                         if (phone) {
                           window.location.href = `tel:${phone}`;
@@ -234,7 +234,7 @@ const PropertyPreview = ({ property }: Props) => {
                       }}
                       disabled={!phone}
                     >
-                      <PhoneCall size={15} />
+                      <PhoneCall size={15} className="shrink-0" aria-hidden />
                       Contact Agent
                     </Button>
                   </div>
@@ -356,7 +356,7 @@ const PropertyPreview = ({ property }: Props) => {
               </p>
             </div>
             <Button
-              className="rounded-xl bg-[var(--b1)] px-4 py-2.5 text-sm text-[var(--fg)] shadow-sm hover:bg-[var(--b1-mid)]"
+              className="gap-2 rounded-xl bg-[var(--b1)] px-4 py-2.5 text-sm text-[var(--fg)] shadow-sm hover:bg-[var(--b1-mid)]"
               onClick={() => {
                 if (phone) {
                   window.location.href = `tel:${phone}`;
@@ -364,7 +364,7 @@ const PropertyPreview = ({ property }: Props) => {
               }}
               disabled={!phone}
             >
-              <PhoneCall size={16} />
+              <PhoneCall size={16} className="shrink-0" aria-hidden />
               Contact Agent
             </Button>
           </div>

@@ -643,7 +643,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         <Button
                           type="button"
                           onClick={() => toggleMobileSection(item.label)}
-                          className="text-[var(--b1)] text-base leading-none"
+                          className="text-[var(--fg)] text-base leading-none"
                           aria-label={t("header.toggleOptions", { item: translateHeaderValue(item.label) })}
                           aria-expanded={mobileActiveSections.includes(item.label)}
                         >

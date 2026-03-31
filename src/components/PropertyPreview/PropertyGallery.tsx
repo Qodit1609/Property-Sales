@@ -1,14 +1,25 @@
 import type { Property } from "../../features/properties/propertyType";
 import { ImageSlider } from "@/components/common";
 import { FALLBACK_PROPERTY_IMAGE } from "../../utils/propertyFormatters";
-import { getGalleryImages } from "./previewUtils";
+import { resolvePropertyGalleryImages } from "./previewUtils";
+import { useAppSelector } from "../../hooks/reduxHooks";
+import {
+  selectCloudinaryUrlPool,
+  selectPropertyImagesMap,
+} from "../../features/media/mediaSelectors";
 
 type PropertyGalleryProps = {
   property: Property;
 };
 
 const PropertyGallery = ({ property }: PropertyGalleryProps) => {
-  const images = getGalleryImages(property);
+  const propertyImagesMap = useAppSelector(selectPropertyImagesMap);
+  const cloudinaryPool = useAppSelector(selectCloudinaryUrlPool);
+  const images = resolvePropertyGalleryImages(
+    property,
+    propertyImagesMap,
+    cloudinaryPool,
+  );
   const videos = property.media?.videos ?? (property.media?.videoUrl ? [property.media.videoUrl] : property.videos ?? []);
   const droneView = Array.isArray(property.media?.droneView)
     ? property.media?.droneView[0]

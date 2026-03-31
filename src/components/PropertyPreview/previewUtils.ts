@@ -4,6 +4,7 @@ import {
   formatArea,
   formatPrice,
 } from "../../utils/propertyFormatters";
+import { pickCyclicImagesForProperty } from "../../utils/propertyImagePool";
 
 export const formatCompactNumber = (value?: number): string => {
   if (!Number.isFinite(value)) {
@@ -131,6 +132,37 @@ export const getGalleryImages = (property: Property): string[] => {
   const rawImages = property.images ?? [];
   const images = mediaImages.length ? mediaImages : rawImages;
   return images.length ? images : [FALLBACK_PROPERTY_IMAGE];
+};
+
+/** Detail page: up to this many images from the pool when using cyclic fallback (repeats if pool is smaller). */
+const GALLERY_POOL_MIN = 3;
+const GALLERY_POOL_MAX = 8;
+
+/** Prefer server-linked map, then cyclic assignment from global Cloudinary pool, then property payload. */
+export const resolvePropertyGalleryImages = (
+  property: Property,
+  propertyImagesMap: Record<string, string[]>,
+  cloudinaryPool: string[],
+): string[] => {
+  const fromMediaApi = propertyImagesMap[property._id];
+  if (fromMediaApi?.length) {
+    return fromMediaApi;
+  }
+  if (cloudinaryPool.length) {
+    const count = Math.min(
+      GALLERY_POOL_MAX,
+      Math.max(GALLERY_POOL_MIN, cloudinaryPool.length),
+    );
+    const cyclic = pickCyclicImagesForProperty(
+      property._id,
+      cloudinaryPool,
+      count,
+    );
+    if (cyclic.length) {
+      return cyclic;
+    }
+  }
+  return getGalleryImages(property);
 };
 
 export const getDisplayAddress = (property: Property): string => {

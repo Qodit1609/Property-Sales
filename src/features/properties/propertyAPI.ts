@@ -64,10 +64,8 @@ const toRecord = (value: unknown): Record<string, unknown> => {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
 };
 
-const BLOCKED_IMAGE_HOSTS = new Set([
-  "via.placeholder.com",
-  "is1-2.housingcdn.com",
-]);
+/** Hosts replaced with the local SVG fallback (broken or unwanted CDNs). Keep real http(s) URLs loadable — e.g. via.placeholder.com is valid for seeded demo data. */
+const BLOCKED_IMAGE_HOSTS = new Set(["is1-2.housingcdn.com"]);
 
 const sanitizeImageUrl = (value: string): string => {
   try {

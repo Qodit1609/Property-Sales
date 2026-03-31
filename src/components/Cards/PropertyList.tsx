@@ -2,12 +2,20 @@ import PropertyCard, { PropertyCardSkeleton } from "../Cards/PropertyCard";
 
 // Redux
 import { useAppSelector } from "../../hooks/reduxHooks";
+import {
+  selectMediaError,
+  selectMediaLoading,
+  selectPropertyImagesMap,
+} from "../../features/media/mediaSelectors";
 
 const PropertyList = () => {
   const { data, loading, error } = useAppSelector(
     (state) => state.properties
   );
   const properties = Array.isArray(data) ? data : [];
+  const propertyImagesMap = useAppSelector(selectPropertyImagesMap);
+  const mediaLoading = useAppSelector(selectMediaLoading);
+  const mediaError = useAppSelector(selectMediaError);
 
   if (error) {
     return (
@@ -35,11 +43,21 @@ const PropertyList = () => {
         Ensuring high returns and dependable investment growth.
       </p>
 
+      {mediaError && (
+        <p className="mb-4 text-center text-xs text-[var(--muted)]" role="status">
+          Gallery images could not be refreshed; showing listing images when available.
+        </p>
+      )}
+
+      {/* Width calcs must match gap: gap-4=1rem, sm:gap-6=1.5rem, lg+:gap-8=2rem (3 gaps for 4 cols = 6rem). */}
       <div className="relative">
         <div
           className="
-            flex gap-4 sm:gap-6 overflow-x-auto pb-4
+            flex items-stretch gap-4 sm:gap-6 lg:gap-8
+            overflow-x-auto
+            pt-3 pb-4 sm:pt-4 sm:pb-5
             snap-x snap-mandatory scroll-smooth
+            scroll-pt-3 sm:scroll-pt-4
             [scrollbar-width:thin]
             [&::-webkit-scrollbar]:h-2
             [&::-webkit-scrollbar-track]:rounded-full
@@ -55,11 +73,11 @@ const PropertyList = () => {
                 <div
                   key={i}
                   className="
-                    snap-start shrink-0
-                    w-[calc(100%-1.5rem)]
+                    flex snap-start shrink-0 min-w-0
+                    w-[calc(100%-1rem)]
                     sm:w-[calc((100%-1.5rem)/2)]
-                    lg:w-[calc((100%-3rem)/3)]
-                    xl:w-[calc((100%-4.5rem)/4)]
+                    lg:w-[calc((100%-4rem)/3)]
+                    xl:w-[calc((100%-6rem)/4)]
                   "
                 >
                   <PropertyCardSkeleton />
@@ -69,14 +87,18 @@ const PropertyList = () => {
                 <div
                   key={property._id}
                   className="
-                    snap-start shrink-0
-                    w-[calc(100%-1.5rem)]
+                    flex snap-start shrink-0 min-w-0
+                    w-[calc(100%-1rem)]
                     sm:w-[calc((100%-1.5rem)/2)]
-                    lg:w-[calc((100%-3rem)/3)]
-                    xl:w-[calc((100%-4.5rem)/4)]
+                    lg:w-[calc((100%-4rem)/3)]
+                    xl:w-[calc((100%-6rem)/4)]
                   "
                 >
-                  <PropertyCard property={property} />
+                  <PropertyCard
+                    property={property}
+                    propertyImagesMap={propertyImagesMap}
+                    mediaLoading={mediaLoading}
+                  />
                 </div>
               ))}
         </div>

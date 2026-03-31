@@ -32,6 +32,9 @@ export const API_ENDPOINTS = {
   HOME: {
     SECTIONS: "/home/sections",
   },
+  MEDIA: {
+    LIST: "/media",
+  },
 } as const;
 
 const api = axios.create({

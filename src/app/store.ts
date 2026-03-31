@@ -6,10 +6,12 @@ import sellerReducer from "../features/seller/sellerSlice";
 import postPropertyReducer from "../features/postProperty/postPropertySlice";
 import buyerReducer from "../features/buyer/buyerSlice";
 import newPropertiesReducer from "../store/slices/newPropertiesSlice";
+import mediaReducer from "../features/media/mediaSlice";
 
 export const store = configureStore({
   reducer: {
     properties: propertyReducer,
+    media: mediaReducer,
     auth: authReducer,
     admin: adminReducer,
     seller: sellerReducer,

@@ -16,6 +16,7 @@ import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
 import { blobToDataUrl, compressImageFile } from "./imageCompression";
 import type { MediaItem } from "../../features/postProperty/postPropertyTypes";
 import { Input, Button } from "@/components/common";
+import { X } from "lucide-react";
 
 function makeId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -185,13 +186,14 @@ export default function MediaUpload() {
               {media.images.map((img) => (
                 <div key={img.id} className="relative overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--white)]">
                   <img src={img.url} alt={img.fileName ?? "Property"} className="h-28 w-full object-cover" />
-                  <Button
+                  <button
                     type="button"
                     onClick={() => dispatch(removeImage(img.id))}
-                    className="absolute right-2 top-2 rounded-md bg-black/70 px-2 py-1 text-[10px] font-semibold text-white hover:bg-black/80"
+                    aria-label={`Remove image ${img.fileName ?? ""}`.trim()}
+                    className="absolute right-1.5 top-1.5 inline-flex h-9 w-9 touch-manipulation items-center justify-center rounded-md bg-black/70 text-white shadow-sm transition hover:bg-black/85 focus-visible:outline focus-visible:ring-2 focus-visible:ring-white/70 sm:right-2 sm:top-2 sm:h-8 sm:w-8"
                   >
-                    Delete
-                  </Button>
+                    <X className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
+                  </button>
                   <div className="px-2 py-2">
                     <p className="text-[10px] text-[var(--muted)] line-clamp-1">
                       {img.source === "remote" ? "URL image" : "Local preview"} •{" "}

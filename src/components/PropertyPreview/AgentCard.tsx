@@ -27,7 +27,7 @@ const AgentCard = ({ property }: AgentCardProps) => {
 
       <div className="mt-4 grid grid-cols-1 gap-2">
         <Button
-          className="w-full bg-[var(--b1)] text-[var(--fg)] hover:bg-[var(--b1-mid)]"
+          className="w-full gap-2 bg-[var(--b1)] text-[var(--fg)] hover:bg-[var(--b1-mid)]"
           onClick={() => {
             if (phone) {
               window.location.href = `tel:${phone}`;
@@ -35,7 +35,7 @@ const AgentCard = ({ property }: AgentCardProps) => {
           }}
           disabled={!phone}
         >
-          <PhoneCall size={14} />
+          <PhoneCall size={14} className="shrink-0" aria-hidden />
           Call
         </Button>
         <Button

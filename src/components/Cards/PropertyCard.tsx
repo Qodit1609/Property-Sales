@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Heart, MapPin, Ruler, ShieldCheck, Star } from "lucide-react";
-import { Button } from "@/components/common";
+import { Button, PropertyImage } from "@/components/common";
 
 import type { Property as BackendProperty } from "../../features/properties/propertyType";
 import { formatINRCurrency } from "../../lib/i18nHelpers";
@@ -11,19 +11,58 @@ import {
   formatArea,
   truncateText,
 } from "../../utils/propertyFormatters";
+import { useAppSelector } from "../../hooks/reduxHooks";
+import {
+  selectCloudinaryUrlPool,
+  selectMediaLoading,
+  selectPropertyImagesMap,
+} from "../../features/media/mediaSelectors";
+import { pickCyclicImagesForProperty } from "../../utils/propertyImagePool";
 
 interface Props {
   property: BackendProperty;
+  /** When omitted, uses Redux map from GET /api/media?tag=property (single fetch). */
+  propertyImagesMap?: Record<string, string[]>;
+  mediaLoading?: boolean;
 }
 
-const PropertyCard: React.FC<Props> = ({ property }) => {
+const PropertyCard: React.FC<Props> = ({
+  property,
+  propertyImagesMap: propertyImagesMapProp,
+  mediaLoading: mediaLoadingProp,
+}) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [liked, setLiked] = useState(false);
-  const [imageFailed, setImageFailed] = useState(false);
   const language = i18n.resolvedLanguage ?? i18n.language;
 
-  const primaryImage = property.images?.[0] || FALLBACK_PROPERTY_IMAGE;
+  const mapFromStore = useAppSelector(selectPropertyImagesMap);
+  const cloudinaryPool = useAppSelector(selectCloudinaryUrlPool);
+  const loadingFromStore = useAppSelector(selectMediaLoading);
+  const propertyImagesMap = propertyImagesMapProp ?? mapFromStore;
+  const mediaLoading = mediaLoadingProp ?? loadingFromStore;
+
+  const cardImages = useMemo(() => {
+    const fromApi = propertyImagesMap[property._id];
+    if (fromApi?.length) {
+      return fromApi;
+    }
+    const cyclic = pickCyclicImagesForProperty(property._id, cloudinaryPool, 3);
+    if (cyclic.length) {
+      return cyclic;
+    }
+    if (property.images?.length) {
+      return property.images;
+    }
+    return [FALLBACK_PROPERTY_IMAGE];
+  }, [property._id, property.images, propertyImagesMap, cloudinaryPool]);
+
+  const primaryImage = cardImages[0] ?? FALLBACK_PROPERTY_IMAGE;
+  const showImageSkeleton =
+    mediaLoading &&
+    !propertyImagesMap[property._id]?.length &&
+    !cloudinaryPool.length &&
+    !property.images?.length;
   const areaValue = property.area ?? property.size ?? property.landSize;
   const areaUnit = property.areaUnit ?? property.landUnit;
   const shortDescription = truncateText(
@@ -46,17 +85,45 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
 
   return (
     <div
+      tabIndex={0}
+      aria-label={`${property.title}. ${t("propertyCard.viewDetails")}.`}
       onClick={() => navigate(`/properties/${property._id}`)}
-      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-[var(--b1-mid)] hover:ring-1 hover:ring-[var(--b1-mid)]/15 cursor-pointer"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          navigate(`/properties/${property._id}`);
+        }
+      }}
+      className="group relative flex h-full w-full min-h-[20rem] sm:min-h-[22rem] md:min-h-[24rem] flex-col overflow-hidden rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] shadow-sm outline-none transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 hover:shadow-xl hover:border-[var(--b1-mid)] focus-visible:-translate-y-1 focus-visible:border-[var(--b1-mid)] focus-visible:shadow-xl focus-visible:ring-2 focus-visible:ring-[var(--b1-mid)]/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--white)] cursor-pointer"
     >
-      <div className="relative h-48 sm:h-52 md:h-56 overflow-hidden bg-gray-100">
-        <img
-          src={imageFailed ? FALLBACK_PROPERTY_IMAGE : primaryImage}
-          alt={property.title}
-          loading="lazy"
-          onError={() => setImageFailed(true)}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+      {/* Top accent: visible on hover/focus; avoids “missing” top edge when parent clips translate */}
+      <span
+        className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[3px] rounded-t-2xl bg-gradient-to-r from-[var(--b1)] via-[var(--b1-mid)] to-[var(--b1)] opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+        aria-hidden
+      />
+      <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden bg-gray-100 min-h-[10.5rem] sm:min-h-[11.5rem]">
+        {showImageSkeleton ? (
+          <div className="h-full w-full animate-pulse bg-gray-200" aria-hidden />
+        ) : cardImages.length > 1 ? (
+          <div className="relative h-full w-full">
+            <PropertyImage
+              src={primaryImage}
+              alt={property.title}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <PropertyImage
+              src={cardImages[1]}
+              alt=""
+              className="pointer-events-none absolute inset-0 z-10 h-full w-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+            />
+          </div>
+        ) : (
+          <PropertyImage
+            src={primaryImage}
+            alt={property.title}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        )}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/35 to-transparent" />
         <span className="absolute left-3 top-3 rounded-full bg-[var(--b1)] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--fg)] shadow-sm">
           {tag}
@@ -99,7 +166,7 @@ const PropertyCard: React.FC<Props> = ({ property }) => {
         </span>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 p-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 p-4">
         <p className="text-[11px] uppercase tracking-wide text-[var(--b1-mid)] font-semibold">
           {property.propertyType}
         </p>
@@ -146,10 +213,10 @@ export default PropertyCard;
 
 export const PropertyCardSkeleton = () => {
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] shadow-sm animate-pulse">
-      <div className="h-48 sm:h-52 md:h-56 bg-gray-200"></div>
+    <div className="flex h-full w-full min-h-[20rem] sm:min-h-[22rem] md:min-h-[24rem] flex-col overflow-hidden rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] shadow-sm animate-pulse">
+      <div className="aspect-[16/10] w-full shrink-0 min-h-[10.5rem] sm:min-h-[11.5rem] bg-gray-200"></div>
 
-      <div className="p-4 flex flex-col flex-1">
+      <div className="flex min-h-0 flex-1 flex-col p-4">
         <div className="mb-3 h-3 w-20 rounded bg-gray-200"></div>
         <div className="mb-2 h-4 w-3/4 rounded bg-gray-200"></div>
         <div className="mb-4 h-3 w-2/3 rounded bg-gray-200"></div>

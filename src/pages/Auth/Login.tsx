@@ -16,7 +16,7 @@ function pathAllowedForRole(pathname: string, role: AppRole | undefined): boolea
   if (pathname.startsWith("/agent/")) return r === "agent";
   if (pathname.startsWith("/admin")) return r === "admin";
   if (pathname.startsWith("/post-property"))
-    return r === "seller" || r === "buyer" || r === "agent";
+    return r === "seller" || r === "buyer" || r === "agent" || r === "admin";
   return true;
 }
 

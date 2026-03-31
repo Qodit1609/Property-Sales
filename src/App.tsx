@@ -44,6 +44,7 @@ import AgentClientsPage from "./pages/Agent/AgentClientsPage";
 import AgentProfilePage from "./pages/Agent/AgentProfilePage";
 import { useAppDispatch } from "./store/hooks";
 import { fetchProperties } from "./features/properties/propertySlice";
+import { fetchPropertyMedia } from "./features/media/mediaSlice";
 import PostPropertyPage from "./pages/PostProperty/PostPropertyPage";
 import React from "react";
 
@@ -81,6 +82,7 @@ function App() {
 
   useEffect(() => {
     dispatch(fetchProperties({ page: 1, limit: 50 }));
+    dispatch(fetchPropertyMedia());
   }, [dispatch]);
 
   return (
@@ -97,9 +99,11 @@ function App() {
           <Route path="/rent-farmhouse" element={<RentFarmhouse />} />
           <Route path="/properties/:id" element={<PropertyDetails />} />
 
-          {/* Post Property (Seller/User/Agent) */}
+          {/* Post Property (seller, buyer, agent, admin) */}
           <Route
-            element={<ProtectedRoute requiredRoles={["seller", "buyer", "agent"]} />}
+            element={
+              <ProtectedRoute requiredRoles={["seller", "buyer", "agent", "admin"]} />
+            }
           >
             <Route path="/post-property" element={<PostPropertyPage />}>
               <Route index element={<Navigate to="basic" replace />} />
