@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import ChatList from '../../components/Chat/ChatList';
 import ChatWindow from '../../components/Chat/ChatWindow';
+import type { ConversationUI } from '../../services/chatService';
 
 /**
  * Chat Page Component
@@ -15,6 +16,7 @@ const ChatPage: React.FC = () => {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(
     conversationId || null
   );
+  const [selectedConversationData, setSelectedConversationData] = useState<ConversationUI | null>(null);
   const [isMobileViewChat, setIsMobileViewChat] = useState(false);
 
   // Redirect to login if not authenticated
@@ -51,8 +53,9 @@ const ChatPage: React.FC = () => {
           <div className="w-full sm:w-80 border-r border-[var(--b2-soft)] bg-[var(--white)] overflow-hidden flex flex-col">
             <ChatList
               selectedConversationId={selectedConversation || undefined}
-              onConversationSelect={(id) => {
+              onConversationSelect={(id, conversation) => {
                 setSelectedConversation(id);
+                setSelectedConversationData(conversation);
                 setIsMobileViewChat(true);
               }}
             />
@@ -64,6 +67,28 @@ const ChatPage: React.FC = () => {
           <div className="flex-1 overflow-hidden flex flex-col">
             <ChatWindow
               conversationId={selectedConversation}
+              participants={
+                selectedConversationData?.otherParticipant
+                  ? [
+                      {
+                        _id: selectedConversationData.otherParticipant._id,
+                        name: selectedConversationData.otherParticipant.name,
+                        avatar: '',
+                        email: selectedConversationData.otherParticipant.email,
+                      },
+                    ]
+                  : []
+              }
+              property={
+                selectedConversationData?.property
+                  ? {
+                      _id: selectedConversationData.property._id,
+                      title: selectedConversationData.property.title,
+                      price: selectedConversationData.property.price,
+                      location: selectedConversationData.property.location,
+                    }
+                  : undefined
+              }
               onBack={() => {
                 setIsMobileViewChat(false);
               }}

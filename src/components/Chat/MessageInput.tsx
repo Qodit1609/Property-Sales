@@ -1,11 +1,7 @@
-import React, { memo, useState, useRef, useEffect } from 'react';
-import type { Message } from '../../hooks/useChat';
+import React, { memo, useState, useRef } from 'react';
 
 interface MessageInputProps {
-  onSendMessage: (content: Message['content']) => void;
-  onSendProperty?: (property: any) => void;
-  onSendLocation?: (coordinates: [number, number], address: string) => void;
-  onSendImage?: (image: { url: string; cloudinaryPublicId: string; caption?: string }) => void;
+  onSendMessage: (text: string) => void;
   onTyping: (isTyping: boolean) => void;
   disabled?: boolean;
 }
@@ -13,16 +9,12 @@ interface MessageInputProps {
 const MessageInput = memo(
   ({
     onSendMessage,
-    onSendProperty,
-    onSendLocation,
-    onSendImage,
     onTyping,
     disabled = false,
   }: MessageInputProps) => {
     const [message, setMessage] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
     const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -51,51 +43,11 @@ const MessageInput = memo(
     const handleSendMessage = () => {
       if (!message.trim()) return;
 
-      onSendMessage({
-        type: 'text',
-        text: message,
-      });
+      onSendMessage(message.trim());
 
       setMessage('');
       setIsTyping(false);
       onTyping(false);
-    };
-
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      // Create FormData and upload to your backend
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('tag', 'chat');
-
-      try {
-        const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/media/upload`, {
-          method: 'POST',
-          headers: {
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: formData,
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          onSendImage?.({
-            url: data.data.url,
-            cloudinaryPublicId: data.data.mediaAsset.cloudinaryPublicId,
-            caption: '',
-          });
-        }
-      } catch (error) {
-        console.error('Image upload failed:', error);
-      }
-
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -140,46 +92,12 @@ const MessageInput = memo(
                   <div className="absolute bottom-12 right-0 bg-white border border-gray-300 rounded-lg shadow-lg p-2 space-y-2 z-10">
                     <button
                       onClick={() => {
-                        fileInputRef.current?.click();
                         setShowMenu(false);
                       }}
                       className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
                     >
-                      📷 Image
+                      Text-only chat enabled
                     </button>
-
-                    {onSendProperty && (
-                      <button
-                        onClick={() => {
-                          // Trigger property selection modal
-                          onSendProperty(null);
-                          setShowMenu(false);
-                        }}
-                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
-                      >
-                        🏠 Property
-                      </button>
-                    )}
-
-                    {onSendLocation && (
-                      <button
-                        onClick={() => {
-                          // Trigger location picker
-                          if (navigator.geolocation) {
-                            navigator.geolocation.getCurrentPosition((position) => {
-                              onSendLocation(
-                                [position.coords.longitude, position.coords.latitude],
-                                `Lat: ${position.coords.latitude}, Lng: ${position.coords.longitude}`
-                              );
-                            });
-                          }
-                          setShowMenu(false);
-                        }}
-                        className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded text-sm"
-                      >
-                        📍 Location
-                      </button>
-                    )}
                   </div>
                 )}
               </div>
@@ -196,15 +114,6 @@ const MessageInput = memo(
             </div>
           </div>
         </div>
-
-        {/* Hidden file input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          className="hidden"
-        />
 
         {/* Character count */}
         <div className="flex justify-between items-center text-xs text-gray-500">

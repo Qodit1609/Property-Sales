@@ -18,15 +18,15 @@ interface ChatWindowProps {
   property?: {
     _id: string;
     title: string;
-    price: number;
-    image: string;
-    location: string;
+    price?: number;
+    image?: string;
+    location?: string;
   };
 }
 
 const ChatWindow = memo(
   ({ conversationId, participants = [], onClose, onBack, property }: ChatWindowProps) => {
-    const userId = useSelector((state: any) => state.auth?.user?.id);
+    const userId = useSelector((state: any) => state.auth?.user?._id || state.auth?.user?.id || '');
     const {
       messages,
       onlineUsers,
@@ -36,10 +36,6 @@ const ChatWindow = memo(
       sendMessage,
       sendTyping,
       markAsRead,
-      editMessage,
-      deleteMessage,
-      addReaction,
-      removeReaction,
       isConnected,
     } = useChat(conversationId);
 
@@ -187,12 +183,7 @@ const ChatWindow = memo(
             >
               <MessageList
                 messages={messages}
-                onlineUsers={onlineUsers}
                 currentUserId={userId}
-                onReactionAdd={addReaction}
-                onReactionRemove={removeReaction}
-                onEdit={editMessage}
-                onDelete={deleteMessage}
                 isLoading={loading}
               />
             </div>
@@ -215,7 +206,7 @@ const ChatWindow = memo(
 
                 {/* Property image */}
                 <img
-                  src={property.image}
+                  src={property.image || 'https://via.placeholder.com/320x160'}
                   alt={property.title}
                   className="w-full h-40 object-cover rounded-lg"
                 />
@@ -226,10 +217,10 @@ const ChatWindow = memo(
 
                   <div className="space-y-1">
                     <p className="text-lg font-bold text-primary">
-                      ₹{property.price?.toLocaleString()}
+                      ₹{property.price?.toLocaleString() || 'N/A'}
                     </p>
                     <p className="text-sm text-gray-600 flex items-center gap-1">
-                      📍 {property.location}
+                      📍 {property.location || 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -244,17 +235,7 @@ const ChatWindow = memo(
                   </a>
                   <button
                     onClick={() => {
-                      // Share property in chat
-                      sendMessage({
-                        type: 'property',
-                        property: {
-                          propertyId: property._id,
-                          title: property.title,
-                          price: property.price,
-                          location: property.location,
-                          image: property.image,
-                        },
-                      });
+                      sendMessage(`Property: ${property.title} | Price: ${property.price || 'N/A'} | Location: ${property.location || 'N/A'}`);
                     }}
                     className="block w-full px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition"
                   >

@@ -1,15 +1,15 @@
 import React, { memo, useEffect, useState } from 'react';
-import type { Conversation } from '../../services/chatService';
+import type { ConversationUI } from '../../services/chatService';
 import chatService from '../../services/chatService';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ChatListProps {
-  onConversationSelect: (conversationId: string, conversation: Conversation) => void;
+  onConversationSelect: (conversationId: string, conversation: ConversationUI) => void;
   selectedConversationId?: string;
 }
 
 const ChatList = memo(({ onConversationSelect, selectedConversationId }: ChatListProps) => {
-  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [conversations, setConversations] = useState<ConversationUI[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -56,12 +56,10 @@ const ChatList = memo(({ onConversationSelect, selectedConversationId }: ChatLis
 
   const filteredConversations = conversations.filter(
     (conv) =>
-      conv.participants.some(
-        (p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.email.toLowerCase().includes(searchQuery.toLowerCase())
-      ) ||
-      conv.property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      conv.lastMessage?.text?.toLowerCase().includes(searchQuery.toLowerCase())
+      (conv.otherParticipant?.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (conv.otherParticipant?.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (conv.property.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (conv.lastMessage || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -110,10 +108,7 @@ const ChatList = memo(({ onConversationSelect, selectedConversationId }: ChatLis
                 <div className="flex items-start gap-3">
                   {/* Avatar */}
                   <img
-                    src={
-                      conv.participants.find((p) => p._id !== localStorage.getItem('userId'))
-                        ?.avatar || 'https://via.placeholder.com/40'
-                    }
+                    src={'https://via.placeholder.com/40'}
                     alt="user"
                     className="w-10 h-10 rounded-full flex-shrink-0"
                   />
@@ -122,21 +117,22 @@ const ChatList = memo(({ onConversationSelect, selectedConversationId }: ChatLis
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-gray-900 text-sm">
-                        {conv.participants.find((p) => p._id !== localStorage.getItem('userId'))
-                          ?.name}
+                        {conv.otherParticipant?.name || 'Unknown User'}
                       </h3>
                       <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
-                        {formatDistanceToNow(new Date(conv.lastMessage?.timestamp), {
-                          addSuffix: false,
-                        })}
+                        {conv.lastMessageAt
+                          ? formatDistanceToNow(new Date(conv.lastMessageAt), {
+                              addSuffix: false,
+                            })
+                          : 'Just now'}
                       </span>
                     </div>
 
                     {/* Property title */}
-                    <p className="text-xs text-gray-600 mb-1 truncate">{conv.property.title}</p>
+                    <p className="text-xs text-gray-600 mb-1 truncate">{conv.property.title || 'Property'}</p>
 
                     {/* Last message preview */}
-                    <p className="text-xs text-gray-600 truncate">{conv.lastMessage?.text}</p>
+                    <p className="text-xs text-gray-600 truncate">{conv.lastMessage || 'No messages yet'}</p>
                   </div>
 
                   {/* Unread badge */}

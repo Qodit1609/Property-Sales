@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
+import chatService from '../../services/chatService';
+import { setUnreadCount } from '../../features/chat/chatSlice';
 
 /**
  * ChatIcon Component
@@ -9,21 +11,39 @@ import { motion } from 'framer-motion';
  */
 const ChatIcon: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const isAuthenticated = useSelector((state: any) => state.auth?.isAuthenticated);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const unreadCount = useSelector((state: any) => state.chat?.unreadCount || 0);
   const [hasUnread, setHasUnread] = useState<boolean>(false);
 
-  // TODO: Connect to Redux/Context for unread conversations
   useEffect(() => {
-    // This would come from chat service or Redux state
-    // For now, it's a placeholder
-    const storedUnread = localStorage.getItem('unreadChatCount');
-    if (storedUnread) {
-      const count = parseInt(storedUnread, 10);
-      setUnreadCount(count);
-      setHasUnread(count > 0);
+    if (!isAuthenticated) {
+      dispatch(setUnreadCount(0));
+      return;
     }
-  }, []);
+
+    let mounted = true;
+    const syncUnread = async () => {
+      try {
+        const summary = await chatService.getUnreadSummary();
+        if (!mounted) return;
+        dispatch(setUnreadCount(summary.unreadTotal));
+      } catch {
+        // Keep icon non-blocking even if unread API fails.
+      }
+    };
+
+    syncUnread();
+    const interval = setInterval(syncUnread, 30000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [dispatch, isAuthenticated]);
+
+  useEffect(() => {
+    setHasUnread(unreadCount > 0);
+  }, [unreadCount]);
 
   const handleChatClick = () => {
     if (!isAuthenticated) {

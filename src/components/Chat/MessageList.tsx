@@ -4,24 +4,14 @@ import MessageBubble from './MessageBubble';
 
 interface MessageListProps {
   messages: Message[];
-  onlineUsers: Set<string>;
   currentUserId: string;
-  onReactionAdd: (messageId: string, emoji: string) => void;
-  onReactionRemove: (messageId: string, emoji: string) => void;
-  onEdit: (messageId: string, newText: string) => void;
-  onDelete: (messageId: string) => void;
   isLoading?: boolean;
 }
 
 const MessageList = memo(
   ({
     messages,
-    onlineUsers,
     currentUserId,
-    onReactionAdd,
-    onReactionRemove,
-    onEdit,
-    onDelete,
     isLoading = false,
   }: MessageListProps) => {
     if (isLoading) {
@@ -55,12 +45,9 @@ const MessageList = memo(
           <MessageBubble
             key={message._id}
             message={message}
-            isOwn={message.sender._id === currentUserId}
-            isOnline={onlineUsers.has(message.sender._id)}
-            onReactionAdd={onReactionAdd}
-            onReactionRemove={onReactionRemove}
-            onEdit={onEdit}
-            onDelete={onDelete}
+            isOwn={(typeof message.senderId === 'string'
+              ? message.senderId
+              : message.senderId._id) === currentUserId}
           />
         ))}
       </div>
