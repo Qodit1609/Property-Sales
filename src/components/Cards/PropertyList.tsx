@@ -7,12 +7,18 @@ import {
   selectMediaLoading,
   selectPropertyImagesMap,
 } from "../../features/media/mediaSelectors";
+import { useHomeFilterOptional } from "../Home/homeFilterContext";
 
 const PropertyList = () => {
   const { data, loading, error } = useAppSelector(
     (state) => state.properties
   );
-  const properties = Array.isArray(data) ? data : [];
+  const homeFilter = useHomeFilterOptional();
+  const rawList = Array.isArray(data) ? data : [];
+  const properties = homeFilter
+    ? homeFilter.getFilteredProperties(rawList)
+    : rawList;
+  const isHomeFiltered = Boolean(homeFilter?.appliedCriteria);
   const propertyImagesMap = useAppSelector(selectPropertyImagesMap);
   const mediaLoading = useAppSelector(selectMediaLoading);
   const mediaError = useAppSelector(selectMediaError);
@@ -105,7 +111,9 @@ const PropertyList = () => {
       </div>
       {!loading && !error && properties.length === 0 && (
         <p className="mt-6 text-center text-sm text-[var(--muted)]">
-          No properties found right now. Please try again shortly.
+          {isHomeFiltered
+            ? "No properties found"
+            : "No properties found right now. Please try again shortly."}
         </p>
       )}
     </div>

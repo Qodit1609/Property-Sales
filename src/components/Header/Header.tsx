@@ -426,7 +426,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
 
             {/* Right Section */}
             <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-              <div className="inline-flex h-8 min-w-[86px] items-center justify-center gap-0.5 rounded-lg border border-[var(--fg)]/50 bg-transparent px-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[2px]">
+              <div className="inline-flex h-8 min-w-[86px] items-center justify-center gap-0.5 rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[2px]">
                 <button
                   type="button"
                   onClick={() => changeLanguage("en")}
@@ -460,7 +460,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
                 <Link
                   to="/post-property/basic"
-                  className="hidden lg:inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-[var(--fg)]/50 bg-transparent px-2.5 xl:px-3 text-[13px] text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)]/70 hover:bg-[var(--fg)]/8"
+                  className="hidden lg:inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-2.5 xl:px-3 text-[13px] text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)]/70 hover:bg-[var(--fg)]/8"
                 >
                   {t("header.postProperty")}
                   <span className="inline-flex h-[18px] min-w-[2rem] items-center justify-center rounded-md border border-[var(--fg)]/25 bg-[var(--b1-mid)] px-1.5 text-[9px] font-bold leading-none tracking-wide text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
@@ -491,7 +491,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                 <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
                   <Link
                     to="/login"
-                    className="hidden lg:inline-flex h-8 items-center justify-center rounded-full border-2 border-[var(--fg)]/90 bg-transparent px-3 text-[13px] font-semibold leading-none text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)] hover:bg-[var(--fg)]/12"
+                    className="hidden lg:inline-flex h-8 items-center justify-center rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-3 text-[13px] font-semibold leading-none text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)] hover:bg-[var(--fg)]/12"
                   >
                     {t("header.loginRegister")}
                   </Link>

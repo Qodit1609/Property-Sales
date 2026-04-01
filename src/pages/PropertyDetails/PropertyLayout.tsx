@@ -13,7 +13,7 @@ const PropertyLayout: React.FC<PropertyLayoutProps> = ({ allProperties, children
   const [filtered, setFiltered] = useState<Property[]>(allProperties);
 
   return (
-    <div className="bg-gray-100 min-h-screen">
+    <div className="min-h-screen bg-[var(--warning-bg)]">
       <NavbarHeaderImage />
 
       <section className="max-w-7xl mx-auto px-4 py-6 md:py-10">

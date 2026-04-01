@@ -1,4 +1,4 @@
-import Home from "../../components/Home/Home";
+import Home, { HomeFilterProvider } from "../../components/Home/Home";
 import React from "react";
 import ServiceSection from "../ServiceSection/ServiceSection";
 import PropertyList from "../../components/Cards/PropertyList";
@@ -9,9 +9,13 @@ import HomePageSections from "../../components/Home/HomePageSections";
 const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-[var(--fg)]">
-      <Home />
-      <PropertyList />
-      <HomePageSections />
+      <HomeFilterProvider>
+        <Home />
+        <div id="home-property-listings" className="scroll-mt-24">
+          <PropertyList />
+        </div>
+        <HomePageSections />
+      </HomeFilterProvider>
       <NewlyLaunchedProjects />
       <ServiceSection />
       <StatsSection />

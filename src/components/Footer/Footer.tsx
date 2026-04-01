@@ -235,7 +235,14 @@ const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="footer-bg" role="contentinfo">
+    <footer
+      className="footer-bg"
+      style={{
+        background:
+          "linear-gradient(135deg, color-mix(in srgb, var(--b2) 72%, var(--b1) 28%) 0%, var(--b1) 60%)",
+      }}
+      role="contentinfo"
+    >
       {/* Trust Badges Strip */}
       <div className="border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
