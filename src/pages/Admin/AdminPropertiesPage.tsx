@@ -53,6 +53,13 @@ function statusBadgeClass(status: string | undefined): string {
   return "bg-amber-500/15 text-amber-800";
 }
 
+function normalizedStatus(status: string | undefined): string {
+  return (status ?? "pending").toLowerCase();
+}
+
+const filterSelectClass =
+  "w-full min-h-[44px] rounded-xl border border-[var(--b2)] bg-[var(--white)] px-3 py-2.5 text-sm text-[var(--b1)] shadow-sm transition focus:outline-none focus:ring-2 focus:ring-[var(--b1-mid)]/35 focus:border-[var(--b1-mid)]";
+
 const AdminPropertiesPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const {
@@ -213,65 +220,113 @@ const AdminPropertiesPage: React.FC = () => {
 
   return (
     <AdminLayout title="Properties">
-      <div className="mx-auto max-w-7xl space-y-4">
+      <div className="mx-auto max-w-7xl space-y-5">
         <ToastStack toasts={toasts} onDismiss={dismissToast} />
 
-        <div>
-          <h2 className="text-base font-semibold text-[var(--b1)]">
-            All properties
-          </h2>
-          <p className="text-xs text-[var(--muted)]">
-            CRUD and moderation for every listing.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:items-end">
-          <Input
-            placeholder="Search on this page…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full lg:max-w-xs text-sm"
+        <header className="relative overflow-hidden rounded-2xl border border-[var(--b2)]/70 bg-[var(--white)] p-5 shadow-[0_2px_16px_rgba(27,67,50,0.06)] sm:p-6">
+          <div
+            className="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full bg-gradient-to-br from-[var(--b2-soft)] to-transparent"
+            aria-hidden
           />
-          <select
-            value={filterStatus}
-            onChange={(e) => {
-              setFilterStatus(e.target.value);
-              setPage(1);
-            }}
-            className="w-full rounded-lg border border-[var(--b2)] bg-white px-3 py-2 text-sm lg:w-44"
-          >
-            <option value="">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="approved">Approved</option>
-            <option value="rejected">Rejected</option>
-            <option value="sold">Sold</option>
-          </select>
-          <select
-            value={filterType}
-            onChange={(e) => {
-              setFilterType(e.target.value);
-              setPage(1);
-            }}
-            className="w-full rounded-lg border border-[var(--b2)] bg-white px-3 py-2 text-sm lg:w-52"
-          >
-            <option value="">All types</option>
-            {PROPERTY_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div className="relative">
+            <h2 className="font-sans text-lg font-semibold tracking-tight text-[var(--b1)] sm:text-xl">
+              All properties
+            </h2>
+            <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">
+              CRUD and moderation for every listing.
+            </p>
+          </div>
+        </header>
+
+        <section
+          className="rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] p-4 shadow-sm sm:p-5"
+          aria-label="Filters"
+        >
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-12 xl:gap-4">
+            <div className="sm:col-span-2 xl:col-span-5">
+              <label
+                htmlFor="admin-properties-search"
+                className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--b1-mid)]"
+              >
+                Search
+              </label>
+              <Input
+                id="admin-properties-search"
+                placeholder="Search on this page…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                autoComplete="off"
+                className="border-[var(--b2)] text-sm"
+              />
+            </div>
+            <div className="xl:col-span-3">
+              <label
+                htmlFor="admin-properties-status"
+                className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--b1-mid)]"
+              >
+                Status
+              </label>
+              <select
+                id="admin-properties-status"
+                value={filterStatus}
+                onChange={(e) => {
+                  setFilterStatus(e.target.value);
+                  setPage(1);
+                }}
+                className={filterSelectClass}
+              >
+                <option value="">All statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="sold">Sold</option>
+              </select>
+            </div>
+            <div className="sm:col-span-2 xl:col-span-4">
+              <label
+                htmlFor="admin-properties-type"
+                className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--b1-mid)]"
+              >
+                Property type
+              </label>
+              <select
+                id="admin-properties-type"
+                value={filterType}
+                onChange={(e) => {
+                  setFilterType(e.target.value);
+                  setPage(1);
+                }}
+                className={filterSelectClass}
+              >
+                <option value="">All types</option>
+                {PROPERTY_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </section>
 
         {listingsLoading && (
-          <div className="flex items-center gap-2 rounded-xl border border-[var(--b2)] bg-[var(--white)] px-4 py-8 text-sm text-[var(--muted)]">
-            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--b1-mid)] border-t-transparent" />
+          <div
+            className="flex items-center gap-3 rounded-2xl border border-[var(--b2)] bg-[var(--white)] px-4 py-10 text-sm text-[var(--muted)]"
+            role="status"
+            aria-live="polite"
+          >
+            <span className="inline-block h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-[var(--b1-mid)] border-t-transparent" />
             Loading properties…
           </div>
         )}
 
         {listingsError && !listingsLoading && (
-          <p className="text-sm text-rose-600">{listingsError}</p>
+          <div
+            className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800"
+            role="alert"
+          >
+            {listingsError}
+          </div>
         )}
 
         {!listingsLoading && !listingsError && (
@@ -296,9 +351,9 @@ const AdminPropertiesPage: React.FC = () => {
               )}
             </div>
 
-            <div className="hidden md:block overflow-x-auto rounded-xl border border-[var(--b2)] bg-[var(--white)]">
-              <table className="min-w-[920px] w-full text-xs text-[var(--b1)]">
-                <thead className="sticky top-0 bg-[var(--b2-soft)] text-[11px] uppercase tracking-wide">
+            <div className="hidden md:block overflow-x-auto rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-inner">
+              <table className="w-full min-w-[920px] text-xs text-[var(--b1)]">
+                <thead className="sticky top-0 z-10 bg-gradient-to-r from-[var(--b2-soft)] to-[var(--white)] text-[11px] font-semibold uppercase tracking-wide shadow-sm">
                   <tr>
                     <th className="px-4 py-3 text-left font-medium">Property</th>
                     <th className="px-4 py-3 text-left font-medium">Type</th>
@@ -307,11 +362,14 @@ const AdminPropertiesPage: React.FC = () => {
                     <th className="px-4 py-3 text-right font-medium">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[var(--b2)]">
-                  {filtered.map((listing) => (
+                <tbody className="divide-y divide-[var(--b2)]/80">
+                  {filtered.map((listing, index) => (
                     <tr
                       key={listing._id}
-                      className="hover:bg-[var(--b2-soft)] transition-colors"
+                      className={[
+                        "transition-colors hover:bg-[var(--b2-soft)]/80",
+                        index % 2 === 1 ? "bg-[var(--b2-soft)]/15" : "",
+                      ].join(" ")}
                     >
                       <td className="px-4 py-3 align-top">
                         <p className="text-xs font-semibold text-[var(--b1)]">
@@ -344,8 +402,9 @@ const AdminPropertiesPage: React.FC = () => {
                             variant="outline"
                             disabled={
                               actionLoading ||
-                              (listing.status ?? "").toLowerCase() ===
-                                "approved"
+                              ["approved", "sold"].includes(
+                                normalizedStatus(listing.status)
+                              )
                             }
                             onClick={() => handleApprove(listing._id)}
                             className={`${actionBtn} border-emerald-500/40 text-emerald-700`}
@@ -357,7 +416,12 @@ const AdminPropertiesPage: React.FC = () => {
                             type="button"
                             size="sm"
                             variant="outline"
-                            disabled={actionLoading}
+                            disabled={
+                              actionLoading ||
+                              ["rejected", "sold"].includes(
+                                normalizedStatus(listing.status)
+                              )
+                            }
                             onClick={() => setRejectId(listing._id)}
                             className={`${actionBtn} border-amber-500/40 text-amber-800`}
                           >
@@ -404,10 +468,16 @@ const AdminPropertiesPage: React.FC = () => {
               </table>
             </div>
 
-            {totalPages > 1 && (
-              <div className="flex flex-col items-center justify-between gap-3 border-t border-[var(--b2)] pt-4 sm:flex-row">
-                <p className="text-[11px] text-[var(--muted)]">
-                  Page {page} of {totalPages} · {listingsPagination.total} total
+            {(totalPages > 1 || listingsPagination.total > 0) && (
+              <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-[var(--b2)]/60 bg-[var(--b2-soft)]/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-center text-[11px] text-[var(--muted)] sm:text-left">
+                  Page {page} of {totalPages}
+                  {listingsPagination.total > 0 && (
+                    <>
+                      {" "}
+                      · {listingsPagination.total} total
+                    </>
+                  )}
                 </p>
                 <div className="flex items-center gap-2">
                   <Button
@@ -619,7 +689,9 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
   onDelete: () => void;
   actionBtn: string;
 }) {
-  const st = (listing.status ?? "pending").toLowerCase();
+  const st = normalizedStatus(listing.status);
+  const cannotApprove = st === "approved" || st === "sold";
+  const cannotReject = st === "rejected" || st === "sold";
   return (
     <div className="rounded-xl border border-[var(--b2)] bg-[var(--white)] p-3 shadow-sm">
       <div className="flex items-start justify-between gap-2">
@@ -649,7 +721,7 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
           type="button"
           size="sm"
           variant="outline"
-          disabled={actionLoading || st === "approved"}
+          disabled={actionLoading || cannotApprove}
           onClick={onApprove}
           className={`${actionBtn} border-emerald-500/40 text-emerald-700`}
         >
@@ -659,7 +731,7 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
           type="button"
           size="sm"
           variant="outline"
-          disabled={actionLoading}
+          disabled={actionLoading || cannotReject}
           onClick={onReject}
           className={`${actionBtn} border-amber-500/40 text-amber-800`}
         >

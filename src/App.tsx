@@ -5,7 +5,7 @@ import {
   Navigate,
   useLocation,
 } from "react-router-dom";
-import { useEffect } from "react";
+import { Suspense, useEffect, type ReactNode } from "react";
 import MainLayout from "./layout/MainLayout";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Farmhouse from "./pages/Farmhouse/Farmhouse";
@@ -47,6 +47,18 @@ import { fetchProperties } from "./features/properties/propertySlice";
 import { fetchPropertyMedia } from "./features/media/mediaSlice";
 import PostPropertyPage from "./pages/PostProperty/PostPropertyPage";
 import React from "react";
+import { SellerStatsSkeleton } from "./components/seller/SellerSkeleton";
+
+const SellerLeadsPage = React.lazy(() => import("./pages/Seller/SellerLeadsPage"));
+const SellerAnalyticsPage = React.lazy(() => import("./pages/Seller/SellerAnalyticsPage"));
+const SellerMessagesPage = React.lazy(() => import("./pages/Seller/SellerMessagesPage"));
+const SellerPromotionsPage = React.lazy(() => import("./pages/Seller/SellerPromotionsPage"));
+const SellerProfilePage = React.lazy(() => import("./pages/Seller/SellerProfilePage"));
+const SellerSettingsPage = React.lazy(() => import("./pages/Seller/SellerSettingsPage"));
+
+function SellerLazy({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<SellerStatsSkeleton />}>{children}</Suspense>;
+}
 
 const BasicDetailsForm = React.lazy(
   () => import("./components/propertyPost/BasicDetailsForm")
@@ -151,6 +163,78 @@ function App() {
             <ProtectedRoute requiredRoles={["seller"]}>
               <SellerLayout>
                 <SellerPropertiesPage />
+              </SellerLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/seller/leads"
+          element={
+            <ProtectedRoute requiredRoles={["seller"]}>
+              <SellerLayout>
+                <SellerLazy>
+                  <SellerLeadsPage />
+                </SellerLazy>
+              </SellerLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/seller/analytics"
+          element={
+            <ProtectedRoute requiredRoles={["seller"]}>
+              <SellerLayout>
+                <SellerLazy>
+                  <SellerAnalyticsPage />
+                </SellerLazy>
+              </SellerLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/seller/messages"
+          element={
+            <ProtectedRoute requiredRoles={["seller"]}>
+              <SellerLayout>
+                <SellerLazy>
+                  <SellerMessagesPage />
+                </SellerLazy>
+              </SellerLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/seller/promotions"
+          element={
+            <ProtectedRoute requiredRoles={["seller"]}>
+              <SellerLayout>
+                <SellerLazy>
+                  <SellerPromotionsPage />
+                </SellerLazy>
+              </SellerLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/seller/profile"
+          element={
+            <ProtectedRoute requiredRoles={["seller"]}>
+              <SellerLayout>
+                <SellerLazy>
+                  <SellerProfilePage />
+                </SellerLazy>
+              </SellerLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/seller/settings"
+          element={
+            <ProtectedRoute requiredRoles={["seller"]}>
+              <SellerLayout>
+                <SellerLazy>
+                  <SellerSettingsPage />
+                </SellerLazy>
               </SellerLayout>
             </ProtectedRoute>
           }

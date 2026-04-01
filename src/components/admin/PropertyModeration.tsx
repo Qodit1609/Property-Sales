@@ -5,6 +5,10 @@ import AdminConfirmDialog from "./AdminConfirmDialog";
 
 import type { Property } from "../../features/properties/propertyType";
 
+function normalizeListingStatus(status: string | undefined): string {
+  return (status ?? "pending").toLowerCase();
+}
+
 interface PropertyModerationProps {
   listings: Property[];
   loading: boolean;
@@ -26,20 +30,26 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
 }) => {
   const [query, setQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<
-    "all" | "approved" | "pending" | "rejected"
+    "all" | "approved" | "pending" | "rejected" | "sold"
   >("all");
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [rejectId, setRejectId] = useState<string | null>(null);
 
   const getStatusBadgeClass = (status: string) => {
-    if (status === "approved") return "bg-emerald-500/15 text-emerald-700";
-    if (status === "rejected") return "bg-rose-500/15 text-rose-700";
+    const s = (status || "pending").toLowerCase();
+    if (s === "approved") return "bg-emerald-500/15 text-emerald-700";
+    if (s === "rejected") return "bg-rose-500/15 text-rose-700";
+    if (s === "sold") return "bg-slate-500/15 text-slate-700";
     return "bg-amber-500/15 text-amber-800";
   };
 
   const filtered = useMemo(() => {
     return listings.filter((l) => {
-      if (filterStatus !== "all" && l.status !== filterStatus) return false;
+      if (
+        filterStatus !== "all" &&
+        normalizeListingStatus(l.status) !== filterStatus
+      )
+        return false;
       if (!query) return true;
       const lower = query.toLowerCase();
       return (
@@ -90,7 +100,12 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
             value={filterStatus}
             onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
               setFilterStatus(
-                e.target.value as "all" | "approved" | "pending" | "rejected"
+                e.target.value as
+                  | "all"
+                  | "approved"
+                  | "pending"
+                  | "rejected"
+                  | "sold"
               )
             }
             className="w-full rounded-lg border border-[var(--b2)] bg-[var(--white)] px-3 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--b1-mid)] sm:w-48"
@@ -99,6 +114,7 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
             <option value="approved">Approved</option>
             <option value="pending">Pending</option>
             <option value="rejected">Rejected</option>
+            <option value="sold">Sold</option>
           </select>
         </div>
       </div>
@@ -154,7 +170,12 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Button
                     type="button"
-                    disabled={actionLoading || listing.status === "approved"}
+                    disabled={
+                      actionLoading ||
+                      ["approved", "sold"].includes(
+                        normalizeListingStatus(listing.status)
+                      )
+                    }
                     onClick={() => onApprove(listing._id)}
                     variant="outline"
                     size="sm"
@@ -166,7 +187,12 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
 
                   <Button
                     type="button"
-                    disabled={actionLoading}
+                    disabled={
+                      actionLoading ||
+                      ["rejected", "sold"].includes(
+                        normalizeListingStatus(listing.status)
+                      )
+                    }
                     onClick={() => setRejectId(listing._id)}
                     variant="outline"
                     size="sm"
@@ -250,7 +276,10 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
                         <Button
                           type="button"
                           disabled={
-                            actionLoading || listing.status === "approved"
+                            actionLoading ||
+                            ["approved", "sold"].includes(
+                              normalizeListingStatus(listing.status)
+                            )
                           }
                           onClick={() => onApprove(listing._id)}
                           variant="outline"
@@ -263,7 +292,12 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
 
                         <Button
                           type="button"
-                          disabled={actionLoading}
+                          disabled={
+                            actionLoading ||
+                            ["rejected", "sold"].includes(
+                              normalizeListingStatus(listing.status)
+                            )
+                          }
                           onClick={() => setRejectId(listing._id)}
                           variant="outline"
                           size="sm"

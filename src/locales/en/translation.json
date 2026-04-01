@@ -131,5 +131,200 @@
     "delete": "Delete",
     "noListingsYet": "You have no listings yet.",
     "na": "N/A"
+  },
+  "sellerPanel": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "myProperties": "My Properties",
+      "addProperty": "Add Property",
+      "leads": "Leads",
+      "analytics": "Analytics",
+      "messages": "Messages",
+      "promotions": "Promotions",
+      "profile": "Profile",
+      "settings": "Settings"
+    },
+    "sidebar": {
+      "workspace": "Workspace",
+      "account": "Account",
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar"
+    },
+    "topbar": {
+      "menu": "Open navigation",
+      "kicker": "Seller workspace",
+      "tagline": "Operate listings with clarity and speed."
+    },
+    "notifications": {
+      "aria": "Notifications",
+      "heading": "Notifications",
+      "sub": "Listing and lead updates",
+      "approvedTitle": "Listing approved",
+      "approvedDesc": "Your property passed review and is live.",
+      "leadTitle": "New lead",
+      "leadDesc": "A buyer requested contact on your farmland listing.",
+      "rejectedTitle": "Update required",
+      "rejectedDesc": "A listing needs changes before approval."
+    },
+    "stats": {
+      "totalProperties": "Total properties",
+      "activeListings": "Active listings",
+      "pendingApproval": "Pending approval",
+      "rejected": "Rejected",
+      "totalLeads": "Total leads",
+      "totalViews": "Total views"
+    },
+    "charts": {
+      "viewsTitle": "Property views trend",
+      "viewsSub": "Rolling weekly signal derived from your portfolio analytics.",
+      "leadsTitle": "Leads trend",
+      "leadsSub": "Engagement proxy from contact actions across listings."
+    },
+    "leadsPreview": {
+      "title": "Recent leads",
+      "sub": "Preview only — connect workflows as APIs go live.",
+      "cta": "Open leads"
+    },
+    "table": {
+      "image": "Image",
+      "title": "Title",
+      "price": "Price",
+      "location": "Location",
+      "status": "Status",
+      "views": "Views",
+      "leads": "Leads",
+      "created": "Created",
+      "actions": "Actions",
+      "searchPlaceholder": "Search title, city, or address",
+      "filterAll": "All",
+      "sortRecent": "Newest first",
+      "sortPriceDesc": "Price high → low",
+      "sortPriceAsc": "Price low → high",
+      "sortViews": "Most views",
+      "sortTitle": "Title A–Z",
+      "emptyFilter": "No listings match your filters.",
+      "pageOf": "Page {{current}} of {{total}}",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "status": {
+      "pending": "pending",
+      "approved": "approved",
+      "rejected": "rejected",
+      "sold": "sold"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "duplicate": "Duplicate",
+      "more": "More",
+      "markSold": "Mark sold",
+      "deactivate": "Deactivate"
+    },
+    "workflow": {
+      "title": "Listing status",
+      "sold": "Marking a property as sold is verified by our team to protect buyers and sellers. Please contact support with your listing ID, or watch this space for self-serve status updates.",
+      "deactivate": "Temporarily hiding a listing may require administrator approval depending on your account. Contact support if you need an urgent takedown.",
+      "ok": "Got it"
+    },
+    "duplicateSuccess": "Duplicate listing created.",
+    "duplicateError": "Could not duplicate listing. Ensure images and required fields are present.",
+    "analytics": {
+      "title": "Analytics",
+      "sub": "Portfolio performance derived from listing analytics.",
+      "statConversion": "Conversion rate",
+      "statRatio": "Views to lead ratio",
+      "statViews": "Total views",
+      "statLeads": "Total leads",
+      "topTitle": "Top performing listings",
+      "topSub": "By views across your portfolio.",
+      "locationsTitle": "Top locations",
+      "locationsSub": "Where your inventory is concentrated.",
+      "noData": "Not enough listings to rank locations yet.",
+      "footer": "Figures reflect analytics captured on listings. Admin dashboards may include additional telemetry."
+    },
+    "leadsPage": {
+      "title": "Lead management",
+      "sub": "Track buyer interest and follow-ups. Sample data until CRM APIs are connected.",
+      "searchPlaceholder": "Search buyer or property",
+      "interest": "Interest",
+      "colBuyer": "Buyer",
+      "colContact": "Contact",
+      "colProperty": "Property",
+      "colInterest": "Interest",
+      "colActivity": "Last activity",
+      "colStatus": "Status",
+      "colActions": "Actions"
+    },
+    "leads": {
+      "interest": {
+        "hot": "Hot",
+        "warm": "Warm",
+        "cold": "Cold"
+      },
+      "status": {
+        "new": "New",
+        "contacted": "Contacted",
+        "converted": "Converted",
+        "lost": "Lost"
+      },
+      "actions": {
+        "hot": "Hot",
+        "notes": "Notes"
+      }
+    },
+    "messages": {
+      "title": "Messages",
+      "sub": "Inbox UI — connect to chat APIs when ready.",
+      "inbox": "Inbox",
+      "unread": "Unread",
+      "encrypted": "End-to-end encryption may apply when chat is enabled.",
+      "placeholderYou": "Thanks for your interest — happy to share more details.",
+      "composerPlaceholder": "Type a message…",
+      "send": "Send message"
+    },
+    "promo": {
+      "title": "Promotions",
+      "sub": "Boost visibility for listings. Billing integration pending.",
+      "featuredTitle": "Featured listing",
+      "featuredDesc": "Prime placement on high-traffic surfaces.",
+      "boostTitle": "Boost property",
+      "boostDesc": "Short bursts of extra impressions.",
+      "priorityTitle": "Priority listing",
+      "priorityDesc": "Preferential ordering in relevant searches.",
+      "impressions": "Impr.",
+      "clicks": "Clicks",
+      "performance": "Δ",
+      "ctaSoon": "Coming soon"
+    },
+    "profile": {
+      "title": "Seller profile",
+      "sub": "How buyers and our team see you.",
+      "sectionMain": "Contact & company",
+      "name": "Display name",
+      "company": "Company / brand",
+      "phone": "Phone",
+      "city": "Primary city",
+      "gstin": "GSTIN (optional)",
+      "bio": "Bio",
+      "save": "Save profile",
+      "savedUi": "Saved locally — sync when profile API is available.",
+      "verifyTitle": "Verification",
+      "verifySub": "Upload documents to unlock badges and faster approvals.",
+      "docPan": "PAN / ID proof",
+      "docAddress": "Address proof",
+      "pending": "Pending",
+      "optional": "Optional"
+    },
+    "settings": {
+      "title": "Settings",
+      "sub": "Notification preferences for your seller workspace.",
+      "notifications": "Notifications",
+      "digest": "Weekly performance digest",
+      "leads": "Instant lead alerts",
+      "listings": "Listing status changes",
+      "marketing": "Product tips & marketplace updates",
+      "save": "Save preferences"
+    }
   }
 }

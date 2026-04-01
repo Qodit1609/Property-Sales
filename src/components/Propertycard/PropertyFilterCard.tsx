@@ -4,7 +4,7 @@ import {
   Search,
   SlidersHorizontal,
   X,
-  RotateCcw,
+  ChevronDown,
   Ruler,
   Sprout,
   Droplets,
@@ -17,10 +17,10 @@ interface PropertyFilterCardProps {
   onFiltered: (filtered: Property[]) => void;
 }
 
-interface Filters {
+/** Centralized filter state — listingType uses backend values; "both" means no listing filter. */
+export interface PropertyFiltersState {
   search: string;
-  propertyType: string;
-  listingType: string;
+  listingType: "both" | "sale" | "rent";
   minPrice: string;
   maxPrice: string;
   minArea: string;
@@ -33,20 +33,21 @@ interface Filters {
   maxParking: string;
   soilType: string;
   waterAvailability: string;
-  irrigationSystem: "any" | "yes" | "no";
-  borewellAvailable: "any" | "yes" | "no";
-  roadAccess: "any" | "yes" | "no";
-  electricityAvailable: "any" | "yes" | "no";
-  powerBackup: "any" | "yes" | "no";
-  security: "any" | "yes" | "no";
-  gatedCommunity: "any" | "yes" | "no";
-  farmhouseBuilt: "any" | "yes" | "no";
+  irrigationSystem: TriBool;
+  borewellAvailable: TriBool;
+  roadAccess: TriBool;
+  electricityAvailable: TriBool;
+  powerBackup: TriBool;
+  security: TriBool;
+  gatedCommunity: TriBool;
+  farmhouseBuilt: TriBool;
 }
 
-const INITIAL_FILTERS: Filters = {
+type TriBool = "both" | "yes" | "no";
+
+const INITIAL_FILTERS: PropertyFiltersState = {
   search: "",
-  propertyType: "",
-  listingType: "",
+  listingType: "both",
   minPrice: "",
   maxPrice: "",
   minArea: "",
@@ -59,21 +60,24 @@ const INITIAL_FILTERS: Filters = {
   maxParking: "",
   soilType: "",
   waterAvailability: "",
-  irrigationSystem: "any",
-  borewellAvailable: "any",
-  roadAccess: "any",
-  electricityAvailable: "any",
-  powerBackup: "any",
-  security: "any",
-  gatedCommunity: "any",
-  farmhouseBuilt: "any",
+  irrigationSystem: "both",
+  borewellAvailable: "both",
+  roadAccess: "both",
+  electricityAvailable: "both",
+  powerBackup: "both",
+  security: "both",
+  gatedCommunity: "both",
+  farmhouseBuilt: "both",
 };
 
 const inputBaseClass =
-  "min-w-0 w-full rounded-lg border border-emerald-100 bg-white py-1.5 px-2.5 text-xs text-slate-700 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100";
+  "min-h-[44px] min-w-0 w-full rounded-lg border border-b2/40 bg-white py-2 px-3 text-sm text-foreground shadow-sm outline-none transition placeholder:text-muted/55 hover:border-[var(--b1-mid)]/40 focus:border-primary focus:ring-2 focus:ring-[var(--b2-soft)] font-serif";
 
 const sectionCardClass =
-  "rounded-xl border border-emerald-100 bg-gradient-to-b from-white to-emerald-50/35 p-3 sm:p-4";
+  "rounded-xl border border-b2/35 bg-white/95 p-3.5 shadow-sm sm:p-4";
+
+const primaryCardClass =
+  "rounded-xl border border-b2/35 bg-gradient-to-b from-white to-[var(--b2-soft)]/30 p-3.5 shadow-sm sm:p-4";
 
 const normalizeText = (value?: string | null) => (value ?? "").toLowerCase();
 
@@ -105,11 +109,8 @@ const parseBooleanLike = (value: unknown): boolean | undefined => {
   return undefined;
 };
 
-const matchesBooleanFilter = (
-  value: unknown,
-  filter: Filters["irrigationSystem"]
-) => {
-  if (filter === "any") return true;
+const matchesBooleanFilter = (value: unknown, filter: TriBool) => {
+  if (filter === "both") return true;
   const parsed = parseBooleanLike(value);
   if (parsed === undefined) return false;
   return filter === "yes" ? parsed : !parsed;
@@ -127,46 +128,67 @@ const getBathroomCount = (property: Property) =>
 const getParkingCount = (property: Property) =>
   parseNumberish(property.parking ?? property.features?.parking);
 
-const FilterSection: React.FC<{
+export const FilterSection: React.FC<{
   icon: React.ReactNode;
   title: string;
   children: React.ReactNode;
   delay?: number;
 }> = ({ icon, title, children, delay = 0 }) => (
   <motion.section
-    initial={{ opacity: 0, y: 8 }}
+    initial={{ opacity: 0, y: 6 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.28, delay }}
+    transition={{ duration: 0.22, delay }}
     className={sectionCardClass}
   >
-    <div className="mb-2.5 flex items-center gap-1.5">
-      <span className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-100 text-emerald-700">
+    <div className="mb-2 flex items-center gap-1.5">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--b2-soft)] text-b1">
         {icon}
       </span>
-      <h4 className="text-xs font-semibold tracking-wide text-[var(--b1)]">{title}</h4>
+      <h4 className="text-sm font-semibold tracking-wide text-foreground">{title}</h4>
     </div>
     {children}
   </motion.section>
 );
 
 const FieldLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
-  <label className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.08em] text-slate-700">
+  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-muted">
     {children}
   </label>
 );
 
+export const FilterChip: React.FC<{
+  label: string;
+  onRemove: () => void;
+  removeLabel?: string;
+}> = ({ label, onRemove, removeLabel = "Remove filter" }) => (
+  <span
+    className="inline-flex max-w-full items-center gap-1 rounded-full border border-b2 bg-[var(--b2-soft)] px-2.5 py-1 text-xs font-medium text-b1 shadow-sm transition hover:border-[var(--b1-mid)] hover:bg-[var(--b2-soft)] focus-within:ring-2 focus-within:ring-b2"
+    title={label}
+  >
+    <span className="truncate">{label}</span>
+    <button
+      type="button"
+      onClick={onRemove}
+      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-b1 transition hover:bg-b2/60 hover:text-b1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+      aria-label={removeLabel}
+    >
+      <X size={12} strokeWidth={2.5} />
+    </button>
+  </span>
+);
+
 const BooleanToggleGroup: React.FC<{
-  value: "any" | "yes" | "no";
-  onChange: (next: "any" | "yes" | "no") => void;
+  value: TriBool;
+  onChange: (next: TriBool) => void;
 }> = ({ value, onChange }) => {
-  const options: Array<{ id: "any" | "yes" | "no"; label: string }> = [
-    { id: "any", label: "Any" },
+  const options: Array<{ id: TriBool; label: string }> = [
+    { id: "both", label: "Both" },
     { id: "yes", label: "Yes" },
     { id: "no", label: "No" },
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-1 rounded-lg border border-emerald-100 bg-white p-1">
+    <div className="grid grid-cols-3 gap-1 rounded-lg border border-b2/40 bg-[var(--b2-soft)]/50 p-1">
       {options.map((option) => {
         const isActive = value === option.id;
         return (
@@ -175,10 +197,10 @@ const BooleanToggleGroup: React.FC<{
             type="button"
             whileTap={{ scale: 0.97 }}
             onClick={() => onChange(option.id)}
-            className={`whitespace-nowrap rounded-md px-2 py-1 text-[11px] font-semibold transition ${
+            className={`whitespace-nowrap rounded-md px-2 py-1.5 text-xs font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary font-serif ${
               isActive
-                ? "bg-emerald-700 text-white shadow-sm"
-                : "text-slate-600 hover:bg-emerald-50"
+                ? "bg-b1 text-fg shadow-sm"
+                : "text-muted hover:bg-white"
             }`}
           >
             {option.label}
@@ -189,18 +211,126 @@ const BooleanToggleGroup: React.FC<{
   );
 };
 
+const ListingTypeToggle: React.FC<{
+  value: PropertyFiltersState["listingType"];
+  onChange: (next: PropertyFiltersState["listingType"]) => void;
+}> = ({ value, onChange }) => {
+  const options: Array<{ id: PropertyFiltersState["listingType"]; label: string }> = [
+    { id: "both", label: "Both" },
+    { id: "sale", label: "Buy" },
+    { id: "rent", label: "Rent" },
+  ];
+
+  return (
+    <div className="grid grid-cols-3 gap-1 rounded-lg border border-b2/40 bg-[var(--b2-soft)]/50 p-1">
+      {options.map((option) => {
+        const isActive = value === option.id;
+        return (
+          <motion.button
+            key={option.id}
+            type="button"
+            whileTap={{ scale: 0.97 }}
+            onClick={() => onChange(option.id)}
+            className={`whitespace-nowrap rounded-md px-2 py-2 text-xs font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:py-1.5 font-serif ${
+              isActive
+                ? "bg-b1 text-fg shadow-sm"
+                : "text-muted hover:bg-white"
+            }`}
+          >
+            {option.label}
+          </motion.button>
+        );
+      })}
+    </div>
+  );
+};
+
+type AppliedChip = { id: string; label: string };
+
+function buildAppliedChips(f: PropertyFiltersState): AppliedChip[] {
+  const chips: AppliedChip[] = [];
+
+  if (f.listingType !== "both") {
+    chips.push({
+      id: "listingType",
+      label: f.listingType === "sale" ? "Buy" : "Rent",
+    });
+  }
+
+  if (f.search.trim()) {
+    chips.push({ id: "location", label: f.search.trim() });
+  }
+
+  if (f.minPrice || f.maxPrice) {
+    const parts = [
+      f.minPrice ? `Min ₹${f.minPrice}` : null,
+      f.maxPrice ? `Max ₹${f.maxPrice}` : null,
+    ].filter(Boolean) as string[];
+    chips.push({ id: "price", label: parts.join(" · ") });
+  }
+
+  if (f.minArea || f.maxArea) {
+    chips.push({
+      id: "area",
+      label: `Area: ${f.minArea || "—"} – ${f.maxArea || "—"}`,
+    });
+  }
+
+  if (f.minBedrooms || f.maxBedrooms) {
+    chips.push({
+      id: "bedrooms",
+      label: `Bedrooms: ${f.minBedrooms || "—"} – ${f.maxBedrooms || "—"}`,
+    });
+  }
+
+  if (f.minBathrooms || f.maxBathrooms) {
+    chips.push({
+      id: "bathrooms",
+      label: `Bathrooms: ${f.minBathrooms || "—"} – ${f.maxBathrooms || "—"}`,
+    });
+  }
+
+  if (f.minParking || f.maxParking) {
+    chips.push({
+      id: "parking",
+      label: `Parking: ${f.minParking || "—"} – ${f.maxParking || "—"}`,
+    });
+  }
+
+  if (f.soilType) chips.push({ id: "soilType", label: f.soilType });
+
+  if (f.waterAvailability) {
+    chips.push({ id: "waterAvailability", label: f.waterAvailability });
+  }
+
+  const boolLabel = (name: string, v: TriBool) =>
+    v !== "both" ? `${name}: ${v === "yes" ? "Yes" : "No"}` : null;
+
+  const addBool = (id: keyof PropertyFiltersState, name: string, v: TriBool) => {
+    const lbl = boolLabel(name, v);
+    if (lbl) chips.push({ id, label: lbl });
+  };
+
+  addBool("irrigationSystem", "Irrigation", f.irrigationSystem);
+  addBool("borewellAvailable", "Borewell", f.borewellAvailable);
+  addBool("roadAccess", "Road access", f.roadAccess);
+  addBool("electricityAvailable", "Electricity", f.electricityAvailable);
+  addBool("powerBackup", "Power backup", f.powerBackup);
+  addBool("security", "Security", f.security);
+  addBool("gatedCommunity", "Gated", f.gatedCommunity);
+  addBool("farmhouseBuilt", "Farmhouse built", f.farmhouseBuilt);
+
+  return chips;
+}
+
 const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
   properties,
   onFiltered,
 }) => {
-  const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
+  const [filters, setFilters] = useState<PropertyFiltersState>(INITIAL_FILTERS);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [secondaryOpen, setSecondaryOpen] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const propertyTypes = useMemo(() => {
-    const types = new Set(properties.map((p) => p.propertyType).filter(Boolean));
-    return Array.from(types).sort((a, b) => a.localeCompare(b));
-  }, [properties]);
 
   const soilTypeOptions = useMemo(() => {
     const types = new Set(
@@ -220,23 +350,8 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
     return Array.from(values).sort((a, b) => a.localeCompare(b));
   }, [properties]);
 
-  const listingTypeOptions = useMemo(() => {
-    const values = new Set(
-      properties
-        .map((p) => p.listingType?.trim()?.toLowerCase() ?? "")
-        .filter((value): value is string => Boolean(value))
-    );
-
-    const ordered = ["sale", "rent"].filter((value) => values.has(value));
-    const others = Array.from(values)
-      .filter((value) => !ordered.includes(value))
-      .sort((a, b) => a.localeCompare(b));
-
-    return [...ordered, ...others];
-  }, [properties]);
-
   const applyFilters = useCallback(
-    (current: Filters) => {
+    (current: PropertyFiltersState) => {
       let result = [...properties];
 
       if (current.search.trim()) {
@@ -249,15 +364,9 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
         );
       }
 
-      if (current.propertyType) {
-        result = result.filter((p) => p.propertyType === current.propertyType);
-      }
-
-      if (current.listingType) {
-        const selectedListingType = current.listingType.toLowerCase();
-        result = result.filter(
-          (p) => normalizeText(p.listingType) === selectedListingType
-        );
+      if (current.listingType !== "both") {
+        const selected = current.listingType.toLowerCase();
+        result = result.filter((p) => normalizeText(p.listingType) === selected);
       }
 
       if (current.minPrice) {
@@ -365,10 +474,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
       }
 
       result = result.filter((p) =>
-        matchesBooleanFilter(
-          p.waterResources?.irrigationSystem,
-          current.irrigationSystem
-        )
+        matchesBooleanFilter(p.waterResources?.irrigationSystem, current.irrigationSystem)
       );
 
       result = result.filter((p) =>
@@ -421,178 +527,215 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
     []
   );
 
-  const updateFilter = <K extends keyof Filters>(key: K, value: Filters[K]) => {
-    const next = { ...filters, [key]: value };
-    setFilters(next);
-
-    if (key === "search") {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => applyFilters(next), 300);
-    } else {
+  const commitFilters = useCallback(
+    (next: PropertyFiltersState) => {
+      setFilters(next);
       applyFilters(next);
-    }
-  };
+    },
+    [applyFilters]
+  );
 
-  const resetFilters = () => {
+  const updateFilter = useCallback(
+    <K extends keyof PropertyFiltersState>(key: K, value: PropertyFiltersState[K]) => {
+      setFilters((prev) => {
+        const next = { ...prev, [key]: value };
+        if (key === "search") {
+          if (debounceRef.current) clearTimeout(debounceRef.current);
+          debounceRef.current = setTimeout(() => applyFilters(next), 320);
+        } else {
+          applyFilters(next);
+        }
+        return next;
+      });
+    },
+    [applyFilters]
+  );
+
+  const resetFilters = useCallback(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    setFilters(INITIAL_FILTERS);
-    applyFilters(INITIAL_FILTERS);
-  };
+    commitFilters(INITIAL_FILTERS);
+  }, [commitFilters]);
 
-  const hasActiveFilters = useMemo(
-    () =>
-      filters.search !== "" ||
-      filters.propertyType !== "" ||
-      filters.listingType !== "" ||
-      filters.minPrice !== "" ||
-      filters.maxPrice !== "" ||
-      filters.minArea !== "" ||
-      filters.maxArea !== "" ||
-      filters.minBedrooms !== "" ||
-      filters.maxBedrooms !== "" ||
-      filters.minBathrooms !== "" ||
-      filters.maxBathrooms !== "" ||
-      filters.minParking !== "" ||
-      filters.maxParking !== "" ||
-      filters.soilType !== "" ||
-      filters.waterAvailability !== "" ||
-      filters.irrigationSystem !== "any" ||
-      filters.borewellAvailable !== "any" ||
-      filters.roadAccess !== "any" ||
-      filters.electricityAvailable !== "any" ||
-      filters.powerBackup !== "any" ||
-      filters.security !== "any" ||
-      filters.gatedCommunity !== "any" ||
-      filters.farmhouseBuilt !== "any",
-    [filters]
+  const removeAppliedChip = useCallback(
+    (chipId: string) => {
+      setFilters((prev) => {
+        let next: PropertyFiltersState = { ...prev };
+        switch (chipId) {
+          case "listingType":
+            next.listingType = "both";
+            break;
+          case "location":
+            next.search = "";
+            break;
+          case "price":
+            next.minPrice = "";
+            next.maxPrice = "";
+            break;
+          case "area":
+            next.minArea = "";
+            next.maxArea = "";
+            break;
+          case "bedrooms":
+            next.minBedrooms = "";
+            next.maxBedrooms = "";
+            break;
+          case "bathrooms":
+            next.minBathrooms = "";
+            next.maxBathrooms = "";
+            break;
+          case "parking":
+            next.minParking = "";
+            next.maxParking = "";
+            break;
+          case "soilType":
+            next.soilType = "";
+            break;
+          case "waterAvailability":
+            next.waterAvailability = "";
+            break;
+          case "irrigationSystem":
+            next.irrigationSystem = "both";
+            break;
+          case "borewellAvailable":
+            next.borewellAvailable = "both";
+            break;
+          case "roadAccess":
+            next.roadAccess = "both";
+            break;
+          case "electricityAvailable":
+            next.electricityAvailable = "both";
+            break;
+          case "powerBackup":
+            next.powerBackup = "both";
+            break;
+          case "security":
+            next.security = "both";
+            break;
+          case "gatedCommunity":
+            next.gatedCommunity = "both";
+            break;
+          case "farmhouseBuilt":
+            next.farmhouseBuilt = "both";
+            break;
+          default:
+            return prev;
+        }
+        applyFilters(next);
+        return next;
+      });
+    },
+    [applyFilters]
   );
 
-  const activeCount = useMemo(
-    () =>
-      [
-        filters.search,
-        filters.propertyType,
-        filters.listingType,
-        filters.minPrice,
-        filters.maxPrice,
-        filters.minArea,
-        filters.maxArea,
-        filters.minBedrooms,
-        filters.maxBedrooms,
-        filters.minBathrooms,
-        filters.maxBathrooms,
-        filters.minParking,
-        filters.maxParking,
-        filters.soilType,
-        filters.waterAvailability,
-        filters.irrigationSystem !== "any" ? "irrigation" : "",
-        filters.borewellAvailable !== "any" ? "borewell" : "",
-        filters.roadAccess !== "any" ? "road" : "",
-        filters.electricityAvailable !== "any" ? "electricity" : "",
-        filters.powerBackup !== "any" ? "powerBackup" : "",
-        filters.security !== "any" ? "security" : "",
-        filters.gatedCommunity !== "any" ? "gatedCommunity" : "",
-        filters.farmhouseBuilt !== "any" ? "farmhouseBuilt" : "",
-      ].filter(Boolean).length,
-    [filters]
+  const appliedChips = useMemo(() => buildAppliedChips(filters), [filters]);
+
+  const activeCount = appliedChips.length;
+
+  const hasActiveFilters = activeCount > 0;
+
+  const appliedFiltersBlock = (
+    <div
+      className={`border-b border-b2/30 pb-3 ${hasActiveFilters ? "" : "hidden"}`}
+    >
+      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+        <span className="text-xs font-semibold uppercase tracking-wide text-muted">
+          Applied filters
+        </span>
+        <button
+          type="button"
+          onClick={resetFilters}
+          className="text-xs font-semibold text-primary underline-offset-2 transition hover:opacity-90 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
+        >
+          Clear all
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {appliedChips.map((chip) => (
+          <FilterChip
+            key={`${chip.id}-${chip.label}`}
+            label={chip.label}
+            onRemove={() => removeAppliedChip(chip.id)}
+            removeLabel={`Remove ${chip.label}`}
+          />
+        ))}
+      </div>
+    </div>
   );
 
-  const filterContent = (
-    <div className="flex flex-col gap-3 sm:gap-4">
-      <FilterSection icon={<Search size={13} />} title="Basic Filters">
-        <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-1">
-          <div className="md:col-span-2 lg:col-span-1">
-            <FieldLabel>Search</FieldLabel>
-            <div className="relative">
-              <Search
-                size={14}
-                className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"
-              />
-              <input
-                type="text"
-                placeholder="Title, address or city"
-                value={filters.search}
-                onChange={(e) => updateFilter("search", e.target.value)}
-                className={`${inputBaseClass} pl-8 pr-7`}
-              />
-              {filters.search && (
-                <button
-                  type="button"
-                  onClick={() => updateFilter("search", "")}
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded p-0.5 text-slate-400 transition hover:text-slate-700"
-                  aria-label="Clear search"
-                >
-                  <X size={12} />
-                </button>
-              )}
-            </div>
-          </div>
+  const primaryFilters = (
+    <div className={primaryCardClass}>
+      <div className="grid grid-cols-1 gap-3 sm:gap-3">
+        <div>
+          <FieldLabel>Buy / Rent</FieldLabel>
+          <ListingTypeToggle
+            value={filters.listingType}
+            onChange={(next) => updateFilter("listingType", next)}
+          />
+        </div>
 
-          <div>
-            <FieldLabel>Property Type</FieldLabel>
-            <select
-              value={filters.propertyType}
-              onChange={(e) => updateFilter("propertyType", e.target.value)}
-              className={inputBaseClass}
-            >
-              <option value="">All Types</option>
-              {propertyTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <FieldLabel>Price Range (INR)</FieldLabel>
-            <div className="grid grid-cols-2 gap-1.5">
-              <input
-                type="number"
-                placeholder="Min"
-                value={filters.minPrice}
-                onChange={(e) => updateFilter("minPrice", e.target.value)}
-                className={inputBaseClass}
-              />
-              <input
-                type="number"
-                placeholder="Max"
-                value={filters.maxPrice}
-                onChange={(e) => updateFilter("maxPrice", e.target.value)}
-                className={inputBaseClass}
-              />
-            </div>
-          </div>
-
-          <div>
-            <FieldLabel>Listing Type</FieldLabel>
-            <select
-              value={filters.listingType}
-              onChange={(e) => updateFilter("listingType", e.target.value)}
-              className={inputBaseClass}
-            >
-              <option value="">Any</option>
-              {listingTypeOptions.map((type) => (
-                <option key={type} value={type}>
-                  {type.charAt(0).toUpperCase() + type.slice(1)}
-                </option>
-              ))}
-            </select>
+        <div>
+          <FieldLabel>Location</FieldLabel>
+          <div className="relative">
+            <Search
+              size={14}
+              className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted/70"
+            />
+            <input
+              type="text"
+              placeholder="City, area, or keyword"
+              value={filters.search}
+              onChange={(e) => updateFilter("search", e.target.value)}
+              className={`${inputBaseClass} pl-8 pr-9`}
+              autoComplete="off"
+            />
+            {filters.search ? (
+              <button
+                type="button"
+                onClick={() => commitFilters({ ...filters, search: "" })}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted/70 transition hover:bg-[var(--b2-soft)] hover:text-b1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label="Clear location"
+              >
+                <X size={14} />
+              </button>
+            ) : null}
           </div>
         </div>
-      </FilterSection>
 
-      <FilterSection
-        icon={<Landmark size={13} />}
-        title="Resort & Farmhouse"
-        delay={0.04}
-      >
-        <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-1">
+        <div>
+          <FieldLabel>Price range (INR)</FieldLabel>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <input
+              type="number"
+              inputMode="decimal"
+              placeholder="Min"
+              value={filters.minPrice}
+              onChange={(e) => updateFilter("minPrice", e.target.value)}
+              className={inputBaseClass}
+            />
+            <input
+              type="number"
+              inputMode="decimal"
+              placeholder="Max"
+              value={filters.maxPrice}
+              onChange={(e) => updateFilter("maxPrice", e.target.value)}
+              className={inputBaseClass}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const secondaryFilters = (
+    <div className="flex flex-col gap-3">
+      <FilterSection icon={<Landmark size={14} />} title="Resort & farmhouse">
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-1">
           <div>
             <FieldLabel>Bedrooms</FieldLabel>
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
+                inputMode="numeric"
                 placeholder="Min"
                 value={filters.minBedrooms}
                 onChange={(e) => updateFilter("minBedrooms", e.target.value)}
@@ -600,6 +743,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
               />
               <input
                 type="number"
+                inputMode="numeric"
                 placeholder="Max"
                 value={filters.maxBedrooms}
                 onChange={(e) => updateFilter("maxBedrooms", e.target.value)}
@@ -610,9 +754,10 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
 
           <div>
             <FieldLabel>Bathrooms</FieldLabel>
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
+                inputMode="numeric"
                 placeholder="Min"
                 value={filters.minBathrooms}
                 onChange={(e) => updateFilter("minBathrooms", e.target.value)}
@@ -620,6 +765,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
               />
               <input
                 type="number"
+                inputMode="numeric"
                 placeholder="Max"
                 value={filters.maxBathrooms}
                 onChange={(e) => updateFilter("maxBathrooms", e.target.value)}
@@ -629,10 +775,11 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           </div>
 
           <div>
-            <FieldLabel>Parking Slots</FieldLabel>
-            <div className="grid grid-cols-2 gap-1.5">
+            <FieldLabel>Parking</FieldLabel>
+            <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
+                inputMode="numeric"
                 placeholder="Min"
                 value={filters.minParking}
                 onChange={(e) => updateFilter("minParking", e.target.value)}
@@ -640,6 +787,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
               />
               <input
                 type="number"
+                inputMode="numeric"
                 placeholder="Max"
                 value={filters.maxParking}
                 onChange={(e) => updateFilter("maxParking", e.target.value)}
@@ -649,7 +797,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           </div>
 
           <div>
-            <FieldLabel>Power Backup</FieldLabel>
+            <FieldLabel>Power backup</FieldLabel>
             <BooleanToggleGroup
               value={filters.powerBackup}
               onChange={(next) => updateFilter("powerBackup", next)}
@@ -665,15 +813,15 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           </div>
 
           <div>
-            <FieldLabel>Gated Community</FieldLabel>
+            <FieldLabel>Gated community</FieldLabel>
             <BooleanToggleGroup
               value={filters.gatedCommunity}
               onChange={(next) => updateFilter("gatedCommunity", next)}
             />
           </div>
 
-          <div className="md:col-span-2 lg:col-span-1">
-            <FieldLabel>Farmhouse Built</FieldLabel>
+          <div className="sm:col-span-2 lg:col-span-1">
+            <FieldLabel>Farmhouse built</FieldLabel>
             <BooleanToggleGroup
               value={filters.farmhouseBuilt}
               onChange={(next) => updateFilter("farmhouseBuilt", next)}
@@ -682,17 +830,18 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
         </div>
       </FilterSection>
 
-      <FilterSection icon={<Sprout size={13} />} title="Land Details" delay={0.05}>
-        <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-1">
+      <FilterSection icon={<Sprout size={14} />} title="Land details" delay={0.04}>
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-1">
           <div>
             <FieldLabel>
               <span className="inline-flex items-center gap-1">
-                <Ruler size={10} /> Area Range
+                <Ruler size={10} /> Area range
               </span>
             </FieldLabel>
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-2 gap-2">
               <input
                 type="number"
+                inputMode="decimal"
                 placeholder="Min"
                 value={filters.minArea}
                 onChange={(e) => updateFilter("minArea", e.target.value)}
@@ -700,6 +849,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
               />
               <input
                 type="number"
+                inputMode="decimal"
                 placeholder="Max"
                 value={filters.maxArea}
                 onChange={(e) => updateFilter("maxArea", e.target.value)}
@@ -709,13 +859,16 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           </div>
 
           <div>
-            <FieldLabel>Soil Type</FieldLabel>
+            <FieldLabel>Soil type</FieldLabel>
             <select
               value={filters.soilType}
               onChange={(e) => updateFilter("soilType", e.target.value)}
-              className={inputBaseClass}
+              className={`${inputBaseClass} cursor-pointer appearance-none bg-[length:1rem] bg-[right_0.5rem_center] bg-no-repeat pr-8`}
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231B4332' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+              }}
             >
-              <option value="">All Soil Types</option>
+              <option value="">Both</option>
               {soilTypeOptions.map((soil) => (
                 <option key={soil} value={soil}>
                   {soil}
@@ -726,20 +879,19 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
         </div>
       </FilterSection>
 
-      <FilterSection
-        icon={<Droplets size={13} />}
-        title="Water & Resources"
-        delay={0.1}
-      >
-        <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-1">
+      <FilterSection icon={<Droplets size={14} />} title="Water & resources" delay={0.06}>
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-1">
           <div>
-            <FieldLabel>Water Availability</FieldLabel>
+            <FieldLabel>Water availability</FieldLabel>
             <select
               value={filters.waterAvailability}
               onChange={(e) => updateFilter("waterAvailability", e.target.value)}
-              className={inputBaseClass}
+              className={`${inputBaseClass} cursor-pointer appearance-none bg-[length:1rem] bg-[right_0.5rem_center] bg-no-repeat pr-8`}
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231B4332' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+              }}
             >
-              <option value="">Any</option>
+              <option value="">Both</option>
               {waterAvailabilityOptions.map((water) => (
                 <option key={water} value={water}>
                   {water}
@@ -749,15 +901,15 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           </div>
 
           <div>
-            <FieldLabel>Irrigation Available</FieldLabel>
+            <FieldLabel>Irrigation</FieldLabel>
             <BooleanToggleGroup
               value={filters.irrigationSystem}
               onChange={(next) => updateFilter("irrigationSystem", next)}
             />
           </div>
 
-          <div className="md:col-span-2 lg:col-span-1">
-            <FieldLabel>Borewell Available</FieldLabel>
+          <div className="sm:col-span-2 lg:col-span-1">
+            <FieldLabel>Borewell</FieldLabel>
             <BooleanToggleGroup
               value={filters.borewellAvailable}
               onChange={(next) => updateFilter("borewellAvailable", next)}
@@ -766,14 +918,10 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
         </div>
       </FilterSection>
 
-      <FilterSection
-        icon={<Landmark size={13} />}
-        title="Infrastructure"
-        delay={0.15}
-      >
-        <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-1">
+      <FilterSection icon={<Landmark size={14} />} title="Infrastructure" delay={0.08}>
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-1">
           <div>
-            <FieldLabel>Road Access</FieldLabel>
+            <FieldLabel>Road access</FieldLabel>
             <BooleanToggleGroup
               value={filters.roadAccess}
               onChange={(next) => updateFilter("roadAccess", next)}
@@ -788,18 +936,47 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           </div>
         </div>
       </FilterSection>
+    </div>
+  );
 
-      {hasActiveFilters && (
-        <motion.button
-          type="button"
-          whileTap={{ scale: 0.98 }}
-          onClick={resetFilters}
-          className="flex items-center justify-center gap-1 rounded-lg border border-red-200 bg-red-50 py-1.5 text-[11px] font-semibold text-red-600 transition hover:bg-red-100"
-        >
-          <RotateCcw size={11} />
-          Clear All Filters
-        </motion.button>
-      )}
+  const expandToggle = (
+    <motion.button
+      type="button"
+      layout
+      onClick={() => setSecondaryOpen((o) => !o)}
+      className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-lg border border-b2/40 bg-white py-2.5 text-xs font-semibold text-foreground shadow-sm transition hover:border-[var(--b1-mid)]/50 hover:bg-[var(--b2-soft)]/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary font-serif"
+    >
+      <SlidersHorizontal size={15} className="text-b1" />
+      {secondaryOpen ? "Show less" : "Apply more filter"}
+      <motion.span
+        animate={{ rotate: secondaryOpen ? 180 : 0 }}
+        transition={{ duration: 0.2 }}
+        className="inline-flex"
+      >
+        <ChevronDown size={16} className="text-muted" />
+      </motion.span>
+    </motion.button>
+  );
+
+  const filterBody = (
+    <div className="flex flex-col gap-3">
+      {appliedFiltersBlock}
+      {primaryFilters}
+      {expandToggle}
+      <AnimatePresence initial={false}>
+        {secondaryOpen ? (
+          <motion.div
+            key="secondary"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+            className="overflow-hidden"
+          >
+            {secondaryFilters}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </div>
   );
 
@@ -809,19 +986,19 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
         type="button"
         whileTap={{ scale: 0.96 }}
         onClick={() => setMobileOpen(true)}
-        className="fixed bottom-3.5 right-3.5 z-40 inline-flex items-center gap-1.5 rounded-full bg-[var(--b1)] px-3 py-2 text-xs font-semibold text-[var(--fg)] shadow-lg ring-1 ring-black/5 backdrop-blur-sm transition hover:bg-[var(--b1-mid)] lg:hidden"
+        className="fixed bottom-3.5 right-3.5 z-40 inline-flex min-h-[44px] items-center gap-1.5 rounded-full bg-[var(--b1)] px-4 py-2.5 text-xs font-semibold text-[var(--fg)] shadow-lg ring-1 ring-black/5 backdrop-blur-sm transition hover:bg-[var(--b1-mid)] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 lg:hidden"
       >
         <SlidersHorizontal size={14} />
         Filters
-        {activeCount > 0 && (
-          <span className="ml-0.5 inline-flex min-w-4.5 items-center justify-center rounded-full bg-white px-1 py-0.5 text-[9px] font-bold text-[var(--b1)]">
+        {activeCount > 0 ? (
+          <span className="ml-0.5 inline-flex min-w-[1.125rem] items-center justify-center rounded-full bg-white px-1 py-0.5 text-[9px] font-bold text-[var(--b1)]">
             {activeCount}
           </span>
-        )}
+        ) : null}
       </motion.button>
 
       <AnimatePresence>
-        {mobileOpen && (
+        {mobileOpen ? (
           <motion.div
             className="fixed inset-0 z-50 bg-black/45 backdrop-blur-sm lg:hidden"
             initial={{ opacity: 0 }}
@@ -830,56 +1007,56 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
             onClick={() => setMobileOpen(false)}
           >
             <motion.aside
-              className="absolute right-0 top-0 h-full w-full max-w-sm overflow-y-auto bg-gradient-to-b from-white to-emerald-50/40 p-3 shadow-2xl sm:w-[86vw] md:w-[64vw]"
+              className="absolute right-0 top-0 flex h-[100dvh] max-h-[100dvh] w-full max-w-sm flex-col overflow-hidden bg-gradient-to-b from-white to-[var(--b2-soft)]/35 shadow-2xl sm:w-[90vw]"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 280 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="sticky top-0 z-10 -mx-3 mb-3 flex items-center justify-between border-b border-emerald-100 bg-white/95 px-3 py-2.5 backdrop-blur">
+              <div className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-b2/30 bg-white/95 px-3 py-3 backdrop-blur">
                 <div>
-                  <h3 className="text-sm font-bold text-[var(--b1)]">Filter Properties</h3>
-                  <p className="text-[11px] text-slate-500">
-                    Refine farms by land, water and infrastructure
-                  </p>
+                  <h3 className="text-sm font-bold text-[var(--b1)]">Filter properties</h3>
+                  <p className="text-xs text-muted">Refine by location, price & more</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-full p-1 text-slate-500 transition hover:bg-emerald-50 hover:text-slate-900"
+                  className="rounded-full p-2 text-muted transition hover:bg-[var(--b2-soft)] hover:text-b1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                   aria-label="Close filters"
                 >
-                  <X size={17} />
+                  <X size={18} />
                 </button>
               </div>
-              {filterContent}
+              <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 pb-6">
+                {filterBody}
+              </div>
             </motion.aside>
           </motion.div>
-        )}
+        ) : null}
       </AnimatePresence>
 
       <motion.aside
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.28 }}
-        className="hidden lg:sticky lg:top-24 lg:block lg:w-full lg:max-w-[340px] xl:max-w-[380px]"
+        transition={{ duration: 0.26 }}
+        className="hidden min-h-0 lg:block lg:w-full lg:max-w-[340px] xl:max-w-[380px]"
       >
-        <div className="rounded-xl border border-emerald-100 bg-gradient-to-b from-white to-emerald-50/25 p-4 xl:p-5 shadow-[0_8px_24px_rgba(16,24,40,0.08)]">
-          <div className="mb-4 flex items-start justify-between gap-2">
+        <div className="rounded-xl border border-b2/35 bg-gradient-to-b from-white to-[var(--b2-soft)]/25 p-4 shadow-[0_8px_24px_rgba(27,67,50,0.08)] sm:p-5">
+          <div className="mb-3 flex items-start justify-between gap-2">
             <div>
-              <h3 className="text-base font-bold text-[var(--b1)]">Filter Properties</h3>
-              <p className="mt-0.5 text-[11px] text-slate-500">
-                Smart filters for agriculture land listings
+              <h3 className="text-sm font-bold text-[var(--b1)]">Filter properties</h3>
+              <p className="mt-0.5 text-xs text-muted">
+                Compact search — expand for advanced options
               </p>
             </div>
-            {activeCount > 0 && (
-              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-emerald-700 px-1.5 text-[10px] font-bold text-white">
+            {activeCount > 0 ? (
+              <span className="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-b1 px-2 text-[10px] font-bold text-fg">
                 {activeCount}
               </span>
-            )}
+            ) : null}
           </div>
-          {filterContent}
+          {filterBody}
         </div>
       </motion.aside>
     </>

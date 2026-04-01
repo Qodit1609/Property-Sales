@@ -39,9 +39,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     actionLoading,
   } = useAppSelector((state) => state.admin);
 
-  // For now show all listings; filters can be reintroduced without changing API.
-  const filteredListings = listings;
-
   useEffect(() => {
     dispatch(fetchAdminUsers());
     dispatch(fetchAdminListings());
@@ -103,7 +100,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const renderListings = () => (
     <PropertyModeration
-      listings={filteredListings}
+      listings={listings}
       loading={listingsLoading}
       error={listingsError}
       actionLoading={actionLoading}

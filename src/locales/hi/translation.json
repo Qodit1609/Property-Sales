@@ -131,5 +131,193 @@
     "delete": "हटाएं",
     "noListingsYet": "आपकी अभी कोई लिस्टिंग नहीं है।",
     "na": "उपलब्ध नहीं"
+  },
+  "sellerPanel": {
+    "nav": {
+      "dashboard": "डैशबोर्ड",
+      "myProperties": "मेरी प्रॉपर्टीज",
+      "addProperty": "प्रॉपर्टी जोड़ें",
+      "leads": "लीड्स",
+      "analytics": "एनालिटिक्स",
+      "messages": "संदेश",
+      "promotions": "प्रचार",
+      "profile": "प्रोफ़ाइल",
+      "settings": "सेटिंग्स"
+    },
+    "sidebar": {
+      "workspace": "कार्यक्षेत्र",
+      "account": "खाता",
+      "collapse": "साइडबार छोटा करें",
+      "expand": "साइडबार बड़ा करें"
+    },
+    "topbar": {
+      "menu": "नेविगेशन खोलें",
+      "kicker": "विक्रेता कार्यक्षेत्र",
+      "tagline": "स्पष्टता और गति के साथ लिस्टिंग संचालित करें।"
+    },
+    "notifications": {
+      "aria": "सूचनाएं",
+      "heading": "सूचनाएं",
+      "sub": "लिस्टिंग और लीड अपडेट",
+      "approvedTitle": "लिस्टिंग स्वीकृत",
+      "approvedDesc": "आपकी प्रॉपर्टी समीक्षा पास हो गई है।",
+      "leadTitle": "नया लीड",
+      "leadDesc": "खरीदार ने संपर्क अनुरोध किया।",
+      "rejectedTitle": "अपडेट आवश्यक",
+      "rejectedDesc": "स्वीकृति से पहले बदलाव चाहिए।"
+    },
+    "stats": {
+      "totalProperties": "कुल प्रॉपर्टी",
+      "activeListings": "सक्रिय लिस्टिंग",
+      "pendingApproval": "लंबित स्वीकृति",
+      "rejected": "अस्वीकृत",
+      "totalLeads": "कुल लीड्स",
+      "totalViews": "कुल व्यूज"
+    },
+    "charts": {
+      "viewsTitle": "प्रॉपर्टी व्यू ट्रेंड",
+      "viewsSub": "आपके पोर्टफोलियो एनालिटिक्स से साप्ताहिक संकेत।",
+      "leadsTitle": "लीड ट्रेंड",
+      "leadsSub": "संपर्क क्रियाओं से जुड़ाव।"
+    },
+    "leadsPreview": {
+      "title": "हाल के लीड्स",
+      "sub": "पूर्वावलोकन — API जुड़ने पर वर्कफ़्लो।",
+      "cta": "लीड्स खोलें"
+    },
+    "table": {
+      "image": "छवि",
+      "title": "शीर्षक",
+      "price": "कीमत",
+      "location": "स्थान",
+      "status": "स्थिति",
+      "views": "व्यूज",
+      "leads": "लीड्स",
+      "created": "बनाई गई",
+      "actions": "क्रियाएं",
+      "searchPlaceholder": "शीर्षक, शहर या पता खोजें",
+      "filterAll": "सभी",
+      "sortRecent": "नवीनतम पहले",
+      "sortPriceDesc": "कीमत उच्च → निम्न",
+      "sortPriceAsc": "कीमत निम्न → उच्च",
+      "sortViews": "सबसे अधिक व्यू",
+      "sortTitle": "शीर्षक A–Z",
+      "emptyFilter": "फ़िल्टर से कोई लिस्टिंग मेल नहीं खाती।",
+      "pageOf": "पृष्ठ {{current}} / {{total}}",
+      "prev": "पिछला",
+      "next": "अगला"
+    },
+    "status": {
+      "pending": "लंबित",
+      "approved": "स्वीकृत",
+      "rejected": "अस्वीकृत",
+      "sold": "बिक चुकी"
+    },
+    "actions": {
+      "view": "देखें",
+      "edit": "संपादित करें",
+      "duplicate": "डुप्लिकेट",
+      "more": "और",
+      "markSold": "बिकी चिह्नित करें",
+      "deactivate": "निष्क्रिय करें"
+    },
+    "workflow": {
+      "title": "लिस्टिंग स्थिति",
+      "sold": "बिक्री की पुष्टि हमारी टीम करती है। सहायता से संपर्क करें या अपडेट की प्रतीक्षा करें।",
+      "deactivate": "लिस्टिंग छुपाने के लिए प्रशासक अनुमोदन आवश्यक हो सकता है।",
+      "ok": "समझ गया"
+    },
+    "duplicateSuccess": "डुप्लिकेट लिस्टिंग बनाई गई।",
+    "duplicateError": "डुप्लिकेट नहीं बन सका। छवियाँ और आवश्यक फ़ील्ड जाँचें।",
+    "analytics": {
+      "title": "एनालिटिक्स",
+      "sub": "पोर्टफोलियो प्रदर्शन।",
+      "statConversion": "रूपांतरण दर",
+      "statRatio": "व्यू से लीड अनुपात",
+      "statViews": "कुल व्यूज",
+      "statLeads": "कुल लीड्स",
+      "topTitle": "शीर्ष लिस्टिंग",
+      "topSub": "व्यूज के अनुसार।",
+      "locationsTitle": "शीर्ष स्थान",
+      "locationsSub": "आपकी इन्वेंटरी कहाँ केंद्रित है।",
+      "noData": "अभी पर्याप्त डेटा नहीं।",
+      "footer": "आँकड़े लिस्टिंग एनालिटिक्स पर आधारित हैं।"
+    },
+    "leadsPage": {
+      "title": "लीड प्रबंधन",
+      "sub": "खरीदार रुचि ट्रैक करें। नमूना डेटा।",
+      "searchPlaceholder": "खरीदार या प्रॉपर्टी खोजें",
+      "interest": "रुचि",
+      "colBuyer": "खरीदार",
+      "colContact": "संपर्क",
+      "colProperty": "प्रॉपर्टी",
+      "colInterest": "रुचि",
+      "colActivity": "अंतिम गतिविधि",
+      "colStatus": "स्थिति",
+      "colActions": "क्रियाएं"
+    },
+    "leads": {
+      "interest": { "hot": "गर्म", "warm": "गुनगुना", "cold": "ठंडा" },
+      "status": {
+        "new": "नया",
+        "contacted": "संपर्क किया",
+        "converted": "रूपांतरित",
+        "lost": "खोया"
+      },
+      "actions": { "hot": "हॉट", "notes": "नोट्स" }
+    },
+    "messages": {
+      "title": "संदेश",
+      "sub": "इनबॉक्स UI — चैट API तैयार होने पर।",
+      "inbox": "इनबॉक्स",
+      "unread": "अपठित",
+      "encrypted": "चैट सक्षम होने पर एन्क्रिप्शन लागू हो सकता है।",
+      "placeholderYou": "धन्यवाद — और विवरण साझा कर सकते हैं।",
+      "composerPlaceholder": "संदेश लिखें…",
+      "send": "भेजें"
+    },
+    "promo": {
+      "title": "प्रचार",
+      "sub": "दृश्यता बढ़ाएँ — बिलिंग जल्द।",
+      "featuredTitle": "फ़ीचर्ड लिस्टिंग",
+      "featuredDesc": "प्रमुख प्लेसमेंट।",
+      "boostTitle": "बूस्ट",
+      "boostDesc": "अतिरिक्त इंप्रेशन।",
+      "priorityTitle": "प्राथमिकता",
+      "priorityDesc": "खोज में प्राथमिकता।",
+      "impressions": "इंप्रैशन",
+      "clicks": "क्लिक",
+      "performance": "Δ",
+      "ctaSoon": "जल्द आ रहा है"
+    },
+    "profile": {
+      "title": "विक्रेता प्रोफ़ाइल",
+      "sub": "खरीदार आपको कैसे देखते हैं।",
+      "sectionMain": "संपर्क और कंपनी",
+      "name": "नाम",
+      "company": "कंपनी / ब्रांड",
+      "phone": "फ़ोन",
+      "city": "मुख्य शहर",
+      "gstin": "GSTIN (वैकल्पिक)",
+      "bio": "बायो",
+      "save": "सहेजें",
+      "savedUi": "स्थानीय रूप से सहेजा — API उपलब्ध होने पर सिंक।",
+      "verifyTitle": "सत्यापन",
+      "verifySub": "दस्तावेज़ अपलोड करें।",
+      "docPan": "PAN / ID",
+      "docAddress": "पता प्रमाण",
+      "pending": "लंबित",
+      "optional": "वैकल्पिक"
+    },
+    "settings": {
+      "title": "सेटिंग्स",
+      "sub": "सूचना वरीयताएँ।",
+      "notifications": "सूचनाएं",
+      "digest": "साप्ताहिक डाइजेस्ट",
+      "leads": "लीड अलर्ट",
+      "listings": "लिस्टिंग स्थिति",
+      "marketing": "टिप्स और अपडेट",
+      "save": "सहेजें"
+    }
   }
 }

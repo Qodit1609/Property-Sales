@@ -1,20 +1,24 @@
-import React, { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Building2, List } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import type { RootState } from "../../app/store";
-import { deleteListing, fetchMyListings } from "../../features/seller/sellerSlice";
+import { createListing, deleteListing, fetchMyListings } from "../../features/seller/sellerSlice";
 import type { Property } from "../../features/properties/propertyType";
 import { Button } from "@/components/common";
-import SellerListingsTable from "../../components/seller/SellerListingsTable";
+import Modal from "../../components/Modal/Modal";
+import { buildDuplicateListingPayload } from "../../lib/sellerHelpers";
+import { SellerPropertiesTable } from "@/components/seller/SellerPropertiesTable";
+import { SellerEmptyState } from "@/components/seller/SellerEmptyState";
 
-const SellerPropertiesPage: React.FC = () => {
+const SellerPropertiesPage = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { listings, loading, error, actionLoading } = useAppSelector(
-    (state: RootState) => state.seller
-  );
+  const { listings, loading, error, actionLoading } = useAppSelector((state: RootState) => state.seller);
+  const [info, setInfo] = useState<null | "sold" | "deactivate">(null);
+  const [banner, setBanner] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(fetchMyListings());
@@ -25,6 +29,28 @@ const SellerPropertiesPage: React.FC = () => {
     await dispatch(deleteListing(id));
   };
 
+  const handleDuplicate = useCallback(
+    async (p: Property) => {
+      try {
+        await dispatch(createListing(buildDuplicateListingPayload(p))).unwrap();
+        setBanner(t("sellerPanel.duplicateSuccess"));
+        window.setTimeout(() => setBanner(null), 5000);
+      } catch {
+        setBanner(t("sellerPanel.duplicateError"));
+        window.setTimeout(() => setBanner(null), 6000);
+      }
+    },
+    [dispatch, t]
+  );
+
+  const handleMarkSold = useCallback((_p: Property) => {
+    setInfo("sold");
+  }, []);
+
+  const handleDeactivate = useCallback((_p: Property) => {
+    setInfo("deactivate");
+  }, []);
+
   return (
     <section className="space-y-8">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -33,9 +59,7 @@ const SellerPropertiesPage: React.FC = () => {
             <List className="h-6 w-6 shrink-0 text-[var(--b1-mid)]" />
             {t("sellerDashboard.myProperties")}
           </h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">
-            {t("sellerDashboard.propertiesPageSubtitle")}
-          </p>
+          <p className="mt-1 text-sm text-[var(--muted)]">{t("sellerDashboard.propertiesPageSubtitle")}</p>
         </div>
         <Link to="/post-property/basic">
           <Button className="!rounded-xl !bg-[var(--b1)] !px-5 !py-2.5 !text-white !shadow-sm hover:!opacity-90">
@@ -44,42 +68,68 @@ const SellerPropertiesPage: React.FC = () => {
         </Link>
       </div>
 
-      {loading && (
-        <p className="text-sm text-[var(--muted)]">
-          {t("sellerDashboard.loadingListings")}
-        </p>
-      )}
+      <AnimatePresence>
+        {banner ? (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            className="rounded-xl border border-[var(--b2)] bg-[var(--white)] px-4 py-3 text-sm text-[var(--b1)] shadow-sm"
+          >
+            {banner}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
-      {error && (
+      {loading ? (
+        <p className="text-sm text-[var(--muted)]">{t("sellerDashboard.loadingListings")}</p>
+      ) : null}
+
+      {error ? (
         <p className="rounded-xl border border-[var(--error)] bg-[var(--error-bg)] px-4 py-3 text-sm text-[var(--error)]">
           {error}
         </p>
-      )}
+      ) : null}
 
       {listings.length === 0 && !loading ? (
-        <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] px-6 py-14 text-center shadow-sm">
-          <Building2 className="mx-auto h-12 w-12 text-[var(--b2)]" />
-          <h2 className="mt-4 text-lg font-semibold text-[var(--b1)]">
-            {t("sellerDashboard.emptyTitle")}
-          </h2>
-          <p className="mt-2 text-sm text-[var(--muted)]">
-            {t("sellerDashboard.emptyDescription")}
-          </p>
-          <Link to="/post-property/basic" className="mt-6 inline-block">
-            <Button className="!rounded-xl !bg-[var(--b1)] !px-6 !py-2.5 !text-white hover:!opacity-90">
-              {t("sellerDashboard.addPropertyCta")}
-            </Button>
-          </Link>
-        </div>
+        <SellerEmptyState
+          icon={Building2}
+          title={t("sellerDashboard.emptyTitle")}
+          description={t("sellerDashboard.emptyDescription")}
+          action={
+            <Link to="/post-property/basic">
+              <Button className="!rounded-xl !bg-[var(--b1)] !px-6 !py-2.5 !text-white hover:!opacity-90">
+                {t("sellerDashboard.addPropertyCta")}
+              </Button>
+            </Link>
+          }
+        />
       ) : (
-        <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-sm">
-          <SellerListingsTable
-            listings={listings as Property[]}
-            actionLoading={actionLoading}
-            onDelete={handleDelete}
-          />
-        </div>
+        <SellerPropertiesTable
+          listings={listings as Property[]}
+          actionLoading={actionLoading}
+          onDelete={handleDelete}
+          onDuplicate={handleDuplicate}
+          onMarkSold={handleMarkSold}
+          onDeactivate={handleDeactivate}
+        />
       )}
+
+      <Modal open={info !== null} onClose={() => setInfo(null)} title={t("sellerPanel.workflow.title")}>
+        <p className="text-sm leading-relaxed text-[var(--b1)]">
+          {info === "sold" ? t("sellerPanel.workflow.sold") : null}
+          {info === "deactivate" ? t("sellerPanel.workflow.deactivate") : null}
+        </p>
+        <div className="mt-5 flex justify-end">
+          <Button
+            type="button"
+            onClick={() => setInfo(null)}
+            className="!rounded-xl !bg-[var(--b1)] !px-4 !py-2 !text-[var(--fg)]"
+          >
+            {t("sellerPanel.workflow.ok")}
+          </Button>
+        </div>
+      </Modal>
     </section>
   );
 };

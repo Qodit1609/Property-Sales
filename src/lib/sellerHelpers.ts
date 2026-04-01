@@ -1,7 +1,13 @@
 import type { AuthUser } from "../features/auth/authTypes";
 import type { Property } from "../features/properties/propertyType";
+import type { SellerListingPayload } from "../features/seller/sellerAPI";
 
 export type NormalizedListingStatus = "approved" | "rejected" | "pending";
+
+/** Display status for seller UI (includes sold). */
+export type SellerListingDisplayStatus =
+  | NormalizedListingStatus
+  | "sold";
 
 export function getSellerId(user: AuthUser | null | undefined): string | undefined {
   if (!user) return undefined;
@@ -35,6 +41,65 @@ export function normalizeListingStatus(
     return "rejected";
   }
   return "pending";
+}
+
+/** Resolves badge row status: pending / approved / rejected / sold */
+export function getSellerListingDisplayStatus(
+  p: Property
+): SellerListingDisplayStatus {
+  const approvalRaw =
+    p.statusDetails?.approvalStatus ??
+    (typeof p.status === "string" ? p.status : null);
+  const approval = (approvalRaw ?? "").toString().trim().toLowerCase();
+  if (approval === "sold") return "sold";
+  const avail = (p.availabilityStatus ?? "").toString().trim().toLowerCase();
+  if (avail === "sold" || avail === "unavailable") return "sold";
+  return normalizeListingStatus(p.status ?? p.statusDetails?.approvalStatus);
+}
+
+export function extractPropertyLatLng(p: Property): { lat: number; lng: number } {
+  const coords = p.location?.coordinates;
+  if (coords && typeof coords === "object" && !Array.isArray(coords)) {
+    const o = coords as { lat?: unknown; lng?: unknown };
+    const lat = Number(o.lat);
+    const lng = Number(o.lng);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+  }
+  const gj = p.location?.geoJSON?.coordinates;
+  if (Array.isArray(gj) && gj.length >= 2) {
+    const lng = Number(gj[0]);
+    const lat = Number(gj[1]);
+    if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+  }
+  return { lat: 0, lng: 0 };
+}
+
+/** Build create payload for duplicate listing (best-effort; same shape as post flow). */
+export function buildDuplicateListingPayload(p: Property): SellerListingPayload {
+  const images =
+    (p.images?.length ? p.images : undefined) ??
+    p.media?.images ??
+    [];
+  const baseTitle = (p.title?.trim() || "Listing").slice(0, 180);
+  const { lat, lng } = extractPropertyLatLng(p);
+  const address =
+    p.location?.address?.trim() ||
+    p.address?.trim() ||
+    p.locationText?.trim() ||
+    "Location not set";
+
+  return {
+    title: `${baseTitle} (copy)`,
+    address,
+    price: typeof p.price === "number" && Number.isFinite(p.price) ? p.price : 0,
+    images: images.filter(Boolean).slice(0, 24),
+    propertyType: p.propertyType || "Farmhouse",
+    listingType: p.listingType === "rent" ? "rent" : "sale",
+    description: p.description || p.shortDescription || "",
+    latitude: lat,
+    longitude: lng,
+    location: p.location?.city ?? p.location?.locality ?? undefined,
+  };
 }
 
 export function sortPropertiesByRecency(listings: Property[]): Property[] {
