@@ -186,6 +186,18 @@
       "sub": "Preview only — connect workflows as APIs go live.",
       "cta": "Open leads"
     },
+    "propertyInsights": {
+      "title": "Property insights",
+      "sub": "Sample performance metrics — wire to analytics when ready.",
+      "cta": "Analytics",
+      "views": "Views",
+      "inquiries": "Inquiries",
+      "saved": "Saved",
+      "popularity": "Popularity",
+      "popularityHigh": "High",
+      "popularityMedium": "Medium",
+      "popularityLow": "Low"
+    },
     "table": {
       "image": "Image",
       "title": "Title",

@@ -23,6 +23,7 @@ import Modal from "../../components/Modal/Modal";
 import { useSellerAggregates } from "../../hooks/useSellerAggregates";
 import { SellerCharts } from "@/components/seller/SellerCharts";
 import { SellerLeadsCard } from "@/components/seller/SellerLeadsCard";
+import { PropertyInsights } from "@/components/seller/PropertyInsights";
 import { SellerPropertiesTable } from "@/components/seller/SellerPropertiesTable";
 import { SellerEmptyState } from "@/components/seller/SellerEmptyState";
 import { SellerStats } from "@/components/seller/SellerStats";
@@ -201,7 +202,8 @@ const SellerDashboard = () => {
             <div className="xl:col-span-2">
               <SellerLeadsCard />
             </div>
-            <div className="xl:col-span-3">
+            <div className="space-y-5 xl:col-span-3">
+              <PropertyInsights />
               <div className="overflow-hidden rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] shadow-sm ring-1 ring-black/[0.02]">
                 <div className="flex flex-col gap-2 border-b border-[var(--b2)]/70 bg-gradient-to-r from-[var(--white)] to-[var(--b2-soft)]/30 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                   <h2 className="font-serif text-base font-semibold text-[var(--b1)]">{t("sellerDashboard.recentHeading")}</h2>

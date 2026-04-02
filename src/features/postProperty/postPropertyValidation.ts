@@ -48,10 +48,9 @@ export function validateProfileDetails(values: ProfileDetails) {
 
 export function validateMedia(values: MediaState) {
   const errors: Partial<Record<"images", string>> = {};
-  const remoteImages = values.images.filter((i) => i.source === "remote");
-  if (!remoteImages.length) {
-    errors.images =
-      "Add at least one image URL (upload service integration is pending).";
+  const hasImage = values.images.some((i) => Boolean(i.url?.trim()));
+  if (!hasImage) {
+    errors.images = "Add at least one image (upload files or paste an image URL).";
   }
   return errors;
 }

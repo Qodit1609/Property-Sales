@@ -11,6 +11,11 @@ export interface SellerListingPayload {
   /** Backend expects `sale` | `rent` (UI uses sell/rent) */
   listingType: "sale" | "rent";
   description?: string;
+  /** Structured fields for propertyModel.location */
+  city?: string;
+  state?: string;
+  pincode?: string;
+  locality?: string;
   latitude?: number | string;
   longitude?: number | string;
   location?: string;

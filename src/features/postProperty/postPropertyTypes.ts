@@ -7,6 +7,27 @@ export type PropertyCategory =
   | "Residential"
   | "Commercial";
 
+/** Must match Property-Sales-BE propertyModel.propertyType + utils/constants PROPERTY_TYPES */
+export const BACKEND_PROPERTY_TYPES = [
+  "Farmhouse",
+  "Farmland",
+  "Agriculture Land",
+  "Resort",
+  "Flat",
+  "House",
+  "Plot",
+  "Villa",
+  "Apartment",
+  "Commercial",
+  "Other",
+] as const;
+
+const BACKEND_PROPERTY_TYPE_SET = new Set<string>(BACKEND_PROPERTY_TYPES);
+
+export function isBackendPropertyType(value: string): boolean {
+  return BACKEND_PROPERTY_TYPE_SET.has(value.trim());
+}
+
 export type AreaUnit = "acre" | "hectare" | "sqft";
 
 export type OwnershipType = "Freehold" | "Leasehold" | "Power of Attorney" | "Other";

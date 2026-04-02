@@ -7,15 +7,16 @@ import {
   loadPostPropertyDraft,
   savePostPropertyDraft,
 } from "./postPropertyStorage";
-import type {
-  AmenitiesState,
-  BasicDetails,
-  LocationDetails,
-  MediaItem,
-  MediaState,
-  PostPropertyState,
-  PostPropertyStepKey,
-  ProfileDetails,
+import {
+  isBackendPropertyType,
+  type AmenitiesState,
+  type BasicDetails,
+  type LocationDetails,
+  type MediaItem,
+  type MediaState,
+  type PostPropertyState,
+  type PostPropertyStepKey,
+  type ProfileDetails,
 } from "./postPropertyTypes";
 
 const emptyBasicDetails: BasicDetails = {
@@ -122,20 +123,18 @@ export const submitPostProperty = createAsyncThunk<
   try {
     const state = getState().postProperty;
 
-    const remoteImages = state.media.images
-      .filter((i) => i.source === "remote")
-      .map((i) => i.url);
+    const imageUrls = state.media.images.map((i) => i.url).filter(Boolean);
 
-    if (!remoteImages.length) {
-      return rejectWithValue(
-        "Please add at least one image URL before submitting (upload service integration is pending)."
-      );
+    if (!imageUrls.length) {
+      return rejectWithValue("Please add at least one image before submitting.");
     }
 
     // Map UI category/subtype → backend enum (see Property-Sales-BE propertyModel.propertyType)
     const propertyType = (() => {
       const cat = state.basicDetails.category;
-      const pt = state.basicDetails.propertyType;
+      const pt = state.basicDetails.propertyType.trim();
+      if (pt && isBackendPropertyType(pt)) return pt;
+
       if (cat === "Agriculture Land") return "Agriculture Land";
       if (cat === "Farmhouse") return "Farmhouse";
       if (cat === "Agri Resort") return "Resort";
@@ -165,8 +164,12 @@ export const submitPostProperty = createAsyncThunk<
       ]
         .filter(Boolean)
         .join(", "),
+      city: state.locationDetails.city,
+      state: state.locationDetails.state,
+      pincode: state.locationDetails.pinCode,
+      locality: state.locationDetails.locality,
       price: state.profileDetails.price ?? 0,
-      images: remoteImages,
+      images: imageUrls,
       propertyType,
       listingType,
       description: state.profileDetails.description,

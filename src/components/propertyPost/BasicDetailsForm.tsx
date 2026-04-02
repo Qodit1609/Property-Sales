@@ -23,12 +23,25 @@ const CATEGORY_OPTIONS: PropertyCategory[] = [
   "Commercial",
 ];
 
-const PROPERTY_TYPES_BY_CATEGORY: Record<string, string[]> = {
-  "Agriculture Land": ["Irrigated Land", "Non-Irrigated Land", "Orchard", "Plantation"],
-  Farmhouse: ["Farmhouse", "Weekend Home", "Farm Villa"],
-  "Agri Resort": ["Resort", "Eco Resort", "Farm Retreat"],
-  Residential: ["Plot", "House", "Apartment"],
-  Commercial: ["Plot", "Shop", "Office", "Warehouse"],
+/** Subtypes per category — each value matches the API propertyType enum. */
+const PROPERTY_TYPES_BY_CATEGORY: Record<PropertyCategory, string[]> = {
+  "Agriculture Land": [
+    "Agriculture Land",
+    "Farmland",
+    "Farmhouse",
+    "Other",
+  ],
+  Farmhouse: [
+    "Farmhouse",
+    "Farmland",
+    "Villa",
+    "House",
+    "Resort",
+    "Other",
+  ],
+  "Agri Resort": ["Resort", "Farmhouse", "Commercial", "Villa", "Other"],
+  Residential: ["Plot", "House", "Apartment", "Flat", "Villa"],
+  Commercial: ["Commercial", "Plot", "Flat", "Apartment", "Other"],
 };
 
 export default function BasicDetailsForm() {
@@ -40,7 +53,8 @@ export default function BasicDetailsForm() {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const propertyTypeOptions = useMemo(() => {
-    return PROPERTY_TYPES_BY_CATEGORY[basic.category] ?? [];
+    if (!basic.category) return [];
+    return PROPERTY_TYPES_BY_CATEGORY[basic.category];
   }, [basic.category]);
 
   const errors = useMemo(() => validateBasicDetails(basic), [basic]);

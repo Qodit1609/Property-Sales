@@ -86,9 +86,8 @@ export default function MediaUpload() {
     if (Object.keys(errors).length > 0) {
       pushToast({
         kind: "error",
-        title: "Add at least one image URL",
-        detail:
-          "Your server currently expects image URLs. Add an image URL (upload service will be integrated later).",
+        title: "Add at least one image",
+        detail: "Upload image files from your device or add an image URL, then continue.",
       });
       return;
     }
