@@ -7,6 +7,8 @@ export const sellerProfileFormSchema = z.object({
   city: z.string().max(80).optional(),
   gstin: z.string().max(20).optional(),
   bio: z.string().max(2000).optional(),
+  /** Data URL or HTTPS URL from seller upload (persisted locally until API exists). */
+  profilePhotoUrl: z.string().max(3_000_000).nullable().optional(),
 });
 
 export type SellerProfileFormValues = z.infer<typeof sellerProfileFormSchema>;

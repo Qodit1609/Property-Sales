@@ -148,7 +148,8 @@
       "workspace": "कार्यक्षेत्र",
       "account": "खाता",
       "collapse": "साइडबार छोटा करें",
-      "expand": "साइडबार बड़ा करें"
+      "expand": "साइडबार बड़ा करें",
+      "sellerFallback": "विक्रेता"
     },
     "topbar": {
       "menu": "नेविगेशन खोलें",
@@ -293,6 +294,16 @@
     "profile": {
       "title": "विक्रेता प्रोफ़ाइल",
       "sub": "खरीदार आपको कैसे देखते हैं।",
+      "photoLabel": "प्रोफ़ाइल फ़ोटो",
+      "photoHint": "विक्रेता साइडबार में दिखेगी। JPG या PNG, लगभग 1.5 MB तक।",
+      "photoUpload": "फ़ोटो अपलोड करें",
+      "photoRemove": "फ़ोटो हटाएँ",
+      "photoInvalidType": "कृपया एक इमेज फ़ाइल चुनें।",
+      "photoTooLarge": "फ़ाइल बहुत बड़ी है। 1.5 MB से छोटी इमेज उपयोग करें।",
+      "activityTitle": "गतिविधि",
+      "lastLogin": "अंतिम लॉगिन",
+      "accountCreated": "खाता बनाया",
+      "activityPending": "एक बार प्रोफ़ाइल सहेजने के बाद दिखेगा",
       "sectionMain": "संपर्क और कंपनी",
       "name": "नाम",
       "company": "कंपनी / ब्रांड",

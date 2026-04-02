@@ -148,7 +148,8 @@
       "workspace": "Workspace",
       "account": "Account",
       "collapse": "Collapse sidebar",
-      "expand": "Expand sidebar"
+      "expand": "Expand sidebar",
+      "sellerFallback": "Seller"
     },
     "topbar": {
       "menu": "Open navigation",
@@ -300,6 +301,16 @@
     "profile": {
       "title": "Seller profile",
       "sub": "How buyers and our team see you.",
+      "photoLabel": "Profile photo",
+      "photoHint": "Shown in your seller sidebar. JPG or PNG, max about 1.5 MB.",
+      "photoUpload": "Upload photo",
+      "photoRemove": "Remove photo",
+      "photoInvalidType": "Please choose an image file.",
+      "photoTooLarge": "Image is too large. Use a file under 1.5 MB.",
+      "activityTitle": "Activity",
+      "lastLogin": "Last login",
+      "accountCreated": "Account created",
+      "activityPending": "Shown after you save your profile once",
       "sectionMain": "Contact & company",
       "name": "Display name",
       "company": "Company / brand",

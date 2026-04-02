@@ -12,7 +12,12 @@ const MOCK_ITEMS: Item[] = [
   { id: "3", titleKey: "sellerPanel.notifications.rejectedTitle", descKey: "sellerPanel.notifications.rejectedDesc", time: "3d", unread: false },
 ];
 
-export function SellerNotificationsBell() {
+type SellerNotificationsBellProps = {
+  /** Use `left` when the control sits on the left edge (e.g. sidebar) so the panel opens inward. */
+  dropdownAlign?: "left" | "right";
+};
+
+export function SellerNotificationsBell({ dropdownAlign = "right" }: SellerNotificationsBellProps) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -68,7 +73,10 @@ export function SellerNotificationsBell() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, scale: 0.98 }}
             transition={{ duration: 0.18 }}
-            className="absolute right-0 z-[80] mt-2 w-[min(100vw-2rem,22rem)] overflow-hidden rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-[0_16px_40px_rgba(27,67,50,0.12)]"
+            className={cn(
+              "absolute z-[80] mt-2 w-[min(100vw-2rem,22rem)] overflow-hidden rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-[0_16px_40px_rgba(27,67,50,0.12)]",
+              dropdownAlign === "left" ? "left-0" : "right-0"
+            )}
           >
             <div className="border-b border-[var(--b2)]/80 bg-gradient-to-r from-[var(--b2-soft)] to-[var(--white)] px-4 py-3">
               <p className="text-sm font-semibold text-[var(--b1)]">{t("sellerPanel.notifications.heading")}</p>

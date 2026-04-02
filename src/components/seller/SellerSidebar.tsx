@@ -3,10 +3,12 @@ import { NavLink, Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useAppDispatch } from "../../hooks/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
+import { useSellerProfileLocal } from "../../hooks/useSellerProfileLocal";
 import { SELLER_NAV_ACCOUNT, SELLER_NAV_MAIN } from "./sellerNav";
+import { SellerNotificationsBell } from "./SellerNotificationsBell";
 import { cn } from "./sellerUtils";
 
 type NavBlockProps = {
@@ -99,6 +101,34 @@ type SellerSidebarProps = {
   onNavigate?: () => void;
 };
 
+function SellerAvatar({
+  photoUrl,
+  name,
+  sizeClass,
+}: {
+  photoUrl?: string | null;
+  name: string;
+  sizeClass: string;
+}) {
+  const initial = name.trim().charAt(0).toUpperCase() || "S";
+  return (
+    <div
+      className={cn(
+        "shrink-0 overflow-hidden rounded-full border border-[var(--b2)] bg-[var(--b2-soft)] shadow-inner shadow-[var(--b2)]/30",
+        sizeClass
+      )}
+    >
+      {photoUrl ? (
+        <img src={photoUrl} alt="" className="h-full w-full object-cover" />
+      ) : (
+        <span className="flex h-full w-full items-center justify-center font-serif text-sm font-semibold text-[var(--b1-mid)]">
+          {initial}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export function SellerSidebar({
   collapsed,
   onToggleCollapsed,
@@ -108,6 +138,8 @@ export function SellerSidebar({
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const user = useAppSelector((s) => s.auth.user);
+  const storedProfile = useSellerProfileLocal(user?.email);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -116,6 +148,15 @@ export function SellerSidebar({
   };
 
   const width = collapsed && !mobile ? 72 : 280;
+
+  const displayName =
+    storedProfile?.displayName?.trim() ||
+    user?.name?.trim() ||
+    t("sellerPanel.sidebar.sellerFallback");
+
+  const photoUrl = storedProfile?.profilePhotoUrl;
+
+  const headerExpanded = !collapsed || mobile;
 
   return (
     <motion.aside
@@ -129,22 +170,35 @@ export function SellerSidebar({
     >
       <div
         className={cn(
-          "flex items-center justify-between gap-2 border-b border-[var(--b2)]/80 bg-gradient-to-br from-[var(--b2-soft)]/90 to-[var(--white)] px-3 py-3",
-          collapsed && !mobile ? "flex-col" : ""
+          "flex border-b border-[var(--b2)]/80 bg-gradient-to-br from-[var(--b2-soft)]/90 to-[var(--white)] px-3 py-3",
+          collapsed && !mobile ? "flex-col items-center gap-3" : "flex-row items-center justify-between gap-2"
         )}
       >
-        {!collapsed || mobile ? (
-          <div className="min-w-0 px-1">
-            <p className="truncate text-xs font-semibold uppercase tracking-wide text-[var(--b1-mid)]">
-              BhoomiWala
-            </p>
-            <p className="truncate text-sm font-semibold text-[var(--b1)]">{t("sellerDashboard.sellerPanel")}</p>
+        <div
+          className={cn(
+            "flex min-w-0 gap-2",
+            headerExpanded ? "flex-1 flex-row items-center" : "w-full flex-col items-center"
+          )}
+        >
+          <SellerNotificationsBell dropdownAlign="left" />
+          <div
+            className={cn(
+              "flex min-w-0 items-center gap-2",
+              headerExpanded ? "flex-1" : "flex-col items-center"
+            )}
+          >
+            <SellerAvatar
+              photoUrl={photoUrl}
+              name={displayName}
+              sizeClass={headerExpanded ? "h-10 w-10" : "h-9 w-9"}
+            />
+            {headerExpanded ? (
+              <p className="min-w-0 flex-1 truncate font-serif text-sm font-semibold leading-tight text-[var(--b1)]">
+                {displayName}
+              </p>
+            ) : null}
           </div>
-        ) : (
-          <span className="mx-auto flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--b1)] text-xs font-bold text-[var(--fg)]">
-            BW
-          </span>
-        )}
+        </div>
         {!mobile ? (
           <button
             type="button"

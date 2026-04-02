@@ -1,6 +1,5 @@
 export { default as SellerShellLayout } from "./SellerShellLayout";
 export { SellerSidebar, SellerMobileOverlay } from "./SellerSidebar";
-export { SellerTopBar } from "./SellerTopBar";
 export { SellerNotificationsBell } from "./SellerNotificationsBell";
 export { SellerStats } from "./SellerStats";
 export { SellerCharts } from "./SellerCharts";
