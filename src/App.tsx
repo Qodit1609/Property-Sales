@@ -23,6 +23,7 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminPropertiesPage from "./pages/Admin/AdminPropertiesPage";
 import AdminUsersPage from "./pages/Admin/AdminUsersPage";
 import AdminLogsPage from "./pages/Admin/AdminLogsPage";
+import ActivityLogs from "./pages/Admin/ActivityLogs";
 import AdminNotificationsPage from "./pages/Admin/AdminNotificationsPage";
 import AdminSellersPage from "./pages/Admin/AdminSellersPage";
 import AdminAccountPage from "./pages/Admin/AdminAccountPage";
@@ -265,6 +266,7 @@ function App() {
           <Route path="/admin/sellers" element={<AdminSellersPage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />
           <Route path="/admin/logs" element={<AdminLogsPage />} />
+          <Route path="/admin/activity-logs" element={<ActivityLogs />} />
           <Route
             path="/admin/notifications"
             element={<AdminNotificationsPage />}

@@ -7,6 +7,7 @@ import {
   FileClock,
   UserCircle,
   Bell,
+  ClipboardList,
 } from "lucide-react";
 
 const items = [
@@ -15,6 +16,7 @@ const items = [
   { to: "/admin/properties", label: "Properties", icon: ListChecks },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/logs", label: "Activity logs", icon: FileClock },
+  { to: "/admin/activity-logs", label: "Audit logs", icon: ClipboardList },
   { to: "/admin/notifications", label: "Notifications", icon: Bell },
 ];
 
