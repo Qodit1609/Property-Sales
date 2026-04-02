@@ -3,6 +3,7 @@ export type PostPropertyStepKey =
   | "location"
   | "profile"
   | "media"
+  | "documents"
   | "amenities"
   | "review";
 
@@ -15,6 +16,7 @@ export const POST_PROPERTY_STEPS: Array<{
   { key: "location", label: "Location", path: "/post-property/location" },
   { key: "profile", label: "Profile", path: "/post-property/profile" },
   { key: "media", label: "Media", path: "/post-property/media" },
+  { key: "documents", label: "Documents", path: "/post-property/documents" },
   { key: "amenities", label: "Amenities", path: "/post-property/amenities" },
   { key: "review", label: "Review", path: "/post-property/review" },
 ];

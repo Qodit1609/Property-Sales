@@ -72,6 +72,9 @@ const PropertyProfileForm = React.lazy(
 const MediaUpload = React.lazy(
   () => import("./components/propertyPost/MediaUpload")
 );
+const PropertyDocumentsStep = React.lazy(
+  () => import("./components/propertyPost/PropertyDocumentsStep")
+);
 const AmenitiesForm = React.lazy(
   () => import("./components/propertyPost/AmenitiesForm")
 );
@@ -123,6 +126,7 @@ function App() {
               <Route path="location" element={<LocationForm />} />
               <Route path="profile" element={<PropertyProfileForm />} />
               <Route path="media" element={<MediaUpload />} />
+              <Route path="documents" element={<PropertyDocumentsStep />} />
               <Route path="amenities" element={<AmenitiesForm />} />
               <Route path="review" element={<ReviewSubmit />} />
             </Route>

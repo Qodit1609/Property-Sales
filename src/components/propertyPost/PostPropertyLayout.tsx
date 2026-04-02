@@ -52,6 +52,10 @@ export default function PostPropertyLayout() {
   }, [dispatch, post.draftState.isDirty]);
 
   const activePath = location.pathname;
+  const documentsStepDone =
+    activePath === "/post-property/amenities" ||
+    activePath === "/post-property/review" ||
+    post.completedSteps.amenities;
   const activeKey = useMemo(() => {
     return (
       POST_PROPERTY_STEPS.find((s) => s.path === activePath)?.key ?? "basic"
@@ -90,6 +94,7 @@ export default function PostPropertyLayout() {
       location: locOk && post.completedSteps.location,
       profile: profileOk && post.completedSteps.profile,
       media: mediaOk && post.completedSteps.media,
+      documents: documentsStepDone,
       amenities: post.completedSteps.amenities,
       // Review is complete when every prior step is valid and marked completed (ready for submit)
       review: allContentStepsDone,
@@ -103,6 +108,8 @@ export default function PostPropertyLayout() {
     return { statuses, doneMap };
   }, [
     activeKey,
+    activePath,
+    documentsStepDone,
     post.basicDetails,
     post.locationDetails,
     post.media,

@@ -69,7 +69,7 @@ export default function AmenitiesForm() {
       </div>
 
       <FormActions
-        onBack={() => navigate("/post-property/media")}
+        onBack={() => navigate("/post-property/documents")}
         onNext={() => {
           dispatch(markStepCompleted("amenities"));
           dispatch(saveDraftNow());

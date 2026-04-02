@@ -95,7 +95,7 @@ export default function MediaUpload() {
     dispatch(markStepCompleted("media"));
     dispatch(saveDraftNow());
     pushToast({ kind: "success", title: "Draft saved" });
-    navigate("/post-property/amenities");
+    navigate("/post-property/documents");
   };
 
   return (
