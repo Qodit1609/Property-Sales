@@ -13,7 +13,7 @@ const MOCK_ITEMS: Item[] = [
 ];
 
 type SellerNotificationsBellProps = {
-  /** Use `left` when the control sits on the left edge (e.g. sidebar) so the panel opens inward. */
+  /** Use `left` when the panel should align to the button's left edge; otherwise it aligns to the right. */
   dropdownAlign?: "left" | "right";
 };
 

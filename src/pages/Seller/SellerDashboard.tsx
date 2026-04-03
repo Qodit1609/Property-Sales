@@ -30,6 +30,7 @@ import { SellerStats } from "@/components/seller/SellerStats";
 import { SellerStatsSkeleton } from "@/components/seller/SellerSkeleton";
 import type { SellerStatItem } from "@/components/seller/SellerStats";
 import { cn } from "@/components/seller/sellerUtils";
+import { SellerNotificationsBell } from "@/components/seller/SellerNotificationsBell";
 
 const SellerDashboard = () => {
   const { t } = useTranslation();
@@ -144,13 +145,9 @@ const SellerDashboard = () => {
               </p>
             </div>
           </div>
-          <Link
-            to="/seller/properties"
-            className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl border border-[var(--b2)] bg-[var(--white)]/95 px-4 py-2.5 font-sans text-sm font-medium text-[var(--b1-mid)] shadow-sm ring-1 ring-[var(--b2)]/40 transition hover:border-[var(--b1-mid)]/35 hover:bg-[var(--b2-soft)]/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--b1-mid)]"
-          >
-            {t("sellerDashboard.myProperties")}
-            <ArrowRight className="h-4 w-4 opacity-80" aria-hidden />
-          </Link>
+          <div className="flex w-full shrink-0 justify-end self-start sm:w-auto">
+            <SellerNotificationsBell dropdownAlign="right" />
+          </div>
         </div>
       </div>
 

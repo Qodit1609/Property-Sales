@@ -229,7 +229,7 @@ const AdminPropertiesPage: React.FC = () => {
             aria-hidden
           />
           <div className="relative">
-            <h2 className="font-sans text-lg font-semibold tracking-tight text-[var(--b1)] sm:text-xl">
+            <h2 className="text-lg font-semibold tracking-tight text-[var(--b1)] sm:text-xl">
               All properties
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">

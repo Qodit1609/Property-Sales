@@ -149,7 +149,7 @@ const AdminStats: React.FC<AdminStatsProps> = ({ accounts, listings }) => {
       {sections.map((section) => (
         <section key={section.title} className="space-y-4">
           <div className="border-b border-[var(--b2)]/40 pb-3">
-            <h2 className="font-sans text-sm font-semibold tracking-tight text-[var(--b1)]">
+            <h2 className="text-sm font-semibold tracking-tight text-[var(--b1)]">
               {section.title}
             </h2>
             <p className="mt-0.5 text-xs text-[var(--muted)]">{section.description}</p>
@@ -181,7 +181,7 @@ const AdminStats: React.FC<AdminStatsProps> = ({ accounts, listings }) => {
                       <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
                         {card.label}
                       </p>
-                      <p className="mt-1.5 font-sans text-3xl font-bold tabular-nums tracking-tight text-[var(--b1)]">
+                      <p className="mt-1.5 text-3xl font-bold tabular-nums tracking-tight text-[var(--b1)]">
                         {card.value}
                       </p>
                     </div>

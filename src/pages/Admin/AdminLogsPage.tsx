@@ -43,7 +43,7 @@ const AdminLogsPage: React.FC = () => {
               <FileClock className="h-5 w-5" aria-hidden />
             </div>
             <div>
-              <h2 className="font-sans text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
+              <h2 className="text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
                 Activity trail
               </h2>
               <p className="mt-1 max-w-xl text-sm text-[var(--muted)]">

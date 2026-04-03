@@ -89,7 +89,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
     <div className="space-y-5 rounded-2xl border border-[var(--b2)]/90 bg-[var(--white)] p-4 shadow-md shadow-[var(--b1)]/5 sm:p-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0 shrink">
-          <h2 className="font-sans text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
+          <h2 className="text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
             Users
           </h2>
           <p className="mt-1 max-w-xl text-sm leading-relaxed text-[var(--muted)]">

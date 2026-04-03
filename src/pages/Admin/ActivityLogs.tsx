@@ -50,7 +50,7 @@ const ActivityLogs: React.FC = () => {
                 <ClipboardList className="h-6 w-6" aria-hidden />
               </div>
               <div>
-                <h1 className="font-sans text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
+                <h1 className="text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
                   Activity logs
                 </h1>
                 <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
@@ -67,7 +67,7 @@ const ActivityLogs: React.FC = () => {
 
         <section className="space-y-4 rounded-2xl border border-[var(--b2)]/90 bg-[var(--white)] p-4 shadow-md shadow-[var(--b1)]/5 sm:p-6">
           <div className="border-b border-[var(--b2)]/60 pb-4">
-            <h2 className="font-sans text-lg font-semibold text-[var(--b1)]">
+            <h2 className="text-lg font-semibold text-[var(--b1)]">
               Filters
             </h2>
             <p className="mt-1 text-sm text-[var(--muted)]">
@@ -86,7 +86,7 @@ const ActivityLogs: React.FC = () => {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-sans text-lg font-semibold text-[var(--b1)]">
+          <h2 className="text-lg font-semibold text-[var(--b1)]">
             Activity table
           </h2>
           <ActivityLogTable rows={filteredRows} />

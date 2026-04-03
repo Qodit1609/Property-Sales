@@ -8,8 +8,11 @@ import { logout } from "../../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import { useSellerProfileLocal } from "../../hooks/useSellerProfileLocal";
 import { SELLER_NAV_ACCOUNT, SELLER_NAV_MAIN } from "./sellerNav";
-import { SellerNotificationsBell } from "./SellerNotificationsBell";
-import { cn } from "./sellerUtils";
+import {
+  cn,
+  SELLER_SIDEBAR_WIDTH_COLLAPSED,
+  SELLER_SIDEBAR_WIDTH_EXPANDED,
+} from "./sellerUtils";
 
 type NavBlockProps = {
   collapsed: boolean;
@@ -147,7 +150,8 @@ export function SellerSidebar({
     onNavigate?.();
   };
 
-  const width = collapsed && !mobile ? 72 : 280;
+  const width =
+    collapsed && !mobile ? SELLER_SIDEBAR_WIDTH_COLLAPSED : SELLER_SIDEBAR_WIDTH_EXPANDED;
 
   const displayName =
     storedProfile?.displayName?.trim() ||
@@ -164,51 +168,49 @@ export function SellerSidebar({
       animate={{ width }}
       transition={{ type: "spring", stiffness: 380, damping: 38 }}
       className={cn(
-        "relative flex h-full shrink-0 flex-col border-[var(--b2)] bg-[var(--white)] shadow-[0_0_0_1px_rgba(149,213,178,0.35)]",
-        mobile ? "border-r" : "hidden border-r md:flex"
+        "relative flex shrink-0 flex-col border-[var(--b2)] bg-[var(--white)] shadow-[0_0_0_1px_rgba(149,213,178,0.35)]",
+        mobile
+          ? "h-full w-full border-r"
+          : "fixed left-0 top-[68px] z-30 hidden h-[calc(100vh-68px)] border-r md:flex"
       )}
     >
       <div
         className={cn(
-          "flex border-b border-[var(--b2)]/80 bg-gradient-to-br from-[var(--b2-soft)]/90 to-[var(--white)] px-3 py-3",
-          collapsed && !mobile ? "flex-col items-center gap-3" : "flex-row items-center justify-between gap-2"
+          "relative border-b border-[var(--b2)]/80 bg-gradient-to-br from-[var(--b2-soft)]/90 to-[var(--white)] px-3 py-3",
+          collapsed && !mobile
+            ? "flex flex-col items-center pb-3 pt-11"
+            : "flex min-h-[3.25rem] flex-row items-center gap-2"
         )}
       >
-        <div
-          className={cn(
-            "flex min-w-0 gap-2",
-            headerExpanded ? "flex-1 flex-row items-center" : "w-full flex-col items-center"
-          )}
-        >
-          <SellerNotificationsBell dropdownAlign="left" />
-          <div
-            className={cn(
-              "flex min-w-0 items-center gap-2",
-              headerExpanded ? "flex-1" : "flex-col items-center"
-            )}
-          >
-            <SellerAvatar
-              photoUrl={photoUrl}
-              name={displayName}
-              sizeClass={headerExpanded ? "h-10 w-10" : "h-9 w-9"}
-            />
-            {headerExpanded ? (
-              <p className="min-w-0 flex-1 truncate font-serif text-sm font-semibold leading-tight text-[var(--b1)]">
-                {displayName}
-              </p>
-            ) : null}
-          </div>
-        </div>
         {!mobile ? (
           <button
             type="button"
             onClick={onToggleCollapsed}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--b2)] bg-[var(--white)] text-[var(--b1)] shadow-sm transition hover:bg-[var(--b2-soft)]"
+            className="absolute right-2 top-2 z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--b2)] bg-[var(--white)] text-[var(--b1)] shadow-sm transition hover:bg-[var(--b2-soft)]"
             aria-label={collapsed ? t("sellerPanel.sidebar.expand") : t("sellerPanel.sidebar.collapse")}
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
         ) : null}
+        <div
+          className={cn(
+            "flex min-w-0 items-center gap-2",
+            headerExpanded && mobile && "min-w-0 flex-1",
+            headerExpanded && !mobile && "w-full min-w-0 flex-1 pr-11",
+            !headerExpanded && "w-full flex-col items-center"
+          )}
+        >
+          <SellerAvatar
+            photoUrl={photoUrl}
+            name={displayName}
+            sizeClass={headerExpanded ? "h-10 w-10" : "h-9 w-9"}
+          />
+          {headerExpanded ? (
+            <p className="min-w-0 flex-1 truncate text-left font-serif text-sm font-semibold leading-tight text-[var(--b1)]">
+              {displayName}
+            </p>
+          ) : null}
+        </div>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-4">

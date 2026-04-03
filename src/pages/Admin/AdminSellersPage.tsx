@@ -60,7 +60,7 @@ const AdminSellersPage: React.FC = () => {
     <AdminLayout title="Sellers">
       <div className="mx-auto max-w-7xl space-y-5">
         <div>
-          <h2 className="font-sans text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
+          <h2 className="text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
             Sellers
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">

@@ -79,7 +79,7 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
     <div className="space-y-5 rounded-2xl border border-[var(--b2)]/90 bg-[var(--white)] p-4 shadow-md shadow-[var(--b1)]/5 sm:p-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h2 className="font-sans text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
+          <h2 className="text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
             Property moderation
           </h2>
           <p className="mt-1 max-w-xl text-sm text-[var(--muted)]">

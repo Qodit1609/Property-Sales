@@ -82,7 +82,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ stats }) => {
                 <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
                   {card.label}
                 </p>
-                <p className="mt-0.5 font-sans text-2xl font-bold tabular-nums tracking-tight text-[var(--b1)]">
+                <p className="mt-0.5 text-2xl font-bold tabular-nums tracking-tight text-[var(--b1)]">
                   {card.value}
                 </p>
               </div>
