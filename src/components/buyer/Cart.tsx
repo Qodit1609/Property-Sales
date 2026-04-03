@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   MessageCircle,
   PhoneCall,
@@ -8,47 +8,78 @@ import {
   Trash2,
   Scale,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import {
   addToCompare,
   addToWishlist,
+  clearCart,
   removeFromCart,
 } from "../../features/buyer/buyerSlice";
+import { useBuyerResolvedProperties } from "../../hooks/useBuyerResolvedProperties";
 import PropertyCard from "../Cards/PropertyCard";
+import CartGrid from "./CartGrid";
 import { Button } from "@/components/common";
 
 const Cart: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { cart } = useAppSelector((state) => state.buyer);
+  const cartIds = useAppSelector((s) => s.buyer.cartIds);
+  const { properties: cart, loading } = useBuyerResolvedProperties(cartIds);
 
-  if (cart.length === 0) {
+  const totalValue = useMemo(
+    () => cart.reduce((sum, p) => sum + (p.price || 0), 0),
+    [cart]
+  );
+
+  if (cartIds.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-[var(--b2)] bg-[var(--white)] px-8 py-16 text-center shadow-sm">
         <h2 className="text-lg font-semibold text-[var(--b1)]">
           Your property cart is empty
         </h2>
         <p className="mt-2 max-w-md text-sm text-[var(--muted)]">
-          Add farmland, farmhouse or resort listings to your cart to manage
-          negotiations, visits and enquiries in one place.
+          Shortlist farmland, farmhouse or resort listings to manage visits and
+          enquiries in one place.
         </p>
+        <Link
+          to="/buyer/dashboard"
+          className="mt-6 inline-flex items-center justify-center rounded-full bg-[var(--b1)] px-5 py-2 text-sm font-semibold text-[var(--fg)] transition hover:opacity-95"
+        >
+          Explore listings
+        </Link>
       </div>
     );
   }
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-[var(--b1)]">
-            Property cart
+            Shortlisted properties
           </h2>
           <p className="text-xs text-[var(--muted)]">
-            {cart.length} properties ready for negotiation and site visits.
+            {cartIds.length} {cartIds.length === 1 ? "property" : "properties"} in
+            your cart
+            {loading ? " · Loading latest data…" : ""}
           </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-[var(--b2-soft)] px-3 py-1 text-[11px] font-medium text-[var(--b1)] ring-1 ring-[var(--b2)]">
+            Portfolio value: ₹ {totalValue.toLocaleString("en-IN")}
+          </span>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => dispatch(clearCart())}
+            className="rounded-full px-3 py-1 text-[11px] text-[var(--error)] ring-1 ring-[var(--error)]/30 hover:bg-[var(--error-bg)]"
+          >
+            Clear cart
+          </Button>
         </div>
       </div>
 
-      <div className="space-y-4">
+      <CartGrid>
         {cart.map((property) => (
           <div
             key={property._id}
@@ -152,7 +183,7 @@ const Cart: React.FC = () => {
             </div>
           </div>
         ))}
-      </div>
+      </CartGrid>
     </div>
   );
 };

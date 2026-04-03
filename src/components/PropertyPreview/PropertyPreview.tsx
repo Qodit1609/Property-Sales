@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { ArrowUpRight, BarChart3, MapPin, PhoneCall, ShieldCheck, Star } from "lucide-react";
 import type { Property } from "../../features/properties/propertyType";
 import { Button } from "@/components/common";
+import BuyerActions from "../buyer/BuyerActions";
+import { useAppSelector } from "../../hooks/reduxHooks";
 import Header from "../Header/Header";
 import { formatPrice } from "../../utils/propertyFormatters";
 import AgentCard from "./AgentCard";
@@ -32,6 +34,8 @@ type Props = {
 
 const PropertyPreview = ({ property }: Props) => {
   const navigate = useNavigate();
+  const user = useAppSelector((s) => s.auth.user);
+  const isBuyer = Boolean(user?.role === "buyer");
   const [showStickyHeader, setShowStickyHeader] = useState(false);
   const { phone } = getPrimaryContact(property);
   const mapCoordinates = useMemo(() => getLatLng(property), [property]);
@@ -207,11 +211,18 @@ const PropertyPreview = ({ property }: Props) => {
 
               <div className="p-4 sm:p-6">
                 <div className="flex flex-col gap-4 border-b border-[var(--b2-soft)] pb-4 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <p className="text-2xl font-extrabold text-[var(--b1)] sm:text-3xl">
-                      {formatPrice(property.price, property.listingType)}
-                    </p>
-                    <p className="mt-1 text-sm font-semibold text-[var(--muted)]">{formatSqftPrice(property)}</p>
+                  <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-end sm:gap-6">
+                    <div>
+                      <p className="text-2xl font-extrabold text-[var(--b1)] sm:text-3xl">
+                        {formatPrice(property.price, property.listingType)}
+                      </p>
+                      <p className="mt-1 text-sm font-semibold text-[var(--muted)]">{formatSqftPrice(property)}</p>
+                    </div>
+                    {isBuyer && (
+                      <div className="flex shrink-0 justify-start sm:justify-end">
+                        <BuyerActions property={property} showQuickView={false} />
+                      </div>
+                    )}
                   </div>
                   <div className="hidden items-center gap-2 sm:flex">
                     {mapLink && (

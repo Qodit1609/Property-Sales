@@ -7,6 +7,9 @@ import postPropertyReducer from "../features/postProperty/postPropertySlice";
 import buyerReducer from "../features/buyer/buyerSlice";
 import newPropertiesReducer from "../store/slices/newPropertiesSlice";
 import mediaReducer from "../features/media/mediaSlice";
+import { loadPersistedBuyerState, persistBuyerState } from "../features/buyer/buyerPersist";
+
+const persistedBuyer = loadPersistedBuyerState();
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +22,15 @@ export const store = configureStore({
     buyer: buyerReducer,
     newProperties: newPropertiesReducer,
   },
+  preloadedState: persistedBuyer ? { buyer: persistedBuyer } : undefined,
+});
+
+let persistTimer: ReturnType<typeof setTimeout> | undefined;
+store.subscribe(() => {
+  if (persistTimer) clearTimeout(persistTimer);
+  persistTimer = setTimeout(() => {
+    persistBuyerState(store.getState().buyer);
+  }, 400);
 });
 
 export type RootState = ReturnType<typeof store.getState>;

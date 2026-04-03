@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Heart, MapPin, Ruler, ShieldCheck, Star } from "lucide-react";
+import { MapPin, Ruler, ShieldCheck, Star } from "lucide-react";
 import { Button, PropertyImage } from "@/components/common";
 
 import type { Property as BackendProperty } from "../../features/properties/propertyType";
+import BuyerActions from "../buyer/BuyerActions";
 import { formatINRCurrency } from "../../lib/i18nHelpers";
 import {
   FALLBACK_PROPERTY_IMAGE,
@@ -33,8 +34,9 @@ const PropertyCard: React.FC<Props> = ({
 }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const [liked, setLiked] = useState(false);
   const language = i18n.resolvedLanguage ?? i18n.language;
+  const user = useAppSelector((s) => s.auth.user);
+  const isBuyer = Boolean(user?.role === "buyer");
 
   const mapFromStore = useAppSelector(selectPropertyImagesMap);
   const cloudinaryPool = useAppSelector(selectCloudinaryUrlPool);
@@ -143,23 +145,11 @@ const PropertyCard: React.FC<Props> = ({
           </span>
         )}
 
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setLiked(!liked);
-          }}
-          className={`absolute bottom-12 right-3 p-2 rounded-full backdrop-blur-md transition ${
-            liked ? "bg-red-100/95" : "bg-black/35 hover:bg-black/55"
-          }`}
-          aria-label="Toggle favourite"
-        >
-          <Heart
-            size={18}
-            className={`transition ${
-              liked ? "fill-red-500 text-red-500" : "text-white"
-            }`}
-          />
-        </button>
+        {isBuyer && (
+          <div className="absolute bottom-12 left-1/2 z-20 w-[min(100%,18rem)] -translate-x-1/2 px-2">
+            <BuyerActions property={property} className="w-full" />
+          </div>
+        )}
 
         <span className="absolute bottom-3 left-3 rounded-md bg-white/95 px-3 py-1 text-sm font-bold text-[var(--b1)] shadow">
           {formatINRCurrency(property.price || 0, language)}

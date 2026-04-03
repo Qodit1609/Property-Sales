@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { fetchPropertyById } from "../../features/properties/propertySlice";
+import { recordPropertyView } from "../../features/buyer/buyerSlice";
 import PropertyPreview, {
   PropertyPreviewSkeleton,
 } from "../../components/PropertyPreview/PropertyPreview";
@@ -14,12 +15,20 @@ const PropertyDetails = () => {
 
   const { selectedProperty, selectedLoading, selectedError } =
     useAppSelector((state) => state.properties);
+  const isBuyer = useAppSelector((state) => state.auth.user?.role === "buyer");
 
   useEffect(() => {
     if (id) {
       dispatch(fetchPropertyById(id));
     }
   }, [dispatch, id]);
+
+  useEffect(() => {
+    if (!isBuyer) return;
+    if (selectedProperty && id && selectedProperty._id === id) {
+      dispatch(recordPropertyView(selectedProperty));
+    }
+  }, [dispatch, selectedProperty, id, isBuyer]);
 
   if (selectedLoading) {
     return <PropertyPreviewSkeleton />;

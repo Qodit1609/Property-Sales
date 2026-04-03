@@ -1,3 +1,22 @@
+/** Minimal cached fields for lists; full rows come from API when available. */
+export interface BuyerPropertyMeta {
+  propertyId: string;
+  title: string;
+  price: number;
+  image?: string;
+  location?: string;
+  status?: string;
+  propertyType?: string;
+}
+
+export interface SavedSearch {
+  id: string;
+  label: string;
+  /** Serializable filter snapshot (e.g. dashboard query + path). */
+  filter: Record<string, string | number | boolean | undefined>;
+  createdAt: string;
+}
+
 export interface BuyerPreference {
   locations: string[];
   minPrice?: number;

@@ -49,6 +49,8 @@ import { fetchPropertyMedia } from "./features/media/mediaSlice";
 import PostPropertyPage from "./pages/PostProperty/PostPropertyPage";
 import React from "react";
 import { SellerStatsSkeleton } from "./components/seller/SellerSkeleton";
+import BuyerCompareToast from "./components/buyer/BuyerCompareToast";
+import BuyerFeedbackToast from "./components/buyer/BuyerFeedbackToast";
 
 const SellerLeadsPage = React.lazy(() => import("./pages/Seller/SellerLeadsPage"));
 const SellerAnalyticsPage = React.lazy(() => import("./pages/Seller/SellerAnalyticsPage"));
@@ -104,6 +106,8 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <BuyerCompareToast />
+      <BuyerFeedbackToast />
       <Routes>
 
         {/* Public routes WITH header/footer */}
