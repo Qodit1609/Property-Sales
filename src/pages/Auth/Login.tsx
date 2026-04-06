@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { loginUser } from "../../features/auth/authSlice";
+import { loginUser, resetError } from "../../features/auth/authSlice";
 import type { AppRole } from "../../features/auth/roleTypes";
 import Dashboard from "../Dashboard/Dashboard";
 import { Input, Button } from "@/components/common";
@@ -41,6 +41,13 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const from = (location.state as { from?: string } | null)?.from ?? "/";
+
+  useEffect(() => {
+    dispatch(resetError());
+    return () => {
+      dispatch(resetError());
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {

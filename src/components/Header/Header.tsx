@@ -175,6 +175,312 @@ const navItemMotion = {
   },
 };
 
+/** Left-column mega menu art: one distinct illustration per top-level nav item. */
+const MegaMenuLeftDecor: React.FC<{
+  prefersReducedMotion: boolean | null;
+  navLabel: string;
+}> = ({ prefersReducedMotion, navLabel }) => {
+  const floatY = prefersReducedMotion
+    ? undefined
+    : {
+        y: [0, -4, 0],
+      };
+  const floatSlow = { duration: 4.5, repeat: Infinity, ease: "easeInOut" as const };
+  const floatMed = { duration: 3.8, repeat: Infinity, ease: "easeInOut" as const };
+
+  let inner: React.ReactNode;
+
+  switch (navLabel) {
+    case "Agriculture Land":
+      inner = (
+        <motion.div
+          className="w-full max-w-[10rem] 2xl:max-w-[11rem]"
+          initial={false}
+          animate={floatY}
+          transition={floatMed}
+        >
+          <svg
+            viewBox="0 0 140 108"
+            className="h-auto w-full overflow-visible drop-shadow-sm"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="112" cy="20" r="10" fill="var(--b2)" opacity={0.92} />
+            <path
+              d="M0 90 Q40 68 80 82 T140 76 L140 108 L0 108 Z"
+              fill="var(--b2)"
+              opacity={0.45}
+            />
+            <path
+              d="M0 96 Q55 78 100 90 T140 86 L140 108 L0 108 Z"
+              fill="var(--brown)"
+              opacity={0.18}
+            />
+            {[0, 1, 2].map((row) => (
+              <g key={row} transform={`translate(0, ${row * 8})`}>
+                {[18, 38, 58, 78, 98].map((x) => (
+                  <path
+                    key={`${row}-${x}`}
+                    d={`M${x} ${68 + row * 5} l3 -8 l3 8 z`}
+                    fill="var(--b1-mid)"
+                    opacity={0.75 - row * 0.12}
+                  />
+                ))}
+              </g>
+            ))}
+            <path
+              d="M8 84 H132"
+              stroke="var(--brown)"
+              strokeWidth="1"
+              opacity={0.35}
+              strokeDasharray="4 3"
+            />
+            <path
+              d="M12 92 H128"
+              stroke="var(--b1-mid)"
+              strokeWidth="0.8"
+              opacity={0.25}
+            />
+          </svg>
+        </motion.div>
+      );
+      break;
+    case "Resort Properties":
+      inner = (
+        <motion.div
+          className="w-full max-w-[10rem] 2xl:max-w-[11rem]"
+          initial={false}
+          animate={floatY}
+          transition={floatSlow}
+        >
+          <svg
+            viewBox="0 0 140 108"
+            className="h-auto w-full overflow-visible drop-shadow-sm"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="118" cy="18" r="11" fill="var(--b2)" opacity={0.95} />
+            <path
+              d="M0 88 Q45 60 90 76 T140 70 L140 108 L0 108 Z"
+              fill="var(--b2)"
+              opacity={0.4}
+            />
+            <rect
+              x="24"
+              y="78"
+              width="92"
+              height="22"
+              rx="4"
+              fill="var(--b1-mid)"
+              opacity={0.22}
+            />
+            <rect
+              x="28"
+              y="82"
+              width="84"
+              height="14"
+              rx="2"
+              fill="var(--b2)"
+              opacity={0.55}
+            />
+            <rect x="66" y="52" width="4" height="34" fill="var(--b1)" opacity={0.75} />
+            <path
+              d="M48 52 Q68 32 88 52 Z"
+              fill="var(--b1-mid)"
+              opacity={0.85}
+            />
+            <path
+              d="M22 48 L32 38 L42 48 L52 36 L62 48 L72 34 L82 48 L92 36 L102 48 L112 38 L122 48"
+              fill="none"
+              stroke="var(--b1)"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              opacity={0.55}
+            />
+            <rect x="38" y="58" width="22" height="18" rx="2" fill="var(--b1)" opacity={0.55} />
+            <path d="M38 58 L49 48 L60 58 Z" fill="var(--b1-mid)" opacity={0.8} />
+          </svg>
+        </motion.div>
+      );
+      break;
+    case "Rent Farmhouse":
+      inner = (
+        <motion.div
+          className="w-full max-w-[10rem] 2xl:max-w-[11rem]"
+          initial={false}
+          animate={
+            prefersReducedMotion
+              ? undefined
+              : { y: [0, -3, 0], rotate: [0, 0.4, 0] }
+          }
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <svg
+            viewBox="0 0 140 108"
+            className="h-auto w-full overflow-visible drop-shadow-sm"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="108" cy="24" r="10" fill="var(--b2)" opacity={0.88} />
+            <path
+              d="M0 90 Q38 64 76 80 T140 72 L140 108 L0 108 Z"
+              fill="var(--b2)"
+              opacity={0.5}
+            />
+            <rect x="44" y="56" width="40" height="30" rx="2" fill="var(--b1)" opacity={0.85} />
+            <path d="M38 56 L64 36 L90 56 Z" fill="var(--b1-mid)" opacity={0.92} />
+            <rect x="58" y="68" width="12" height="18" rx="1" fill="var(--b2-soft)" />
+            <rect
+              x="88"
+              y="38"
+              width="34"
+              height="38"
+              rx="3"
+              fill="var(--white)"
+              stroke="var(--b1-mid)"
+              strokeWidth="1.8"
+              opacity={0.95}
+            />
+            <path
+              d="M94 38 h22"
+              stroke="var(--b1-mid)"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            <circle cx="98" cy="32" r="2" fill="var(--b1-mid)" opacity={0.5} />
+            <circle cx="112" cy="32" r="2" fill="var(--b1-mid)" opacity={0.5} />
+            {[0, 1, 2].map((i) => (
+              <line
+                key={i}
+                x1="94"
+                y1={50 + i * 8}
+                x2="116"
+                y2={50 + i * 8}
+                stroke="var(--brown)"
+                strokeWidth="0.9"
+                opacity={0.35}
+              />
+            ))}
+          </svg>
+        </motion.div>
+      );
+      break;
+    case "Farmhouse / Farmland":
+    default:
+      inner = (
+        <motion.div
+          className="w-full max-w-[10rem] 2xl:max-w-[11rem]"
+          initial={false}
+          animate={floatY}
+          transition={floatSlow}
+        >
+          <svg
+            viewBox="0 0 140 108"
+            className="h-auto w-full overflow-visible drop-shadow-sm"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <circle cx="118" cy="22" r="11" fill="var(--b2)" opacity={0.9} />
+            <g stroke="var(--b1-mid)" strokeWidth="1.2" opacity={0.35}>
+              <line x1="118" y1="10" x2="118" y2="6" />
+              <line x1="106" y1="22" x2="102" y2="22" />
+              <line x1="130" y1="22" x2="134" y2="22" />
+              <line x1="110" y1="12" x2="107" y2="9" />
+              <line x1="126" y1="12" x2="129" y2="9" />
+              <line x1="110" y1="32" x2="107" y2="35" />
+              <line x1="126" y1="32" x2="129" y2="35" />
+            </g>
+            <path
+              d="M0 88 Q35 62 70 78 T140 70 L140 108 L0 108 Z"
+              fill="var(--b2)"
+              opacity={0.55}
+            />
+            <path
+              d="M0 95 Q50 72 100 85 T140 82 L140 108 L0 108 Z"
+              fill="var(--b1-mid)"
+              opacity={0.28}
+            />
+            <rect x="48" y="58" width="44" height="32" rx="2" fill="var(--b1)" opacity={0.88} />
+            <path d="M42 58 L70 38 L98 58 Z" fill="var(--b1-mid)" opacity={0.95} />
+            <rect x="62" y="72" width="16" height="18" rx="1" fill="var(--b2-soft)" />
+          </svg>
+        </motion.div>
+      );
+  }
+
+  return (
+    <div
+      className="mt-4 flex min-h-[5.5rem] flex-1 flex-col items-center justify-end"
+      aria-hidden
+    >
+      {inner}
+    </div>
+  );
+};
+
+/** Decorative illustration for mega menu right column (between copy and Post Property). */
+const MegaMenuSellDecor: React.FC<{ prefersReducedMotion: boolean | null }> = ({
+  prefersReducedMotion,
+}) => (
+  <div
+    className="flex min-h-[4.5rem] flex-1 flex-col items-center justify-center py-1"
+    aria-hidden
+  >
+    <motion.div
+      className="w-full max-w-[9.5rem] 2xl:max-w-[10.5rem]"
+      initial={false}
+      animate={
+        prefersReducedMotion
+          ? undefined
+          : {
+              scale: [1, 1.04, 1],
+              opacity: [0.88, 1, 0.88],
+            }
+      }
+      transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+    >
+      <svg
+        viewBox="0 0 120 100"
+        className="h-auto w-full overflow-visible drop-shadow-sm"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <rect
+          x="28"
+          y="44"
+          width="64"
+          height="46"
+          rx="3"
+          fill="none"
+          stroke="var(--b1-mid)"
+          strokeWidth="2.2"
+        />
+        <path
+          d="M22 44 L60 20 L98 44"
+          fill="none"
+          stroke="var(--b1-mid)"
+          strokeWidth="2.2"
+          strokeLinejoin="round"
+        />
+        <rect x="52" y="64" width="16" height="26" rx="1" fill="var(--b1-mid)" opacity={0.28} />
+        <motion.g
+          initial={false}
+          animate={
+            prefersReducedMotion
+              ? undefined
+              : {
+                  y: [0, -3, 0],
+                }
+          }
+          transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <circle cx="80" cy="18" r="5.5" fill="none" stroke="var(--brown)" strokeWidth="2" />
+          <path
+            d="M86 18 h10 v6 h-4 v10 h-4 v-6 h-4 v-4 Z"
+            fill="var(--brown)"
+            opacity={0.88}
+          />
+        </motion.g>
+      </svg>
+    </motion.div>
+  </div>
+);
+
 const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   const { t, i18n } = useTranslation();
   const location = useLocation();
@@ -325,7 +631,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               initial="hidden"
               animate="visible"
               variants={navStagger}
-              className="hidden xl:flex min-w-0 flex-1 items-center justify-center gap-4 2xl:gap-8 px-3"
+              className="relative hidden xl:flex min-w-0 flex-1 items-center justify-center gap-4 2xl:gap-8 px-3"
             >
               {visibleNavItems.map((item) => {
                 const isActive = location.pathname === item.href;
@@ -334,7 +640,6 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                   <motion.div
                     key={item.label}
                     variants={navItemMotion}
-                    className="relative"
                     onMouseEnter={() => item.mega && openMega(item.label)}
                     onMouseLeave={closeMega}
                   >
@@ -371,9 +676,15 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                           onMouseEnter={() => openMega(item.label)}
                           onMouseLeave={closeMega}
                         >
-                        <div className="bg-[var(--b2-soft)] p-6 space-y-4 text-[var(--b1)]">
-                          <div className="font-semibold">{t("header.ownerOfferings")}</div>
-                          <div>{t("header.articlesNews")}</div>
+                        <div className="bg-[var(--b2-soft)] p-6 flex flex-col h-full min-h-0 text-[var(--b1)]">
+                          <div className="shrink-0 space-y-4">
+                            <div className="font-semibold">{t("header.ownerOfferings")}</div>
+                            <div>{t("header.articlesNews")}</div>
+                          </div>
+                          <MegaMenuLeftDecor
+                            prefersReducedMotion={prefersReducedMotion}
+                            navLabel={item.label}
+                          />
                         </div>
 
                         <div className="p-8 grid grid-cols-2 gap-8 text-[var(--b1)]">
@@ -398,8 +709,8 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                           ))}
                         </div>
 
-                        <div className="bg-[var(--b2-soft)] p-6 flex flex-col justify-between">
-                          <div>
+                        <div className="bg-[var(--b2-soft)] p-6 flex flex-col h-full min-h-0 justify-between gap-3">
+                          <div className="shrink-0">
                             <h3 className="font-semibold text-lg text-[var(--b1)]">
                               {t("header.sellOrRentFaster")}
                             </h3>
@@ -408,10 +719,12 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                             </p>
                           </div>
 
+                          <MegaMenuSellDecor prefersReducedMotion={prefersReducedMotion} />
+
                           {/* Preserve routing for Post Property */}
                           <Link
                             to="/post-property/basic"
-                            className="mt-4 btn-brand px-4 py-2 rounded-lg shadow text-center"
+                            className="shrink-0 btn-brand px-4 py-2 rounded-lg shadow text-center"
                           >
                             {t("header.postProperty")}
                           </Link>

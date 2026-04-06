@@ -1,7 +1,7 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { registerUser } from "../../features/auth/authSlice";
+import { registerUser, resetError } from "../../features/auth/authSlice";
 import type { RegisterRequest } from "../../features/auth/authTypes";
 import Dashboard from "../Dashboard/Dashboard";
 import { ToastStack, type ToastMessage } from "../../components/propertyPost/Toast";
@@ -40,6 +40,13 @@ const Register: React.FC = () => {
   const [investmentInterest, setInvestmentInterest] = useState("");
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  useEffect(() => {
+    dispatch(resetError());
+    return () => {
+      dispatch(resetError());
+    };
+  }, [dispatch]);
 
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -124,7 +131,7 @@ const Register: React.FC = () => {
             type="button"
             onClick={() => navigate("/", { replace: true })}
             aria-label="Close"
-            className="absolute right-4 top-4 h-8 w-8 flex items-center justify-center rounded-full bg-[var(--b2-soft)] text-[var(--b1)] hover:bg-[var(--b2)] transition"
+            className="absolute right-4 top-6 h-8 w-8 flex items-center justify-center rounded-full bg-[var(--b2-soft)] text-[var(--b1)] hover:bg-[var(--b2)] transition"
           >
             ✕
           </Button>
