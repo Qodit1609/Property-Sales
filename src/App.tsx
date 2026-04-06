@@ -119,7 +119,7 @@ function App() {
           <Route path="/rent-farmhouse" element={<RentFarmhouse />} />
           <Route path="/properties/:id" element={<PropertyDetails />} />
 
-          {/* Post Property (seller, buyer, agent, admin) */}
+          {/* Post Property (authenticated users; page-level guard allows seller/admin only) */}
           <Route
             element={
               <ProtectedRoute requiredRoles={["seller", "buyer", "agent", "admin"]} />

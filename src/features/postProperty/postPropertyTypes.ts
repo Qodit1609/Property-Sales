@@ -94,6 +94,7 @@ export type MediaItem = {
   fileName?: string;
   sizeBytes?: number;
   mimeType?: string;
+  hash?: string;
 };
 
 export type MediaState = {

@@ -25,6 +25,14 @@ export interface SellerListingPayload {
   parking?: string | number;
 }
 
+export interface UploadPropertyImagePayload {
+  file: File;
+  tag?: string;
+  name?: string;
+  altText?: string;
+  onUploadProgress?: (percent: number) => void;
+}
+
 export const fetchMyListingsAPI = async (): Promise<Property[]> => {
   const res = await api.get("/properties/my-properties/list");
   return mapPropertyListPayload(res.data);
@@ -52,4 +60,36 @@ export const updateListingAPI = async (
 export const deleteMyListingAPI = async (id: string): Promise<void> => {
 
   await api.delete(`/properties/${id}`);
+};
+
+export const uploadPropertyImageAPI = async (
+  payload: UploadPropertyImagePayload
+): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", payload.file);
+  if (payload.tag) formData.append("tag", payload.tag);
+  if (payload.name) formData.append("name", payload.name);
+  if (payload.altText) formData.append("altText", payload.altText);
+
+  const res = await api.post("/media/upload", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+    onUploadProgress: (event) => {
+      if (!payload.onUploadProgress) return;
+      const total = event.total ?? payload.file.size;
+      const percent = total > 0 ? Math.min(100, Math.round((event.loaded * 100) / total)) : 0;
+      payload.onUploadProgress(percent);
+    },
+  });
+
+  const data = (res.data ?? {}) as {
+    data?: { url?: string; mediaAsset?: { cloudinaryUrl?: string } };
+    url?: string;
+  };
+
+  const url = data.data?.url ?? data.data?.mediaAsset?.cloudinaryUrl ?? data.url;
+  if (!url) {
+    throw new Error("Upload succeeded but no image URL was returned.");
+  }
+
+  return url;
 };
