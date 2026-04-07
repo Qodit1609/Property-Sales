@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import AdminLayout from "../../components/admin/AdminLayout";
 import AdminStats from "../../components/admin/AdminStats";
@@ -19,13 +20,16 @@ interface AdminDashboardProps {
   initialTab?: Tab;
   /** Sidebar section title (e.g. "Users" on /admin/users). */
   layoutTitle?: string;
+  initialUserRoleFilter?: "all" | "buyer" | "seller" | "agent" | "user";
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({
   initialTab,
   layoutTitle,
+  initialUserRoleFilter,
 }) => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const activeTab: Tab = initialTab ?? "overview";
 
   const {
@@ -59,9 +63,39 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     dispatch(deleteUserById(String(userId)));
   };
 
+  const handleStatsCardClick = (
+    section: "listings" | "users",
+    label: string
+  ) => {
+    if (section === "listings") {
+      const mapping: Record<string, string> = {
+        "Total properties": "",
+        Approved: "approved",
+        "Pending review": "pending",
+        Rejected: "rejected",
+      };
+      const status = mapping[label] ?? "";
+      navigate(status ? `/admin/properties?status=${status}` : "/admin/properties");
+      return;
+    }
+
+    const mapping: Record<string, string> = {
+      "Total accounts": "",
+      Buyers: "user",
+      Sellers: "seller",
+      Agents: "agent",
+    };
+    const role = mapping[label] ?? "";
+    navigate(role ? `/admin/users?role=${role}` : "/admin/users");
+  };
+
   const renderOverview = () => (
     <div className="space-y-6">
-      <AdminStats accounts={users} listings={listings} />
+      <AdminStats
+        accounts={users}
+        listings={listings}
+        onCardClick={handleStatsCardClick}
+      />
     </div>
   );
 
@@ -72,6 +106,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       error={usersError}
       actionLoading={actionLoading}
       onDelete={handleDeleteUser}
+      initialRoleFilter={initialUserRoleFilter}
     />
   );
 

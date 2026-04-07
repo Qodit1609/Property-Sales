@@ -1,12 +1,16 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import PostPropertyLayout from "../../components/propertyPost/PostPropertyLayout";
-import { useAppSelector } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { loadEditProperty, setEditPropertyId } from "../../features/postProperty/postPropertySlice";
 
 export default function PostPropertyPage() {
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const userRole = useAppSelector((state) => state.auth.user?.role);
   const canAccess = userRole === "seller" || userRole === "admin";
+  const editPropertyId = useAppSelector((state) => state.postProperty.editPropertyId);
 
   useEffect(() => {
     if (canAccess) return;
@@ -23,6 +27,19 @@ export default function PostPropertyPage() {
     }
     navigate("/", { replace: true });
   }, [canAccess, navigate, userRole]);
+
+  useEffect(() => {
+    if (!canAccess) return;
+    const editId = searchParams.get("edit");
+    if (!editId) {
+      if (editPropertyId) {
+        dispatch(setEditPropertyId(null));
+      }
+      return;
+    }
+    if (editPropertyId === editId) return;
+    void dispatch(loadEditProperty(editId));
+  }, [canAccess, dispatch, editPropertyId, searchParams]);
 
   if (!canAccess) {
     return null;

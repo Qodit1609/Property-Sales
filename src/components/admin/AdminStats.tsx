@@ -16,6 +16,7 @@ import type { ManagedAccount } from "../../features/auth/roleTypes";
 interface AdminStatsProps {
   accounts: ManagedAccount[];
   listings: Property[];
+  onCardClick?: (section: "listings" | "users", label: string) => void;
 }
 
 type Tone = "emerald" | "sky" | "amber" | "rose" | "slate";
@@ -33,7 +34,11 @@ interface StatSection {
   items: StatItem[];
 }
 
-const AdminStats: React.FC<AdminStatsProps> = ({ accounts, listings }) => {
+const AdminStats: React.FC<AdminStatsProps> = ({
+  accounts,
+  listings,
+  onCardClick,
+}) => {
   const totalAccounts = accounts.length;
   const buyers = accounts.filter((u) => u.role === "buyer").length;
   const sellers = accounts.filter((u) => u.role === "seller").length;
@@ -163,6 +168,12 @@ const AdminStats: React.FC<AdminStatsProps> = ({ accounts, listings }) => {
               return (
                 <article
                   key={card.label}
+                  onClick={() =>
+                    onCardClick?.(
+                      section.title === "Property listings" ? "listings" : "users",
+                      card.label
+                    )
+                  }
                   className="group relative overflow-hidden rounded-2xl border border-[var(--b2)]/50 bg-[var(--white)] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--b2)] hover:shadow-[0_12px_28px_rgba(27,67,50,0.12)]"
                 >
                   <div

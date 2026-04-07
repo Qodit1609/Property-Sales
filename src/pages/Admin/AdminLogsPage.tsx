@@ -2,37 +2,22 @@ import React, { useState, useMemo } from "react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { FileClock, ScrollText } from "lucide-react";
 import { Input } from "@/components/common";
-
-const mockLogs = [
-  {
-    id: "1",
-    actor: "admin@bhoomiwala.com",
-    action: "Approved listing",
-    target: "5 Acre agriculture land near Indore Bypass",
-    timestamp: "2026-03-10T11:20:00Z",
-  },
-  {
-    id: "2",
-    actor: "admin@bhoomiwala.com",
-    action: "Rejected listing",
-    target: "Farmhouse near Mhow",
-    timestamp: "2026-03-09T15:42:00Z",
-  },
-];
+import { useAppSelector } from "../../hooks/reduxHooks";
 
 const AdminLogsPage: React.FC = () => {
   const [search, setSearch] = useState("");
+  const logs = useAppSelector((s) => s.admin.activityLogs);
 
   const filtered = useMemo(() => {
-    if (!search) return mockLogs;
+    if (!search) return logs;
     const l = search.toLowerCase();
-    return mockLogs.filter(
+    return logs.filter(
       (log) =>
         log.action.toLowerCase().includes(l) ||
         log.target.toLowerCase().includes(l) ||
         log.actor.toLowerCase().includes(l)
     );
-  }, [search]);
+  }, [search, logs]);
 
   return (
     <AdminLayout title="Activity logs">
@@ -47,8 +32,7 @@ const AdminLogsPage: React.FC = () => {
                 Activity trail
               </h2>
               <p className="mt-1 max-w-xl text-sm text-[var(--muted)]">
-                Moderation and account events. Connect your backend to stream
-                live audit data.
+                Moderation and account events from admin actions.
               </p>
             </div>
           </div>

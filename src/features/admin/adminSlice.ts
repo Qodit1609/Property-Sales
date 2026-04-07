@@ -17,6 +17,11 @@ import {
   type AdminCreatePropertyPayload,
   type AdminUpdatePropertyPayload,
 } from "./adminAPI";
+import type {
+  ActivityLogEntry,
+  ActivityStatusTone,
+  ActivityTypeCode,
+} from "../../components/admin/activityLogTypes";
 
 export interface AdminNotification {
   id: string;
@@ -24,6 +29,14 @@ export interface AdminNotification {
   message: string;
   createdAt: string;
   read: boolean;
+}
+
+export interface AdminActionLog {
+  id: string;
+  action: string;
+  target: string;
+  actor: string;
+  timestamp: string;
 }
 
 interface AdminState {
@@ -40,6 +53,9 @@ interface AdminState {
   mutationError: string | null;
 
   notifications: AdminNotification[];
+  activityLogs: AdminActionLog[];
+  auditLogs: ActivityLogEntry[];
+  seenPendingListingIds: string[];
 }
 
 const defaultPagination = (): AdminListingsPagination => ({
@@ -63,7 +79,100 @@ const initialState: AdminState = {
   mutationError: null,
 
   notifications: [],
+  activityLogs: [],
+  auditLogs: [],
+  seenPendingListingIds: [],
 };
+
+function getAdminActorName(): string {
+  if (typeof window === "undefined") return "Admin";
+  try {
+    const raw = localStorage.getItem("auth_user");
+    if (!raw) return "Admin";
+    const parsed = JSON.parse(raw) as { name?: string; email?: string };
+    return parsed.name || parsed.email || "Admin";
+  } catch {
+    return "Admin";
+  }
+}
+
+function formatLogDate(iso: string): string {
+  const now = new Date();
+  const dt = new Date(iso);
+  const isToday = now.toDateString() === dt.toDateString();
+  if (isToday) return "Today";
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (yesterday.toDateString() === dt.toDateString()) return "Yesterday";
+  return dt.toLocaleDateString();
+}
+
+function pushAdminActivity(
+  state: AdminState,
+  args: { action: string; target: string; actor?: string; timestamp?: string }
+) {
+  const timestamp = args.timestamp ?? new Date().toISOString();
+  state.activityLogs.unshift({
+    id: nanoid(),
+    action: args.action,
+    target: args.target,
+    actor: args.actor ?? getAdminActorName(),
+    timestamp,
+  });
+  if (state.activityLogs.length > 200) {
+    state.activityLogs = state.activityLogs.slice(0, 200);
+  }
+}
+
+function pushAdminAudit(
+  state: AdminState,
+  args: {
+    activity: string;
+    activityType: ActivityTypeCode;
+    target: string;
+    status: string;
+    statusTone: ActivityStatusTone;
+    actor?: string;
+    entityType?: string;
+    entityId?: string;
+    timestamp?: string;
+  }
+) {
+  const timestamp = args.timestamp ?? new Date().toISOString();
+  state.auditLogs.unshift({
+    id: nanoid(),
+    userName: args.actor ?? getAdminActorName(),
+    role: "admin",
+    activity: args.activity,
+    activityType: args.activityType,
+    target: args.target,
+    date: formatLogDate(timestamp),
+    status: args.status,
+    statusTone: args.statusTone,
+    entityType: args.entityType,
+    entityId: args.entityId,
+    timestamp,
+  });
+  if (state.auditLogs.length > 300) {
+    state.auditLogs = state.auditLogs.slice(0, 300);
+  }
+}
+
+function pushNotification(
+  state: AdminState,
+  payload: { title: string; message: string; createdAt?: string }
+) {
+  state.notifications.unshift({
+    id: nanoid(),
+    title: payload.title,
+    message: payload.message,
+    createdAt: payload.createdAt ?? new Date().toISOString(),
+    read: false,
+  });
+  if (state.notifications.length > 200) {
+    state.notifications = state.notifications.slice(0, 200);
+  }
+}
 
 export const fetchAdminUsers = createAsyncThunk<
   ManagedAccount[],
@@ -226,6 +335,12 @@ const adminSlice = createSlice({
         n.read = true;
       });
     },
+    clearAdminActivityLogs(state) {
+      state.activityLogs = [];
+    },
+    clearAdminAuditLogs(state) {
+      state.auditLogs = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -235,6 +350,28 @@ const adminSlice = createSlice({
       })
       .addCase(fetchAdminUsers.fulfilled, (state, action) => {
         state.usersLoading = false;
+        const existingIds = new Set(state.users.map((u) => String(u.id)));
+        const newUsers = action.payload.filter((u) => !existingIds.has(String(u.id)));
+        for (const user of newUsers) {
+          const target = user.name || user.email || "New user";
+          pushAdminActivity(state, {
+            action: "User created",
+            target,
+          });
+          pushAdminAudit(state, {
+            activity: "User registered",
+            activityType: "USER_VERIFIED",
+            target,
+            status: "Created",
+            statusTone: "info",
+            entityType: "user",
+            entityId: String(user.id),
+          });
+          pushNotification(state, {
+            title: "New user registered",
+            message: `${target} joined the platform.`,
+          });
+        }
         state.users = action.payload;
       })
       .addCase(fetchAdminUsers.rejected, (state, action) => {
@@ -250,6 +387,19 @@ const adminSlice = createSlice({
         state.listingsLoading = false;
         state.listings = action.payload.items;
         state.listingsPagination = action.payload.pagination;
+        const pendingNow = action.payload.items.filter(
+          (listing) => (listing.status ?? "pending").toLowerCase() === "pending"
+        );
+        const seen = new Set(state.seenPendingListingIds);
+        for (const listing of pendingNow) {
+          if (seen.has(listing._id)) continue;
+          pushNotification(state, {
+            title: "New property pending approval",
+            message: `${listing.title ?? "A listing"} is waiting for review.`,
+          });
+          seen.add(listing._id);
+        }
+        state.seenPendingListingIds = [...seen];
       })
       .addCase(fetchAdminListings.rejected, (state, action) => {
         state.listingsLoading = false;
@@ -264,6 +414,12 @@ const adminSlice = createSlice({
         state.listingsLoading = false;
         state.listings = action.payload.items;
         state.listingsPagination = action.payload.pagination;
+        const pendingIds = action.payload.items
+          .filter((listing) => (listing.status ?? "pending").toLowerCase() === "pending")
+          .map((listing) => listing._id);
+        state.seenPendingListingIds = Array.from(
+          new Set([...state.seenPendingListingIds, ...pendingIds])
+        );
       })
       .addCase(fetchAdminListingsAllPages.rejected, (state, action) => {
         state.listingsLoading = false;
@@ -280,6 +436,21 @@ const adminSlice = createSlice({
         state.listings = state.listings.map((listing) =>
           listing._id === updated._id ? updated : listing
         );
+        const target = updated.title ?? "Property";
+        pushAdminActivity(state, { action: "Property approved", target });
+        pushAdminAudit(state, {
+          activity: "Approved property",
+          activityType: "PROPERTY_APPROVED",
+          target,
+          status: "Approved",
+          statusTone: "success",
+          entityType: "property",
+          entityId: updated._id,
+        });
+        pushNotification(state, {
+          title: "Property approved",
+          message: `${target} was approved by admin.`,
+        });
       })
       .addCase(approveListing.rejected, (state, action) => {
         state.actionLoading = false;
@@ -296,6 +467,21 @@ const adminSlice = createSlice({
         state.listings = state.listings.map((listing) =>
           listing._id === updated._id ? updated : listing
         );
+        const target = updated.title ?? "Property";
+        pushAdminActivity(state, { action: "Property rejected", target });
+        pushAdminAudit(state, {
+          activity: "Rejected property",
+          activityType: "PROPERTY_REJECTED",
+          target,
+          status: "Rejected",
+          statusTone: "danger",
+          entityType: "property",
+          entityId: updated._id,
+        });
+        pushNotification(state, {
+          title: "Property rejected",
+          message: `${target} was rejected by admin.`,
+        });
       })
       .addCase(rejectListing.rejected, (state, action) => {
         state.actionLoading = false;
@@ -328,15 +514,31 @@ const adminSlice = createSlice({
       .addCase(createAdminProperty.fulfilled, (state, action) => {
         state.actionLoading = false;
         const p = action.payload;
-        state.notifications.unshift({
-          id: nanoid(),
-          title: "New property added",
-          message: `${p.title ?? "A listing"} has been added.`,
-          createdAt: new Date().toISOString(),
-          read: false,
+        const target = p.title ?? "A listing";
+        pushAdminActivity(state, {
+          action: "Property created",
+          target,
         });
-        if (state.notifications.length > 200) {
-          state.notifications = state.notifications.slice(0, 200);
+        pushAdminAudit(state, {
+          activity: "Created property",
+          activityType: "PROPERTY_CREATED",
+          target,
+          status: "Created",
+          statusTone: "success",
+          entityType: "property",
+          entityId: p._id,
+        });
+        const status = (p.status ?? "pending").toLowerCase();
+        if (status === "pending") {
+          pushNotification(state, {
+            title: "New property pending approval",
+            message: `${target} is waiting for review.`,
+          });
+        } else {
+          pushNotification(state, {
+            title: "New property added",
+            message: `${target} has been added.`,
+          });
         }
       })
       .addCase(createAdminProperty.rejected, (state, action) => {
@@ -354,6 +556,17 @@ const adminSlice = createSlice({
         state.listings = state.listings.map((listing) =>
           listing._id === updated._id ? updated : listing
         );
+        const target = updated.title ?? "Property";
+        pushAdminActivity(state, { action: "Property edited", target });
+        pushAdminAudit(state, {
+          activity: "Edited property",
+          activityType: "PROPERTY_EDITED",
+          target,
+          status: "Updated",
+          statusTone: "info",
+          entityType: "property",
+          entityId: updated._id,
+        });
       })
       .addCase(updateAdminProperty.rejected, (state, action) => {
         state.actionLoading = false;
@@ -380,5 +593,7 @@ export const {
   addAdminNotification,
   markAdminNotificationRead,
   markAllAdminNotificationsRead,
+  clearAdminActivityLogs,
+  clearAdminAuditLogs,
 } = adminSlice.actions;
 export default adminSlice.reducer;

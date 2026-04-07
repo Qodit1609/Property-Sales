@@ -129,5 +129,6 @@ export type PostPropertyState = {
   completedSteps: Record<PostPropertyStepKey, boolean>;
   submitLoading: boolean;
   submitError: string | null;
+  editPropertyId: string | null;
 };
 

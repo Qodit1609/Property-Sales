@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   CheckCircle2,
   ChevronLeft,
@@ -18,7 +19,6 @@ import {
   deleteListingById,
   fetchAdminListings,
   rejectListing,
-  updateAdminProperty,
 } from "../../features/admin/adminSlice";
 
 const PROPERTY_TYPES = [
@@ -62,6 +62,8 @@ const filterSelectClass =
 
 const AdminPropertiesPage: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const {
     listings,
     listingsLoading,
@@ -72,7 +74,12 @@ const AdminPropertiesPage: React.FC = () => {
   } = useAppSelector((s) => s.admin);
 
   const [search, setSearch] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
+  const [filterStatus, setFilterStatus] = useState(() => {
+    const status = (searchParams.get("status") ?? "").toLowerCase();
+    return ["pending", "approved", "rejected", "sold"].includes(status)
+      ? status
+      : "";
+  });
   const [filterType, setFilterType] = useState("");
   const [page, setPage] = useState(1);
 
@@ -88,28 +95,28 @@ const AdminPropertiesPage: React.FC = () => {
     setToasts((prev) => prev.filter((x) => x.id !== id));
   }, []);
 
-  const [editId, setEditId] = useState<string | null>(null);
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-
-  const [editForm, setEditForm] = useState({
-    title: "",
-    description: "",
-    price: "",
-    propertyType: "Farmhouse",
-    listingType: "sale" as "sale" | "rent",
-  });
 
   const load = useCallback(() => {
     dispatch(
       fetchAdminListings({
         page,
         limit: PER_PAGE,
-        ...(filterStatus ? { status: filterStatus } : {}),
-        ...(filterType ? { propertyType: filterType } : {}),
       })
     );
-  }, [dispatch, page, filterStatus, filterType]);
+  }, [dispatch, page]);
+  useEffect(() => {
+    const status = (searchParams.get("status") ?? "").toLowerCase();
+    if (["pending", "approved", "rejected", "sold"].includes(status)) {
+      setFilterStatus(status);
+      setPage(1);
+      return;
+    }
+    setFilterStatus("");
+    setPage(1);
+  }, [searchParams]);
+
 
   useEffect(() => {
     load();
@@ -124,34 +131,25 @@ const AdminPropertiesPage: React.FC = () => {
     return () => window.clearTimeout(timer);
   }, [mutationError, dispatch, pushToast]);
 
-  const editing = useMemo(
-    () => listings.find((l) => l._id === editId) ?? null,
-    [listings, editId]
+  const openEdit = useCallback(
+    (listing: Property) => {
+      navigate(`/post-property/basic?edit=${listing._id}`);
+    },
+    [navigate]
   );
 
-  const openEdit = useCallback((listing: Property) => {
-    setEditForm({
-      title: listing.title ?? "",
-      description: listing.description ?? "",
-      price: String(listing.price ?? ""),
-      propertyType: listing.propertyType ?? "Farmhouse",
-      listingType:
-        listing.listingType === "rent" || listing.listingType === "sale"
-          ? listing.listingType
-          : "sale",
-    });
-    setEditId(listing._id);
-  }, []);
-
   const filtered = useMemo(() => {
-    if (!search.trim()) return listings;
     const q = search.trim().toLowerCase();
-    return listings.filter(
-      (l) =>
+    return listings.filter((l) => {
+      if (filterStatus && normalizedStatus(l.status) !== filterStatus) return false;
+      if (filterType && (l.propertyType ?? "") !== filterType) return false;
+      if (!q) return true;
+      return (
         (l.title && l.title.toLowerCase().includes(q)) ||
         (l.address && l.address.toLowerCase().includes(q))
-    );
-  }, [listings, search]);
+      );
+    });
+  }, [listings, search, filterStatus, filterType]);
 
   const handleApprove = (id: string) => {
     dispatch(approveListing(id))
@@ -179,35 +177,6 @@ const AdminPropertiesPage: React.FC = () => {
         pushToast({ kind: "success", title: "Property deleted" });
         setDeleteId(null);
         load();
-      });
-  };
-
-  const submitEdit = () => {
-    if (!editId) return;
-    const price = Number(editForm.price);
-    if (!editForm.title.trim() || !Number.isFinite(price)) {
-      pushToast({
-        kind: "error",
-        title: "Title and valid price are required",
-      });
-      return;
-    }
-    dispatch(
-      updateAdminProperty({
-        id: editId,
-        payload: {
-          title: editForm.title.trim(),
-          description: editForm.description.trim(),
-          price,
-          propertyType: editForm.propertyType,
-          listingType: editForm.listingType,
-        },
-      })
-    )
-      .unwrap()
-      .then(() => {
-        pushToast({ kind: "success", title: "Property updated" });
-        setEditId(null);
       });
   };
 
@@ -504,86 +473,6 @@ const AdminPropertiesPage: React.FC = () => {
               </div>
             )}
           </>
-        )}
-
-        {editId && editing && (
-          <Modal
-            title="Edit property"
-            onClose={() => setEditId(null)}
-            footer={
-              <>
-                <Button variant="outline" onClick={() => setEditId(null)}>
-                  Cancel
-                </Button>
-                <Button onClick={submitEdit} disabled={actionLoading}>
-                  {actionLoading ? "Saving…" : "Save changes"}
-                </Button>
-              </>
-            }
-          >
-            <div className="space-y-3">
-              <Input
-                label="Title"
-                value={editForm.title}
-                onChange={(e) =>
-                  setEditForm((f) => ({ ...f, title: e.target.value }))
-                }
-              />
-              <div>
-                <label className="mb-1 block text-sm">Description</label>
-                <textarea
-                  className="w-full min-h-[88px] rounded-lg border border-border px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  value={editForm.description}
-                  onChange={(e) =>
-                    setEditForm((f) => ({ ...f, description: e.target.value }))
-                  }
-                />
-              </div>
-              <Input
-                label="Price (₹)"
-                type="number"
-                min={0}
-                value={editForm.price}
-                onChange={(e) =>
-                  setEditForm((f) => ({ ...f, price: e.target.value }))
-                }
-              />
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="mb-1 block text-sm">Property type</label>
-                  <select
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                    value={editForm.propertyType}
-                    onChange={(e) =>
-                      setEditForm((f) => ({ ...f, propertyType: e.target.value }))
-                    }
-                  >
-                    {PROPERTY_TYPES.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm">Listing type</label>
-                  <select
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                    value={editForm.listingType}
-                    onChange={(e) =>
-                      setEditForm((f) => ({
-                        ...f,
-                        listingType: e.target.value as "sale" | "rent",
-                      }))
-                    }
-                  >
-                    <option value="sale">Sale</option>
-                    <option value="rent">Rent</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </Modal>
         )}
 
         {rejectId && (

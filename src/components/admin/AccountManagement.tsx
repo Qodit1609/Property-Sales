@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Trash2, Users } from "lucide-react";
 import { Button, Input } from "@/components/common";
 import AdminConfirmDialog from "./AdminConfirmDialog";
 
 import type { ManagedAccount } from "../../features/auth/roleTypes";
 
-const ROLE_FILTERS = ["All", "Buyer", "Seller"] as const;
+const ROLE_FILTERS = ["All", "Buyer", "Seller", "Agent"] as const;
 type RoleFilterOption = (typeof ROLE_FILTERS)[number];
 
 function matchesRoleFilter(
@@ -16,6 +16,7 @@ function matchesRoleFilter(
   const r = (account.role ?? "").toLowerCase();
   if (filter === "Buyer") return r === "buyer";
   if (filter === "Seller") return r === "seller";
+  if (filter === "Agent") return r === "agent";
   return true;
 }
 
@@ -25,6 +26,7 @@ interface AccountManagementProps {
   error: string | null;
   actionLoading: boolean;
   onDelete: (id: string | number) => void;
+  initialRoleFilter?: "all" | "buyer" | "seller" | "agent" | "user";
 }
 
 function TableSkeleton() {
@@ -62,10 +64,32 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
   error,
   actionLoading,
   onDelete,
+  initialRoleFilter = "all",
 }) => {
   const [query, setQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState<RoleFilterOption>("All");
+  const [roleFilter, setRoleFilter] = useState<RoleFilterOption>(() => {
+    if (initialRoleFilter === "buyer" || initialRoleFilter === "user") return "Buyer";
+    if (initialRoleFilter === "seller") return "Seller";
+    if (initialRoleFilter === "agent") return "Agent";
+    return "All";
+  });
   const [deleteTarget, setDeleteTarget] = useState<ManagedAccount | null>(null);
+
+  useEffect(() => {
+    if (initialRoleFilter === "buyer" || initialRoleFilter === "user") {
+      setRoleFilter("Buyer");
+      return;
+    }
+    if (initialRoleFilter === "seller") {
+      setRoleFilter("Seller");
+      return;
+    }
+    if (initialRoleFilter === "agent") {
+      setRoleFilter("Agent");
+      return;
+    }
+    setRoleFilter("All");
+  }, [initialRoleFilter]);
 
   const filtered = useMemo(() => {
     const byRole = accounts.filter((u) => matchesRoleFilter(u, roleFilter));

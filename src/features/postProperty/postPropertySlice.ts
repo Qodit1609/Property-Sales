@@ -1,7 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../app/store";
-import { createListingAPI, type SellerListingPayload } from "../seller/sellerAPI";
+import {
+  createListingAPI,
+  updateListingAPI,
+  type SellerListingPayload,
+} from "../seller/sellerAPI";
+import { fetchPropertyByIdAPI } from "../properties/propertyAPI";
+import type { Property } from "../properties/propertyType";
 import {
   clearPostPropertyDraft,
   loadPostPropertyDraft,
@@ -91,6 +97,7 @@ const initial: PostPropertyState = {
   },
   submitLoading: false,
   submitError: null,
+  editPropertyId: null,
 };
 
 function hydrateInitialState(): PostPropertyState {
@@ -177,7 +184,9 @@ export const submitPostProperty = createAsyncThunk<
       longitude: state.locationDetails.longitude ?? 0,
     };
 
-    const created = await createListingAPI(payload);
+    const created = state.editPropertyId
+      ? await updateListingAPI(state.editPropertyId, payload)
+      : await createListingAPI(payload);
     clearPostPropertyDraft();
     return created;
   } catch (error: unknown) {
@@ -213,6 +222,139 @@ export const submitPostProperty = createAsyncThunk<
       "Failed to submit property";
     const message = `Submission failed${err.response?.status ? ` (${err.response.status})` : ""}: ${detail}`;
     return rejectWithValue(message);
+  }
+});
+
+const categoryFromPropertyType = (propertyType: string): BasicDetails["category"] => {
+  if (propertyType === "Agriculture Land" || propertyType === "Farmland") {
+    return "Agriculture Land";
+  }
+  if (propertyType === "Resort") return "Agri Resort";
+  if (["Plot", "House", "Apartment", "Flat", "Villa"].includes(propertyType)) {
+    return "Residential";
+  }
+  if (propertyType === "Commercial") return "Commercial";
+  return "Farmhouse";
+};
+
+const mapPropertyToEditState = (property: Property): PostPropertyState => {
+  const category = categoryFromPropertyType(property.propertyType ?? "");
+  const mapDetails = property.location ?? {};
+  const mapCoordinates = Array.isArray(mapDetails.coordinates)
+    ? { lat: mapDetails.coordinates[0], lng: mapDetails.coordinates[1] }
+    : mapDetails.coordinates;
+  const images = (property.media?.images ?? property.images ?? []).filter(Boolean);
+  const amenities = property.amenities ?? [];
+  const hasAmenity = (key: string) => amenities.some((value) => value.toLowerCase().includes(key));
+  const rawArea = property.area ?? property.landSize ?? null;
+  const totalArea =
+    typeof rawArea === "number"
+      ? rawArea
+      : typeof rawArea === "string"
+      ? Number(rawArea) || null
+      : null;
+  const areaUnit = ["acre", "hectare", "sqft"].includes(property.areaUnit ?? "")
+    ? (property.areaUnit as ProfileDetails["areaUnit"])
+    : "acre";
+
+  return {
+    ...initial,
+    basicDetails: {
+      ...emptyBasicDetails,
+      listingType: property.listingType === "rent" ? "rent" : "sell",
+      category,
+      propertyType: property.propertyType ?? "",
+      title: property.title ?? "",
+      contactName:
+        property.ownerDetails?.name ??
+        property.dealer?.name ??
+        property.seller?.name ??
+        "",
+      contactEmail: property.seller?.email ?? "",
+      contactMobile:
+        property.ownerDetails?.phone ??
+        property.dealer?.phone ??
+        property.seller?.phone ??
+        "",
+    },
+    locationDetails: {
+      ...emptyLocationDetails,
+      state: mapDetails.state ?? "",
+      city: mapDetails.city ?? "",
+      locality: mapDetails.locality ?? "",
+      pinCode: mapDetails.pincode ?? "",
+      latitude: mapCoordinates?.lat ?? null,
+      longitude: mapCoordinates?.lng ?? null,
+    },
+    profileDetails: {
+      ...emptyProfileDetails,
+      totalArea,
+      areaUnit,
+      price: property.price ?? null,
+      waterAvailability:
+        typeof property.waterResources?.waterAvailability === "string"
+          ? property.waterResources.waterAvailability.toLowerCase() === "good"
+          : null,
+      electricityAvailability:
+        typeof property.infrastructure?.electricityAvailable === "boolean"
+          ? property.infrastructure.electricityAvailable
+          : null,
+      roadAccess:
+        typeof property.infrastructure?.roadAccess === "boolean"
+          ? property.infrastructure.roadAccess
+          : null,
+      soilType: (property.soilType as ProfileDetails["soilType"]) ?? "",
+      suitableFor: (property.soilAndFarming?.cropSuitability ?? []).filter(
+        (value): value is ProfileDetails["suitableFor"][number] =>
+          ["Farming", "Resort", "Investment", "Farmhouse"].includes(value)
+      ),
+      description: property.description ?? "",
+    },
+    media: {
+      ...emptyMedia,
+      images: images.map((url, index) => ({
+        id: `edit-${index}-${Date.now()}`,
+        url,
+        source: "remote",
+      })),
+      videoUrl: property.media?.videos?.[0] ?? "",
+    },
+    amenities: {
+      borewell: hasAmenity("borewell"),
+      dripIrrigation: hasAmenity("drip"),
+      fencing: hasAmenity("fencing"),
+      electricityConnection: hasAmenity("electric"),
+      farmRoad: hasAmenity("road"),
+      nearbyHighway: hasAmenity("highway"),
+      storageFacility: hasAmenity("storage"),
+      security: hasAmenity("security"),
+    },
+    completedSteps: {
+      basic: true,
+      location: true,
+      profile: true,
+      media: true,
+      amenities: true,
+      review: false,
+    },
+    draftState: { lastSavedAt: null, isDirty: false },
+    submitLoading: false,
+    submitError: null,
+    editPropertyId: property._id,
+  };
+};
+
+export const loadEditProperty = createAsyncThunk<
+  PostPropertyState,
+  string,
+  { rejectValue: string }
+>("postProperty/loadEditProperty", async (id, { rejectWithValue }) => {
+  try {
+    const property = await fetchPropertyByIdAPI(id);
+    return mapPropertyToEditState(property);
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return rejectWithValue(err.message ?? "Failed to load property for edit");
   }
 });
 
@@ -284,6 +426,9 @@ const postPropertySlice = createSlice({
       Object.assign(state, initial);
       clearPostPropertyDraft();
     },
+    setEditPropertyId(state, action: PayloadAction<string | null>) {
+      state.editPropertyId = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -299,6 +444,17 @@ const postPropertySlice = createSlice({
       .addCase(submitPostProperty.rejected, (state, action) => {
         state.submitLoading = false;
         state.submitError = action.payload ?? "Failed to submit property";
+      })
+      .addCase(loadEditProperty.pending, (state) => {
+        state.submitLoading = true;
+        state.submitError = null;
+      })
+      .addCase(loadEditProperty.fulfilled, (_state, action) => {
+        return action.payload;
+      })
+      .addCase(loadEditProperty.rejected, (state, action) => {
+        state.submitLoading = false;
+        state.submitError = action.payload ?? "Failed to load property";
       });
   },
 });
@@ -318,6 +474,7 @@ export const {
   markDraftSaved,
   saveDraftNow,
   resetPostProperty,
+  setEditPropertyId,
 } = postPropertySlice.actions;
 
 export default postPropertySlice.reducer;

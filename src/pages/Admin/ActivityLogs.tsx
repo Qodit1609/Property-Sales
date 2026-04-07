@@ -8,32 +8,33 @@ import ActivityStats from "../../components/admin/ActivityStats";
 import {
   computeActivityStats,
   filterActivityLogs,
-  MOCK_ACTIVITY_LOGS,
 } from "../../components/admin/activityLogMockData";
 import type {
   ActivityCategoryFilter,
   UserTypeFilter,
 } from "../../components/admin/activityLogTypes";
+import { useAppSelector } from "../../hooks/reduxHooks";
 
 const ActivityLogs: React.FC = () => {
+  const auditLogs = useAppSelector((s) => s.admin.auditLogs);
   const [userType, setUserType] = useState<UserTypeFilter>("all");
   const [activityCategory, setActivityCategory] =
     useState<ActivityCategoryFilter>("all");
   const [search, setSearch] = useState("");
 
   const stats = useMemo(
-    () => computeActivityStats(MOCK_ACTIVITY_LOGS),
-    []
+    () => computeActivityStats(auditLogs),
+    [auditLogs]
   );
 
   const filteredRows = useMemo(
     () =>
-      filterActivityLogs(MOCK_ACTIVITY_LOGS, {
+      filterActivityLogs(auditLogs, {
         userType,
         activityCategory,
         search,
       }),
-    [userType, activityCategory, search]
+    [auditLogs, userType, activityCategory, search]
   );
 
   return (
@@ -54,9 +55,7 @@ const ActivityLogs: React.FC = () => {
                   Activity logs
                 </h1>
                 <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
-                  Track seller, buyer, and admin actions across properties,
-                  documents, and security. Static preview — connect your audit API
-                  when ready.
+                  Track admin actions across properties and users.
                 </p>
               </div>
             </div>
@@ -71,8 +70,7 @@ const ActivityLogs: React.FC = () => {
               Filters
             </h2>
             <p className="mt-1 text-sm text-[var(--muted)]">
-              Narrow by role and category. Date range and export will wire to
-              your backend.
+              Narrow by role and category.
             </p>
           </div>
           <ActivityFilters
