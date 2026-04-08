@@ -18,7 +18,7 @@ const MediaGallery = ({ title, images = [], videos = [], droneView, mapScreensho
   const hasAnyMedia = images.length || videos.length || droneItems.length || mapScreenshot;
 
   if (!hasAnyMedia) {
-    return <p className="text-sm text-[var(--muted)]">No Data Available</p>;
+    return <p className="text-sm text-[var(--muted)]">-</p>;
   }
 
   return (

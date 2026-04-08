@@ -1,7 +1,7 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
-import { saveDraftNow } from "../../features/postProperty/postPropertySlice";
+import { saveDraftNow, setDocuments as setDocumentPreviews } from "../../features/postProperty/postPropertySlice";
 import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
 import DocumentUploadCard, { type DocumentFileKey } from "./DocumentUploadCard";
@@ -46,6 +46,42 @@ export default function PropertyDocumentsStep() {
     pushToast({ kind: "success", title: "Draft saved" });
     navigate("/post-property/amenities");
   };
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    const toDataUrl = (file: File) =>
+      new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "");
+        reader.onerror = () => reject(new Error("Failed to read document"));
+        reader.readAsDataURL(file);
+      });
+
+    const syncDocumentPreviews = async () => {
+      const entries = Object.entries(documents).filter((entry): entry is [string, File] => Boolean(entry[1]));
+      const items = await Promise.all(
+        entries.map(async ([key, file]) => ({
+          id: `doc-${key}`,
+          url: await toDataUrl(file),
+          source: "local" as const,
+          fileName: file.name,
+          sizeBytes: file.size,
+          mimeType: file.type,
+        }))
+      );
+
+      if (!isCancelled) {
+        dispatch(setDocumentPreviews(items));
+      }
+    };
+
+    void syncDocumentPreviews();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [dispatch, documents]);
 
   return (
     <div>

@@ -68,7 +68,7 @@ export default function PostPropertyLayout() {
     const locationBaseOk =
       Object.keys(validateLocationDetails(post.locationDetails)).length === 0;
     const profileOk =
-      Object.keys(validateProfileDetails(post.profileDetails)).length === 0;
+      Object.keys(validateProfileDetails(post.profileDetails, post.basicDetails)).length === 0;
     const mediaOk = Object.keys(validateMedia(post.media)).length === 0;
 
     // Survey number required when Agriculture Land

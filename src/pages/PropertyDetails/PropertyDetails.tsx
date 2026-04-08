@@ -8,6 +8,8 @@ import PropertyPreview, {
 } from "../../components/PropertyPreview/PropertyPreview";
 import { Button } from "@/components/common";
 
+const ADMIN_VIEWED_STORAGE_KEY = "admin_viewed_property_ids";
+
 const PropertyDetails = () => {
   const { id } = useParams();
   const dispatch = useAppDispatch();
@@ -16,6 +18,7 @@ const PropertyDetails = () => {
   const { selectedProperty, selectedLoading, selectedError } =
     useAppSelector((state) => state.properties);
   const isBuyer = useAppSelector((state) => state.auth.user?.role === "buyer");
+  const isAdmin = useAppSelector((state) => state.auth.user?.role === "admin");
 
   useEffect(() => {
     if (id) {
@@ -29,6 +32,25 @@ const PropertyDetails = () => {
       dispatch(recordPropertyView(selectedProperty));
     }
   }, [dispatch, selectedProperty, id, isBuyer]);
+
+  useEffect(() => {
+    if (!isAdmin || !id || !selectedProperty || selectedProperty._id !== id) return;
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.sessionStorage.getItem(ADMIN_VIEWED_STORAGE_KEY);
+      const parsed = raw ? (JSON.parse(raw) as unknown) : [];
+      const ids = Array.isArray(parsed)
+        ? parsed.map((value) => String(value))
+        : [];
+      if (ids.includes(id)) return;
+      window.sessionStorage.setItem(
+        ADMIN_VIEWED_STORAGE_KEY,
+        JSON.stringify([...ids, id])
+      );
+    } catch {
+      // Avoid blocking details render on storage parse issues.
+    }
+  }, [isAdmin, id, selectedProperty]);
 
   if (selectedLoading) {
     return <PropertyPreviewSkeleton />;

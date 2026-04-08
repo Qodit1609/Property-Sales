@@ -6,6 +6,7 @@ import InfoItem from "./InfoItem";
 import MediaGallery from "./MediaGallery";
 import PropertySection from "./PropertySection";
 import RiskCard from "./RiskCard";
+import { formatPrice } from "../../utils/propertyFormatters";
 
 type PropertyExtendedDetailsProps = {
   property: Property;
@@ -51,7 +52,7 @@ const parseNumber = (value: unknown): number | undefined => {
 
 const renderTagList = (items?: string[]) => {
   if (!items?.length) {
-    return <p className="text-sm text-[var(--muted)]">No Data Available</p>;
+    return <p className="text-sm text-[var(--muted)]">-</p>;
   }
 
   return (
@@ -78,7 +79,7 @@ const renderFacilityGroup = (title: string, items?: string[]) => (
         ))}
       </ul>
     ) : (
-      <p className="mt-2 text-sm text-[var(--muted)]">No Data Available</p>
+      <p className="mt-2 text-sm text-[var(--muted)]">-</p>
     )}
   </div>
 );
@@ -109,6 +110,7 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
   const climate = property.climateRisk;
   const investment = property.investment;
   const availability = property.availabilityStatus ?? "Available";
+  const mapLink = property.location?.googleMapLink ?? property.mapLink;
   const coordinates = property.location?.coordinates;
   const latitude = Array.isArray(coordinates)
     ? coordinates[1]
@@ -116,11 +118,34 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
   const longitude = Array.isArray(coordinates)
     ? coordinates[0]
     : coordinates?.lng;
+  const analytics = property.analytics;
+  const dealer = property.dealer ?? {};
+  const seller = property.seller ?? {};
+  const owner = property.ownerDetails ?? {};
+  const areaValue = property.area ?? property.size ?? property.landSize;
+  const areaUnit = property.areaUnit ?? property.landUnit;
 
   return (
     <div className="space-y-4">
-      <PropertySection title="Location & Geo">
+      <PropertySection title="Basic Details">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <InfoItem label="Title" value={property.title} />
+          <InfoItem label="Property Type" value={property.propertyType} />
+          <InfoItem label="Listing Type" value={property.listingType?.toUpperCase()} />
+          <InfoItem label="Description" value={property.description} />
+          <InfoItem label="Short Description" value={property.shortDescription} />
+          <InfoItem label="Tags" value={property.tags?.length ? property.tags.join(", ") : undefined} />
+        </div>
+      </PropertySection>
+
+      <PropertySection title="Location Details">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <InfoItem label="Address" value={property.location?.address ?? property.address} />
+          <InfoItem label="Locality" value={property.location?.locality} />
+          <InfoItem label="City" value={property.location?.city} />
+          <InfoItem label="State" value={property.location?.state} />
+          <InfoItem label="Pincode" value={property.location?.pincode} />
+          <InfoItem label="Map Link" value={mapLink} />
           <InfoItem label="Latitude" value={latitude} />
           <InfoItem label="Longitude" value={longitude} />
           <InfoItem label="GeoJSON Type" value={property.location?.geoJSON?.type} />
@@ -138,6 +163,17 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
           />
           <InfoItem label="Highway Distance" value={locationDistances?.highway} suffix=" km" />
           <InfoItem label="Airport Distance" value={locationDistances?.airport} suffix=" km" />
+        </div>
+      </PropertySection>
+
+      <PropertySection title="Pricing & Area">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <InfoItem label="Price" value={formatPrice(property.price, property.listingType)} />
+          <InfoItem label="Price / Sqft" value={analytics?.pricePerSqft ?? property.pricePerSqft} />
+          <InfoItem label="Area" value={areaValue} suffix={areaUnit ? ` ${areaUnit}` : undefined} />
+          <InfoItem label="Land Size" value={property.landSize} suffix={property.landUnit ? ` ${property.landUnit}` : undefined} />
+          <InfoItem label="Bedrooms" value={property.bedrooms ?? property.beds} />
+          <InfoItem label="Bathrooms" value={property.bathrooms ?? property.baths} />
         </div>
       </PropertySection>
 
@@ -190,7 +226,7 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
         </div>
       </PropertySection>
 
-      <PropertySection title="Legal">
+      <PropertySection title="Legal Information">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <InfoItem label="Land Registry Available" value={parseBoolean(legal?.landRegistryAvailable ?? legal?.landRegistry)} />
           <InfoItem label="Ownership Documents" value={parseBoolean(legal?.ownershipDocuments ?? legal?.ownershipDocs)} />
@@ -199,7 +235,7 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
         </div>
       </PropertySection>
 
-      <PropertySection title="Features">
+      <PropertySection title="Features & Amenities">
         <FeatureList
           items={[
             { label: "Construction Allowed", enabled: parseBoolean(featureFlags?.constructionAllowed) },
@@ -209,6 +245,10 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
             { label: "Power Backup", enabled: parseBoolean(featureFlags?.powerBackup) },
           ]}
         />
+        <div className="mt-4">
+          <p className="mb-2 text-sm font-semibold text-[var(--b1)]">Amenities</p>
+          {renderTagList(property.amenities)}
+        </div>
       </PropertySection>
 
       <PropertySection title="Media">
@@ -219,6 +259,23 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
           droneView={media?.droneView}
           mapScreenshot={media?.mapScreenshot}
         />
+      </PropertySection>
+
+      <PropertySection title="Dealer Information">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <InfoItem label="Dealer Name" value={dealer.name} />
+          <InfoItem label="Dealer Phone" value={dealer.phone} />
+          <InfoItem label="Dealer Type" value={dealer.type} />
+          <InfoItem label="Dealer Verified" value={parseBoolean(dealer.verified)} />
+          <InfoItem label="Seller Name" value={seller.name} />
+          <InfoItem label="Seller Phone" value={seller.phone} />
+          <InfoItem label="Seller Email" value={seller.email} />
+          <InfoItem label="Seller Verified" value={parseBoolean(seller.verified)} />
+          <InfoItem label="Owner Name" value={owner.name} />
+          <InfoItem label="Owner Phone" value={owner.phone} />
+          <InfoItem label="Owner Type" value={owner.type} />
+          <InfoItem label="Owner Verified" value={parseBoolean(owner.verified)} />
+        </div>
       </PropertySection>
 
       <PropertySection title="Topography">
@@ -245,7 +302,7 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
         </div>
       </PropertySection>
 
-      <PropertySection title="Investment">
+      <PropertySection title="Investment Insights">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <InfoItem
             label="Expected ROI"
@@ -260,7 +317,18 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
         </div>
       </PropertySection>
 
-      <PropertySection title="Property Status">
+      <PropertySection title="Analytics">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <InfoItem label="Views" value={analytics?.views} />
+          <InfoItem label="Saves" value={analytics?.saves} />
+          <InfoItem label="Contact Clicks" value={analytics?.contactClicks} />
+          <InfoItem label="ROI %" value={analytics?.roiPercent ?? property.roiPercent} suffix="%" />
+          <InfoItem label="Appreciation Rate" value={analytics?.appreciationRate} suffix="%" />
+          <InfoItem label="Price / Sqft" value={analytics?.pricePerSqft ?? property.pricePerSqft} />
+        </div>
+      </PropertySection>
+
+      <PropertySection title="Status">
         <div className="flex items-center gap-2">
           <Mountain size={16} className="text-[var(--b1)]" />
           <span className="text-sm font-medium text-[var(--b1)]">Current Status</span>

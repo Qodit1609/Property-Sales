@@ -4,6 +4,8 @@ import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
+  Eye,
+  EyeOff,
   Pencil,
   Trash2,
   XCircle,
@@ -36,6 +38,19 @@ const PROPERTY_TYPES = [
 ] as const;
 
 const PER_PAGE = 10;
+const ADMIN_VIEWED_STORAGE_KEY = "admin_viewed_property_ids";
+
+function getViewedIdsFromSession(): Set<string> {
+  if (typeof window === "undefined") return new Set<string>();
+  try {
+    const raw = window.sessionStorage.getItem(ADMIN_VIEWED_STORAGE_KEY);
+    const parsed = raw ? (JSON.parse(raw) as unknown) : [];
+    if (!Array.isArray(parsed)) return new Set<string>();
+    return new Set(parsed.map((value) => String(value)));
+  } catch {
+    return new Set<string>();
+  }
+}
 
 function approvalLabel(status: string | undefined): string {
   const s = (status ?? "pending").toLowerCase();
@@ -97,6 +112,9 @@ const AdminPropertiesPage: React.FC = () => {
 
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [viewedIds, setViewedIds] = useState<Set<string>>(() =>
+    getViewedIdsFromSession()
+  );
 
   const load = useCallback(() => {
     dispatch(
@@ -123,6 +141,17 @@ const AdminPropertiesPage: React.FC = () => {
   }, [load]);
 
   useEffect(() => {
+    const syncViewedIds = () => {
+      setViewedIds(getViewedIdsFromSession());
+    };
+    syncViewedIds();
+    window.addEventListener("focus", syncViewedIds);
+    return () => {
+      window.removeEventListener("focus", syncViewedIds);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!mutationError) return;
     const timer = window.setTimeout(() => {
       pushToast({ kind: "error", title: mutationError });
@@ -134,6 +163,13 @@ const AdminPropertiesPage: React.FC = () => {
   const openEdit = useCallback(
     (listing: Property) => {
       navigate(`/post-property/basic?edit=${listing._id}`);
+    },
+    [navigate]
+  );
+
+  const openDetails = useCallback(
+    (listing: Property) => {
+      navigate(`/properties/${listing._id}`);
     },
     [navigate]
   );
@@ -151,7 +187,21 @@ const AdminPropertiesPage: React.FC = () => {
     });
   }, [listings, search, filterStatus, filterType]);
 
-  const handleApprove = (id: string) => {
+  const isListingViewed = useCallback(
+    (listing: Property) => {
+      const viewedFlag = (listing as Property & { isViewed?: boolean }).isViewed;
+      return Boolean(viewedFlag) || viewedIds.has(listing._id);
+    },
+    [viewedIds]
+  );
+
+  const handleApprove = (listing: Property) => {
+    if (!isListingViewed(listing)) {
+      window.alert("First view the property");
+      return;
+    }
+
+    const id = listing._id;
     dispatch(approveListing(id))
       .unwrap()
       .then(() =>
@@ -185,7 +235,7 @@ const AdminPropertiesPage: React.FC = () => {
   const canNext = page < totalPages;
 
   const actionBtn =
-    "inline-flex items-center gap-1 text-[11px] font-medium disabled:opacity-50";
+    "inline-flex items-center gap-1 whitespace-nowrap text-[11px] font-medium disabled:opacity-50";
 
   return (
     <AdminLayout title="Properties">
@@ -305,9 +355,11 @@ const AdminPropertiesPage: React.FC = () => {
                 <PropertyCardMobile
                   key={listing._id}
                   listing={listing}
+                  isViewed={isListingViewed(listing)}
                   actionLoading={actionLoading}
-                  onApprove={() => handleApprove(listing._id)}
+                  onApprove={() => handleApprove(listing)}
                   onReject={() => setRejectId(listing._id)}
+                  onOpenDetails={() => openDetails(listing)}
                   onEdit={() => openEdit(listing)}
                   onDelete={() => setDeleteId(listing._id)}
                   actionBtn={actionBtn}
@@ -336,9 +388,19 @@ const AdminPropertiesPage: React.FC = () => {
                     <tr
                       key={listing._id}
                       className={[
-                        "transition-colors hover:bg-[var(--b2-soft)]/80",
+                        "cursor-pointer transition-colors hover:bg-[var(--b2-soft)]/80",
                         index % 2 === 1 ? "bg-[var(--b2-soft)]/15" : "",
                       ].join(" ")}
+                      onClick={() => openDetails(listing)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          openDetails(listing);
+                        }
+                      }}
+                      tabIndex={0}
+                      role="link"
+                      aria-label={`Open details for ${listing.title || "property"}`}
                     >
                       <td className="px-4 py-3 align-top">
                         <p className="text-xs font-semibold text-[var(--b1)]">
@@ -364,18 +426,42 @@ const AdminPropertiesPage: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-4 py-3 align-top text-right">
-                        <div className="flex flex-wrap justify-end gap-1">
+                        <div className="flex flex-nowrap justify-end gap-1 overflow-x-auto">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            disabled={actionLoading}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openDetails(listing);
+                            }}
+                            className={`${actionBtn} border-[var(--b2)]`}
+                            aria-label={isListingViewed(listing) ? "Viewed" : "Unviewed"}
+                            title={isListingViewed(listing) ? "Viewed" : "Unviewed"}
+                          >
+                            {isListingViewed(listing) ? (
+                              <Eye className="h-3.5 w-3.5" />
+                            ) : (
+                              <EyeOff className="h-3.5 w-3.5" />
+                            )}
+                            View
+                          </Button>
                           <Button
                             type="button"
                             size="sm"
                             variant="outline"
                             disabled={
                               actionLoading ||
+                              !isListingViewed(listing) ||
                               ["approved", "sold"].includes(
                                 normalizedStatus(listing.status)
                               )
                             }
-                            onClick={() => handleApprove(listing._id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleApprove(listing);
+                            }}
                             className={`${actionBtn} border-emerald-500/40 text-emerald-700`}
                           >
                             <CheckCircle2 className="h-3.5 w-3.5" />
@@ -387,11 +473,15 @@ const AdminPropertiesPage: React.FC = () => {
                             variant="outline"
                             disabled={
                               actionLoading ||
+                              !isListingViewed(listing) ||
                               ["rejected", "sold"].includes(
                                 normalizedStatus(listing.status)
                               )
                             }
-                            onClick={() => setRejectId(listing._id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setRejectId(listing._id);
+                            }}
                             className={`${actionBtn} border-amber-500/40 text-amber-800`}
                           >
                             <XCircle className="h-3.5 w-3.5" />
@@ -401,8 +491,11 @@ const AdminPropertiesPage: React.FC = () => {
                             type="button"
                             size="sm"
                             variant="outline"
-                            disabled={actionLoading}
-                            onClick={() => openEdit(listing)}
+                            disabled={actionLoading || !isListingViewed(listing)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openEdit(listing);
+                            }}
                             className={`${actionBtn} border-[var(--b2)]`}
                           >
                             <Pencil className="h-3.5 w-3.5" />
@@ -412,8 +505,11 @@ const AdminPropertiesPage: React.FC = () => {
                             type="button"
                             size="sm"
                             variant="outline"
-                            disabled={actionLoading}
-                            onClick={() => setDeleteId(listing._id)}
+                            disabled={actionLoading || !isListingViewed(listing)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteId(listing._id);
+                            }}
                             className={`${actionBtn} border-rose-500/40 text-rose-700`}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
@@ -563,17 +659,21 @@ function Modal({
 
 const PropertyCardMobile = React.memo(function PropertyCardMobile({
   listing,
+  isViewed,
   actionLoading,
   onApprove,
   onReject,
+  onOpenDetails,
   onEdit,
   onDelete,
   actionBtn,
 }: {
   listing: Property;
+  isViewed: boolean;
   actionLoading: boolean;
   onApprove: () => void;
   onReject: () => void;
+  onOpenDetails: () => void;
   onEdit: () => void;
   onDelete: () => void;
   actionBtn: string;
@@ -585,9 +685,13 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
     <div className="rounded-xl border border-[var(--b2)] bg-[var(--white)] p-3 shadow-sm">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <p className="text-sm font-semibold text-[var(--b1)]">
+          <button
+            type="button"
+            onClick={onOpenDetails}
+            className="text-left text-sm font-semibold text-[var(--b1)] hover:underline"
+          >
             {listing.title || "Untitled"}
-          </p>
+          </button>
           <p className="mt-1 text-[11px] text-[var(--b1-mid)] line-clamp-2">
             {listing.address}
           </p>
@@ -605,12 +709,29 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
         <span>·</span>
         <span>₹ {listing.price?.toLocaleString("en-IN") ?? "—"}</span>
       </div>
-      <div className="mt-3 flex flex-wrap gap-1.5">
+      <div className="mt-3 flex flex-nowrap gap-1.5 overflow-x-auto">
         <Button
           type="button"
           size="sm"
           variant="outline"
-          disabled={actionLoading || cannotApprove}
+          disabled={actionLoading}
+          onClick={onOpenDetails}
+          className={`${actionBtn} border-[var(--b2)]`}
+          aria-label={isViewed ? "Viewed" : "Unviewed"}
+          title={isViewed ? "Viewed" : "Unviewed"}
+        >
+          {isViewed ? (
+            <Eye className="h-3.5 w-3.5" />
+          ) : (
+            <EyeOff className="h-3.5 w-3.5" />
+          )}
+          View
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          disabled={actionLoading || !isViewed || cannotApprove}
           onClick={onApprove}
           className={`${actionBtn} border-emerald-500/40 text-emerald-700`}
         >
@@ -620,7 +741,7 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
           type="button"
           size="sm"
           variant="outline"
-          disabled={actionLoading || cannotReject}
+          disabled={actionLoading || !isViewed || cannotReject}
           onClick={onReject}
           className={`${actionBtn} border-amber-500/40 text-amber-800`}
         >
@@ -630,7 +751,7 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
           type="button"
           size="sm"
           variant="outline"
-          disabled={actionLoading}
+          disabled={actionLoading || !isViewed}
           onClick={onEdit}
           className={`${actionBtn} border-[var(--b2)]`}
         >
@@ -640,7 +761,7 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
           type="button"
           size="sm"
           variant="outline"
-          disabled={actionLoading}
+          disabled={actionLoading || !isViewed}
           onClick={onDelete}
           className={`${actionBtn} border-rose-500/40 text-rose-700`}
         >

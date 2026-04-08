@@ -14,6 +14,7 @@ import {
 import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
 import { Button } from "@/components/common";
+import { FileText } from "lucide-react";
 
 function SummaryRow({
   label,
@@ -45,6 +46,11 @@ function formatVideoPreview(value: string): string {
   return `${trimmed.slice(0, 35)}...${trimmed.slice(-20)}`;
 }
 
+function isImageDocument(mimeType?: string, fileName?: string): boolean {
+  if (mimeType?.startsWith("image/")) return true;
+  return /\.(jpe?g|png|gif|webp)$/i.test(fileName ?? "");
+}
+
 export default function ReviewSubmit() {
   const { pushToast } = useOutletContext<PostPropertyOutletContext>();
   const navigate = useNavigate();
@@ -62,7 +68,7 @@ export default function ReviewSubmit() {
         ? { surveyNumber: "Survey number is required for agriculture land" }
         : {}),
     };
-    const profile = validateProfileDetails(post.profileDetails);
+    const profile = validateProfileDetails(post.profileDetails, post.basicDetails);
     const media = validateMedia(post.media);
     return { basic, location, profile, media };
   }, [post.basicDetails, post.locationDetails, post.media, post.profileDetails]);
@@ -231,6 +237,61 @@ export default function ReviewSubmit() {
           </div>
           <div className="mt-3 divide-y divide-[var(--b2)]">
             <SummaryRow label="Images" value={`${post.media.images.length}`} />
+            {post.media.images.length > 0 && (
+              <div className="py-3">
+                <p className="text-xs font-semibold text-[var(--muted)]">Image preview</p>
+                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+                  {post.media.images.map((image) => (
+                    <div
+                      key={image.id}
+                      className="overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]/40"
+                    >
+                      <div className="aspect-[4/3] w-full">
+                        <img
+                          src={image.url}
+                          alt={image.fileName || "Property image"}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            <SummaryRow label="Documents" value={`${post.media.documents.length}`} />
+            {post.media.documents.length > 0 && (
+              <div className="py-3">
+                <p className="text-xs font-semibold text-[var(--muted)]">Documents preview</p>
+                <div className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+                  {post.media.documents.map((doc) => {
+                    const showImage = isImageDocument(doc.mimeType, doc.fileName);
+                    return (
+                      <div
+                        key={doc.id}
+                        className="overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--white)]"
+                      >
+                        <div className="aspect-[4/3] w-full bg-[var(--b2-soft)]/50">
+                          {showImage ? (
+                            <img
+                              src={doc.url}
+                              alt={doc.fileName || "Document"}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-[var(--muted)]">
+                              <FileText className="h-8 w-8" strokeWidth={1.75} aria-hidden />
+                            </div>
+                          )}
+                        </div>
+                        <p className="truncate border-t border-[var(--b2)] px-2 py-1.5 text-[10px] text-[var(--muted)]">
+                          {doc.fileName || "Document"}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             <SummaryRow
               label="Video"
               value={formatVideoPreview(post.media.videoUrl ?? "")}

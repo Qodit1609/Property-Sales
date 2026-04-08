@@ -33,7 +33,10 @@ export function validateLocationDetails(values: LocationDetails) {
   return errors;
 }
 
-export function validateProfileDetails(values: ProfileDetails) {
+export function validateProfileDetails(
+  values: ProfileDetails,
+  basicDetails?: BasicDetails
+) {
   const errors: ValidationErrors<ProfileDetails> = {};
   if (values.totalArea == null || Number.isNaN(values.totalArea) || values.totalArea <= 0) {
     errors.totalArea = "Enter total area";
@@ -42,6 +45,34 @@ export function validateProfileDetails(values: ProfileDetails) {
     errors.price = "Enter price";
   }
   if (!values.ownershipType) errors.ownershipType = "Select ownership type";
+  const isAgricultureLandProfile =
+    basicDetails?.category === "Agriculture Land" ||
+    basicDetails?.propertyType === "Agriculture Land" ||
+    basicDetails?.propertyType === "Farmland" ||
+    basicDetails?.propertyType === "Plot";
+  const requiresResidentialSpecs =
+    !isAgricultureLandProfile &&
+    ["House", "Apartment", "Flat", "Villa", "Farmhouse", "Resort"].includes(
+      basicDetails?.propertyType ?? ""
+    );
+  if (requiresResidentialSpecs) {
+    if (
+      values.bedrooms == null ||
+      Number.isNaN(values.bedrooms) ||
+      values.bedrooms < 0
+    ) {
+      errors.bedrooms = "Enter bedrooms";
+    }
+    if (
+      values.bathrooms == null ||
+      Number.isNaN(values.bathrooms) ||
+      values.bathrooms < 0
+    ) {
+      errors.bathrooms = "Enter bathrooms";
+    }
+    if (!values.floor.trim()) errors.floor = "Enter floor";
+    if (!values.furnishing.trim()) errors.furnishing = "Enter furnishing";
+  }
   if (!values.description.trim()) errors.description = "Add description";
   return errors;
 }

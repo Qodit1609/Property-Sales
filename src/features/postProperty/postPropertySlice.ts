@@ -30,6 +30,7 @@ const emptyBasicDetails: BasicDetails = {
   category: "",
   propertyType: "",
   title: "",
+  shortDescription: "",
   contactName: "",
   contactEmail: "",
   contactMobile: "",
@@ -39,8 +40,11 @@ const emptyBasicDetails: BasicDetails = {
 const emptyLocationDetails: LocationDetails = {
   state: "",
   city: "",
+  district: "",
   tehsil: "",
   village: "",
+  address: "",
+  landmark: "",
   locality: "",
   surveyNumber: "",
   pinCode: "",
@@ -53,17 +57,52 @@ const emptyProfileDetails: ProfileDetails = {
   areaUnit: "acre",
   price: null,
   negotiable: false,
+  bedrooms: null,
+  bathrooms: null,
+  floor: "",
+  furnishing: "",
+  facing: "",
+  parking: null,
+  powerBackup: null,
+  security: null,
+  constructionAllowed: null,
+  farmhouseBuilt: null,
   ownershipType: "",
+  landRegistry: null,
+  ownershipDocs: null,
+  encumbrance: null,
+  landUseType: "",
   waterAvailability: null,
+  waterAvailabilityText: "",
+  borewell: null,
+  irrigation: null,
+  borewellDepth: null,
+  nearbySources: "",
   electricityAvailability: null,
   roadAccess: null,
+  roadType: "",
+  gated: null,
+  airportDistance: null,
+  railwayDistance: null,
+  highwayDistance: null,
+  cityCenterDistance: null,
+  nearbySchools: "",
+  nearbyHospitals: "",
+  nearbyMarkets: "",
   soilType: "",
+  soilQualityIndex: null,
+  annualRainfall: null,
+  irrigationSupport: null,
+  farmingPercentage: null,
   suitableFor: [],
+  roiPercent: null,
+  appreciationRate: null,
   description: "",
 };
 
 const emptyMedia: MediaState = {
   images: [],
+  documents: [],
   videoUrl: "",
   uploading: false,
   uploadError: null,
@@ -109,7 +148,12 @@ function hydrateInitialState(): PostPropertyState {
     basicDetails: { ...emptyBasicDetails, ...(draft.basicDetails ?? {}) },
     locationDetails: { ...emptyLocationDetails, ...(draft.locationDetails ?? {}) },
     profileDetails: { ...emptyProfileDetails, ...(draft.profileDetails ?? {}) },
-    media: { ...emptyMedia, ...(draft.media ?? {}), images: draft.media?.images ?? [] },
+    media: {
+      ...emptyMedia,
+      ...(draft.media ?? {}),
+      images: draft.media?.images ?? [],
+      documents: draft.media?.documents ?? [],
+    },
     amenities: { ...emptyAmenities, ...(draft.amenities ?? {}) },
     draftState: {
       lastSavedAt: draft.draftState?.lastSavedAt ?? null,
@@ -159,12 +203,15 @@ export const submitPostProperty = createAsyncThunk<
     // Map to existing backend payload shape used by seller listings.
     // Extended fields are persisted in the draft for now; backend integration
     // can be expanded later without changing the UI contract.
-    const payload: SellerListingPayload = {
+    const payload = {
       title: state.basicDetails.title,
       address: [
+        state.locationDetails.address,
+        state.locationDetails.landmark,
         state.locationDetails.locality,
         state.locationDetails.village,
         state.locationDetails.tehsil,
+        state.locationDetails.district,
         state.locationDetails.city,
         state.locationDetails.state,
         state.locationDetails.pinCode,
@@ -176,17 +223,115 @@ export const submitPostProperty = createAsyncThunk<
       pincode: state.locationDetails.pinCode,
       locality: state.locationDetails.locality,
       price: state.profileDetails.price ?? 0,
+      size: state.profileDetails.totalArea ?? undefined,
+      beds: state.profileDetails.bedrooms ?? undefined,
+      baths: state.profileDetails.bathrooms ?? undefined,
+      parking: state.profileDetails.parking == null ? undefined : state.profileDetails.parking ? 1 : 0,
       images: imageUrls,
       propertyType,
       listingType,
       description: state.profileDetails.description,
+      shortDescription: state.basicDetails.shortDescription,
       latitude: state.locationDetails.latitude ?? 0,
       longitude: state.locationDetails.longitude ?? 0,
+      area: state.profileDetails.totalArea ?? undefined,
+      areaUnit: state.profileDetails.areaUnit,
+      landSize: state.profileDetails.totalArea ?? undefined,
+      location: {
+        address: state.locationDetails.address,
+        locality: state.locationDetails.locality,
+        city: state.locationDetails.city,
+        state: state.locationDetails.state,
+        pincode: state.locationDetails.pinCode,
+        distances: {
+          airport: state.profileDetails.airportDistance ?? undefined,
+          railway: state.profileDetails.railwayDistance ?? undefined,
+          highway: state.profileDetails.highwayDistance ?? undefined,
+          cityCenter: state.profileDetails.cityCenterDistance ?? undefined,
+        },
+        nearbyFacilities: {
+          schools: state.profileDetails.nearbySchools
+            .split(",")
+            .map((value) => value.trim())
+            .filter(Boolean),
+          hospitals: state.profileDetails.nearbyHospitals
+            .split(",")
+            .map((value) => value.trim())
+            .filter(Boolean),
+          markets: state.profileDetails.nearbyMarkets
+            .split(",")
+            .map((value) => value.trim())
+            .filter(Boolean),
+        },
+        coordinates:
+          state.locationDetails.latitude != null && state.locationDetails.longitude != null
+            ? { lat: state.locationDetails.latitude, lng: state.locationDetails.longitude }
+            : undefined,
+      },
+      features: {
+        parking: state.profileDetails.parking,
+        powerBackup: state.profileDetails.powerBackup,
+        security: state.profileDetails.security,
+        constructionAllowed: state.profileDetails.constructionAllowed,
+        farmhouseBuilt: state.profileDetails.farmhouseBuilt,
+        facing: state.profileDetails.facing || undefined,
+        floor: state.profileDetails.floor || undefined,
+      },
+      legal: {
+        landRegistry: state.profileDetails.landRegistry,
+        ownershipDocs: state.profileDetails.ownershipDocs,
+        encumbrance: state.profileDetails.encumbrance,
+        landUseType: state.profileDetails.landUseType || undefined,
+        constructionAllowed: state.profileDetails.constructionAllowed,
+      },
+      waterResources: {
+        borewell: state.profileDetails.borewell,
+        borewellDepth: state.profileDetails.borewellDepth ?? undefined,
+        waterAvailability:
+          state.profileDetails.waterAvailabilityText ||
+          (state.profileDetails.waterAvailability == null
+            ? undefined
+            : state.profileDetails.waterAvailability
+            ? "Good"
+            : "Limited"),
+        irrigation: state.profileDetails.irrigation,
+        nearbySources: state.profileDetails.nearbySources
+          .split(",")
+          .map((value) => value.trim())
+          .filter(Boolean),
+      },
+      infrastructure: {
+        electricityAvailable: state.profileDetails.electricityAvailability,
+        roadAccess: state.profileDetails.roadAccess,
+        roadType: state.profileDetails.roadType || undefined,
+        fencing: state.amenities.fencing,
+        gated: state.profileDetails.gated,
+      },
+      soilAndFarming: {
+        soilType: state.profileDetails.soilType || undefined,
+        soilQualityIndex: state.profileDetails.soilQualityIndex ?? undefined,
+        cropSuitability: state.profileDetails.suitableFor,
+        rainfallData:
+          state.profileDetails.annualRainfall != null || state.profileDetails.irrigationSupport != null
+            ? {
+                annualRainfall: state.profileDetails.annualRainfall ?? undefined,
+                irrigationSupport: state.profileDetails.irrigationSupport ?? undefined,
+              }
+            : undefined,
+        farmingPercentage: state.profileDetails.farmingPercentage ?? undefined,
+      },
+      investment: {
+        expectedROI: state.profileDetails.roiPercent ?? undefined,
+        appreciationRate: state.profileDetails.appreciationRate ?? undefined,
+      },
     };
 
     const created = state.editPropertyId
-      ? await updateListingAPI(state.editPropertyId, payload)
-      : await createListingAPI(payload);
+      ? await updateListingAPI(
+          state.editPropertyId,
+          payload as unknown as Partial<SellerListingPayload>,
+        )
+      : await createListingAPI(payload as unknown as SellerListingPayload);
     clearPostPropertyDraft();
     return created;
   } catch (error: unknown) {
@@ -265,6 +410,7 @@ const mapPropertyToEditState = (property: Property): PostPropertyState => {
       category,
       propertyType: property.propertyType ?? "",
       title: property.title ?? "",
+      shortDescription: property.shortDescription ?? "",
       contactName:
         property.ownerDetails?.name ??
         property.dealer?.name ??
@@ -281,7 +427,10 @@ const mapPropertyToEditState = (property: Property): PostPropertyState => {
       ...emptyLocationDetails,
       state: mapDetails.state ?? "",
       city: mapDetails.city ?? "",
+      district: "",
       locality: mapDetails.locality ?? "",
+      address: mapDetails.address ?? property.address ?? "",
+      landmark: "",
       pinCode: mapDetails.pincode ?? "",
       latitude: mapCoordinates?.lat ?? null,
       longitude: mapCoordinates?.lng ?? null,
@@ -291,10 +440,54 @@ const mapPropertyToEditState = (property: Property): PostPropertyState => {
       totalArea,
       areaUnit,
       price: property.price ?? null,
+      bedrooms:
+        typeof property.bedrooms === "number"
+          ? property.bedrooms
+          : typeof property.beds === "number"
+          ? property.beds
+          : null,
+      bathrooms:
+        typeof property.bathrooms === "number"
+          ? property.bathrooms
+          : typeof property.baths === "number"
+          ? property.baths
+          : null,
+      floor: String(property.features?.floor ?? property.floor ?? ""),
+      furnishing: "",
+      facing: String(property.features?.facing ?? property.facing ?? ""),
+      parking:
+        typeof property.features?.parking === "boolean"
+          ? property.features.parking
+          : typeof property.parking === "number"
+          ? property.parking > 0
+          : null,
+      powerBackup:
+        typeof property.features?.powerBackup === "boolean" ? property.features.powerBackup : null,
+      security: typeof property.features?.security === "boolean" ? property.features.security : null,
+      constructionAllowed:
+        typeof property.features?.constructionAllowed === "boolean"
+          ? property.features.constructionAllowed
+          : typeof property.legal?.constructionAllowed === "boolean"
+          ? property.legal.constructionAllowed
+          : null,
+      farmhouseBuilt:
+        typeof property.features?.farmhouseBuilt === "boolean" ? property.features.farmhouseBuilt : null,
+      landRegistry:
+        typeof property.legal?.landRegistry === "boolean" ? property.legal.landRegistry : null,
+      ownershipDocs:
+        typeof property.legal?.ownershipDocs === "boolean" ? property.legal.ownershipDocs : null,
+      encumbrance:
+        typeof property.legal?.encumbrance === "boolean" ? property.legal.encumbrance : null,
+      landUseType: property.legal?.landUseType ?? "",
       waterAvailability:
         typeof property.waterResources?.waterAvailability === "string"
           ? property.waterResources.waterAvailability.toLowerCase() === "good"
           : null,
+      waterAvailabilityText: property.waterResources?.waterAvailability ?? "",
+      borewell: typeof property.waterResources?.borewell === "boolean" ? property.waterResources.borewell : null,
+      irrigation: typeof property.waterResources?.irrigation === "boolean" ? property.waterResources.irrigation : null,
+      borewellDepth: property.waterResources?.borewellDepth ?? null,
+      nearbySources: (property.waterResources?.nearbySources ?? []).join(", "),
       electricityAvailability:
         typeof property.infrastructure?.electricityAvailable === "boolean"
           ? property.infrastructure.electricityAvailable
@@ -303,11 +496,50 @@ const mapPropertyToEditState = (property: Property): PostPropertyState => {
         typeof property.infrastructure?.roadAccess === "boolean"
           ? property.infrastructure.roadAccess
           : null,
+      roadType: property.infrastructure?.roadType ?? "",
+      gated: typeof property.infrastructure?.gated === "boolean" ? property.infrastructure.gated : null,
+      airportDistance: property.location?.distances?.airport ?? property.infrastructure?.distances?.airport ?? null,
+      railwayDistance:
+        property.location?.distances?.railway ??
+        property.location?.distances?.railwayStation ??
+        property.infrastructure?.distances?.railway ??
+        null,
+      highwayDistance: property.location?.distances?.highway ?? property.infrastructure?.distances?.highway ?? null,
+      cityCenterDistance:
+        property.location?.distances?.cityCenter ?? property.infrastructure?.distances?.cityCenter ?? null,
+      nearbySchools:
+        (property.location?.nearbyFacilities?.schools ??
+          property.infrastructure?.nearbyFacilities?.schools ??
+          []
+        ).join(", "),
+      nearbyHospitals:
+        (property.location?.nearbyFacilities?.hospitals ??
+          property.infrastructure?.nearbyFacilities?.hospitals ??
+          []
+        ).join(", "),
+      nearbyMarkets:
+        (property.location?.nearbyFacilities?.markets ??
+          property.infrastructure?.nearbyFacilities?.markets ??
+          []
+        ).join(", "),
       soilType: (property.soilType as ProfileDetails["soilType"]) ?? "",
+      soilQualityIndex: property.soilAndFarming?.soilQualityIndex ?? null,
+      annualRainfall:
+        typeof property.soilAndFarming?.rainfallData === "object"
+          ? property.soilAndFarming.rainfallData?.annualRainfall ?? null
+          : null,
+      irrigationSupport:
+        typeof property.soilAndFarming?.rainfallData === "object"
+          ? property.soilAndFarming.rainfallData?.irrigationSupport ?? null
+          : null,
+      farmingPercentage:
+        property.soilAndFarming?.farmingPercentage ?? property.soilAndFarming?.farmingPercent ?? null,
       suitableFor: (property.soilAndFarming?.cropSuitability ?? []).filter(
         (value): value is ProfileDetails["suitableFor"][number] =>
           ["Farming", "Resort", "Investment", "Farmhouse"].includes(value)
       ),
+      roiPercent: property.investment?.expectedROI ?? property.analytics?.roiPercent ?? property.roiPercent ?? null,
+      appreciationRate: property.investment?.appreciationRate ?? property.analytics?.appreciationRate ?? null,
       description: property.description ?? "",
     },
     media: {
@@ -398,6 +630,10 @@ const postPropertySlice = createSlice({
       state.media.images = state.media.images.filter((i) => i.id !== action.payload);
       state.draftState.isDirty = true;
     },
+    setDocuments(state, action: PayloadAction<MediaItem[]>) {
+      state.media.documents = action.payload;
+      state.draftState.isDirty = true;
+    },
     setMediaUploading(state, action: PayloadAction<boolean>) {
       state.media.uploading = action.payload;
     },
@@ -467,6 +703,7 @@ export const {
   setAmenities,
   addImages,
   removeImage,
+  setDocuments,
   setMediaUploading,
   setMediaUploadError,
   setVideoUrl,

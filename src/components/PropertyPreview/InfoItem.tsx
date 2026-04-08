@@ -21,7 +21,7 @@ const getDisplayValue = (value: InfoValue, suffix?: string) => {
     return value;
   }
 
-  return "N/A";
+  return "-";
 };
 
 const InfoItem = ({ label, value, suffix }: InfoItemProps) => {

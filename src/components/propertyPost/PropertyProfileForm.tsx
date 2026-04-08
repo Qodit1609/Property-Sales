@@ -7,6 +7,7 @@ import {
   updateProfileDetails,
 } from "../../features/postProperty/postPropertySlice";
 import type {
+  BasicDetails,
   AreaUnit,
   ProfileDetails,
   OwnershipType,
@@ -29,14 +30,74 @@ const SOIL: SoilType[] = ["Black", "Red", "Alluvial", "Sandy", "Other"];
 
 const SUITABLE: SuitableFor[] = ["Farming", "Resort", "Investment", "Farmhouse"];
 
+const YES_NO_OPTIONS = (
+  value: boolean | null,
+  onChange: (value: boolean | null) => void,
+) => (
+  <select
+    value={value == null ? "" : value ? "yes" : "no"}
+    onChange={(e) => {
+      const next =
+        e.target.value === "" ? null : e.target.value === "yes" ? true : false;
+      onChange(next);
+    }}
+    className="rounded-md border border-[var(--b2)] px-2 py-1 text-xs bg-[var(--white)]"
+  >
+    <option value="">Select</option>
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+  </select>
+);
+
+function FieldLabel({
+  title,
+  required,
+}: {
+  title: string;
+  required: boolean;
+}) {
+  return (
+    <div className="mb-1 flex items-center justify-between gap-2">
+      <label className="block text-sm font-semibold text-[var(--b1)]">{title}</label>
+      <span className="text-[11px] font-semibold text-[var(--muted)]">
+        {required ? "Required" : "Optional"}
+      </span>
+    </div>
+  );
+}
+
 export default function PropertyProfileForm() {
   const { pushToast } = useOutletContext<PostPropertyOutletContext>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const profile = useAppSelector((s) => s.postProperty.profileDetails);
+  const basic = useAppSelector((s) => s.postProperty.basicDetails);
+
+  const isAgricultureLandProfile =
+    basic.category === "Agriculture Land" ||
+    basic.propertyType === "Agriculture Land" ||
+    basic.propertyType === "Farmland" ||
+    basic.propertyType === "Plot";
+  const requiresResidentialSpecs =
+    !isAgricultureLandProfile &&
+    ["House", "Apartment", "Flat", "Villa", "Farmhouse", "Resort"].includes(
+      basic.propertyType
+    );
+  const showResidentialSpecs =
+    !isAgricultureLandProfile &&
+    (requiresResidentialSpecs ||
+      basic.category === "Residential" ||
+      basic.category === "Farmhouse" ||
+      basic.category === "Agri Resort");
+  const showCommercialSpecs =
+    !isAgricultureLandProfile &&
+    (basic.category === "Commercial" || basic.propertyType === "Commercial");
 
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const errors = useMemo(() => validateProfileDetails(profile), [profile]);
+  const errors = useMemo(
+    () => validateProfileDetails(profile, basic as BasicDetails),
+    [basic, profile]
+  );
   const showError = (key: string) =>
     Boolean(touched[key] && (errors as Record<string, string | undefined>)[key]);
 
@@ -48,12 +109,19 @@ export default function PropertyProfileForm() {
   };
 
   const onNext = () => {
-    setTouched({
+    const nextTouched: Record<string, boolean> = {
       totalArea: true,
       price: true,
       ownershipType: true,
       description: true,
-    });
+    };
+    if (requiresResidentialSpecs) {
+      nextTouched.bedrooms = true;
+      nextTouched.bathrooms = true;
+      nextTouched.floor = true;
+      nextTouched.furnishing = true;
+    }
+    setTouched(nextTouched);
     if (Object.keys(errors).length > 0) {
       pushToast({
         kind: "error",
@@ -79,9 +147,7 @@ export default function PropertyProfileForm() {
 
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div>
-          <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-            Total land area *
-          </label>
+          <FieldLabel title="Total land area" required />
           <div className="flex gap-2">
             <Input
               value={profile.totalArea ?? ""}
@@ -118,9 +184,7 @@ export default function PropertyProfileForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-            Price *
-          </label>
+          <FieldLabel title="Price" required />
           <Input
             value={profile.price ?? ""}
             onBlur={() => setTouched((p) => ({ ...p, price: true }))}
@@ -156,9 +220,7 @@ export default function PropertyProfileForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-            Ownership type *
-          </label>
+          <FieldLabel title="Ownership type" required />
           <select
             value={profile.ownershipType}
             onBlur={() => setTouched((p) => ({ ...p, ownershipType: true }))}
@@ -186,9 +248,7 @@ export default function PropertyProfileForm() {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-            Soil type
-          </label>
+          <FieldLabel title="Soil type" required={false} />
           <select
             value={profile.soilType}
             onChange={(e) =>
@@ -205,6 +265,86 @@ export default function PropertyProfileForm() {
           </select>
         </div>
 
+        {showResidentialSpecs && (
+        <div>
+          <FieldLabel title="Bedrooms" required={requiresResidentialSpecs} />
+          <Input
+            value={profile.bedrooms ?? ""}
+            onBlur={() => setTouched((p) => ({ ...p, bedrooms: true }))}
+            onChange={(e) =>
+              dispatch(
+                updateProfileDetails({
+                  bedrooms: e.target.value === "" ? null : Number(e.target.value),
+                })
+              )
+            }
+            type="number"
+            min={0}
+            className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            placeholder="e.g. 3"
+          />
+          {showError("bedrooms") && (
+            <p className="mt-1 text-xs text-[var(--error)]">{errors.bedrooms}</p>
+          )}
+        </div>
+        )}
+
+        {showResidentialSpecs && (
+        <div>
+          <FieldLabel title="Bathrooms" required={requiresResidentialSpecs} />
+          <Input
+            value={profile.bathrooms ?? ""}
+            onBlur={() => setTouched((p) => ({ ...p, bathrooms: true }))}
+            onChange={(e) =>
+              dispatch(
+                updateProfileDetails({
+                  bathrooms: e.target.value === "" ? null : Number(e.target.value),
+                })
+              )
+            }
+            type="number"
+            min={0}
+            className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            placeholder="e.g. 2"
+          />
+          {showError("bathrooms") && (
+            <p className="mt-1 text-xs text-[var(--error)]">{errors.bathrooms}</p>
+          )}
+        </div>
+        )}
+
+        {(showResidentialSpecs || showCommercialSpecs) && (
+        <div>
+          <FieldLabel title="Floor" required={requiresResidentialSpecs} />
+          <Input
+            value={profile.floor}
+            onBlur={() => setTouched((p) => ({ ...p, floor: true }))}
+            onChange={(e) => dispatch(updateProfileDetails({ floor: e.target.value }))}
+            className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            placeholder="e.g. Ground / 2nd"
+          />
+          {showError("floor") && (
+            <p className="mt-1 text-xs text-[var(--error)]">{errors.floor}</p>
+          )}
+        </div>
+        )}
+
+        {(showResidentialSpecs || showCommercialSpecs) && (
+        <div>
+          <FieldLabel title="Furnishing" required={requiresResidentialSpecs} />
+          <Input
+            value={profile.furnishing}
+            onBlur={() => setTouched((p) => ({ ...p, furnishing: true }))}
+            onChange={(e) => dispatch(updateProfileDetails({ furnishing: e.target.value }))}
+            className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            placeholder="e.g. Semi-furnished"
+          />
+          {showError("furnishing") && (
+            <p className="mt-1 text-xs text-[var(--error)]">{errors.furnishing}</p>
+          )}
+        </div>
+        )}
+
         <div className="lg:col-span-2">
           <p className="text-sm font-semibold text-[var(--b1)] mb-2">
             Availability
@@ -220,31 +360,237 @@ export default function PropertyProfileForm() {
                 className="flex items-center justify-between rounded-xl border border-[var(--b2)] px-4 py-3 text-sm text-[var(--b1)]"
               >
                 <span className="font-medium">{x.label}</span>
-                <select
-                  value={
-                    profile[x.key as keyof ProfileDetails] == null
-                      ? ""
-                      : (profile[x.key as keyof ProfileDetails] as unknown as boolean)
-                      ? "yes"
-                      : "no"
-                  }
-                  onChange={(e) => {
-                    const v =
-                      e.target.value === ""
-                        ? null
-                        : e.target.value === "yes"
-                        ? true
-                        : false;
-                    dispatch(updateProfileDetails({ [x.key]: v } as Partial<ProfileDetails>));
-                  }}
-                  className="rounded-md border border-[var(--b2)] px-2 py-1 text-xs bg-[var(--white)]"
-                >
-                  <option value="">Select</option>
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
+                {YES_NO_OPTIONS(
+                  profile[x.key as keyof ProfileDetails] as boolean | null,
+                  (v) =>
+                    dispatch(updateProfileDetails({ [x.key]: v } as Partial<ProfileDetails>))
+                )}
               </label>
             ))}
+          </div>
+        </div>
+
+        <div className="lg:col-span-2">
+          <p className="text-sm font-semibold text-[var(--b1)] mb-2">Features</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              { key: "parking", label: "Parking" },
+              { key: "powerBackup", label: "Power backup" },
+              { key: "security", label: "Security" },
+              { key: "constructionAllowed", label: "Construction allowed" },
+              { key: "farmhouseBuilt", label: "Farmhouse built" },
+              { key: "gated", label: "Gated" },
+            ].map((x) => (
+              <label
+                key={x.key}
+                className="flex items-center justify-between rounded-xl border border-[var(--b2)] px-4 py-3 text-sm text-[var(--b1)]"
+              >
+                <span className="font-medium">{x.label}</span>
+                {YES_NO_OPTIONS(
+                  profile[x.key as keyof ProfileDetails] as boolean | null,
+                  (v) =>
+                    dispatch(updateProfileDetails({ [x.key]: v } as Partial<ProfileDetails>))
+                )}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="lg:col-span-2">
+          <p className="text-sm font-semibold text-[var(--b1)] mb-2">Legal details</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              { key: "landRegistry", label: "Land registry" },
+              { key: "ownershipDocs", label: "Ownership docs" },
+              { key: "encumbrance", label: "Encumbrance free" },
+            ].map((x) => (
+              <label
+                key={x.key}
+                className="flex items-center justify-between rounded-xl border border-[var(--b2)] px-4 py-3 text-sm text-[var(--b1)]"
+              >
+                <span className="font-medium">{x.label}</span>
+                {YES_NO_OPTIONS(
+                  profile[x.key as keyof ProfileDetails] as boolean | null,
+                  (v) =>
+                    dispatch(updateProfileDetails({ [x.key]: v } as Partial<ProfileDetails>))
+                )}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="lg:col-span-2">
+          <p className="text-sm font-semibold text-[var(--b1)] mb-2">Water & farming</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {[
+              { key: "borewell", label: "Borewell" },
+              { key: "irrigation", label: "Irrigation" },
+              { key: "irrigationSupport", label: "Irrigation support" },
+            ].map((x) => (
+              <label
+                key={x.key}
+                className="flex items-center justify-between rounded-xl border border-[var(--b2)] px-4 py-3 text-sm text-[var(--b1)]"
+              >
+                <span className="font-medium">{x.label}</span>
+                {YES_NO_OPTIONS(
+                  profile[x.key as keyof ProfileDetails] as boolean | null,
+                  (v) =>
+                    dispatch(updateProfileDetails({ [x.key]: v } as Partial<ProfileDetails>))
+                )}
+              </label>
+            ))}
+          </div>
+          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Input
+              value={profile.borewellDepth ?? ""}
+              onChange={(e) =>
+                dispatch(
+                  updateProfileDetails({
+                    borewellDepth: e.target.value === "" ? null : Number(e.target.value),
+                  })
+                )
+              }
+              type="number"
+              min={0}
+              placeholder="Borewell depth (ft)"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            />
+            <Input
+              value={profile.annualRainfall ?? ""}
+              onChange={(e) =>
+                dispatch(
+                  updateProfileDetails({
+                    annualRainfall: e.target.value === "" ? null : Number(e.target.value),
+                  })
+                )
+              }
+              type="number"
+              min={0}
+              placeholder="Annual rainfall (mm)"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            />
+            <Input
+              value={profile.soilQualityIndex ?? ""}
+              onChange={(e) =>
+                dispatch(
+                  updateProfileDetails({
+                    soilQualityIndex: e.target.value === "" ? null : Number(e.target.value),
+                  })
+                )
+              }
+              type="number"
+              min={0}
+              placeholder="Soil quality index"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            />
+            <Input
+              value={profile.farmingPercentage ?? ""}
+              onChange={(e) =>
+                dispatch(
+                  updateProfileDetails({
+                    farmingPercentage: e.target.value === "" ? null : Number(e.target.value),
+                  })
+                )
+              }
+              type="number"
+              min={0}
+              placeholder="Farming %"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            />
+          </div>
+        </div>
+
+        <div className="lg:col-span-2">
+          <p className="text-sm font-semibold text-[var(--b1)] mb-2">Location insights</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Input
+              value={profile.airportDistance ?? ""}
+              onChange={(e) =>
+                dispatch(
+                  updateProfileDetails({
+                    airportDistance: e.target.value === "" ? null : Number(e.target.value),
+                  })
+                )
+              }
+              type="number"
+              min={0}
+              placeholder="Airport distance (km)"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            />
+            <Input
+              value={profile.railwayDistance ?? ""}
+              onChange={(e) =>
+                dispatch(
+                  updateProfileDetails({
+                    railwayDistance: e.target.value === "" ? null : Number(e.target.value),
+                  })
+                )
+              }
+              type="number"
+              min={0}
+              placeholder="Railway distance (km)"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            />
+            <Input
+              value={profile.highwayDistance ?? ""}
+              onChange={(e) =>
+                dispatch(
+                  updateProfileDetails({
+                    highwayDistance: e.target.value === "" ? null : Number(e.target.value),
+                  })
+                )
+              }
+              type="number"
+              min={0}
+              placeholder="Highway distance (km)"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            />
+            <Input
+              value={profile.cityCenterDistance ?? ""}
+              onChange={(e) =>
+                dispatch(
+                  updateProfileDetails({
+                    cityCenterDistance: e.target.value === "" ? null : Number(e.target.value),
+                  })
+                )
+              }
+              type="number"
+              min={0}
+              placeholder="City center distance (km)"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            />
+          </div>
+        </div>
+
+        <div className="lg:col-span-2">
+          <p className="text-sm font-semibold text-[var(--b1)] mb-2">Investment</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Input
+              value={profile.roiPercent ?? ""}
+              onChange={(e) =>
+                dispatch(
+                  updateProfileDetails({
+                    roiPercent: e.target.value === "" ? null : Number(e.target.value),
+                  })
+                )
+              }
+              type="number"
+              placeholder="Expected ROI (%)"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            />
+            <Input
+              value={profile.appreciationRate ?? ""}
+              onChange={(e) =>
+                dispatch(
+                  updateProfileDetails({
+                    appreciationRate: e.target.value === "" ? null : Number(e.target.value),
+                  })
+                )
+              }
+              type="number"
+              placeholder="Appreciation rate (%)"
+              className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            />
           </div>
         </div>
 
@@ -274,9 +620,7 @@ export default function PropertyProfileForm() {
         </div>
 
         <div className="lg:col-span-2">
-          <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-            Description *
-          </label>
+          <FieldLabel title="Description" required />
           <textarea
             value={profile.description}
             onBlur={() => setTouched((p) => ({ ...p, description: true }))}

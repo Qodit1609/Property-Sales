@@ -83,8 +83,9 @@ export function ToastStack({
 
             <Button
               type="button"
+              variant="ghost"
               onClick={() => onDismiss(t.id)}
-              className="shrink-0 rounded-md p-1 text-[var(--muted)] hover:bg-black/5 hover:text-[var(--b1)] transition"
+              className="shrink-0 rounded-md p-1 text-[var(--b1-mid)] hover:bg-[var(--b2-soft)] hover:text-[var(--b1)] transition"
               aria-label="Dismiss"
             >
               <X className="h-4 w-4" />

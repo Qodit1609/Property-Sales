@@ -134,6 +134,12 @@ export default function LocationForm() {
           placeholder="Indore"
         />
         <Field
+          label="District"
+          value={location.district}
+          onChange={(v) => dispatch(updateLocationDetails({ district: v }))}
+          placeholder="District name"
+        />
+        <Field
           label="Tehsil"
           required
           value={location.tehsil}
@@ -150,6 +156,18 @@ export default function LocationForm() {
           onChange={(v) => dispatch(updateLocationDetails({ village: v }))}
           error={showError("village") ? errors.village : undefined}
           placeholder="Village name"
+        />
+        <Field
+          label="Address"
+          value={location.address}
+          onChange={(v) => dispatch(updateLocationDetails({ address: v }))}
+          placeholder="Full address"
+        />
+        <Field
+          label="Landmark"
+          value={location.landmark}
+          onChange={(v) => dispatch(updateLocationDetails({ landmark: v }))}
+          placeholder="Nearby landmark"
         />
         <Field
           label="Locality"

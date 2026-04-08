@@ -206,6 +206,20 @@ export default function BasicDetailsForm() {
             <p className="mt-1 text-xs text-[var(--error)]">{errors.title}</p>
           )}
         </div>
+
+        <div className="lg:col-span-2">
+          <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
+            Short description
+          </label>
+          <Input
+            value={basic.shortDescription}
+            onChange={(e) =>
+              dispatch(updateBasicDetails({ shortDescription: e.target.value }))
+            }
+            placeholder="One-line summary shown in preview cards"
+            className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+          />
+        </div>
       </div>
 
       <div className="mt-8">

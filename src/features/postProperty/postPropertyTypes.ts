@@ -55,6 +55,7 @@ export type BasicDetails = {
   category: PropertyCategory | "";
   propertyType: string;
   title: string;
+  shortDescription: string;
   contactName: string;
   contactEmail: string;
   contactMobile: string;
@@ -64,8 +65,11 @@ export type BasicDetails = {
 export type LocationDetails = {
   state: string;
   city: string;
+  district: string;
   tehsil: string;
   village: string;
+  address: string;
+  landmark: string;
   locality: string;
   surveyNumber: string;
   pinCode: string;
@@ -78,12 +82,46 @@ export type ProfileDetails = {
   areaUnit: AreaUnit;
   price: number | null;
   negotiable: boolean;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  floor: string;
+  furnishing: string;
+  facing: string;
+  parking: boolean | null;
+  powerBackup: boolean | null;
+  security: boolean | null;
+  constructionAllowed: boolean | null;
+  farmhouseBuilt: boolean | null;
   ownershipType: OwnershipType | "";
+  landRegistry: boolean | null;
+  ownershipDocs: boolean | null;
+  encumbrance: boolean | null;
+  landUseType: string;
   waterAvailability: boolean | null;
+  waterAvailabilityText: string;
+  borewell: boolean | null;
+  irrigation: boolean | null;
+  borewellDepth: number | null;
+  nearbySources: string;
   electricityAvailability: boolean | null;
   roadAccess: boolean | null;
+  roadType: string;
+  gated: boolean | null;
+  airportDistance: number | null;
+  railwayDistance: number | null;
+  highwayDistance: number | null;
+  cityCenterDistance: number | null;
+  nearbySchools: string;
+  nearbyHospitals: string;
+  nearbyMarkets: string;
   soilType: SoilType | "";
+  soilQualityIndex: number | null;
+  annualRainfall: number | null;
+  irrigationSupport: boolean | null;
+  farmingPercentage: number | null;
   suitableFor: SuitableFor[];
+  roiPercent: number | null;
+  appreciationRate: number | null;
   description: string;
 };
 
@@ -99,6 +137,7 @@ export type MediaItem = {
 
 export type MediaState = {
   images: MediaItem[];
+  documents: MediaItem[];
   videoUrl?: string;
   uploading: boolean;
   uploadError: string | null;
