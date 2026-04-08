@@ -53,6 +53,7 @@ const SellerDashboard = () => {
         value: agg.total,
         icon: Building2,
         accent: "neutral",
+        to: "/seller/properties?filter=all",
       },
       {
         key: "active",
@@ -60,6 +61,7 @@ const SellerDashboard = () => {
         value: agg.activeListings,
         icon: CheckCircle2,
         accent: "success",
+        to: "/seller/properties?filter=active",
       },
       {
         key: "pending",
@@ -67,6 +69,7 @@ const SellerDashboard = () => {
         value: agg.pending,
         icon: Clock,
         accent: "warning",
+        to: "/seller/properties?filter=pending",
       },
       {
         key: "rejected",
@@ -74,6 +77,7 @@ const SellerDashboard = () => {
         value: agg.rejected,
         icon: XCircle,
         accent: "danger",
+        to: "/seller/properties?filter=rejected",
       },
       {
         key: "leads",
@@ -81,6 +85,7 @@ const SellerDashboard = () => {
         value: agg.totalLeads,
         icon: MousePointerClick,
         accent: "info",
+        to: "/seller/properties?filter=leads",
       },
       {
         key: "views",
@@ -88,6 +93,7 @@ const SellerDashboard = () => {
         value: agg.totalViews,
         icon: Eye,
         accent: "neutral",
+        to: "/seller/properties?filter=views",
       },
     ],
     [agg, t]

@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "./sellerUtils";
@@ -9,6 +10,7 @@ export type SellerStatItem = {
   value: number;
   icon: LucideIcon;
   accent: "neutral" | "success" | "warning" | "danger" | "info";
+  to?: string;
 };
 
 const accentMap: Record<SellerStatItem["accent"], string> = {
@@ -45,7 +47,7 @@ function SellerStatsComponent({ items, loading }: SellerStatsProps) {
     >
       {items.map((card, index) => {
         const Icon = card.icon;
-        return (
+        const cardBody = (
           <motion.article
             key={card.key}
             role="listitem"
@@ -54,7 +56,8 @@ function SellerStatsComponent({ items, loading }: SellerStatsProps) {
             transition={{ duration: 0.22, delay: index * 0.04 }}
             whileHover={{ y: -2, transition: { duration: 0.18 } }}
             className={cn(
-              "group min-h-[108px] rounded-2xl border p-4 shadow-sm ring-1 ring-black/[0.02] transition-shadow hover:shadow-md sm:p-5",
+              "group min-h-[108px] rounded-2xl border p-4 shadow-sm ring-1 ring-black/[0.02] transition-shadow sm:p-5",
+              card.to ? "cursor-pointer hover:shadow-md" : "",
               accentMap[card.accent]
             )}
           >
@@ -77,6 +80,13 @@ function SellerStatsComponent({ items, loading }: SellerStatsProps) {
               </span>
             </div>
           </motion.article>
+        );
+
+        if (!card.to) return cardBody;
+        return (
+          <Link key={card.key} to={card.to} className="block focus-visible:outline-none">
+            {cardBody}
+          </Link>
         );
       })}
     </div>

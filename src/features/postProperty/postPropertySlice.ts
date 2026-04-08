@@ -166,6 +166,51 @@ function hydrateInitialState(): PostPropertyState {
   };
 }
 
+function sanitizeForApi<T>(value: T): T {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => sanitizeForApi(item))
+      .filter(
+        (item) =>
+          item !== undefined &&
+          item !== null &&
+          !(typeof item === "string" && item.trim().toLowerCase() === "undefined")
+      ) as T;
+  }
+
+  if (value && typeof value === "object") {
+    const entries = Object.entries(value as Record<string, unknown>)
+      .map(([key, nestedValue]) => [key, sanitizeForApi(nestedValue)] as const)
+      .filter(([, nestedValue]) => {
+        if (nestedValue === undefined) return false;
+        if (typeof nestedValue === "string" && nestedValue.trim().toLowerCase() === "undefined") {
+          return false;
+        }
+        if (
+          nestedValue &&
+          typeof nestedValue === "object" &&
+          !Array.isArray(nestedValue) &&
+          Object.keys(nestedValue as Record<string, unknown>).length === 0
+        ) {
+          return false;
+        }
+        return true;
+      });
+
+    return Object.fromEntries(entries) as T;
+  }
+
+  if (typeof value === "string" && value.trim().toLowerCase() === "undefined") {
+    return undefined as T;
+  }
+
+  return value;
+}
+
+function isValidObjectId(value: string | null | undefined): value is string {
+  return typeof value === "string" && /^[a-fA-F0-9]{24}$/.test(value);
+}
+
 export const submitPostProperty = createAsyncThunk<
   unknown,
   void,
@@ -287,13 +332,14 @@ export const submitPostProperty = createAsyncThunk<
       waterResources: {
         borewell: state.profileDetails.borewell,
         borewellDepth: state.profileDetails.borewellDepth ?? undefined,
-        waterAvailability:
-          state.profileDetails.waterAvailabilityText ||
-          (state.profileDetails.waterAvailability == null
-            ? undefined
-            : state.profileDetails.waterAvailability
-            ? "Good"
-            : "Limited"),
+        waterAvailability: (() => {
+          const raw = (state.profileDetails.waterAvailabilityText || "").trim().toLowerCase();
+          if (raw === "high" || raw === "good") return "High";
+          if (raw === "medium" || raw === "moderate") return "Medium";
+          if (raw === "low" || raw === "limited" || raw === "poor") return "Low";
+          if (state.profileDetails.waterAvailability == null) return undefined;
+          return state.profileDetails.waterAvailability ? "High" : "Low";
+        })(),
         irrigation: state.profileDetails.irrigation,
         nearbySources: state.profileDetails.nearbySources
           .split(",")
@@ -311,13 +357,14 @@ export const submitPostProperty = createAsyncThunk<
         soilType: state.profileDetails.soilType || undefined,
         soilQualityIndex: state.profileDetails.soilQualityIndex ?? undefined,
         cropSuitability: state.profileDetails.suitableFor,
-        rainfallData:
-          state.profileDetails.annualRainfall != null || state.profileDetails.irrigationSupport != null
-            ? {
+        ...(state.profileDetails.annualRainfall != null || state.profileDetails.irrigationSupport != null
+          ? {
+              rainfallData: {
                 annualRainfall: state.profileDetails.annualRainfall ?? undefined,
                 irrigationSupport: state.profileDetails.irrigationSupport ?? undefined,
-              }
-            : undefined,
+              },
+            }
+          : {}),
         farmingPercentage: state.profileDetails.farmingPercentage ?? undefined,
       },
       investment: {
@@ -326,12 +373,18 @@ export const submitPostProperty = createAsyncThunk<
       },
     };
 
+    const cleanedPayload = sanitizeForApi(payload);
+
     const created = state.editPropertyId
-      ? await updateListingAPI(
+      ? isValidObjectId(state.editPropertyId)
+        ? await updateListingAPI(
           state.editPropertyId,
-          payload as unknown as Partial<SellerListingPayload>,
+          cleanedPayload as unknown as Partial<SellerListingPayload>,
         )
-      : await createListingAPI(payload as unknown as SellerListingPayload);
+        : (() => {
+            throw new Error("Invalid property id for update");
+          })()
+      : await createListingAPI(cleanedPayload as unknown as SellerListingPayload);
     clearPostPropertyDraft();
     return created;
   } catch (error: unknown) {
@@ -582,6 +635,9 @@ export const loadEditProperty = createAsyncThunk<
   { rejectValue: string }
 >("postProperty/loadEditProperty", async (id, { rejectWithValue }) => {
   try {
+    if (!isValidObjectId(id)) {
+      return rejectWithValue("Invalid property id");
+    }
     const property = await fetchPropertyByIdAPI(id);
     return mapPropertyToEditState(property);
   } catch (error: unknown) {

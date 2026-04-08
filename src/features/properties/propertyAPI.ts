@@ -169,8 +169,14 @@ const normalizeProperty = (payload: unknown): Property => {
     return undefined;
   })();
 
+  const resolvedId =
+    toString(raw._id) ??
+    toString(raw.id) ??
+    (typeof raw === "object" && raw !== null && "_id" in raw ? String((raw as Record<string, unknown>)._id) : undefined) ??
+    (typeof raw === "object" && raw !== null && "id" in raw ? String((raw as Record<string, unknown>).id) : undefined);
+
   return {
-    _id: toString(raw._id) ?? String(Math.random()),
+    _id: resolvedId ?? "",
     title: toString(raw.title) ?? toString(raw.name) ?? "Untitled Property",
     description: toString(raw.description) ?? toString(raw.aboutProperty) ?? "",
     shortDescription:

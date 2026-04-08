@@ -31,12 +31,7 @@ export default function PostPropertyPage() {
   useEffect(() => {
     if (!canAccess) return;
     const editId = searchParams.get("edit");
-    if (!editId) {
-      if (editPropertyId) {
-        dispatch(setEditPropertyId(null));
-      }
-      return;
-    }
+    if (!editId) return;
     if (editPropertyId === editId) return;
     void dispatch(loadEditProperty(editId));
   }, [canAccess, dispatch, editPropertyId, searchParams]);

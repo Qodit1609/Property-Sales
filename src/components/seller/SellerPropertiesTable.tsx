@@ -62,6 +62,10 @@ function thumb(p: Property) {
   return url || null;
 }
 
+function isValidObjectId(value: string | undefined) {
+  return typeof value === "string" && /^[a-fA-F0-9]{24}$/.test(value);
+}
+
 function SellerPropertiesTableComponent({
   listings,
   actionLoading,
@@ -145,7 +149,7 @@ function SellerPropertiesTableComponent({
     <div className="space-y-4">
       {!compact && typeof limit !== "number" ? (
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="relative max-w-md flex-1">
+          <div className="relative w-full max-w-md flex-1">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--muted)]" />
             <input
               type="search"
@@ -158,14 +162,14 @@ function SellerPropertiesTableComponent({
               className="w-full rounded-xl border border-[var(--b2)] bg-[var(--white)] py-2.5 pl-10 pr-3 text-sm text-[var(--b1)] shadow-sm outline-none ring-0 transition placeholder:text-[var(--muted)] focus:border-[var(--b1-mid)] focus:ring-2 focus:ring-[var(--b2)]"
             />
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center">
             <select
               value={statusFilter}
               onChange={(e) => {
                 setStatusFilter(e.target.value as typeof statusFilter);
                 setPage(0);
               }}
-              className="rounded-xl border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm font-medium text-[var(--b1)] shadow-sm outline-none focus:ring-2 focus:ring-[var(--b2)]"
+              className="w-full rounded-xl border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm font-medium text-[var(--b1)] shadow-sm outline-none focus:ring-2 focus:ring-[var(--b2)] sm:w-auto"
             >
               <option value="all">{t("sellerPanel.table.filterAll")}</option>
               <option value="pending">{t("sellerPanel.status.pending")}</option>
@@ -179,7 +183,7 @@ function SellerPropertiesTableComponent({
                 setSort(e.target.value as SortKey);
                 setPage(0);
               }}
-              className="rounded-xl border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm font-medium text-[var(--b1)] shadow-sm outline-none focus:ring-2 focus:ring-[var(--b2)]"
+              className="w-full rounded-xl border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm font-medium text-[var(--b1)] shadow-sm outline-none focus:ring-2 focus:ring-[var(--b2)] sm:w-auto"
             >
               <option value="recent">{t("sellerPanel.table.sortRecent")}</option>
               <option value="priceDesc">{t("sellerPanel.table.sortPriceDesc")}</option>
@@ -193,18 +197,18 @@ function SellerPropertiesTableComponent({
 
       <div className="overflow-hidden rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] shadow-sm">
         <div className="overflow-x-auto">
-          <table className="min-w-[960px] w-full text-sm">
+          <table className="min-w-[760px] w-full text-sm md:min-w-[860px] xl:min-w-[960px]">
             <thead className="bg-[var(--b2-soft)]/90 text-left text-[var(--b1)]">
               <tr>
                 <th className="px-4 py-3 font-semibold">{t("sellerPanel.table.image")}</th>
                 <th className="px-4 py-3 font-semibold">{t("sellerPanel.table.title")}</th>
                 <th className="px-4 py-3 font-semibold tabular-nums">{t("sellerPanel.table.price")}</th>
-                <th className="px-4 py-3 font-semibold">{t("sellerPanel.table.location")}</th>
+                <th className="hidden px-4 py-3 font-semibold md:table-cell">{t("sellerPanel.table.location")}</th>
                 <th className="px-4 py-3 font-semibold">{t("sellerPanel.table.status")}</th>
-                <th className="px-4 py-3 font-semibold tabular-nums">{t("sellerPanel.table.views")}</th>
-                <th className="px-4 py-3 font-semibold tabular-nums">{t("sellerPanel.table.leads")}</th>
-                <th className="px-4 py-3 font-semibold">{t("sellerPanel.table.created")}</th>
-                <th className="px-4 py-3 text-right font-semibold">{t("sellerPanel.table.actions")}</th>
+                <th className="hidden px-4 py-3 font-semibold tabular-nums lg:table-cell">{t("sellerPanel.table.views")}</th>
+                <th className="hidden px-4 py-3 font-semibold tabular-nums lg:table-cell">{t("sellerPanel.table.leads")}</th>
+                <th className="hidden px-4 py-3 font-semibold xl:table-cell">{t("sellerPanel.table.created")}</th>
+                <th className="w-[1%] whitespace-nowrap px-4 py-3 text-right font-semibold">{t("sellerPanel.table.actions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--b2)]/70">
@@ -234,7 +238,7 @@ function SellerPropertiesTableComponent({
                       <p className="mt-0.5 text-xs text-[var(--muted)]">{p.propertyType}</p>
                     </td>
                     <td className="px-4 py-3 align-top tabular-nums text-[var(--b1)]">{fmtPrice(p.price)}</td>
-                    <td className="max-w-[200px] px-4 py-3 align-top text-[var(--b1)]">
+                    <td className="hidden max-w-[200px] px-4 py-3 align-top text-[var(--b1)] md:table-cell">
                       <span className="line-clamp-2">{loc(p)}</span>
                     </td>
                     <td className="px-4 py-3 align-top">
@@ -247,42 +251,53 @@ function SellerPropertiesTableComponent({
                         {t(`sellerPanel.status.${st}`)}
                       </span>
                     </td>
-                    <td className="px-4 py-3 align-top tabular-nums text-[var(--b1)]">
+                    <td className="hidden px-4 py-3 align-top tabular-nums text-[var(--b1)] lg:table-cell">
                       {p.analytics?.views ?? 0}
                     </td>
-                    <td className="px-4 py-3 align-top tabular-nums text-[var(--b1)]">
+                    <td className="hidden px-4 py-3 align-top tabular-nums text-[var(--b1)] lg:table-cell">
                       {p.analytics?.contactClicks ?? 0}
                     </td>
-                    <td className="px-4 py-3 align-top text-[var(--b1)]">{rowDate(p)}</td>
-                    <td className="px-4 py-3 align-top text-right">
-                      <div className="flex flex-wrap justify-end gap-1.5">
+                    <td className="hidden px-4 py-3 align-top text-[var(--b1)] xl:table-cell">{rowDate(p)}</td>
+                    <td className="px-3 py-3 align-top text-right sm:px-4">
+                      <div className="flex flex-nowrap justify-end gap-1.5">
                         <Link
                           to={`/properties/${p._id}`}
-                          className="inline-flex items-center gap-1 rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]"
+                          className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]"
                         >
                           <Eye className="h-3.5 w-3.5" />
-                          {t("sellerPanel.actions.view")}
+                          <span className="hidden xl:inline">{t("sellerPanel.actions.view")}</span>
                         </Link>
-                        <Link
-                          to={`/properties/${p._id}`}
-                          className="inline-flex items-center gap-1 rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]"
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                          {t("sellerPanel.actions.edit")}
-                        </Link>
+                        {isValidObjectId(p._id) ? (
+                          <Link
+                            to={`/post-property/basic?edit=${p._id}`}
+                            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                            <span className="hidden xl:inline">{t("sellerPanel.actions.edit")}</span>
+                          </Link>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled
+                            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--muted)] opacity-60"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                            <span className="hidden xl:inline">{t("sellerPanel.actions.edit")}</span>
+                          </button>
+                        )}
                         <Button
                           type="button"
                           disabled={actionLoading}
                           onClick={() => onDuplicate(p)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-[var(--b2)] bg-[var(--b2-soft)] px-2 py-1 text-xs font-medium text-[var(--b1)] hover:opacity-90 disabled:opacity-50"
+                          className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--b2-soft)] px-2 py-1 text-xs font-medium text-[var(--b1)] hover:opacity-90 disabled:opacity-50"
                         >
                           <Copy className="h-3.5 w-3.5" />
-                          {t("sellerPanel.actions.duplicate")}
+                          <span className="hidden xl:inline">{t("sellerPanel.actions.duplicate")}</span>
                         </Button>
-                        <div className="relative inline-block text-left">
+                        <div className="relative inline-block shrink-0 text-left">
                           <button
                             type="button"
-                            className="inline-flex items-center gap-1 rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]"
+                            className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]"
                             onClick={(e) => {
                               e.stopPropagation();
                               setOpenMenu(menuOpen ? null : p._id);
@@ -290,7 +305,7 @@ function SellerPropertiesTableComponent({
                             aria-expanded={menuOpen}
                           >
                             <MoreHorizontal className="h-3.5 w-3.5" />
-                            {t("sellerPanel.actions.more")}
+                            <span className="hidden xl:inline">{t("sellerPanel.actions.more")}</span>
                           </button>
                           {menuOpen ? (
                             <div

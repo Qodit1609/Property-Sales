@@ -92,6 +92,11 @@ export default function ReviewSubmit() {
     const result = await dispatch(submitPostProperty());
     if (submitPostProperty.fulfilled.match(result)) {
       pushToast({ kind: "success", title: isEditMode ? "Property updated" : "Property submitted" });
+      if (isEditMode) {
+        window.alert("Update Property successfully.");
+      } else {
+        window.alert("Property is successfully Listed.");
+      }
       const created = result.payload as unknown as { _id?: string };
       if (created?._id) {
         navigate(`/admin/properties`, { replace: true });
@@ -311,7 +316,7 @@ export default function ReviewSubmit() {
       <FormActions
         onBack={() => navigate("/post-property/amenities")}
         onNext={submit}
-        nextLabel={isEditMode ? "Edit Property" : "Submit property"}
+        nextLabel={isEditMode ? "Update Property" : "Submit property"}
         nextDisabled={!isReadyToSubmit}
         nextLoading={post.submitLoading}
         rightExtra={
