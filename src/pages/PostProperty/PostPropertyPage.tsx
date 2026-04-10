@@ -3,8 +3,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import PostPropertyLayout from "../../components/propertyPost/PostPropertyLayout";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { loadEditProperty, setEditPropertyId } from "../../features/postProperty/postPropertySlice";
+import { useTranslation } from "react-i18next";
 
 export default function PostPropertyPage() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -17,8 +19,8 @@ export default function PostPropertyPage() {
 
     const message =
       userRole === "buyer"
-        ? "Buyers are not authorized to post property. Please switch to a seller/admin account."
-        : "Only admin, super admin, and seller accounts can access the post property form.";
+        ? t("postProperty.page.buyerUnauthorized")
+        : t("postProperty.page.roleUnauthorized");
     window.alert(message);
 
     if (userRole === "buyer") {

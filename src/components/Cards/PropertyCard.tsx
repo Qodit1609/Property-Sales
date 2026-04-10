@@ -104,7 +104,7 @@ const PropertyCard: React.FC<Props> = ({
     availability === "deactivated" || availability === "inactive" || isInactiveByStatus;
   const isSold = availability === "sold" || availability === "unavailable";
   const isBlocked = isDeactivated || isSold;
-  const deactivatedMessage = "This Property is Deactivate by the Seller";
+  const deactivatedMessage = t("propertyCard.deactivatedBySeller");
   const handleOpenProperty = () => {
     if (isBlocked) return;
     navigate(`/properties/${property._id}`);
@@ -159,7 +159,7 @@ const PropertyCard: React.FC<Props> = ({
         {isSold ? (
           <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/35 px-4 text-center">
             <p className="animate-pulse text-4xl font-black uppercase tracking-[0.14em] text-red-500 drop-shadow-[0_6px_16px_rgba(0,0,0,0.65)] md:text-5xl">
-              Sold
+              {t("propertyCard.sold")}
             </p>
           </div>
         ) : null}
@@ -217,14 +217,14 @@ const PropertyCard: React.FC<Props> = ({
           "
           >
             <Star size={11} />
-            Featured
+            {t("propertyCard.featured")}
           </span>
         )}
 
         {showVerified && (
           <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">
             <ShieldCheck size={11} />
-            Verified
+            {t("propertyCard.verified")}
           </span>
         )}
 
@@ -251,7 +251,9 @@ const PropertyCard: React.FC<Props> = ({
         font-semibold
         "
         >
-          {property.propertyType}
+          {t(`postProperty.options.propertyType.${property.propertyType}`, {
+            defaultValue: property.propertyType,
+          })}
         </p>
 
         <p

@@ -15,12 +15,14 @@ import {
   validateProfileDetails,
 } from "../../features/postProperty/postPropertyValidation";
 import Header from "../Header/Header";  // 👈 ADD THIS
+import { useTranslation } from "react-i18next";
 
 function nowId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
 export default function PostPropertyLayout() {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -150,7 +152,7 @@ export default function PostPropertyLayout() {
                 <Suspense
                   fallback={
                     <div className="py-10 text-sm text-[var(--muted)]">
-                      Loading step...
+                      {t("postProperty.layout.loadingStep")}
                     </div>
                   }
                 >

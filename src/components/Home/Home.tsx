@@ -68,6 +68,21 @@ const Home: React.FC = () => {
     );
   }, [properties]);
 
+  const translateCity = (city: string) => {
+    const cityKey = city
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "")
+      .replace(/[^a-z]/g, "");
+    return t(`homePage.cities.${cityKey}`, { defaultValue: city });
+  };
+
+  const translateListingTypeLabel = (key: string, fallback: string) => {
+    if (key === "sale") return t("homePage.buy");
+    if (key === "rent") return t("homePage.rent");
+    return fallback;
+  };
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % images.length);
@@ -172,7 +187,7 @@ const Home: React.FC = () => {
                 <option value="">{t("homePage.location")}</option>
                 {cities.map((city) => (
                   <option key={city} value={city}>
-                    {city}
+                    {translateCity(city)}
                   </option>
                 ))}
               </select>
@@ -204,7 +219,9 @@ const Home: React.FC = () => {
                 <option value="">{t("homePage.category")}</option>
                 {categories.map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat}
+                    {t(`postProperty.options.propertyType.${cat}`, {
+                      defaultValue: cat,
+                    })}
                   </option>
                 ))}
               </select>
@@ -237,7 +254,7 @@ const Home: React.FC = () => {
                 <option value="">{t("homePage.type")}</option>
                 {listingTypeOptions.map(([key, label]) => (
                   <option key={key} value={key}>
-                    {label}
+                    {translateListingTypeLabel(key, label)}
                   </option>
                 ))}
               </select>

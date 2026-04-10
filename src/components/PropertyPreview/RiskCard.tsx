@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Badge from "./Badge";
+import { useTranslation } from "react-i18next";
 
 type RiskCardProps = {
   title: string;
@@ -9,6 +10,7 @@ type RiskCardProps = {
 };
 
 const RiskCard = ({ title, description, activeRisk, icon }: RiskCardProps) => {
+  const { t } = useTranslation();
   const hasRisk = Boolean(activeRisk);
 
   return (
@@ -19,7 +21,7 @@ const RiskCard = ({ title, description, activeRisk, icon }: RiskCardProps) => {
           <h4 className="text-sm font-semibold text-[var(--b1)]">{title}</h4>
         </div>
         <Badge variant={hasRisk ? "danger" : "success"}>
-          {hasRisk ? "Active Risk" : "No Risk"}
+          {hasRisk ? t("propertyPreview.labels.activeRisk") : t("propertyPreview.labels.noRisk")}
         </Badge>
       </div>
       <p className="mt-2 text-sm text-[var(--muted)]">{description}</p>

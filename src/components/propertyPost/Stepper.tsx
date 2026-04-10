@@ -2,6 +2,7 @@ import { memo } from "react";
 import { POST_PROPERTY_STEPS } from "./stepConfig";
 import { Check } from "lucide-react";
 import { Button } from "@/components/common";
+import { useTranslation } from "react-i18next";
 
 type StepStatus = "done" | "current" | "todo";
 
@@ -16,6 +17,7 @@ export default memo(function Stepper({
   stepStatuses: Record<string, StepStatus>;
   onNavigate: (path: string) => void;
 }) {
+  const { t } = useTranslation();
   const activeIndex = Math.max(
     0,
     POST_PROPERTY_STEPS.findIndex((s) => s.path === activePath)
@@ -33,9 +35,9 @@ export default memo(function Stepper({
       <div className="glass-card border border-white/50 shadow-lg">
         <div className="flex items-start justify-between gap-2.5">
           <div>
-            <p className="text-xs font-semibold text-[var(--b1)]">Post a Property</p>
+            <p className="text-xs font-semibold text-[var(--b1)]">{t("postProperty.stepper.title")}</p>
             <p className="mt-0.5 text-[9px] text-[var(--muted)]">
-              Complete steps to publish your listing
+              {t("postProperty.stepper.subtitle")}
             </p>
           </div>
           <div className="text-right">
@@ -71,7 +73,10 @@ export default memo(function Stepper({
               </p>
             </div>
             <p className="mt-1 text-[9px] text-[var(--muted)]">
-              Step   {activeIndex + 1}/{POST_PROPERTY_STEPS.length}
+              {t("postProperty.stepper.stepCount", {
+                current: activeIndex + 1,
+                total: POST_PROPERTY_STEPS.length,
+              })}
             </p>
           </div>
         </div>
@@ -134,10 +139,10 @@ export default memo(function Stepper({
                     } ${isLocked ? "opacity-60 cursor-not-allowed" : ""}`}
                     title={
                       isLocked
-                        ? "Complete previous steps to continue"
+                        ? t("postProperty.stepper.completePrevious")
                         : canNavigate
-                        ? "Open step"
-                        : "Complete this step to unlock"
+                        ? t("postProperty.stepper.openStep")
+                        : t("postProperty.stepper.completeToUnlock")
                     }
                   >
                     <div className="flex items-start gap-2.5">
@@ -172,16 +177,16 @@ export default memo(function Stepper({
                               : "text-[var(--muted)]"
                           }`}
                         >
-                          {step.label}
+                          {t(`postProperty.steps.${step.key}`)}
                         </p>
                         <p className="mt-0.5 text-[9px] text-[var(--muted)]">
-                          Step {index + 1}
+                          {t("postProperty.stepper.stepLabel", { index: index + 1 })}
                           {status === "done"
-                            ? " • Completed"
+                            ? ` • ${t("postProperty.stepper.completed")}`
                             : isActive
-                            ? " • In progress"
+                            ? ` • ${t("postProperty.stepper.inProgress")}`
                             : isLocked
-                            ? " • Locked"
+                            ? ` • ${t("postProperty.stepper.locked")}`
                             : ""}
                         </p>
                       </div>

@@ -1,4 +1,5 @@
 import { CheckCircle2, XCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type FeatureItem = {
   label: string;
@@ -10,9 +11,12 @@ type FeatureListProps = {
   emptyMessage?: string;
 };
 
-const FeatureList = ({ items, emptyMessage = "No Data Available" }: FeatureListProps) => {
+const FeatureList = ({ items, emptyMessage }: FeatureListProps) => {
+  const { t } = useTranslation();
+  const resolvedEmptyMessage = emptyMessage ?? t("propertyPreview.messages.noDataAvailable");
+
   if (!items.length) {
-    return <p className="text-sm text-[var(--muted)]">{emptyMessage}</p>;
+    return <p className="text-sm text-[var(--muted)]">{resolvedEmptyMessage}</p>;
   }
 
   return (
@@ -31,7 +35,7 @@ const FeatureList = ({ items, emptyMessage = "No Data Available" }: FeatureListP
             )}
             <span className="flex-1">{item.label}</span>
             <span className={isEnabled ? "text-emerald-700" : "text-rose-700"}>
-              {isEnabled ? "Yes" : "No"}
+              {isEnabled ? t("postProperty.common.yes") : t("postProperty.common.no")}
             </span>
           </div>
         );

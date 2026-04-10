@@ -25,8 +25,10 @@ import {
   makeMediaItemId,
   sha256Hex,
 } from "../../lib/propertyImageUpload";
+import { useTranslation } from "react-i18next";
 
 export default function MediaUpload() {
+  const { t } = useTranslation();
   const { pushToast } = useOutletContext<PostPropertyOutletContext>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -41,13 +43,13 @@ export default function MediaUpload() {
     async (files: FileList | File[]) => {
       const list = Array.from(files);
       if (!list.length) {
-        pushToast({ kind: "error", title: "Only images supported", detail: "Please select image files." });
+        pushToast({ kind: "error", title: t("postProperty.media.onlyImagesSupported"), detail: t("postProperty.media.selectImageFiles") });
         return;
       }
       const remaining = MAX_PROPERTY_IMAGES - media.images.length;
       if (remaining <= 0) {
         dispatch(setMediaUploadError(`Only ${MAX_PROPERTY_IMAGES} images are allowed.`));
-        pushToast({ kind: "error", title: "Upload limit reached", detail: `You can upload up to ${MAX_PROPERTY_IMAGES} images.` });
+        pushToast({ kind: "error", title: t("postProperty.media.uploadLimitReached"), detail: t("postProperty.media.uploadLimitDetail", { count: MAX_PROPERTY_IMAGES }) });
         return;
       }
       const queue = list.slice(0, remaining);
@@ -92,7 +94,7 @@ export default function MediaUpload() {
             file: uploadFile,
             tag: "property",
             name: file.name,
-            altText: "Property image",
+            altText: t("postProperty.media.propertyImageAlt"),
             onUploadProgress: (percent: number) =>
               setProgressMap((prev) => ({ ...prev, [key]: percent })),
           });
@@ -110,7 +112,7 @@ export default function MediaUpload() {
         }
         if (items.length) {
           dispatch(addImages(items));
-          pushToast({ kind: "success", title: "Images uploaded", detail: `${items.length} image(s) uploaded.` });
+          pushToast({ kind: "success", title: t("postProperty.media.imagesUploaded"), detail: t("postProperty.media.imagesUploadedDetail", { count: items.length }) });
         }
         if (list.length > queue.length) {
           failures.push(`${list.length - queue.length} file(s) skipped due to ${MAX_PROPERTY_IMAGES}-image limit`);
@@ -118,12 +120,12 @@ export default function MediaUpload() {
         if (failures.length) {
           const message = failures.join("; ");
           dispatch(setMediaUploadError(message));
-          pushToast({ kind: "error", title: "Some uploads failed", detail: message });
+          pushToast({ kind: "error", title: t("postProperty.media.someUploadsFailed"), detail: message });
         }
       } catch (error: unknown) {
-        const detail = error instanceof Error ? error.message : "Could not upload selected images.";
-        dispatch(setMediaUploadError(`Upload failed: ${detail}. You can still paste an image URL below.`));
-        pushToast({ kind: "error", title: "Upload failed", detail });
+        const detail = error instanceof Error ? error.message : t("postProperty.media.couldNotUploadSelectedImages");
+        dispatch(setMediaUploadError(`${t("postProperty.media.uploadFailedPrefix")}: ${detail}. ${t("postProperty.media.pasteImageUrlHint")}`));
+        pushToast({ kind: "error", title: t("postProperty.media.uploadFailed"), detail });
       } finally {
         dispatch(setMediaUploading(false));
         setTimeout(() => setProgressMap({}), 1200);
@@ -150,22 +152,22 @@ export default function MediaUpload() {
     if (Object.keys(errors).length > 0) {
       pushToast({
         kind: "error",
-        title: "Add at least one image",
-        detail: "Upload image files from your device or add an image URL, then continue.",
+        title: t("postProperty.media.addAtLeastOneImage"),
+        detail: t("postProperty.media.addAtLeastOneImageDetail"),
       });
       return;
     }
     dispatch(markStepCompleted("media"));
     dispatch(saveDraftNow());
-    pushToast({ kind: "success", title: "Draft saved" });
+    pushToast({ kind: "success", title: t("postProperty.toast.draftSaved") });
     navigate("/post-property/documents");
   };
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-[var(--b1)]">Step 4: Media</h2>
+      <h2 className="text-xl font-semibold text-[var(--b1)]">{t("postProperty.media.stepTitle")}</h2>
       <p className="mt-1 text-sm text-[var(--muted)]">
-        Upload high-quality images. Images are compressed on-device for faster uploads.
+        {t("postProperty.media.stepSubtitle")}
       </p>
 
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-5">
@@ -183,20 +185,20 @@ export default function MediaUpload() {
           >
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-semibold text-[var(--b1)]">Drag & drop images</p>
+                <p className="text-sm font-semibold text-[var(--b1)]">{t("postProperty.media.dragDropImages")}</p>
                 <p className="mt-1 text-xs text-[var(--muted)]">
-                  Or browse from your computer. Multiple images supported.
+                  {t("postProperty.media.browseFromComputer")}
                 </p>
               </div>
 
               <label className="inline-flex min-w-[116px] shrink-0 cursor-pointer items-center justify-center whitespace-nowrap rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] transition hover:bg-[var(--b1)]">
-                Select files
+                {t("postProperty.media.selectFiles")}
                 <input type="file" accept="image/*" multiple className="hidden" onChange={onInputChange} />
               </label>
             </div>
 
             {errors.images && (
-              <p className="mt-3 text-xs font-semibold text-[var(--error)]">{errors.images}</p>
+              <p className="mt-3 text-xs font-semibold text-[var(--error)]">{t(errors.images)}</p>
             )}
 
             {media.uploadError && (
@@ -206,7 +208,7 @@ export default function MediaUpload() {
 
           {Object.keys(progressMap).length > 0 && (
             <div className="mt-4 rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]/30 p-3">
-              <p className="text-xs font-semibold text-[var(--b1)]">Uploading</p>
+              <p className="text-xs font-semibold text-[var(--b1)]">{t("postProperty.media.uploading")}</p>
               <div className="mt-2 space-y-2">
                 {Object.entries(progressMap).map(([name, percent]) => (
                   <div key={name}>
@@ -226,9 +228,9 @@ export default function MediaUpload() {
           )}
 
           <div className="mt-5 rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-5">
-            <p className="text-sm font-semibold text-[var(--b1)]">Add image by URL</p>
+            <p className="text-sm font-semibold text-[var(--b1)]">{t("postProperty.media.addImageByUrl")}</p>
             <p className="mt-1 text-xs text-[var(--muted)]">
-              You can upload files directly. Use URL only for already hosted public images.
+              {t("postProperty.media.addImageByUrlHint")}
             </p>
             <div className="mt-3 flex flex-col sm:flex-row gap-2">
               <Input
@@ -244,8 +246,8 @@ export default function MediaUpload() {
                   if (!url || !/^https?:\/\//i.test(url)) {
                     pushToast({
                       kind: "error",
-                      title: "Invalid URL",
-                      detail: "Please enter a valid http/https image URL.",
+                    title: t("postProperty.media.invalidUrl"),
+                    detail: t("postProperty.media.invalidUrlDetail"),
                     });
                     return;
                   }
@@ -255,40 +257,40 @@ export default function MediaUpload() {
                     ])
                   );
                   setImageUrl("");
-                  pushToast({ kind: "success", title: "Image URL added" });
+                  pushToast({ kind: "success", title: t("postProperty.media.imageUrlAdded") });
                 }}
                 className="min-w-[104px] shrink-0 whitespace-nowrap rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] transition hover:bg-[var(--b1)]"
               >
-                Add URL
+                {t("postProperty.media.addUrl")}
               </Button>
             </div>
           </div>
 
           <div className="mt-5">
-            <p className="text-sm font-semibold text-[var(--b1)]">Preview</p>
+            <p className="text-sm font-semibold text-[var(--b1)]">{t("postProperty.media.preview")}</p>
             <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
               {media.images.map((img) => (
                 <div key={img.id} className="relative overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--white)]">
-                  <img src={img.url} alt={img.fileName ?? "Property"} className="h-28 w-full object-cover" />
+                  <img src={img.url} alt={img.fileName ?? t("postProperty.media.propertyImageAlt")} className="h-28 w-full object-cover" />
                   <button
                     type="button"
                     onClick={() => dispatch(removeImage(img.id))}
-                    aria-label={`Remove image ${img.fileName ?? ""}`.trim()}
+                    aria-label={`${t("postProperty.media.removeImage")} ${img.fileName ?? ""}`.trim()}
                     className="absolute right-1.5 top-1.5 inline-flex h-9 w-9 touch-manipulation items-center justify-center rounded-md bg-black/70 text-white shadow-sm transition hover:bg-black/85 focus-visible:outline focus-visible:ring-2 focus-visible:ring-white/70 sm:right-2 sm:top-2 sm:h-8 sm:w-8"
                   >
                     <X className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
                   </button>
                   <div className="px-2 py-2">
                     <p className="text-[10px] text-[var(--muted)] line-clamp-1">
-                      {img.source === "remote" ? "Uploaded image" : "Local preview"} •{" "}
-                      {img.fileName ?? "image"}
+                      {img.source === "remote" ? t("postProperty.media.uploadedImage") : t("postProperty.media.localPreview")} •{" "}
+                      {img.fileName ?? t("postProperty.media.image")}
                     </p>
                   </div>
                 </div>
               ))}
               {!media.images.length && (
                 <div className="col-span-2 sm:col-span-3 lg:col-span-4 rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]/40 p-4 text-sm text-[var(--muted)]">
-                  No images added yet.
+                  {t("postProperty.media.noImagesYet")}
                 </div>
               )}
             </div>
@@ -296,9 +298,9 @@ export default function MediaUpload() {
         </div>
 
         <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-sm p-5">
-          <p className="text-sm font-semibold text-[var(--b1)]">Optional video</p>
+          <p className="text-sm font-semibold text-[var(--b1)]">{t("postProperty.media.optionalVideo")}</p>
           <p className="mt-1 text-xs text-[var(--muted)]">
-            Paste a video link (YouTube/Drive). Upload service integration can be added later.
+            {t("postProperty.media.optionalVideoHint")}
           </p>
           <Input
             value={media.videoUrl ?? ""}
@@ -308,9 +310,9 @@ export default function MediaUpload() {
           />
 
           <div className="mt-5 rounded-xl bg-[var(--b2-soft)]/40 p-4">
-            <p className="text-xs font-semibold text-[var(--b1)]">Tip</p>
+            <p className="text-xs font-semibold text-[var(--b1)]">{t("postProperty.media.tip")}</p>
             <p className="mt-1 text-xs text-[var(--muted)]">
-              Add 6–10 clear images (front, access road, nearby landmark, land view).
+              {t("postProperty.media.tipText")}
             </p>
           </div>
         </div>
@@ -319,7 +321,7 @@ export default function MediaUpload() {
       <FormActions
         onBack={() => navigate("/post-property/profile")}
         onNext={onNext}
-        nextLabel="Continue"
+        nextLabel={t("postProperty.common.continue")}
         nextDisabled={media.uploading}
         nextLoading={media.uploading}
       />

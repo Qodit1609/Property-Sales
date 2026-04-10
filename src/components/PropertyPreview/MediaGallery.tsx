@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 type MediaGalleryProps = {
   title: string;
   images?: string[];
@@ -14,18 +16,19 @@ const toArray = (value?: string | string[]) => {
 };
 
 const MediaGallery = ({ title, images = [], videos = [], droneView, mapScreenshot }: MediaGalleryProps) => {
+  const { t } = useTranslation();
   const droneItems = toArray(droneView);
   const hasAnyMedia = images.length || videos.length || droneItems.length || mapScreenshot;
 
   if (!hasAnyMedia) {
-    return <p className="text-sm text-[var(--muted)]">-</p>;
+    return <p className="text-sm text-[var(--muted)]">{t("propertyPreview.labels.notAvailable")}</p>;
   }
 
   return (
     <div className="space-y-4">
       {images.length > 0 ? (
         <div>
-          <p className="mb-2 text-sm font-semibold text-[var(--b1)]">{title} Images</p>
+          <p className="mb-2 text-sm font-semibold text-[var(--b1)]">{title} {t("propertyPreview.labels.images")}</p>
           <div className="flex gap-3 overflow-x-auto pb-1">
             {images.map((src, index) => (
               <img
@@ -59,7 +62,7 @@ const MediaGallery = ({ title, images = [], videos = [], droneView, mapScreensho
             rel="noreferrer"
             className="flex h-44 items-center justify-center rounded-lg border border-[var(--b2-soft)] bg-[var(--b2-soft)]/20 px-4 text-center text-sm font-semibold text-[var(--b1)]"
           >
-            View Drone Preview
+            {t("propertyPreview.actions.viewDronePreview")}
           </a>
         ))}
 

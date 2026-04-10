@@ -1,4 +1,5 @@
 import { CheckCircle2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type PropertyFeatureListProps = {
   items: Array<{ label: string; value: string }>;
@@ -7,10 +8,13 @@ type PropertyFeatureListProps = {
 
 const PropertyFeatureList = ({
   items,
-  emptyMessage = "No data available.",
+  emptyMessage,
 }: PropertyFeatureListProps) => {
+  const { t } = useTranslation();
+  const resolvedEmptyMessage = emptyMessage ?? t("propertyPreview.messages.noDataAvailable");
+
   if (!items.length) {
-    return <p className="text-sm text-[var(--muted)]">{emptyMessage}</p>;
+    return <p className="text-sm text-[var(--muted)]">{resolvedEmptyMessage}</p>;
   }
 
   return (

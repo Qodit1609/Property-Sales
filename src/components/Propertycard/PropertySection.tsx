@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import PropertyCard from "../Cards/PropertyCard";
 import { properties } from "../Data/properties";
 import { Button } from "@/components/common";
+import { useTranslation } from "react-i18next";
 
 const PropertySection = () => {
+  const { t } = useTranslation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showAll, setShowAll] = useState(false);
 
@@ -32,10 +34,10 @@ const PropertySection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-6">
           <p className="text-sm text-[var(--b1-mid)] font-sans">
-            Featured Property
+            {t("propertySection.featuredProperty")}
           </p>
           <h2 className="text-2xl sm:text-3xl font-bold text-[var(--b1)] font-serif">
-            Recommended Properties for You
+            {t("propertySection.recommendedProperties")}
           </h2>
         </div>
 
@@ -72,7 +74,7 @@ const PropertySection = () => {
                 transition
               "
             >
-              Show all Property
+              {t("propertySection.showAllProperties")}
             </Button>
           ) : (
             <Button
@@ -87,7 +89,7 @@ const PropertySection = () => {
                 transition
               "
             >
-              ✕ Close
+              {t("propertySection.close")}
             </Button>
           )}
         </div>

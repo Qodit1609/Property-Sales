@@ -5,6 +5,7 @@ import { saveDraftNow, setDocuments as setDocumentPreviews } from "../../feature
 import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
 import DocumentUploadCard, { type DocumentFileKey } from "./DocumentUploadCard";
+import { useTranslation } from "react-i18next";
 
 type DocumentsState = Partial<Record<DocumentFileKey, File | null>>;
 
@@ -25,6 +26,7 @@ const initialDocs: DocumentsState = {
 };
 
 export default function PropertyDocumentsStep() {
+  const { t } = useTranslation();
   const { pushToast } = useOutletContext<PostPropertyOutletContext>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -43,7 +45,7 @@ export default function PropertyDocumentsStep() {
 
   const onNext = () => {
     dispatch(saveDraftNow());
-    pushToast({ kind: "success", title: "Draft saved" });
+    pushToast({ kind: "success", title: t("postProperty.toast.draftSaved") });
     navigate("/post-property/amenities");
   };
 
@@ -85,45 +87,44 @@ export default function PropertyDocumentsStep() {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold text-[var(--b1)]">Step 5: Documents</h2>
+      <h2 className="text-xl font-semibold text-[var(--b1)]">{t("postProperty.documents.stepTitle")}</h2>
       <p className="mt-1 text-sm text-[var(--muted)]">
-        Upload legal and compliance documents for verification.
+        {t("postProperty.documents.stepSubtitle")}
       </p>
 
       {strictAgSell ? (
         <div className="mt-4 rounded-xl border border-[var(--warning)] bg-[var(--warning-bg)] px-4 py-3">
           <p className="text-sm font-semibold text-[var(--warning)]">
-            Required for agriculture land selling.
+            {t("postProperty.documents.requiredAgriSelling")}
           </p>
           <p className="mt-1 text-xs text-[var(--muted)]">
-            Land Registry and Latest Khasra are mandatory for this listing. (Validation placeholder —
-            not enforced yet.)
+            {t("postProperty.documents.requiredAgriSellingHint")}
           </p>
         </div>
       ) : (
         <div className="mt-4 rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)] px-4 py-3">
           <p className="text-sm font-medium text-[var(--b1)]">
-            Listing Type = Rent (or non-agriculture): all documents optional.
+            {t("postProperty.documents.optionalForRent")}
           </p>
-          <p className="mt-1 text-xs text-[var(--muted)]">Static conditional placeholder — no validation.</p>
+          <p className="mt-1 text-xs text-[var(--muted)]">{t("postProperty.documents.staticPlaceholder")}</p>
         </div>
       )}
 
       <div className="mt-6 space-y-4">
-        <p className="text-sm font-semibold text-[var(--b1)]">Required Documents</p>
+        <p className="text-sm font-semibold text-[var(--b1)]">{t("postProperty.documents.requiredDocuments")}</p>
         <div className="grid grid-cols-1 gap-4">
           <DocumentUploadCard
-            title="Land Registry"
+            title={t("postProperty.documents.landRegistry")}
             required={strictAgSell}
-            description={strictAgSell ? "Required for agriculture land selling." : undefined}
+            description={strictAgSell ? t("postProperty.documents.requiredAgriSelling") : undefined}
             documentKey="landRegistry"
             file={documents.landRegistry ?? null}
             onFileChange={onFileChange}
           />
           <DocumentUploadCard
-            title="Latest Khasra"
+            title={t("postProperty.documents.latestKhasra")}
             required={strictAgSell}
-            description={strictAgSell ? "Required for agriculture land selling." : undefined}
+            description={strictAgSell ? t("postProperty.documents.requiredAgriSelling") : undefined}
             documentKey="khasra"
             file={documents.khasra ?? null}
             onFileChange={onFileChange}
@@ -132,70 +133,70 @@ export default function PropertyDocumentsStep() {
       </div>
 
       <div className="mt-8 space-y-4">
-        <p className="text-sm font-semibold text-[var(--b1)]">Optional Documents</p>
+        <p className="text-sm font-semibold text-[var(--b1)]">{t("postProperty.documents.optionalDocuments")}</p>
         <div className="grid grid-cols-1 gap-4">
           <DocumentUploadCard
-            title="Ownership Proof"
+            title={t("postProperty.documents.ownershipProof")}
             documentKey="ownership"
             file={documents.ownership ?? null}
             onFileChange={onFileChange}
           />
           <DocumentUploadCard
-            title="Previous Registry"
+            title={t("postProperty.documents.previousRegistry")}
             documentKey="previousRegistry"
             file={documents.previousRegistry ?? null}
             onFileChange={onFileChange}
           />
           <DocumentUploadCard
-            title="Mutation Certificate"
+            title={t("postProperty.documents.mutationCertificate")}
             documentKey="mutation"
             file={documents.mutation ?? null}
             onFileChange={onFileChange}
           />
           <DocumentUploadCard
-            title="Encumbrance Certificate"
+            title={t("postProperty.documents.encumbranceCertificate")}
             documentKey="encumbrance"
             file={documents.encumbrance ?? null}
             onFileChange={onFileChange}
           />
           <DocumentUploadCard
-            title="Soil Report"
+            title={t("postProperty.documents.soilReport")}
             documentKey="soil"
             file={documents.soil ?? null}
             onFileChange={onFileChange}
           />
           <DocumentUploadCard
-            title="Water Availability Certificate"
+            title={t("postProperty.documents.waterAvailabilityCertificate")}
             documentKey="water"
             file={documents.water ?? null}
             onFileChange={onFileChange}
           />
           <DocumentUploadCard
-            title="Irrigation Proof"
+            title={t("postProperty.documents.irrigationProof")}
             documentKey="irrigation"
             file={documents.irrigation ?? null}
             onFileChange={onFileChange}
           />
           <DocumentUploadCard
-            title="Electricity Proof"
+            title={t("postProperty.documents.electricityProof")}
             documentKey="electricity"
             file={documents.electricity ?? null}
             onFileChange={onFileChange}
           />
           <DocumentUploadCard
-            title="Tax Receipt"
+            title={t("postProperty.documents.taxReceipt")}
             documentKey="tax"
             file={documents.tax ?? null}
             onFileChange={onFileChange}
           />
           <DocumentUploadCard
-            title="NOC"
+            title={t("postProperty.documents.noc")}
             documentKey="noc"
             file={documents.noc ?? null}
             onFileChange={onFileChange}
           />
           <DocumentUploadCard
-            title="Land Use Certificate"
+            title={t("postProperty.documents.landUseCertificate")}
             documentKey="landUse"
             file={documents.landUse ?? null}
             onFileChange={onFileChange}
@@ -206,7 +207,7 @@ export default function PropertyDocumentsStep() {
       <FormActions
         onBack={() => navigate("/post-property/media")}
         onNext={onNext}
-        nextLabel="Continue"
+        nextLabel={t("postProperty.common.continue")}
       />
     </div>
   );

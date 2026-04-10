@@ -3,6 +3,7 @@ import { ImageSlider } from "@/components/common";
 import { FALLBACK_PROPERTY_IMAGE } from "../../utils/propertyFormatters";
 import { resolvePropertyGalleryImages } from "./previewUtils";
 import { useAppSelector } from "../../hooks/reduxHooks";
+import { useTranslation } from "react-i18next";
 import {
   selectCloudinaryUrlPool,
   selectPropertyImagesMap,
@@ -13,6 +14,7 @@ type PropertyGalleryProps = {
 };
 
 const PropertyGallery = ({ property }: PropertyGalleryProps) => {
+  const { t } = useTranslation();
   const propertyImagesMap = useAppSelector(selectPropertyImagesMap);
   const cloudinaryPool = useAppSelector(selectCloudinaryUrlPool);
   const images = resolvePropertyGalleryImages(
@@ -41,7 +43,7 @@ const PropertyGallery = ({ property }: PropertyGalleryProps) => {
           {videos[0] && (
             <div className="overflow-hidden rounded-xl border border-[var(--b2-soft)] bg-white">
               <p className="border-b border-[var(--b2-soft)] px-4 py-2 text-sm font-semibold text-[var(--b1)]">
-                Video Tour
+                {t("propertyPreview.sections.videoTour")}
               </p>
               <video
                 controls
@@ -60,10 +62,10 @@ const PropertyGallery = ({ property }: PropertyGalleryProps) => {
               className="overflow-hidden rounded-xl border border-[var(--b2-soft)] bg-white transition hover:shadow-sm"
             >
               <p className="border-b border-[var(--b2-soft)] px-4 py-2 text-sm font-semibold text-[var(--b1)]">
-                Drone View
+                {t("propertyPreview.sections.droneView")}
               </p>
               <div className="flex h-52 items-center justify-center bg-[var(--b2-soft)]/40 px-4 text-center text-sm text-[var(--muted)]">
-                Open drone view in new tab
+                {t("propertyPreview.messages.openDroneViewInNewTab")}
               </div>
             </a>
           )}
@@ -71,7 +73,7 @@ const PropertyGallery = ({ property }: PropertyGalleryProps) => {
           {mapPreview && (
             <div className="overflow-hidden rounded-xl border border-[var(--b2-soft)] bg-white md:col-span-2">
               <p className="border-b border-[var(--b2-soft)] px-4 py-2 text-sm font-semibold text-[var(--b1)]">
-                Map Preview
+                {t("propertyPreview.sections.mapPreview")}
               </p>
               <img
                 src={mapPreview}

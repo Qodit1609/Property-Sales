@@ -8,6 +8,7 @@ import {
 import type { AmenityKey } from "../../features/postProperty/postPropertyTypes";
 import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
+import { useTranslation } from "react-i18next";
 
 const OPTIONS: Array<{ key: AmenityKey; label: string; desc: string }> = [
   { key: "borewell", label: "Borewell", desc: "Reliable groundwater source" },
@@ -21,6 +22,7 @@ const OPTIONS: Array<{ key: AmenityKey; label: string; desc: string }> = [
 ];
 
 export default function AmenitiesForm() {
+  const { t } = useTranslation();
   const { pushToast } = useOutletContext<PostPropertyOutletContext>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -29,10 +31,10 @@ export default function AmenitiesForm() {
   return (
     <div>
       <h2 className="text-xl font-semibold text-[var(--b1)]">
-        Step 5: Amenities / Features
+        {t("postProperty.amenities.stepTitle")}
       </h2>
       <p className="mt-1 text-sm text-[var(--muted)]">
-        Select what applies. This helps users filter and compare.
+        {t("postProperty.amenities.stepSubtitle")}
       </p>
 
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -57,10 +59,10 @@ export default function AmenitiesForm() {
               />
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-[var(--b1)]">
-                  {a.label}
+                  {t(`postProperty.amenities.options.${a.key}.label`)}
                 </p>
                 <p className="mt-0.5 text-xs text-[var(--muted)] line-clamp-2">
-                  {a.desc}
+                  {t(`postProperty.amenities.options.${a.key}.desc`)}
                 </p>
               </div>
             </label>
@@ -73,10 +75,10 @@ export default function AmenitiesForm() {
         onNext={() => {
           dispatch(markStepCompleted("amenities"));
           dispatch(saveDraftNow());
-          pushToast({ kind: "success", title: "Draft saved" });
+          pushToast({ kind: "success", title: t("postProperty.toast.draftSaved") });
           navigate("/post-property/review");
         }}
-        nextLabel="Continue"
+        nextLabel={t("postProperty.common.continue")}
       />
     </div>
   );

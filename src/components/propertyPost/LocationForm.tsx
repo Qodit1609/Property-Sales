@@ -10,6 +10,7 @@ import { validateLocationDetails } from "../../features/postProperty/postPropert
 import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
 import { Input } from "@/components/common";
+import { useTranslation } from "react-i18next";
 
 function Field({
   label,
@@ -47,19 +48,19 @@ function Field({
   );
 }
 
-function MapPickerFutureReady() {
+function MapPickerFutureReady({ title, description }: { title: string; description: string }) {
   return (
     <div className="rounded-xl border border-dashed border-[var(--b2)] bg-[var(--b2-soft)]/40 p-4">
-      <p className="text-sm font-semibold text-[var(--b1)]">Map picker</p>
+      <p className="text-sm font-semibold text-[var(--b1)]">{title}</p>
       <p className="mt-1 text-xs text-[var(--muted)]">
-        Component structure is ready. Google Maps integration can be plugged in
-        later without changing this module.
+        {description}
       </p>
     </div>
   );
 }
 
 export default function LocationForm() {
+  const { t } = useTranslation();
   const { pushToast } = useOutletContext<PostPropertyOutletContext>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -72,7 +73,7 @@ export default function LocationForm() {
   const errors = useMemo(() => {
     const e = { ...baseErrors } as Record<string, string | undefined>;
     if (category === "Agriculture Land" && !location.surveyNumber.trim()) {
-      e.surveyNumber = "Survey number is required for agriculture land";
+      e.surveyNumber = "postProperty.validation.surveyNumberRequired";
     }
     return e;
   }, [baseErrors, category, location.surveyNumber]);
@@ -94,114 +95,114 @@ export default function LocationForm() {
     if (hasError) {
       pushToast({
         kind: "error",
-        title: "Fix required fields",
-        detail: "Please complete Location Details before continuing.",
+        title: t("postProperty.toast.fixRequiredFields"),
+        detail: t("postProperty.toast.completeLocationDetails"),
       });
       return;
     }
     dispatch(markStepCompleted("location"));
     dispatch(saveDraftNow());
-    pushToast({ kind: "success", title: "Draft saved" });
+    pushToast({ kind: "success", title: t("postProperty.toast.draftSaved") });
     navigate("/post-property/profile");
   };
 
   return (
     <div>
       <h2 className="text-xl font-semibold text-[var(--b1)]">
-        Step 2: Location Details
+        {t("postProperty.location.stepTitle")}
       </h2>
       <p className="mt-1 text-sm text-[var(--muted)]">
-        Help buyers find your property accurately.
+        {t("postProperty.location.stepSubtitle")}
       </p>
 
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
         <Field
-          label="State"
+          label={t("postProperty.location.state")}
           required
           value={location.state}
           onBlur={() => setTouched((p) => ({ ...p, state: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ state: v }))}
-          error={showError("state") ? errors.state : undefined}
-          placeholder="Madhya Pradesh"
+          error={showError("state") ? t(errors.state || "") : undefined}
+          placeholder={t("postProperty.location.statePlaceholder")}
         />
         <Field
-          label="City"
+          label={t("postProperty.location.city")}
           required
           value={location.city}
           onBlur={() => setTouched((p) => ({ ...p, city: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ city: v }))}
-          error={showError("city") ? errors.city : undefined}
-          placeholder="Indore"
+          error={showError("city") ? t(errors.city || "") : undefined}
+          placeholder={t("postProperty.location.cityPlaceholder")}
         />
         <Field
-          label="District"
+          label={t("postProperty.location.district")}
           value={location.district}
           onChange={(v) => dispatch(updateLocationDetails({ district: v }))}
-          placeholder="District name"
+          placeholder={t("postProperty.location.districtPlaceholder")}
         />
         <Field
-          label="Tehsil"
+          label={t("postProperty.location.tehsil")}
           required
           value={location.tehsil}
           onBlur={() => setTouched((p) => ({ ...p, tehsil: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ tehsil: v }))}
-          error={showError("tehsil") ? errors.tehsil : undefined}
-          placeholder="Mhow"
+          error={showError("tehsil") ? t(errors.tehsil || "") : undefined}
+          placeholder={t("postProperty.location.tehsilPlaceholder")}
         />
         <Field
-          label="Village"
+          label={t("postProperty.location.village")}
           required
           value={location.village}
           onBlur={() => setTouched((p) => ({ ...p, village: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ village: v }))}
-          error={showError("village") ? errors.village : undefined}
-          placeholder="Village name"
+          error={showError("village") ? t(errors.village || "") : undefined}
+          placeholder={t("postProperty.location.villagePlaceholder")}
         />
         <Field
-          label="Address"
+          label={t("postProperty.location.address")}
           value={location.address}
           onChange={(v) => dispatch(updateLocationDetails({ address: v }))}
-          placeholder="Full address"
+          placeholder={t("postProperty.location.addressPlaceholder")}
         />
         <Field
-          label="Landmark"
+          label={t("postProperty.location.landmark")}
           value={location.landmark}
           onChange={(v) => dispatch(updateLocationDetails({ landmark: v }))}
-          placeholder="Nearby landmark"
+          placeholder={t("postProperty.location.landmarkPlaceholder")}
         />
         <Field
-          label="Locality"
+          label={t("postProperty.location.locality")}
           required
           value={location.locality}
           onBlur={() => setTouched((p) => ({ ...p, locality: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ locality: v }))}
-          error={showError("locality") ? errors.locality : undefined}
-          placeholder="Nearby landmark/locality"
+          error={showError("locality") ? t(errors.locality || "") : undefined}
+          placeholder={t("postProperty.location.localityPlaceholder")}
         />
         <Field
-          label="Pin code"
+          label={t("postProperty.location.pinCode")}
           required
           value={location.pinCode}
           onBlur={() => setTouched((p) => ({ ...p, pinCode: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ pinCode: v }))}
-          error={showError("pinCode") ? errors.pinCode : undefined}
+          error={showError("pinCode") ? t(errors.pinCode || "") : undefined}
           placeholder="452001"
         />
 
         <Field
-          label="Survey number"
+          label={t("postProperty.location.surveyNumber")}
           required={category === "Agriculture Land"}
           value={location.surveyNumber}
           onBlur={() => setTouched((p) => ({ ...p, surveyNumber: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ surveyNumber: v }))}
-          error={showError("surveyNumber") ? errors.surveyNumber : undefined}
-          placeholder="e.g. 123/2"
+          error={showError("surveyNumber") ? t(errors.surveyNumber || "") : undefined}
+          placeholder={t("postProperty.location.surveyNumberPlaceholder")}
         />
 
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-              Latitude
+              {t("postProperty.location.latitude")}
             </label>
             <Input
               value={location.latitude ?? ""}
@@ -218,7 +219,7 @@ export default function LocationForm() {
           </div>
           <div>
             <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-              Longitude
+              {t("postProperty.location.longitude")}
             </label>
             <Input
               value={location.longitude ?? ""}
@@ -237,13 +238,16 @@ export default function LocationForm() {
       </div>
 
       <div className="mt-6">
-        <MapPickerFutureReady />
+        <MapPickerFutureReady
+          title={t("postProperty.location.mapPickerTitle")}
+          description={t("postProperty.location.mapPickerDescription")}
+        />
       </div>
 
       <FormActions
         onBack={() => navigate("/post-property/basic")}
         onNext={onNext}
-        nextLabel="Continue"
+        nextLabel={t("postProperty.common.continue")}
       />
     </div>
   );

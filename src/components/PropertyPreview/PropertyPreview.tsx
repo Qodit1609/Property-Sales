@@ -6,7 +6,6 @@ import { Button } from "@/components/common";
 import BuyerActions from "../buyer/BuyerActions";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import Header from "../Header/Header";
-import { formatPrice } from "../../utils/propertyFormatters";
 import AgentCard from "./AgentCard";
 import PropertyFeatureList from "./PropertyFeatureList";
 import PropertyFarming from "./PropertyFarming";
@@ -17,14 +16,18 @@ import PropertyLocation from "./PropertyLocation";
 import PropertyExtendedDetails from "./PropertyExtendedDetails";
 import PropertyTabs, { type PropertyTab } from "./PropertyTabs";
 import PropertyWater from "./PropertyWater";
+import { useTranslation } from "react-i18next";
 import {
   formatCompactNumber,
+  formatPriceLocalized,
   formatSqftPrice,
   getDisplayAddress,
   getLatLng,
   getOverviewSpecs,
   getPrimaryContact,
   toMapLink,
+  translateListingType,
+  translatePropertyType,
   yesNoOptional,
 } from "./previewUtils";
 
@@ -33,6 +36,7 @@ type Props = {
 };
 
 const PropertyPreview = ({ property }: Props) => {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const user = useAppSelector((s) => s.auth.user);
   const isBuyer = Boolean(user?.role === "buyer");
@@ -62,47 +66,47 @@ const PropertyPreview = ({ property }: Props) => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const overviewSpecs = useMemo(() => getOverviewSpecs(property), [property]);
+  const overviewSpecs = useMemo(() => getOverviewSpecs(property), [property, i18n.resolvedLanguage]);
   const features = [
-    { label: "Parking", value: yesNoOptional(property.features?.parking ?? property.parking) },
-    { label: "Power Backup", value: yesNoOptional(property.features?.powerBackup) },
-    { label: "Security", value: yesNoOptional(property.features?.security) },
+    { label: t("propertyPreview.labels.parking"), value: yesNoOptional(property.features?.parking ?? property.parking) },
+    { label: t("propertyPreview.labels.powerBackup"), value: yesNoOptional(property.features?.powerBackup) },
+    { label: t("propertyPreview.labels.security"), value: yesNoOptional(property.features?.security) },
     {
-      label: "Construction Allowed",
+      label: t("propertyPreview.labels.constructionAllowed"),
       value: yesNoOptional(property.features?.constructionAllowed ?? property.legal?.constructionAllowed),
     },
   ].filter((item): item is { label: string; value: string } => Boolean(item.value));
   const investment = [
     {
-      label: "ROI",
+      label: t("propertyPreview.labels.roi"),
       value: Number.isFinite(property.analytics?.roiPercent ?? property.roiPercent)
         ? `${property.analytics?.roiPercent ?? property.roiPercent}%`
         : undefined,
     },
     {
-      label: "Appreciation Rate",
+      label: t("propertyPreview.labels.appreciationRate"),
       value: Number.isFinite(property.analytics?.appreciationRate)
         ? `${property.analytics?.appreciationRate}%`
         : undefined,
     },
-    { label: "Price / Sqft", value: formatSqftPrice(property) },
+    { label: t("propertyPreview.labels.pricePerSqft"), value: formatSqftPrice(property) },
   ].filter((item): item is { label: string; value: string } => Boolean(item.value && item.value !== "\u2014"));
   const topOverviewSpecs = overviewSpecs.slice(0, 4);
 
   const tabs: PropertyTab[] = [
     {
       id: "overview",
-      label: "Overview",
+      label: t("propertyPreview.tabs.overview"),
       content: (
         <div className="space-y-5">
           <div>
-            <h3 className="text-base font-semibold text-[var(--b1)]">Description</h3>
+            <h3 className="text-base font-semibold text-[var(--b1)]">{t("propertyPreview.sections.description")}</h3>
             <p className="mt-2 whitespace-pre-line text-sm leading-7 text-[var(--muted)] sm:text-base">
               {property.description || "\u2014"}
             </p>
           </div>
           <div>
-            <h3 className="text-base font-semibold text-[var(--b1)]">Property Specs</h3>
+            <h3 className="text-base font-semibold text-[var(--b1)]">{t("propertyPreview.sections.propertySpecs")}</h3>
             <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               {overviewSpecs.map((spec) => (
                 <div
@@ -118,24 +122,24 @@ const PropertyPreview = ({ property }: Props) => {
         </div>
       ),
     },
-    { id: "features", label: "Features", content: <PropertyFeatureList items={features} /> },
-    { id: "location", label: "Location", content: <PropertyLocation property={property} /> },
-    { id: "legal", label: "Legal", content: <PropertyLegal property={property} /> },
-    { id: "farming", label: "Farming", content: <PropertyFarming property={property} /> },
-    { id: "water", label: "Water", content: <PropertyWater property={property} /> },
-    { id: "investment", label: "Investment", content: <PropertyFeatureList items={investment} /> },
-    { id: "details", label: "Detailed Insights", content: <PropertyExtendedDetails property={property} /> },
+    { id: "features", label: t("propertyPreview.tabs.features"), content: <PropertyFeatureList items={features} /> },
+    { id: "location", label: t("propertyPreview.tabs.location"), content: <PropertyLocation property={property} /> },
+    { id: "legal", label: t("propertyPreview.tabs.legal"), content: <PropertyLegal property={property} /> },
+    { id: "farming", label: t("propertyPreview.tabs.farming"), content: <PropertyFarming property={property} /> },
+    { id: "water", label: t("propertyPreview.tabs.water"), content: <PropertyWater property={property} /> },
+    { id: "investment", label: t("propertyPreview.tabs.investment"), content: <PropertyFeatureList items={investment} /> },
+    { id: "details", label: t("propertyPreview.tabs.detailedInsights"), content: <PropertyExtendedDetails property={property} /> },
   ];
 
   if (!property) {
     return (
       <div className="pt-24 text-center">
-        <p className="text-lg font-semibold text-[var(--b1)]">Property not found</p>
+        <p className="text-lg font-semibold text-[var(--b1)]">{t("propertyPreview.messages.propertyNotFound")}</p>
         <Button
           onClick={() => navigate("/")}
           className="mt-4 rounded-full bg-[var(--b1-mid)] px-4 py-2 text-sm text-[var(--fg)]"
         >
-          Go back
+          {t("propertyPreview.actions.goBack")}
         </Button>
       </div>
     );
@@ -150,7 +154,7 @@ const PropertyPreview = ({ property }: Props) => {
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-[var(--b1)]">{property.title}</p>
-              <p className="text-xs text-[var(--muted)]">{formatPrice(property.price, property.listingType)}</p>
+              <p className="text-xs text-[var(--muted)]">{formatPriceLocalized(property.price, property.listingType)}</p>
             </div>
             <Button
               className="bg-[var(--b1)] px-3 py-2 text-xs text-[var(--fg)] hover:bg-[var(--b1-mid)]"
@@ -161,7 +165,7 @@ const PropertyPreview = ({ property }: Props) => {
               }}
               disabled={!phone}
             >
-              Contact Agent
+              {t("propertyPreview.actions.contactAgent")}
             </Button>
           </div>
         </div>
@@ -174,23 +178,23 @@ const PropertyPreview = ({ property }: Props) => {
               <div className="border-b border-[var(--b2-soft)] bg-gradient-to-r from-[var(--b2-soft)]/35 via-white to-white p-4 sm:p-6">
                 <div className="mb-3 flex flex-wrap items-center gap-2">
                   <span className="rounded-full bg-[var(--b2-soft)] px-3 py-1 text-xs font-semibold text-[var(--b1)]">
-                    {property.propertyType}
+                    {translatePropertyType(property.propertyType) || property.propertyType}
                   </span>
                   {property.listingType && (
                     <span className="rounded-full bg-[var(--b2-soft)] px-3 py-1 text-xs font-semibold text-[var(--b1)]">
-                      {property.listingType.toUpperCase()}
+                      {translateListingType(property.listingType) || property.listingType}
                     </span>
                   )}
                   {property.featured && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
                       <Star size={12} className="fill-amber-500 text-amber-500" />
-                      Featured
+                      {t("propertyPreview.labels.featured")}
                     </span>
                   )}
                   {property.verified && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
                       <ShieldCheck size={12} />
-                      Verified
+                      {t("propertyPreview.labels.verified")}
                     </span>
                   )}
                 </div>
@@ -214,7 +218,7 @@ const PropertyPreview = ({ property }: Props) => {
                   <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-end sm:gap-6">
                     <div>
                       <p className="text-2xl font-extrabold text-[var(--b1)] sm:text-3xl">
-                        {formatPrice(property.price, property.listingType)}
+                        {formatPriceLocalized(property.price, property.listingType)}
                       </p>
                       <p className="mt-1 text-sm font-semibold text-[var(--muted)]">{formatSqftPrice(property)}</p>
                     </div>
@@ -232,7 +236,7 @@ const PropertyPreview = ({ property }: Props) => {
                         rel="noreferrer"
                         className="inline-flex items-center gap-1 rounded-lg border border-[var(--b2-soft)] px-3 py-2 text-sm font-semibold text-[var(--b1)] transition hover:bg-[var(--b2-soft)]/40"
                       >
-                        View Location
+                        {t("propertyPreview.actions.viewLocation")}
                         <ArrowUpRight size={14} />
                       </a>
                     )}
@@ -246,7 +250,7 @@ const PropertyPreview = ({ property }: Props) => {
                       disabled={!phone}
                     >
                       <PhoneCall size={15} className="shrink-0" aria-hidden />
-                      Contact Agent
+                      {t("propertyPreview.actions.contactAgent")}
                     </Button>
                   </div>
                 </div>
@@ -270,14 +274,14 @@ const PropertyPreview = ({ property }: Props) => {
             <section className="rounded-2xl border border-[var(--b2-soft)] bg-white p-4 sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <span className="rounded-full bg-[var(--b2-soft)] px-3 py-1 text-xs font-semibold text-[var(--b1)]">
-                  Location Intelligence
+                  {t("propertyPreview.sections.locationIntelligence")}
                 </span>
                 <div>
-                  <h3 className="text-base font-semibold text-[var(--b1)] sm:text-lg">Location Map</h3>
+                  <h3 className="text-base font-semibold text-[var(--b1)] sm:text-lg">{t("propertyPreview.sections.locationMap")}</h3>
                   <p className="mt-1 text-xs text-[var(--muted)] sm:text-sm">
                     {mapCoordinates
-                      ? `Lat: ${mapCoordinates.lat}, Lng: ${mapCoordinates.lng}`
-                      : "Coordinates not available for this property."}
+                      ? `${t("propertyPreview.labels.latitude")}: ${mapCoordinates.lat}, ${t("propertyPreview.labels.longitude")}: ${mapCoordinates.lng}`
+                      : t("propertyPreview.messages.coordinatesUnavailable")}
                   </p>
                 </div>
                 {mapLink && (
@@ -287,7 +291,7 @@ const PropertyPreview = ({ property }: Props) => {
                     rel="noreferrer"
                     className="inline-flex rounded-lg border border-[var(--b2-soft)] px-3 py-2 text-sm font-semibold text-[var(--b1)] transition hover:bg-[var(--b2-soft)]/40"
                   >
-                    Open in Google Maps
+                    {t("propertyPreview.actions.openInGoogleMaps")}
                   </a>
                 )}
               </div>
@@ -303,7 +307,7 @@ const PropertyPreview = ({ property }: Props) => {
                   />
                 ) : (
                   <div className="flex h-56 items-center justify-center px-4 text-center text-sm text-[var(--muted)] sm:h-72">
-                    Map preview is unavailable because this listing has no valid latitude/longitude.
+                    {t("propertyPreview.messages.mapPreviewUnavailable")}
                   </div>
                 )}
               </div>
@@ -312,18 +316,18 @@ const PropertyPreview = ({ property }: Props) => {
             <PropertyTabs tabs={tabs} />
 
             <section className="rounded-2xl border border-[var(--b2-soft)] bg-white p-4 sm:p-6">
-              <h3 className="text-base font-semibold text-[var(--b1)]">Analytics</h3>
+              <h3 className="text-base font-semibold text-[var(--b1)]">{t("propertyPreview.sections.analytics")}</h3>
               <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
                 <AnalyticsStatCard
-                  label="Views"
+                  label={t("propertyPreview.labels.views")}
                   value={formatCompactNumber(property.analytics?.views)}
                 />
                 <AnalyticsStatCard
-                  label="Saves"
+                  label={t("propertyPreview.labels.saves")}
                   value={formatCompactNumber(property.analytics?.saves)}
                 />
                 <AnalyticsStatCard
-                  label="Contact Clicks"
+                  label={t("propertyPreview.labels.contactClicks")}
                   value={formatCompactNumber(property.analytics?.contactClicks)}
                 />
               </div>
@@ -336,20 +340,20 @@ const PropertyPreview = ({ property }: Props) => {
               <section className="rounded-2xl border border-[var(--b2-soft)] bg-white p-5 sm:p-6">
                 <h3 className="flex items-center gap-2 text-lg font-semibold text-[var(--b1)]">
                   <BarChart3 size={18} />
-                  Quick Analytics
+                  {t("propertyPreview.sections.quickAnalytics")}
                 </h3>
                 <ul className="mt-3 space-y-2 text-sm text-[var(--muted)]">
-                  <li>Views: {formatCompactNumber(property.analytics?.views)}</li>
-                  <li>Saves: {formatCompactNumber(property.analytics?.saves)}</li>
-                  <li>Contact Clicks: {formatCompactNumber(property.analytics?.contactClicks)}</li>
+                  <li>{t("propertyPreview.labels.views")}: {formatCompactNumber(property.analytics?.views)}</li>
+                  <li>{t("propertyPreview.labels.saves")}: {formatCompactNumber(property.analytics?.saves)}</li>
+                  <li>{t("propertyPreview.labels.contactClicks")}: {formatCompactNumber(property.analytics?.contactClicks)}</li>
                 </ul>
               </section>
               <section className="rounded-2xl border border-[var(--b2-soft)] bg-white p-5 sm:p-6">
-                <h3 className="text-base font-semibold text-[var(--b1)]">Why this property?</h3>
+                <h3 className="text-base font-semibold text-[var(--b1)]">{t("propertyPreview.sections.whyThisProperty")}</h3>
                 <ul className="mt-3 space-y-2 text-sm text-[var(--muted)]">
-                  <li className="rounded-lg bg-[var(--b2-soft)]/20 px-3 py-2">Clear pricing and transparent details</li>
-                  <li className="rounded-lg bg-[var(--b2-soft)]/20 px-3 py-2">Verified owner/agent support for safer transactions</li>
-                  <li className="rounded-lg bg-[var(--b2-soft)]/20 px-3 py-2">Complete location, legal, and utility insights in one view</li>
+                  <li className="rounded-lg bg-[var(--b2-soft)]/20 px-3 py-2">{t("propertyPreview.messages.why1")}</li>
+                  <li className="rounded-lg bg-[var(--b2-soft)]/20 px-3 py-2">{t("propertyPreview.messages.why2")}</li>
+                  <li className="rounded-lg bg-[var(--b2-soft)]/20 px-3 py-2">{t("propertyPreview.messages.why3")}</li>
                 </ul>
               </section>
             </div>
@@ -361,9 +365,9 @@ const PropertyPreview = ({ property }: Props) => {
         <div className="rounded-2xl border border-[var(--b2-soft)] bg-white/95 p-2.5 shadow-[0_10px_25px_rgba(0,0,0,0.14)] backdrop-blur">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="truncate text-[11px] text-[var(--muted)]">Starting from</p>
+              <p className="truncate text-[11px] text-[var(--muted)]">{t("propertyPreview.labels.startingFrom")}</p>
               <p className="truncate text-sm font-bold text-[var(--b1)]">
-                {formatPrice(property.price, property.listingType)}
+                {formatPriceLocalized(property.price, property.listingType)}
               </p>
             </div>
             <Button
@@ -376,7 +380,7 @@ const PropertyPreview = ({ property }: Props) => {
               disabled={!phone}
             >
               <PhoneCall size={16} className="shrink-0" aria-hidden />
-              Contact Agent
+              {t("propertyPreview.actions.contactAgent")}
             </Button>
           </div>
         </div>

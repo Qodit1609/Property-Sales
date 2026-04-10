@@ -1,4 +1,5 @@
 import Badge from "./Badge";
+import { useTranslation } from "react-i18next";
 
 type InfoValue = string | number | boolean | null | undefined;
 
@@ -8,9 +9,9 @@ type InfoItemProps = {
   suffix?: string;
 };
 
-const getDisplayValue = (value: InfoValue, suffix?: string) => {
+const getDisplayValue = (value: InfoValue, suffix: string | undefined, yesText: string, noText: string, naText: string) => {
   if (typeof value === "boolean") {
-    return <Badge variant={value ? "success" : "danger"}>{value ? "Yes" : "No"}</Badge>;
+    return <Badge variant={value ? "success" : "danger"}>{value ? yesText : noText}</Badge>;
   }
 
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -21,11 +22,18 @@ const getDisplayValue = (value: InfoValue, suffix?: string) => {
     return value;
   }
 
-  return "-";
+  return naText;
 };
 
 const InfoItem = ({ label, value, suffix }: InfoItemProps) => {
-  const displayValue = getDisplayValue(value, suffix);
+  const { t } = useTranslation();
+  const displayValue = getDisplayValue(
+    value,
+    suffix,
+    t("postProperty.common.yes"),
+    t("postProperty.common.no"),
+    t("propertyPreview.labels.notAvailable"),
+  );
 
   return (
     <div className="rounded-lg border border-[var(--b2-soft)] bg-[var(--b2-soft)]/20 px-3 py-2">

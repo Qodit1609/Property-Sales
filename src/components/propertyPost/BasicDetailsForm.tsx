@@ -14,6 +14,7 @@ import { validateBasicDetails } from "../../features/postProperty/postPropertyVa
 import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
 import { Input, Button } from "@/components/common";
+import { useTranslation } from "react-i18next";
 
 const CATEGORY_OPTIONS: PropertyCategory[] = [
   "Agriculture Land",
@@ -45,6 +46,7 @@ const PROPERTY_TYPES_BY_CATEGORY: Record<PropertyCategory, string[]> = {
 };
 
 export default function BasicDetailsForm() {
+  const { t } = useTranslation();
   const { pushToast } = useOutletContext<PostPropertyOutletContext>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -76,14 +78,14 @@ export default function BasicDetailsForm() {
     if (Object.keys(errors).length > 0) {
       pushToast({
         kind: "error",
-        title: "Fix required fields",
-        detail: "Please complete Basic Details before continuing.",
+        title: t("postProperty.toast.fixRequiredFields"),
+        detail: t("postProperty.toast.completeBasicDetails"),
       });
       return;
     }
     dispatch(markStepCompleted("basic"));
     dispatch(saveDraftNow());
-    pushToast({ kind: "success", title: "Draft saved" });
+    pushToast({ kind: "success", title: t("postProperty.toast.draftSaved") });
     navigate("/post-property/location");
   };
 
@@ -92,10 +94,10 @@ export default function BasicDetailsForm() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold text-[var(--b1)]">
-            Step 1: Basic Details
+            {t("postProperty.basic.stepTitle")}
           </h2>
           <p className="mt-1 text-sm text-[var(--muted)]">
-            Start with listing basics and your contact info.
+            {t("postProperty.basic.stepSubtitle")}
           </p>
         </div>
       </div>
@@ -103,7 +105,7 @@ export default function BasicDetailsForm() {
       <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-5">
         <div>
           <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-            Listing type *
+            {t("postProperty.basic.listingType")} *
           </label>
           <select
             value={basic.listingType}
@@ -117,18 +119,18 @@ export default function BasicDetailsForm() {
               showError("listingType") ? "border-[var(--error)]" : "border-[var(--b2)]"
             }`}
           >
-            <option value="">Select</option>
-            <option value="sell">Sell</option>
-            <option value="rent">Rent/Lease</option>
+            <option value="">{t("postProperty.common.select")}</option>
+            <option value="sell">{t("postProperty.basic.sell")}</option>
+            <option value="rent">{t("postProperty.basic.rentLease")}</option>
           </select>
           {showError("listingType") && (
-            <p className="mt-1 text-xs text-[var(--error)]">{errors.listingType}</p>
+            <p className="mt-1 text-xs text-[var(--error)]">{t(errors.listingType || "")}</p>
           )}
         </div>
 
         <div>
           <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-            Property category *
+            {t("postProperty.basic.propertyCategory")} *
           </label>
           <select
             value={basic.category}
@@ -146,21 +148,21 @@ export default function BasicDetailsForm() {
               showError("category") ? "border-[var(--error)]" : "border-[var(--b2)]"
             }`}
           >
-            <option value="">Select</option>
+            <option value="">{t("postProperty.common.select")}</option>
             {CATEGORY_OPTIONS.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {t(`postProperty.options.category.${c}`)}
               </option>
             ))}
           </select>
           {showError("category") && (
-            <p className="mt-1 text-xs text-[var(--error)]">{errors.category}</p>
+            <p className="mt-1 text-xs text-[var(--error)]">{t(errors.category || "")}</p>
           )}
         </div>
 
         <div className="lg:col-span-2">
           <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-            Property type *
+            {t("postProperty.basic.propertyType")} *
           </label>
           <select
             value={basic.propertyType}
@@ -174,49 +176,49 @@ export default function BasicDetailsForm() {
             }`}
           >
             <option value="">
-              {basic.category ? "Select" : "Select a category first"}
+              {basic.category ? t("postProperty.common.select") : t("postProperty.basic.selectCategoryFirst")}
             </option>
-            {propertyTypeOptions.map((t) => (
-              <option key={t} value={t}>
-                {t}
+            {propertyTypeOptions.map((typeOption) => (
+              <option key={typeOption} value={typeOption}>
+                {t(`postProperty.options.propertyType.${typeOption}`)}
               </option>
             ))}
           </select>
           {showError("propertyType") && (
             <p className="mt-1 text-xs text-[var(--error)]">
-              {errors.propertyType}
+              {t(errors.propertyType || "")}
             </p>
           )}
         </div>
 
         <div className="lg:col-span-2">
           <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-            Listing title *
+            {t("postProperty.basic.listingTitle")} *
           </label>
           <Input
             value={basic.title}
             onBlur={() => setTouched((p) => ({ ...p, title: true }))}
             onChange={(e) => dispatch(updateBasicDetails({ title: e.target.value }))}
-            placeholder="e.g. 5 Acre irrigated land near highway"
+            placeholder={t("postProperty.basic.listingTitlePlaceholder")}
             className={`w-full rounded-md border px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)] ${
               showError("title") ? "border-[var(--error)]" : "border-[var(--b2)]"
             }`}
           />
           {showError("title") && (
-            <p className="mt-1 text-xs text-[var(--error)]">{errors.title}</p>
+            <p className="mt-1 text-xs text-[var(--error)]">{t(errors.title || "")}</p>
           )}
         </div>
 
         <div className="lg:col-span-2">
           <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-            Short description
+            {t("postProperty.basic.shortDescription")}
           </label>
           <Input
             value={basic.shortDescription}
             onChange={(e) =>
               dispatch(updateBasicDetails({ shortDescription: e.target.value }))
             }
-            placeholder="One-line summary shown in preview cards"
+            placeholder={t("postProperty.basic.shortDescriptionPlaceholder")}
             className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
           />
         </div>
@@ -224,16 +226,16 @@ export default function BasicDetailsForm() {
 
       <div className="mt-8">
         <h3 className="text-sm font-semibold text-[var(--b1)]">
-          Contact details
+          {t("postProperty.basic.contactDetails")}
         </h3>
         <p className="mt-1 text-xs text-[var(--muted)]">
-          These will be shown to interested buyers (editable).
+          {t("postProperty.basic.contactDetailsHint")}
         </p>
 
         <div className="mt-4 grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div>
             <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-              Name *
+              {t("postProperty.basic.name")} *
             </label>
             <Input
               value={basic.contactName}
@@ -244,18 +246,18 @@ export default function BasicDetailsForm() {
               className={`w-full rounded-md border px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)] ${
                 showError("contactName") ? "border-[var(--error)]" : "border-[var(--b2)]"
               }`}
-              placeholder="Your name"
+              placeholder={t("postProperty.basic.yourName")}
             />
             {showError("contactName") && (
               <p className="mt-1 text-xs text-[var(--error)]">
-                {errors.contactName}
+                {t(errors.contactName || "")}
               </p>
             )}
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-              Email *
+              {t("postProperty.basic.email")} *
             </label>
             <Input
               value={basic.contactEmail}
@@ -266,18 +268,18 @@ export default function BasicDetailsForm() {
               className={`w-full rounded-md border px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)] ${
                 showError("contactEmail") ? "border-[var(--error)]" : "border-[var(--b2)]"
               }`}
-              placeholder="you@example.com"
+              placeholder={t("postProperty.basic.emailPlaceholder")}
             />
             {showError("contactEmail") && (
               <p className="mt-1 text-xs text-[var(--error)]">
-                {errors.contactEmail}
+                {t(errors.contactEmail || "")}
               </p>
             )}
           </div>
 
           <div>
             <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
-              Mobile number *
+              {t("postProperty.basic.mobileNumber")} *
             </label>
             <div className="flex gap-2">
               <Input
@@ -291,32 +293,32 @@ export default function BasicDetailsForm() {
                     ? "border-[var(--error)]"
                     : "border-[var(--b2)]"
                 }`}
-                placeholder="10-digit mobile"
+                placeholder={t("postProperty.basic.mobilePlaceholder")}
               />
               <Button
                 type="button"
                 onClick={() =>
                   pushToast({
                     kind: "info",
-                    title: "OTP verification",
-                    detail: "Hook is ready—backend OTP can be integrated next.",
+                    title: t("postProperty.toast.otpVerification"),
+                    detail: t("postProperty.toast.otpHookReady"),
                   })
                 }
                 className="rounded-md border border-[var(--b2)] px-3 py-2 text-xs font-semibold hover:bg-[var(--b1-mid)] transition"
               >
-                Verify
+                {t("postProperty.basic.verify")}
               </Button>
             </div>
             {showError("contactMobile") && (
               <p className="mt-1 text-xs text-[var(--error)]">
-                {errors.contactMobile}
+                {t(errors.contactMobile || "")}
               </p>
             )}
           </div>
         </div>
       </div>
 
-      <FormActions onNext={onNext} nextLabel="Continue" />
+      <FormActions onNext={onNext} nextLabel={t("postProperty.common.continue")} />
     </div>
   );
 }

@@ -622,7 +622,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               to="/"
                 className="font-semibold text-base sm:text-xl lg:text-2xl text-[var(--fg)] tracking-wide whitespace-nowrap"
               >
-                BhoomiWala
+                {t("header.brand")}
               </Link>
             </motion.div>
 
@@ -921,7 +921,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
             >
               <div className="relative flex items-center px-5 sm:px-6 h-14 sm:h-[68px] border-b border-[var(--b2-soft)]">
                 <span className="font-semibold text-lg text-[var(--b1)]">
-                  BhoomiWala
+                  {t("header.brand")}
                 </span>
 
                 <Button

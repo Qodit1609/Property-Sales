@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { FileText, X } from "lucide-react";
 import { Button } from "@/components/common";
+import { useTranslation } from "react-i18next";
 
 function isImageFile(f: File) {
   if (f.type.startsWith("image/")) return true;
@@ -46,6 +47,7 @@ export default function DocumentUploadCard({
   file,
   onFileChange,
 }: Props) {
+  const { t } = useTranslation();
   const inputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>(() => (file ? [file] : []));
   const [imageObjectUrls, setImageObjectUrls] = useState<string[]>([]);
@@ -112,7 +114,7 @@ export default function DocumentUploadCard({
               <span className="text-xs font-semibold text-[var(--b1-mid)]">*</span>
             ) : (
               <span className="rounded-md border border-[var(--b2)] bg-[var(--b2-soft)] px-2 py-0.5 text-[10px] font-semibold text-[var(--muted)]">
-                Optional
+                {t("postProperty.common.optional")}
               </span>
             )}
           </div>
@@ -120,10 +122,10 @@ export default function DocumentUploadCard({
             <p className="mt-1 text-xs text-[var(--muted)]">{description}</p>
           ) : null}
           <p className="mt-2 text-[11px] text-[var(--muted)]">
-            PDF, JPG, PNG allowed · Max 10MB
+            {t("postProperty.documents.fileRules")}
           </p>
           {files.length === 0 ? (
-            <p className="mt-1 text-xs italic text-[var(--muted)]">No file selected</p>
+            <p className="mt-1 text-xs italic text-[var(--muted)]">{t("postProperty.documents.noFileSelected")}</p>
           ) : null}
         </div>
 
@@ -141,14 +143,14 @@ export default function DocumentUploadCard({
             onClick={() => inputRef.current?.click()}
             className="rounded-md border border-[var(--b2)] bg-[var(--b1)] px-3 py-1.5 text-xs font-semibold text-[var(--fg)] hover:bg-[var(--b1-mid)]"
           >
-            Upload
+            {t("postProperty.documents.upload")}
           </Button>
         </div>
       </div>
 
       {files.length > 0 ? (
         <div className="mt-4">
-          <p className="text-sm font-semibold text-[var(--b1)]">Preview</p>
+          <p className="text-sm font-semibold text-[var(--b1)]">{t("postProperty.documents.preview")}</p>
           <div className="mt-3 flex flex-wrap gap-3">
             {files.map((f, i) => {
               const src = imageObjectUrls[i] ?? "";
@@ -174,7 +176,7 @@ export default function DocumentUploadCard({
                     <button
                       type="button"
                       onClick={() => removeAt(i)}
-                      aria-label={`Remove ${f.name}`}
+                      aria-label={`${t("postProperty.documents.remove")} ${f.name}`}
                       className="absolute right-1.5 top-1.5 inline-flex h-8 w-8 touch-manipulation items-center justify-center rounded-md bg-black/70 text-white shadow-sm transition hover:bg-black/85 focus-visible:outline focus-visible:ring-2 focus-visible:ring-white/70 sm:right-2 sm:top-2"
                     >
                       <X className="h-4 w-4 shrink-0" strokeWidth={2.5} aria-hidden />
@@ -182,7 +184,7 @@ export default function DocumentUploadCard({
                   </div>
                   <div className="border-t border-[var(--b2)]/60 bg-[var(--white)] px-2 py-2">
                     <p className="text-[10px] leading-snug text-[var(--b1)] line-clamp-2">
-                      <span className="text-[var(--muted)]">Local preview</span>
+                      <span className="text-[var(--muted)]">{t("postProperty.documents.localPreview")}</span>
                       <span className="text-[var(--muted)]"> • </span>
                       <span className="font-medium text-[var(--b1)]" title={f.name}>
                         {f.name}
@@ -198,11 +200,11 @@ export default function DocumentUploadCard({
 
       <div className="mt-3 flex flex-wrap gap-2 border-t border-[var(--b2)] pt-3">
         <span className="rounded-md border border-[var(--b2)] bg-[var(--b2-soft)] px-2 py-0.5 text-[10px] font-semibold text-[var(--muted)]">
-          Pending verification
+          {t("postProperty.documents.pendingVerification")}
         </span>
-        <span className="text-[10px] text-[var(--muted)]">Admin remarks: —</span>
+        <span className="text-[10px] text-[var(--muted)]">{t("postProperty.documents.adminRemarks")}: —</span>
         <span className="rounded-md border border-[var(--b2)] px-2 py-0.5 text-[10px] font-semibold text-[var(--muted)] opacity-70">
-          Verified (placeholder)
+          {t("postProperty.documents.verifiedPlaceholder")}
         </span>
       </div>
     </motion.div>

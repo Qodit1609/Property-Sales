@@ -1,11 +1,14 @@
 import type { Property } from "../../features/properties/propertyType";
 import PropertyFeatureList from "./PropertyFeatureList";
+import { useTranslation } from "react-i18next";
+import { translateSoilType } from "./previewUtils";
 
 type PropertyFarmingProps = {
   property: Property;
 };
 
 const PropertyFarming = ({ property }: PropertyFarmingProps) => {
+  const { t } = useTranslation();
   const farming = property.soilAndFarming;
   const cropSuitability = Array.isArray(farming?.cropSuitability)
     ? farming.cropSuitability.filter(Boolean).join(", ")
@@ -22,9 +25,9 @@ const PropertyFarming = ({ property }: PropertyFarmingProps) => {
               ? `${farming.rainfallData.annualRainfall} mm/year`
               : undefined,
             farming.rainfallData.irrigationSupport === true
-              ? "Irrigation support available"
+              ? t("propertyPreview.messages.irrigationSupportAvailable")
               : farming.rainfallData.irrigationSupport === false
-                ? "No irrigation support"
+                ? t("propertyPreview.messages.noIrrigationSupport")
                 : undefined,
           ]
             .filter(Boolean)
@@ -37,23 +40,23 @@ const PropertyFarming = ({ property }: PropertyFarmingProps) => {
   const soilQualityIndex = farming?.soilQualityIndex;
 
   const items = [
-    { label: "Soil Type", value: farming?.soilType },
+    { label: t("propertyPreview.labels.soilType"), value: translateSoilType(farming?.soilType) },
     {
-      label: "Soil Quality Index",
+      label: t("propertyPreview.labels.soilQualityIndex"),
       value: Number.isFinite(soilQualityIndex) ? String(soilQualityIndex) : undefined,
     },
     {
-      label: "Crop Suitability",
+      label: t("propertyPreview.labels.cropSuitability"),
       value: cropSuitability,
     },
-    { label: "Rainfall Data", value: rainfallData },
+    { label: t("propertyPreview.labels.rainfallData"), value: rainfallData },
     {
-      label: "Farming %",
+      label: t("propertyPreview.labels.farmingPercent"),
       value: typeof farmingPercent === "number" ? `${farmingPercent}%` : undefined,
     },
   ].filter((item): item is { label: string; value: string } => Boolean(item.value));
 
-  return <PropertyFeatureList items={items} emptyMessage="Farming insights unavailable." />;
+  return <PropertyFeatureList items={items} emptyMessage={t("propertyPreview.messages.farmingInsightsUnavailable")} />;
 };
 
 export default PropertyFarming;
