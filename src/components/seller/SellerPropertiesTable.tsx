@@ -12,6 +12,7 @@ import {
   Trash2,
   Ban,
   CircleCheck,
+  RotateCcw,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Property } from "../../features/properties/propertyType";
@@ -33,7 +34,9 @@ type SellerPropertiesTableProps = {
   onDelete: (id: string) => void;
   onDuplicate: (property: Property) => void;
   onMarkSold: (property: Property) => void;
+  onMarkUnsold: (property: Property) => void;
   onDeactivate: (property: Property) => void;
+  onActivate: (property: Property) => void;
   /** When set, only first N rows after filters/sort */
   limit?: number;
   compact?: boolean;
@@ -72,7 +75,9 @@ function SellerPropertiesTableComponent({
   onDelete,
   onDuplicate,
   onMarkSold,
+  onMarkUnsold,
   onDeactivate,
+  onActivate,
   limit,
   compact,
 }: SellerPropertiesTableProps) {
@@ -176,6 +181,7 @@ function SellerPropertiesTableComponent({
               <option value="approved">{t("sellerPanel.status.approved")}</option>
               <option value="rejected">{t("sellerPanel.status.rejected")}</option>
               <option value="sold">{t("sellerPanel.status.sold")}</option>
+              <option value="deactivated">{t("sellerPanel.status.deactivated")}</option>
             </select>
             <select
               value={sort}
@@ -214,6 +220,8 @@ function SellerPropertiesTableComponent({
             <tbody className="divide-y divide-[var(--b2)]/70">
               {pageRows.map((p) => {
                 const st = getSellerListingDisplayStatus(p);
+                const isDeactivated = st === "deactivated";
+                const isSold = st === "sold";
                 const img = thumb(p);
                 const menuOpen = openMenu === p._id;
                 return (
@@ -287,7 +295,7 @@ function SellerPropertiesTableComponent({
                         )}
                         <Button
                           type="button"
-                          disabled={actionLoading}
+                          disabled={actionLoading || isDeactivated}
                           onClick={() => onDuplicate(p)}
                           className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--b2-soft)] px-2 py-1 text-xs font-medium text-[var(--b1)] hover:opacity-90 disabled:opacity-50"
                         >
@@ -312,28 +320,56 @@ function SellerPropertiesTableComponent({
                               className="absolute right-0 z-50 mt-1 w-48 overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--white)] py-1 shadow-lg"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <button
-                                type="button"
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
-                                onClick={() => {
-                                  onMarkSold(p);
-                                  setOpenMenu(null);
-                                }}
-                              >
-                                <CircleCheck className="h-3.5 w-3.5" />
-                                {t("sellerPanel.actions.markSold")}
-                              </button>
-                              <button
-                                type="button"
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
-                                onClick={() => {
-                                  onDeactivate(p);
-                                  setOpenMenu(null);
-                                }}
-                              >
-                                <Ban className="h-3.5 w-3.5" />
-                                {t("sellerPanel.actions.deactivate")}
-                              </button>
+                              {isSold ? (
+                                <button
+                                  type="button"
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                                  onClick={() => {
+                                    onMarkUnsold(p);
+                                    setOpenMenu(null);
+                                  }}
+                                >
+                                  <RotateCcw className="h-3.5 w-3.5" />
+                                  {t("sellerPanel.actions.markUnsold")}
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                                  onClick={() => {
+                                    onMarkSold(p);
+                                    setOpenMenu(null);
+                                  }}
+                                >
+                                  <CircleCheck className="h-3.5 w-3.5" />
+                                  {t("sellerPanel.actions.markSold")}
+                                </button>
+                              )}
+                              {isDeactivated ? (
+                                <button
+                                  type="button"
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                                  onClick={() => {
+                                    onActivate(p);
+                                    setOpenMenu(null);
+                                  }}
+                                >
+                                  <RotateCcw className="h-3.5 w-3.5" />
+                                  {t("sellerPanel.actions.activate")}
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                                  onClick={() => {
+                                    onDeactivate(p);
+                                    setOpenMenu(null);
+                                  }}
+                                >
+                                  <Ban className="h-3.5 w-3.5" />
+                                  {t("sellerPanel.actions.deactivate")}
+                                </button>
+                              )}
                               <button
                                 type="button"
                                 disabled={actionLoading}

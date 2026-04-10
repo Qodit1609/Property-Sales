@@ -55,6 +55,7 @@ import BuyerFeedbackToast from "./components/buyer/BuyerFeedbackToast";
 const SellerLeadsPage = React.lazy(() => import("./pages/Seller/SellerLeadsPage"));
 const SellerAnalyticsPage = React.lazy(() => import("./pages/Seller/SellerAnalyticsPage"));
 const SellerMessagesPage = React.lazy(() => import("./pages/Seller/SellerMessagesPage"));
+const SellerNotificationsPage = React.lazy(() => import("./pages/Seller/SellerNotificationsPage"));
 const SellerPromotionsPage = React.lazy(() => import("./pages/Seller/SellerPromotionsPage"));
 const SellerProfilePage = React.lazy(() => import("./pages/Seller/SellerProfilePage"));
 const SellerSettingsPage = React.lazy(() => import("./pages/Seller/SellerSettingsPage"));
@@ -207,6 +208,18 @@ function App() {
               <SellerLayout>
                 <SellerLazy>
                   <SellerMessagesPage />
+                </SellerLazy>
+              </SellerLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/seller/notifications"
+          element={
+            <ProtectedRoute requiredRoles={["seller"]}>
+              <SellerLayout>
+                <SellerLazy>
+                  <SellerNotificationsPage />
                 </SellerLazy>
               </SellerLayout>
             </ProtectedRoute>

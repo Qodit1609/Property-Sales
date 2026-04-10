@@ -72,7 +72,7 @@ function AdminShellSidebar({
         className={twMerge(
           "relative border-b border-[var(--b2)]/80 bg-gradient-to-br from-[var(--b2-soft)]/90 to-[var(--white)] px-3 py-3",
           collapsed && !mobile
-            ? "flex flex-col items-center pb-3 pt-11"
+            ? "flex flex-col items-center pb-4 pt-14"
             : "flex min-h-[3.25rem] flex-row items-center gap-2"
         )}
       >
@@ -80,7 +80,10 @@ function AdminShellSidebar({
           <button
             type="button"
             onClick={onToggleCollapsed}
-            className="absolute right-2 top-2 z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--b2)] bg-[var(--white)] text-[var(--b1)] shadow-sm transition hover:bg-[var(--b2-soft)]"
+            className={twMerge(
+              "absolute top-2 z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--b2)] bg-[var(--white)] text-[var(--b1)] shadow-sm transition hover:bg-[var(--b2-soft)]",
+              collapsed && !mobile ? "left-1/2 top-3 -translate-x-1/2" : "right-2"
+            )}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
@@ -113,7 +116,7 @@ function AdminShellSidebar({
         />
       </nav>
 
-      <div className="border-t border-[var(--b2)]/80 p-2">
+      <div className="border-t border-[var(--b2)]/80 p-2 pb-4">
         <button
           type="button"
           onClick={onLogout}

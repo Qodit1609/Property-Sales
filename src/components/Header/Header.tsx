@@ -849,6 +849,8 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                           to={
                             user?.role === "buyer"
                               ? "/buyer/account"
+                              : user?.role === "seller"
+                                ? "/seller/profile"
                               : roleDashboardPath(user?.role ?? "buyer")
                           }
                           className="flex h-10 items-center rounded-md px-3 text-sm font-medium text-[var(--b1)] transition-colors hover:bg-[var(--b2-soft)]/50 hover:text-[var(--b1-mid)]"

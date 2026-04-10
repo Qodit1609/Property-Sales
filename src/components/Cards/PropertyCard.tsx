@@ -98,34 +98,35 @@ const PropertyCard: React.FC<Props> = ({
   const showFeatured = property.featured || property.tags?.includes("Featured");
 
   const showVerified = property.verified || property.tags?.includes("Verified");
+  const availability = (property.availabilityStatus ?? "").toString().trim().toLowerCase();
+  const isInactiveByStatus = property.statusDetails?.isActive === false;
+  const isDeactivated =
+    availability === "deactivated" || availability === "inactive" || isInactiveByStatus;
+  const isSold = availability === "sold" || availability === "unavailable";
+  const isBlocked = isDeactivated || isSold;
+  const deactivatedMessage = "This Property is Deactivate by the Seller";
+  const handleOpenProperty = () => {
+    if (isBlocked) return;
+    navigate(`/properties/${property._id}`);
+  };
 
   return (
     <div
-      tabIndex={0}
+      tabIndex={isBlocked ? -1 : 0}
       aria-label={`${property.title}. ${t("propertyCard.viewDetails")}.`}
-      onClick={() => navigate(`/properties/${property._id}`)}
+      onClick={handleOpenProperty}
       onKeyDown={(e) => {
+        if (isBlocked) return;
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-
-          navigate(`/properties/${property._id}`);
+          handleOpenProperty();
         }
       }}
-      className="
-      group relative flex h-full w-full
-      min-h-[20rem] sm:min-h-[22rem]
-      md:min-h-[24rem]
-      flex-col overflow-hidden
-      rounded-2xl border
-      border-[var(--b2-soft)]
-      bg-[var(--white)]
-      shadow-sm outline-none
-      transition
-      hover:-translate-y-1
-      hover:shadow-xl
-      hover:border-[var(--b1-mid)]
-      cursor-pointer
-      "
+      className={`group relative flex h-full w-full min-h-[20rem] flex-col overflow-hidden rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] shadow-sm outline-none transition sm:min-h-[22rem] md:min-h-[24rem] ${
+        isBlocked
+          ? "cursor-not-allowed"
+          : "cursor-pointer hover:-translate-y-1 hover:border-[var(--b1-mid)] hover:shadow-xl"
+      }`}
     >
       <span
         className="
@@ -150,6 +151,18 @@ const PropertyCard: React.FC<Props> = ({
       bg-gray-100
       "
       >
+        {isDeactivated ? (
+          <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/35 px-4 text-center">
+            <p className="text-sm font-bold text-white md:text-base">{deactivatedMessage}</p>
+          </div>
+        ) : null}
+        {isSold ? (
+          <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/35 px-4 text-center">
+            <p className="animate-pulse text-4xl font-black uppercase tracking-[0.14em] text-red-500 drop-shadow-[0_6px_16px_rgba(0,0,0,0.65)] md:text-5xl">
+              Sold
+            </p>
+          </div>
+        ) : null}
         {showImageSkeleton ? (
           <div
             className="
@@ -162,13 +175,9 @@ const PropertyCard: React.FC<Props> = ({
           <PropertyImage
             src={primaryImage}
             alt={property.title}
-            className="
-            h-full w-full
-            object-cover
-            transition-transform
-            duration-500
-            group-hover:scale-105
-            "
+            className={`h-full w-full object-cover transition-transform duration-500 ${
+              isBlocked ? "blur-[2px]" : "group-hover:scale-105"
+            }`}
           />
         )}
 
@@ -233,12 +242,7 @@ const PropertyCard: React.FC<Props> = ({
         )}
       </div>
 
-      <div
-        className="
-      flex flex-col
-      gap-3 p-4
-      "
-      >
+      <div className={`flex flex-col gap-3 p-4 ${isBlocked ? "blur-[1px]" : ""}`}>
         <p
           className="
         text-[11px]
@@ -297,6 +301,7 @@ const PropertyCard: React.FC<Props> = ({
      
 
         <Button
+          disabled={isBlocked}
           className="
           mt-auto
           w-full
@@ -304,7 +309,7 @@ const PropertyCard: React.FC<Props> = ({
           text-white
           "
         >
-          {t("propertyCard.viewDetails")}
+          {isDeactivated ? deactivatedMessage : t("propertyCard.viewDetails")}
         </Button>
       </div>
     </div>

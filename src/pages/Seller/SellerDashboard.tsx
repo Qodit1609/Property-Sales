@@ -15,11 +15,10 @@ import {
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import type { RootState } from "../../app/store";
-import { createListing, deleteListing, fetchMyListings } from "../../features/seller/sellerSlice";
+import { createListing, deleteListing, fetchMyListings, updateListing } from "../../features/seller/sellerSlice";
 import { buildDuplicateListingPayload } from "../../lib/sellerHelpers";
 import type { Property } from "../../features/properties/propertyType";
 import { Button } from "@/components/common";
-import Modal from "../../components/Modal/Modal";
 import { useSellerAggregates } from "../../hooks/useSellerAggregates";
 import { SellerCharts } from "@/components/seller/SellerCharts";
 import { SellerLeadsCard } from "@/components/seller/SellerLeadsCard";
@@ -36,7 +35,6 @@ const SellerDashboard = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { listings, loading, error, actionLoading } = useAppSelector((state: RootState) => state.seller);
-  const [info, setInfo] = useState<null | "sold" | "deactivate">(null);
   const [banner, setBanner] = useState<{ text: string; variant: "success" | "error" } | null>(null);
 
   useEffect(() => {
@@ -118,13 +116,52 @@ const SellerDashboard = () => {
     [dispatch, t]
   );
 
-  const handleMarkSold = useCallback((_p: Property) => {
-    setInfo("sold");
-  }, []);
+  const applyAvailabilityStatus = useCallback(
+    async (p: Property, availabilityStatus: "Sold" | "Available" | "Deactivated") => {
+      try {
+        await dispatch(
+          updateListing({
+            id: p._id,
+            payload: { availabilityStatus },
+          })
+        ).unwrap();
+        setBanner({ text: t("sellerPanel.statusAction.success"), variant: "success" });
+        window.setTimeout(() => setBanner(null), 4000);
+      } catch {
+        setBanner({ text: t("sellerPanel.statusAction.error"), variant: "error" });
+        window.setTimeout(() => setBanner(null), 5000);
+      }
+    },
+    [dispatch, t]
+  );
 
-  const handleDeactivate = useCallback((_p: Property) => {
-    setInfo("deactivate");
-  }, []);
+  const handleMarkSold = useCallback(
+    async (p: Property) => {
+      await applyAvailabilityStatus(p, "Sold");
+    },
+    [applyAvailabilityStatus]
+  );
+
+  const handleMarkUnsold = useCallback(
+    async (p: Property) => {
+      await applyAvailabilityStatus(p, "Available");
+    },
+    [applyAvailabilityStatus]
+  );
+
+  const handleDeactivate = useCallback(
+    async (p: Property) => {
+      await applyAvailabilityStatus(p, "Deactivated");
+    },
+    [applyAvailabilityStatus]
+  );
+
+  const handleActivate = useCallback(
+    async (p: Property) => {
+      await applyAvailabilityStatus(p, "Available");
+    },
+    [applyAvailabilityStatus]
+  );
 
   return (
     <section className="space-y-6 md:space-y-8">
@@ -224,7 +261,9 @@ const SellerDashboard = () => {
                   onDelete={handleDelete}
                   onDuplicate={handleDuplicate}
                   onMarkSold={handleMarkSold}
+                  onMarkUnsold={handleMarkUnsold}
                   onDeactivate={handleDeactivate}
+                  onActivate={handleActivate}
                   limit={5}
                   compact
                 />
@@ -248,22 +287,6 @@ const SellerDashboard = () => {
           }
         />
       ) : null}
-
-      <Modal open={info !== null} onClose={() => setInfo(null)} title={t("sellerPanel.workflow.title")}>
-        <p className="text-sm leading-relaxed text-[var(--b1)]">
-          {info === "sold" ? t("sellerPanel.workflow.sold") : null}
-          {info === "deactivate" ? t("sellerPanel.workflow.deactivate") : null}
-        </p>
-        <div className="mt-5 flex justify-end">
-          <Button
-            type="button"
-            onClick={() => setInfo(null)}
-            className="!rounded-xl !bg-[var(--b1)] !px-4 !py-2 !text-[var(--fg)]"
-          >
-            {t("sellerPanel.workflow.ok")}
-          </Button>
-        </div>
-      </Modal>
     </section>
   );
 };

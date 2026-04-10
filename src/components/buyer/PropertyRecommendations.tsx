@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Sparkles, MapPin, Flame, Clock3 } from "lucide-react";
+import { Sparkles, MapPin, Flame } from "lucide-react";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import PropertyCard from "../Cards/PropertyCard";
 import type { Property } from "../../features/properties/propertyType";
@@ -54,7 +54,6 @@ const PropertyRecommendations: React.FC<Props> = ({
   className = "",
 }) => {
   const catalog = useAppSelector((s) => s.properties.data);
-  const recentIds = useAppSelector((s) => s.buyer.recentIds);
 
   const approved = useMemo(
     () => catalog.filter((p) => p.status === "approved" || !p.status),
@@ -94,11 +93,6 @@ const PropertyRecommendations: React.FC<Props> = ({
     [approved]
   );
 
-  const recent = useMemo(() => {
-    const set = new Set(recentIds);
-    return approved.filter((p) => set.has(p._id)).slice(0, 3);
-  }, [approved, recentIds]);
-
   return (
     <div className={`space-y-4 ${className}`}>
       <RecommendationSection
@@ -121,13 +115,6 @@ const PropertyRecommendations: React.FC<Props> = ({
         subtitle="Highlighted inventory from your current catalog."
         properties={trending.length ? trending : approved.slice(0, 3)}
         empty="No featured tags yet — showing top listings instead."
-      />
-      <RecommendationSection
-        icon={<Clock3 className="h-4 w-4" />}
-        title="Recently viewed"
-        subtitle="Cross-linked with your browsing history."
-        properties={recent}
-        empty="Open a few property pages to build this row."
       />
     </div>
   );

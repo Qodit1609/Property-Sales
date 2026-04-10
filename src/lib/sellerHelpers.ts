@@ -7,7 +7,8 @@ export type NormalizedListingStatus = "approved" | "rejected" | "pending";
 /** Display status for seller UI (includes sold). */
 export type SellerListingDisplayStatus =
   | NormalizedListingStatus
-  | "sold";
+  | "sold"
+  | "deactivated";
 
 export function getSellerId(user: AuthUser | null | undefined): string | undefined {
   if (!user) return undefined;
@@ -52,8 +53,10 @@ export function getSellerListingDisplayStatus(
     (typeof p.status === "string" ? p.status : null);
   const approval = (approvalRaw ?? "").toString().trim().toLowerCase();
   if (approval === "sold") return "sold";
+  if (approval === "deactivated" || approval === "inactive") return "deactivated";
   const avail = (p.availabilityStatus ?? "").toString().trim().toLowerCase();
   if (avail === "sold" || avail === "unavailable") return "sold";
+  if (avail === "deactivated" || avail === "inactive" || avail === "hidden") return "deactivated";
   return normalizeListingStatus(p.status ?? p.statusDetails?.approvalStatus);
 }
 

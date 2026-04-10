@@ -140,6 +140,7 @@
       "leads": "Leads",
       "analytics": "Analytics",
       "messages": "Messages",
+      "notifications": "Notifications",
       "promotions": "Promotions",
       "profile": "Profile",
       "settings": "Settings"
@@ -157,6 +158,10 @@
       "tagline": "Operate listings with clarity and speed."
     },
     "notifications": {
+      "pageTitle": "Notifications",
+      "pageSub": "Alerts and updates for your account.",
+      "emptyTitle": "You're all caught up",
+      "emptySub": "Alerts for listing status changes, new leads and buyer messages will appear here.",
       "aria": "Notifications",
       "heading": "Notifications",
       "sub": "Listing and lead updates",
@@ -224,7 +229,8 @@
       "pending": "pending",
       "approved": "approved",
       "rejected": "rejected",
-      "sold": "sold"
+      "sold": "sold",
+      "deactivated": "deactivated"
     },
     "actions": {
       "view": "View",
@@ -232,13 +238,19 @@
       "duplicate": "Duplicate",
       "more": "More",
       "markSold": "Mark sold",
-      "deactivate": "Deactivate"
+      "markUnsold": "Mark unsold",
+      "deactivate": "Deactivate",
+      "activate": "Activate"
     },
     "workflow": {
       "title": "Listing status",
       "sold": "Marking a property as sold is verified by our team to protect buyers and sellers. Please contact support with your listing ID, or watch this space for self-serve status updates.",
       "deactivate": "Temporarily hiding a listing may require administrator approval depending on your account. Contact support if you need an urgent takedown.",
       "ok": "Got it"
+    },
+    "statusAction": {
+      "success": "Listing status updated.",
+      "error": "Could not update listing status. Please try again."
     },
     "duplicateSuccess": "Duplicate listing created.",
     "duplicateError": "Could not duplicate listing. Ensure images and required fields are present.",

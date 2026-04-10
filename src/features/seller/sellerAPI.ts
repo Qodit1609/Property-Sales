@@ -23,6 +23,7 @@ export interface SellerListingPayload {
   beds?: string | number;
   baths?: string | number;
   parking?: string | number;
+  availabilityStatus?: string;
 }
 
 export interface UploadPropertyImagePayload {
