@@ -50,9 +50,9 @@ function SellerLeadsPage() {
       try {
         setLoading(true);
         setError("");
-        const buyers = await fetchBuyerUsersAPI();
+        const leads = await fetchBuyerUsersAPI();
         if (!mounted) return;
-        setLeadRows(buyers.map(mapBuyerToRow));
+        setLeadRows(leads.map(mapBuyerToRow));
       } catch (err) {
         if (!mounted) return;
         const message = err instanceof Error ? err.message : "Failed to load leads.";

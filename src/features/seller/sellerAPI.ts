@@ -94,3 +94,54 @@ export const uploadPropertyImageAPI = async (
 
   return url;
 };
+
+/** Lead rows for the authenticated seller (buyers who viewed their listings). */
+export interface SellerLeadRecord {
+  _id: string;
+  userId?: string;
+  propertyId?: string;
+  propertyDetails?: {
+    title?: string;
+    description?: string;
+    price?: number;
+    propertyType?: string;
+    address?: string;
+  };
+  userDetails?: {
+    name?: string;
+    email?: string;
+    contact?: string;
+    role?: string;
+  };
+  viewCount?: number;
+  lastViewedAt?: string;
+  status?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const fetchSellerLeadsAPI = async (): Promise<SellerLeadRecord[]> => {
+  const res = await api.get("/properties/my-leads/list");
+  const raw = (res.data?.data ?? res.data) as { leads?: SellerLeadRecord[] } | undefined;
+  const leads = raw?.leads;
+  return Array.isArray(leads) ? leads : [];
+};
+
+export interface BuyerUser {
+  _id: string;
+  name?: string;
+  email?: string;
+  contact?: string;
+  details?: string;
+  verified?: string;
+  isActive?: boolean;
+  lastLogin?: string;
+  createdAt?: string;
+}
+
+export const fetchBuyerUsersAPI = async (): Promise<BuyerUser[]> => {
+  const res = await api.get("/properties/buyers/list");
+  const raw = (res.data?.data ?? res.data) as { buyers?: BuyerUser[] } | undefined;
+  const buyers = raw?.buyers;
+  return Array.isArray(buyers) ? buyers : [];
+};
