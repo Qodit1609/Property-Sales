@@ -7,6 +7,9 @@ import ContactPopup from "../ContactPopup/ContactPopup";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
 import type { AppRole } from "../../features/auth/roleTypes";
+import type { Property } from "../../features/properties/propertyType";
+import api, { API_ENDPOINTS } from "../../lib/apiClient";
+import { mapPropertyListPayload } from "../../features/properties/propertyAPI";
 import { Button } from "@/components/common";
 import { normalizeLanguage, preloadLanguage } from "../../i18n";
 
@@ -33,17 +36,17 @@ const NAV_ITEMS: NavItem[] = [
     mega: [
       {
         title: "Popular Locations",
-        items: ["Goa", "Lonavala", "Pune", "Alibaug"],
+        items: [],
       },
       {
         title: "Property Type",
-        items: ["Luxury Farmhouse", "Weekend Farmhouse", "Organic Farm"],
+        items: [],
       },
       {
         title: "Budget",
-        items: ["Under 50L", "Under 1Cr", "Under 2Cr"],
+        items: [],
       },
-      { title: "Explore", items: ["New Listings", "Premium Farms", "Top Deals"] },
+      { title: "Explore", items: [] },
     ],
   },
   {
@@ -52,34 +55,34 @@ const NAV_ITEMS: NavItem[] = [
     mega: [
       {
         title: "Land Types",
-        items: ["Organic Land", "Dry Land", "Irrigated Land"],
+        items: [],
       },
-      { title: "Investment", items: ["Short Term", "Long Term"] },
+      { title: "Investment", items: [] },
       {
         title: "Locations",
-        items: ["Maharashtra", "Gujarat", "Karnataka"],
+        items: [],
       },
-      { title: "Guides", items: ["Buying Guide", "Legal Documents"] },
+      { title: "Guides", items: [] },
     ],
   },
   {
     label: "Resort Properties",
     href: "/resort-properties",
     mega: [
-      { title: "Resort Type", items: ["Luxury Resort", "Boutique Resort"] },
-      { title: "Locations", items: ["Beach Resorts", "Hill Resorts"] },
-      { title: "Investment", items: ["Under 5Cr", "Under 10Cr"] },
-      { title: "Insights", items: ["ROI Guide", "Investment Tips"] },
+      { title: "Resort Type", items: [] },
+      { title: "Locations", items: [] },
+      { title: "Investment", items: [] },
+      { title: "Insights", items: [] },
     ],
   },
   {
     label: "Rent Farmhouse",
     href: "/rent-farmhouse",
     mega: [
-      { title: "Occasion", items: ["Wedding", "Party", "Weekend"] },
-      { title: "Budget", items: ["Under 10k", "Under 25k"] },
-      { title: "Locations", items: ["Delhi", "Mumbai", "Pune"] },
-      { title: "Explore", items: ["Featured", "Trending"] },
+      { title: "Occasion", items: [] },
+      { title: "Budget", items: [] },
+      { title: "Locations", items: [] },
+      { title: "Explore", items: [] },
     ],
   },
 ];
@@ -147,6 +150,135 @@ const SECTION_ITEM_KEY_MAP: Record<string, string> = {
   Mumbai: "header.mumbai",
   Featured: "header.featured",
   Trending: "header.trending",
+};
+
+const normalizeValue = (value: string): string => value.trim().toLowerCase();
+
+const toTitleCase = (value: string) =>
+  value
+    .split(" ")
+    .map((part) => (part ? `${part.charAt(0).toUpperCase()}${part.slice(1)}` : part))
+    .join(" ");
+
+const formatBudgetLabel = (value: number) => {
+  if (value >= 1_00_00_000) {
+    const cr = Math.round((value / 1_00_00_000) * 10) / 10;
+    return `Under ${Number.isInteger(cr) ? cr.toFixed(0) : cr}Cr`;
+  }
+  if (value >= 1_00_000) {
+    const l = Math.round((value / 1_00_000) * 10) / 10;
+    return `Under ${Number.isInteger(l) ? l.toFixed(0) : l}L`;
+  }
+  const k = Math.round((value / 1_000) * 10) / 10;
+  return `Under ${Number.isInteger(k) ? k.toFixed(0) : k}k`;
+};
+
+const buildBudgetRanges = (prices: number[]): string[] => {
+  const unique = Array.from(new Set(prices.filter((price) => Number.isFinite(price) && price > 0))).sort(
+    (a, b) => a - b
+  );
+
+  if (unique.length === 0) return [];
+
+  const points = [Math.floor(unique.length * 0.33), Math.floor(unique.length * 0.66), unique.length - 1]
+    .map((index) => unique[Math.max(0, Math.min(index, unique.length - 1))])
+    .filter((value): value is number => Number.isFinite(value));
+
+  return Array.from(new Set(points)).map(formatBudgetLabel).slice(0, 4);
+};
+
+const matchesNavCategory = (property: Property, navLabel: string) => {
+  const source = normalizeValue(`${property.propertyType ?? ""} ${property.listingType ?? ""}`);
+
+  if (navLabel === "Farmhouse / Farmland") {
+    return (
+      source.includes("farmhouse") ||
+      source.includes("farmland") ||
+      source.includes("farm land")
+    );
+  }
+
+  if (navLabel === "Agriculture Land") {
+    return (
+      source.includes("agriculture") ||
+      source.includes("agricultural") ||
+      source.includes("land")
+    );
+  }
+
+  if (navLabel === "Resort Properties") {
+    return source.includes("resort");
+  }
+
+  if (navLabel === "Rent Farmhouse") {
+    return (
+      source.includes("rent farmhouse") ||
+      (source.includes("farmhouse") && source.includes("rent"))
+    );
+  }
+
+  return true;
+};
+
+const getFilteredMenuData = (navLabel: string, properties: Property[], fallbackMega: MegaSection[]): MegaSection[] => {
+  const scoped = properties.filter((property) => matchesNavCategory(property, navLabel));
+  if (scoped.length === 0) return fallbackMega;
+
+  const locations = Array.from(
+    new Set(
+      scoped
+        .map((property) => property.location?.city ?? property.location?.state)
+        .filter((value): value is string => Boolean(value && value.trim()))
+        .map((value) => toTitleCase(value.trim()))
+    )
+  ).slice(0, 8);
+
+  const propertyTypes = Array.from(
+    new Set(
+      scoped
+        .map((property) => property.propertyType)
+        .filter((value): value is string => Boolean(value && value.trim()))
+        .map((value) => toTitleCase(value.trim()))
+    )
+  ).slice(0, 8);
+
+  const budgets = buildBudgetRanges(scoped.map((property) => property.price));
+
+  const tags = Array.from(
+    new Set(
+      scoped
+        .flatMap((property) => property.tags ?? [])
+        .filter((value): value is string => Boolean(value && value.trim()))
+        .map((value) => toTitleCase(value.trim()))
+    )
+  ).slice(0, 8);
+
+  const sectionValueMap = (title: string): string[] => {
+    if (title === "Popular Locations" || title === "Locations") {
+      return locations;
+    }
+    if (title === "Property Type" || title === "Land Types" || title === "Resort Type") {
+      return propertyTypes;
+    }
+    if (title === "Budget" || title === "Investment") {
+      return budgets;
+    }
+    return tags;
+  };
+
+  const mapped = fallbackMega.map((section) => {
+    const dynamicItems = sectionValueMap(section.title);
+    return {
+      ...section,
+      items: dynamicItems.length > 0 ? dynamicItems : section.items,
+    };
+  });
+
+  const hasDynamicValue = mapped.some((section, index) =>
+    section.items.some((item) => !fallbackMega[index].items.includes(item))
+  );
+
+  return hasDynamicValue ? mapped : fallbackMega;
 };
 
 const roleDashboardPath = (role: AppRole) => {
@@ -497,6 +629,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   const [mobileActiveSections, setMobileActiveSections] = useState<string[]>([]);
   const [loginOpen, setLoginOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [menuProperties, setMenuProperties] = useState<Property[]>([]);
 
   const megaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loginTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -553,6 +686,28 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   }, []);
 
   useEffect(() => {
+    let active = true;
+
+    void (async () => {
+      try {
+        const response = await api.get(API_ENDPOINTS.PROPERTY.LIST, {
+          params: { page: 1, limit: 50 },
+        });
+        const mapped = mapPropertyListPayload(response.data);
+        if (active && mapped.length > 0) {
+          setMenuProperties(mapped);
+        }
+      } catch {
+        // Keep existing static mega menu content when API is unavailable.
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         closeMobileMenu();
@@ -565,7 +720,31 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
     return () => window.removeEventListener("keydown", handleEscape);
   }, []);
 
-  const visibleNavItems = NAV_ITEMS;
+  const visibleNavItems = NAV_ITEMS.map((item) => {
+    if (!item.mega || menuProperties.length === 0) return item;
+    return {
+      ...item,
+      mega: getFilteredMenuData(item.label, menuProperties, item.mega),
+    };
+  });
+
+  const handleMegaItemClick = (item: NavItem, sectionTitle: string, value: string) => {
+    const params = new URLSearchParams();
+    params.set("category", normalizeValue(item.label).replace(/\s*\/\s*/g, " ").replace(/\s+/g, "-"));
+
+    if (sectionTitle === "Popular Locations" || sectionTitle === "Locations") {
+      params.set("location", value);
+    } else if (sectionTitle === "Property Type" || sectionTitle === "Land Types" || sectionTitle === "Resort Type") {
+      params.set("type", value);
+    } else if (sectionTitle === "Budget" || sectionTitle === "Investment") {
+      params.set("budget", value);
+    } else {
+      params.set("tag", value);
+    }
+
+    navigate(`${item.href}?${params.toString()}`);
+    setActiveMega(null);
+  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -694,11 +873,12 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                                 {translateHeaderValue(section.title)}
                               </h4>
                               <ul className="space-y-2 text-sm">
-                                {section.items.map((sub) => (
+                                {(section.items ?? []).map((sub) => (
                                   <li key={sub}>
                                     <button
                                       type="button"
                                       className="hover:text-[var(--b1-mid)] transition"
+                                      onClick={() => handleMegaItemClick(item, section.title, sub)}
                                     >
                                       {translateHeaderValue(sub)}
                                     </button>
@@ -983,9 +1163,18 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                                   {translateHeaderValue(section.title)}
                                 </div>
                                 <ul className="space-y-1">
-                                  {section.items.map((sub) => (
-                                    <li key={sub} className="text-sm text-[var(--b1-mid)]">
-                                      {translateHeaderValue(sub)}
+                                  {(section.items ?? []).map((sub) => (
+                                    <li key={sub}>
+                                      <button
+                                        type="button"
+                                        className="text-sm text-[var(--b1-mid)]"
+                                        onClick={() => {
+                                          closeMobileMenu();
+                                          handleMegaItemClick(item, section.title, sub);
+                                        }}
+                                      >
+                                        {translateHeaderValue(sub)}
+                                      </button>
                                     </li>
                                   ))}
                                 </ul>

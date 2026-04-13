@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useSearchParams } from "react-router-dom";
 import {
   Search,
   SlidersHorizontal,
@@ -127,6 +128,21 @@ const getBathroomCount = (property: Property) =>
 
 const getParkingCount = (property: Property) =>
   parseNumberish(property.parking ?? property.features?.parking);
+
+const parseBudgetToMaxPrice = (budget: string): string => {
+  const normalized = budget.trim().toLowerCase();
+  const match = normalized.match(/under\s*([0-9]+(?:\.[0-9]+)?)\s*(cr|l|k)?/i);
+  if (!match) return "";
+
+  const rawValue = Number.parseFloat(match[1]);
+  if (Number.isNaN(rawValue)) return "";
+
+  const unit = (match[2] ?? "").toLowerCase();
+  if (unit === "cr") return String(Math.round(rawValue * 1_00_00_000));
+  if (unit === "l") return String(Math.round(rawValue * 1_00_000));
+  if (unit === "k") return String(Math.round(rawValue * 1_000));
+  return String(Math.round(rawValue));
+};
 
 export const FilterSection: React.FC<{
   icon: React.ReactNode;
@@ -327,6 +343,7 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
   properties,
   onFiltered,
 }) => {
+  const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState<PropertyFiltersState>(INITIAL_FILTERS);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [secondaryOpen, setSecondaryOpen] = useState(false);
@@ -519,6 +536,29 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
   useEffect(() => {
     applyFilters(filters);
   }, [properties]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const location = (searchParams.get("location") ?? "").trim();
+    const type = (searchParams.get("type") ?? "").trim();
+    const tag = (searchParams.get("tag") ?? "").trim();
+    const budget = (searchParams.get("budget") ?? "").trim();
+
+    if (!location && !type && !tag && !budget) return;
+
+    const searchSeed = location || type || tag;
+    const budgetMax = budget ? parseBudgetToMaxPrice(budget) : "";
+
+    setFilters((prev) => {
+      const next: PropertyFiltersState = {
+        ...prev,
+        search: searchSeed,
+        minPrice: "",
+        maxPrice: budgetMax,
+      };
+      applyFilters(next);
+      return next;
+    });
+  }, [searchParams, applyFilters]);
 
   useEffect(
     () => () => {
