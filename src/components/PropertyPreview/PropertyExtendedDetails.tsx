@@ -280,18 +280,18 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
 
       <PropertySection title={t("propertyPreview.detail.dealerInformation")}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <InfoItem label={t("propertyPreview.detail.dealerName")} value={dealer.name} />
-          <InfoItem label={t("propertyPreview.detail.dealerPhone")} value={dealer.phone} />
-          <InfoItem label={t("propertyPreview.detail.dealerType")} value={translatePersonType(dealer.type)} />
-          <InfoItem label={t("propertyPreview.detail.dealerVerified")} value={parseBoolean(dealer.verified)} />
-          <InfoItem label={t("propertyPreview.detail.sellerName")} value={seller.name} />
-          <InfoItem label={t("propertyPreview.detail.sellerPhone")} value={seller.phone} />
-          <InfoItem label={t("propertyPreview.detail.sellerEmail")} value={seller.email} />
-          <InfoItem label={t("propertyPreview.detail.sellerVerified")} value={parseBoolean(seller.verified)} />
-          <InfoItem label={t("propertyPreview.detail.ownerName")} value={owner.name} />
-          <InfoItem label={t("propertyPreview.detail.ownerPhone")} value={owner.phone} />
-          <InfoItem label={t("propertyPreview.detail.ownerType")} value={translatePersonType(owner.type)} />
-          <InfoItem label={t("propertyPreview.detail.ownerVerified")} value={parseBoolean(owner.verified)} />
+          <InfoItem label={t("propertyPreview.detail.dealerName")} value={dealer?.name} />
+          <InfoItem label={t("propertyPreview.detail.dealerPhone")} value={dealer?.phone} />
+          <InfoItem label={t("propertyPreview.detail.dealerType")} value={translatePersonType(dealer?.type)} />
+          <InfoItem label={t("propertyPreview.detail.dealerVerified")} value={parseBoolean(dealer?.verified)} />
+          <InfoItem label={t("propertyPreview.detail.sellerName")} value={seller?.name} />
+          <InfoItem label={t("propertyPreview.detail.sellerPhone")} value={seller?.phone} />
+          <InfoItem label={t("propertyPreview.detail.sellerEmail")} value={seller?.email} />
+          <InfoItem label={t("propertyPreview.detail.sellerVerified")} value={parseBoolean(seller?.verified)} />
+          <InfoItem label={t("propertyPreview.detail.ownerName")} value={owner?.name} />
+          <InfoItem label={t("propertyPreview.detail.ownerPhone")} value={owner?.phone} />
+          <InfoItem label={t("propertyPreview.detail.ownerType")} value={translatePersonType(owner?.type)} />
+          <InfoItem label={t("propertyPreview.detail.ownerVerified")} value={parseBoolean(owner?.verified)} />
         </div>
       </PropertySection>
 
