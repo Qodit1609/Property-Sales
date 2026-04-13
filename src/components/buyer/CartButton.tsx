@@ -7,6 +7,7 @@ import { toggleCart } from "../../features/buyer/buyerSlice";
 import type { Property } from "../../features/properties/propertyType";
 import type { RootState } from "../../app/store";
 import { showBuyerActionFeedback } from "./buyerActionFeedback";
+import { createNotificationAPI } from "../../features/notifications/notificationAPI";
 
 interface Props {
   property: Property;
@@ -18,6 +19,7 @@ const CartButton: React.FC<Props> = ({ property, className = "" }) => {
   const store = useStore<RootState>();
   const reduceMotion = useReducedMotion();
   const active = useAppSelector((s) => s.buyer.cartIds.includes(property._id));
+  const buyerName = useAppSelector((s) => s.auth.user?.name ?? "Buyer");
 
   const onClick = useCallback(
     (e: React.MouseEvent) => {
@@ -29,9 +31,27 @@ const CartButton: React.FC<Props> = ({ property, className = "" }) => {
       const after = store.getState().buyer.cartIds.includes(id);
       if (before !== after) {
         showBuyerActionFeedback(after ? "Added to cart" : "Removed from cart");
+        if (after) {
+          const rawSellerId = (property as Property & { sellerId?: unknown }).sellerId;
+          const sellerId =
+            typeof rawSellerId === "string"
+              ? rawSellerId
+              : rawSellerId && typeof rawSellerId === "object" && "_id" in (rawSellerId as Record<string, unknown>)
+              ? String((rawSellerId as { _id?: string })._id ?? "")
+              : "";
+          if (sellerId) {
+            void createNotificationAPI({
+              title: "Property added to cart",
+              message: `${buyerName} added ${property.title ?? "your property"} to cart.`,
+              type: "cart",
+              receiverId: sellerId,
+              propertyId: property._id,
+            });
+          }
+        }
       }
     },
-    [dispatch, property, store]
+    [buyerName, dispatch, property, store]
   );
 
   return (

@@ -7,6 +7,7 @@ import postPropertyReducer from "../features/postProperty/postPropertySlice";
 import buyerReducer from "../features/buyer/buyerSlice";
 import newPropertiesReducer from "../store/slices/newPropertiesSlice";
 import mediaReducer from "../features/media/mediaSlice";
+import notificationsReducer from "../features/notifications/notificationSlice";
 import { loadPersistedBuyerState, persistBuyerState } from "../features/buyer/buyerPersist";
 
 const persistedBuyer = loadPersistedBuyerState();
@@ -20,6 +21,7 @@ export const store = configureStore({
     seller: sellerReducer,
     postProperty: postPropertyReducer,
     buyer: buyerReducer,
+    notifications: notificationsReducer,
     newProperties: newPropertiesReducer,
   },
   preloadedState: persistedBuyer ? { buyer: persistedBuyer } : undefined,

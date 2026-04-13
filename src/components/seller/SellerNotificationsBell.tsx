@@ -1,16 +1,8 @@
-import { useMemo } from "react";
 import { Bell } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { cn } from "./sellerUtils";
-
-type Item = { id: string; titleKey: string; descKey: string; time: string; unread?: boolean };
-
-const MOCK_ITEMS: Item[] = [
-  { id: "1", titleKey: "sellerPanel.notifications.approvedTitle", descKey: "sellerPanel.notifications.approvedDesc", time: "2h", unread: true },
-  { id: "2", titleKey: "sellerPanel.notifications.leadTitle", descKey: "sellerPanel.notifications.leadDesc", time: "1d", unread: true },
-  { id: "3", titleKey: "sellerPanel.notifications.rejectedTitle", descKey: "sellerPanel.notifications.rejectedDesc", time: "3d", unread: false },
-];
+import { useAppSelector } from "../../hooks/reduxHooks";
 
 type SellerNotificationsBellProps = {
   /** Use `left` when the panel should align to the button's left edge; otherwise it aligns to the right. */
@@ -20,18 +12,7 @@ type SellerNotificationsBellProps = {
 export function SellerNotificationsBell({ dropdownAlign = "right" }: SellerNotificationsBellProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-
-  const items = useMemo(
-    () =>
-      MOCK_ITEMS.map((row) => ({
-        ...row,
-        title: t(row.titleKey),
-        description: t(row.descKey),
-      })),
-    [t]
-  );
-
-  const unread = items.filter((i) => i.unread).length;
+  const unread = useAppSelector((state) => state.notifications.unreadCount);
 
   return (
     <div className="relative">

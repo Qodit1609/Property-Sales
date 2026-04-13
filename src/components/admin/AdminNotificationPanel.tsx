@@ -1,19 +1,12 @@
-import React, { useLayoutEffect } from "react";
+import React from "react";
 import { Bell } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
-import {
-  markAllAdminNotificationsRead,
-  markAdminNotificationRead,
-} from "../../features/admin/adminSlice";
+import { markNotificationRead } from "../../features/notifications/notificationSlice";
 import { Button } from "@/components/common";
 
 const AdminNotificationPanel: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { notifications } = useAppSelector((state) => state.admin);
-
-  useLayoutEffect(() => {
-    dispatch(markAllAdminNotificationsRead());
-  }, [dispatch]);
+  const notifications = useAppSelector((state) => state.notifications.items);
 
   return (
     <div className="space-y-3 rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm">
@@ -26,8 +19,7 @@ const AdminNotificationPanel: React.FC = () => {
             Notifications
           </h2>
           <p className="text-[11px] text-[var(--muted)]">
-            New listings and admin activity alerts. Opening this page marks
-            alerts as seen.
+            New listings and admin activity alerts.
           </p>
         </div>
       </div>
@@ -48,11 +40,11 @@ const AdminNotificationPanel: React.FC = () => {
             <Button
               key={n.id}
               type="button"
-              onClick={() => dispatch(markAdminNotificationRead(n.id))}
+              onClick={() => dispatch(markNotificationRead(n.id))}
               variant="ghost"
               className={[
                 "w-full items-start gap-3 rounded-xl border px-3 py-2 text-left",
-                n.read
+                n.isRead
                   ? "border-[var(--b2-soft)] bg-[var(--b2-soft)]"
                   : "border-[var(--b2)] bg-[var(--white)] shadow-sm",
               ].join(" ")}
@@ -60,7 +52,7 @@ const AdminNotificationPanel: React.FC = () => {
               <span
                 className={[
                   "mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full",
-                  n.read ? "bg-[var(--b2)]" : "bg-amber-400",
+                  n.isRead ? "bg-[var(--b2)]" : "bg-amber-400",
                 ].join(" ")}
               />
               <div className="min-w-0 flex-1">

@@ -106,6 +106,7 @@ const normalizeProperty = (payload: unknown): Property => {
   const media = toRecord(raw.media);
   const dealer = toRecord(raw.dealer);
   const seller = toRecord(raw.seller);
+  const sellerIdRaw = raw.sellerId;
   const status = toRecord(raw.status);
   const distances = toRecord(location.distances);
   const features = toRecord(raw.features);
@@ -177,6 +178,14 @@ const normalizeProperty = (payload: unknown): Property => {
 
   return {
     _id: resolvedId ?? "",
+    sellerId:
+      typeof sellerIdRaw === "string"
+        ? sellerIdRaw
+        : sellerIdRaw && typeof sellerIdRaw === "object"
+        ? toString((sellerIdRaw as Record<string, unknown>)._id) ??
+          toString((sellerIdRaw as Record<string, unknown>).id) ??
+          null
+        : null,
     title: toString(raw.title) ?? toString(raw.name) ?? "Untitled Property",
     description: toString(raw.description) ?? toString(raw.aboutProperty) ?? "",
     shortDescription:

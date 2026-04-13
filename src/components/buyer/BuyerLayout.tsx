@@ -25,9 +25,7 @@ import {
 import { twMerge } from "tailwind-merge";
 
 function BuyerNotificationsBell() {
-  const unreadCount = useAppSelector(
-    (state) => state.buyer.notifications.filter((n) => !n.read).length
-  );
+  const unreadCount = useAppSelector((state) => state.notifications.unreadCount);
 
   return (
     <Link

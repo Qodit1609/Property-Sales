@@ -12,9 +12,7 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
   onLogout,
 }) => {
   const { user } = useAppSelector((state) => state.auth);
-  const unreadCount = useAppSelector(
-    (state) => state.buyer.notifications.filter((n) => !n.read).length
-  );
+  const unreadCount = useAppSelector((state) => state.notifications.unreadCount);
   const [open, setOpen] = useState(false);
 
   return (

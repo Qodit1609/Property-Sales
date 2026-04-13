@@ -10,10 +10,12 @@ import { useBuyerResolvedProperties } from "../../hooks/useBuyerResolvedProperti
 import PropertyCard from "../Cards/PropertyCard";
 import WishlistGrid from "./WishlistGrid";
 import { Button } from "@/components/common";
+import { createNotificationAPI } from "../../features/notifications/notificationAPI";
 
 const Wishlist: React.FC = () => {
   const dispatch = useAppDispatch();
   const wishlistIds = useAppSelector((s) => s.buyer.wishlistIds);
+  const buyerName = useAppSelector((s) => s.auth.user?.name ?? "Buyer");
   const { properties: wishlist, loading } = useBuyerResolvedProperties(wishlistIds);
 
   if (wishlistIds.length === 0) {
@@ -76,7 +78,27 @@ const Wishlist: React.FC = () => {
 
               <Button
                 type="button"
-                onClick={() => dispatch(moveWishlistToCart(property._id))}
+                onClick={() => {
+                  dispatch(moveWishlistToCart(property._id));
+                  const rawSellerId = (property as { sellerId?: unknown }).sellerId;
+                  const sellerId =
+                    typeof rawSellerId === "string"
+                      ? rawSellerId
+                      : rawSellerId &&
+                        typeof rawSellerId === "object" &&
+                        "_id" in (rawSellerId as Record<string, unknown>)
+                      ? String((rawSellerId as { _id?: string })._id ?? "")
+                      : "";
+                  if (sellerId) {
+                    void createNotificationAPI({
+                      title: "Property added to cart",
+                      message: `${buyerName} added ${property.title ?? "your property"} to cart.`,
+                      type: "cart",
+                      receiverId: sellerId,
+                      propertyId: property._id,
+                    });
+                  }
+                }}
                 variant="primary"
                 className="rounded-full px-3 py-1 text-[11px] font-semibold"
               >

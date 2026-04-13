@@ -51,6 +51,7 @@ import React from "react";
 import { SellerStatsSkeleton } from "./components/seller/SellerSkeleton";
 import BuyerCompareToast from "./components/buyer/BuyerCompareToast";
 import BuyerFeedbackToast from "./components/buyer/BuyerFeedbackToast";
+import NotificationSync from "./features/notifications/NotificationSync";
 
 const SellerLeadsPage = React.lazy(() => import("./pages/Seller/SellerLeadsPage"));
 const SellerAnalyticsPage = React.lazy(() => import("./pages/Seller/SellerAnalyticsPage"));
@@ -107,6 +108,7 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <NotificationSync />
       <BuyerCompareToast />
       <BuyerFeedbackToast />
       <Routes>

@@ -15,9 +15,7 @@ import {
 import { twMerge } from "tailwind-merge";
 
 function AdminNotificationsBell() {
-  const unreadCount = useAppSelector(
-    (s) => s.admin.notifications.filter((n) => !n.read).length
-  );
+  const unreadCount = useAppSelector((s) => s.notifications.unreadCount);
 
   return (
     <Link

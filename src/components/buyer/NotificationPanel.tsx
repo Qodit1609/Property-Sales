@@ -1,15 +1,12 @@
 import React from "react";
-import { Bell, CheckCircle2 } from "lucide-react";
+import { Bell } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
-import {
-  markAllNotificationsRead,
-  markNotificationRead,
-} from "../../features/buyer/buyerSlice";
+import { markNotificationRead } from "../../features/notifications/notificationSlice";
 import { Button } from "@/components/common";
 
 const NotificationPanel: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { notifications } = useAppSelector((state) => state.buyer);
+  const notifications = useAppSelector((state) => state.notifications.items);
 
   return (
     <div className="space-y-3 rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm">
@@ -28,17 +25,6 @@ const NotificationPanel: React.FC = () => {
           </div>
         </div>
 
-        {notifications.length > 0 && (
-          <Button
-            type="button"
-            onClick={() => dispatch(markAllNotificationsRead())}
-            variant="ghost"
-            className="rounded-full px-3 py-1 text-[11px] font-medium text-[var(--b1)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2)]"
-          >
-            <CheckCircle2 className="h-3.5 w-3.5" />
-            Mark all read
-          </Button>
-        )}
       </div>
 
       {notifications.length === 0 ? (
@@ -61,7 +47,7 @@ const NotificationPanel: React.FC = () => {
               variant="ghost"
               className={[
                 "w-full items-start gap-3 rounded-xl border px-3 py-2 text-left",
-                n.read
+                n.isRead
                   ? "border-[var(--b2-soft)] bg-[var(--b2-soft)]"
                   : "border-[var(--b2)] bg-[var(--white)] shadow-sm",
               ].join(" ")}
