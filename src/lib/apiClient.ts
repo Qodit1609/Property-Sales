@@ -33,6 +33,9 @@ export const API_ENDPOINTS = {
   HOME: {
     SECTIONS: "/home/sections",
   },
+  CONTACT: {
+    INQUIRIES: "/contact/inquiries",
+  },
   MEDIA: {
     LIST: "/media",
   },
