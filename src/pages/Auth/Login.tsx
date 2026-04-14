@@ -5,6 +5,8 @@ import { loginUser, resetError } from "../../features/auth/authSlice";
 import type { AppRole } from "../../features/auth/roleTypes";
 import Dashboard from "../Dashboard/Dashboard";
 import { Input, Button } from "@/components/common";
+import { touchSellerSession } from "../../lib/sellerProfileStorage";
+import { touchBuyerSession } from "../../lib/buyerProfileStorage";
 
 const AUTH_ONLY_PATHS = new Set(["/login", "/register"]);
 
@@ -76,6 +78,12 @@ const Login: React.FC = () => {
       }
 
       const role = result.payload.user.role;
+      if (role === "seller") {
+        touchSellerSession(result.payload.user.email);
+      }
+      if (role === "buyer") {
+        touchBuyerSession(result.payload.user.email);
+      }
 
       // Only honor `from` when this role is allowed on that route. Otherwise a
       // buyer who hit login via a seller URL would be bounced to "/" by ProtectedRoute.

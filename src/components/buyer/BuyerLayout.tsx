@@ -16,7 +16,6 @@ import Header from "../Header/Header";
 import { DashboardPageTopBar } from "../common/DashboardPageTopBar";
 import { ProfileAvatar } from "../common/ProfileAvatar";
 import { useBuyerProfileLocal } from "../../hooks/useBuyerProfileLocal";
-import { touchBuyerSession } from "../../lib/buyerProfileStorage";
 import {
   BUYER_SIDEBAR_WIDTH_COLLAPSED,
   BUYER_SIDEBAR_WIDTH_EXPANDED,
@@ -162,10 +161,6 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
   const closeMobile = useCallback(() => setMobileNavOpen(false), []);
 
   const displayName = user?.name?.trim() || user?.email?.trim() || "Welcome";
-
-  useEffect(() => {
-    touchBuyerSession(user?.email);
-  }, [user?.email]);
 
   const { title: overviewTitle, subtitle: overviewSubtitle } = useMemo(
     () => buyerTopBarFromPath(location.pathname),

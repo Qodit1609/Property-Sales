@@ -34,6 +34,8 @@ const Register: React.FC = () => {
   const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [propertyFocusType, setPropertyFocusType] = useState("");
   const [experienceYears, setExperienceYears] = useState<string>("");
@@ -166,7 +168,7 @@ const Register: React.FC = () => {
                 {(["buyer", "seller", "agent"] as const).map((r) => (
                   <label
                     key={r}
-                    className={`flex cursor-pointer items-center justify-center rounded-md border px-3 py-2 text-xs font-semibold transition ${
+                    className={`flex cursor-pointer items-center justify-center rounded-md border px-3 py-2 text-center text-xs font-semibold transition ${
                       role === r
                         ? "border-[var(--b2)] bg-[var(--b2-soft)] text-[var(--b1)]"
                         : "border-[var(--b2)] bg-[var(--white)] text-[var(--b1-mid)] hover:bg-[var(--b2-soft)]"
@@ -180,7 +182,9 @@ const Register: React.FC = () => {
                       onChange={() => setRole(r)}
                       className="sr-only"
                     />
-                    {r === "buyer" ? "USER" : r.toUpperCase()}
+                    <span className="block w-full text-center">
+                      {r === "buyer" ? "BUYER" : r.toUpperCase()}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -268,24 +272,44 @@ const Register: React.FC = () => {
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium">Password</label>
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="border border-[var(--b2)] rounded-md px-3 py-2 pr-16 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-transparent px-2 py-1 text-sm font-medium hover:border-[var(--b2)] hover:bg-[var(--b1-mid)] transition"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </Button>
+                </div>
               </div>
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium">Confirm Password</label>
-                <Input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    type={showConfirmPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="border border-[var(--b2)] rounded-md px-3 py-2 pr-16 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
+                    required
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-transparent px-2 py-1 text-sm font-medium hover:border-[var(--b2)] hover:bg-[var(--b1-mid)] transition"
+                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                  >
+                    {showConfirmPassword ? "Hide" : "Show"}
+                  </Button>
+                </div>
               </div>
 
             </div>

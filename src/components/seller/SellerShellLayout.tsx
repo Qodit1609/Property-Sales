@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { Menu } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import Header from "../Header/Header";
 import { useAppSelector } from "../../hooks/reduxHooks";
-import { touchSellerSession } from "../../lib/sellerProfileStorage";
 import {
   SELLER_SIDEBAR_WIDTH_COLLAPSED,
   SELLER_SIDEBAR_WIDTH_EXPANDED,
@@ -24,10 +23,6 @@ function SellerShellLayout({ children }: SellerShellLayoutProps) {
 
   const toggleCollapsed = useCallback(() => setCollapsed((c) => !c), []);
   const closeMobile = useCallback(() => setMobileOpen(false), []);
-
-  useEffect(() => {
-    touchSellerSession(user?.email);
-  }, [user?.email]);
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-[var(--b2-soft)] text-[var(--b1)]">
