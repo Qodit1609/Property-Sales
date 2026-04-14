@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { submitInquiryAPI } from "@/features/contact/contactAPI";
 
 type ContactFormData = {
   name: string;
@@ -156,6 +157,7 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [submitErrorMessage, setSubmitErrorMessage] = useState<string>("");
   const [formData, setFormData] = useState<ContactFormData>({
     name: "",
     email: "",
@@ -187,7 +189,10 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
   const handleFieldChange = useCallback(
     (field: keyof ContactFormData, value: string) => {
       setFormData((prev) => ({ ...prev, [field]: value }));
-      if (submitStatus !== "idle") setSubmitStatus("idle");
+      if (submitStatus !== "idle") {
+        setSubmitStatus("idle");
+        setSubmitErrorMessage("");
+      }
       setErrors((prev) => {
         if (!prev[field]) return prev;
         const next = { ...prev };
@@ -216,11 +221,20 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
       try {
         setIsSubmitting(true);
         setSubmitStatus("idle");
-        await new Promise((resolve) => setTimeout(resolve, 1200));
+        setSubmitErrorMessage("");
+        await submitInquiryAPI({
+          fullName: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          message: formData.message.trim(),
+          source: "contact_popup",
+        });
         setSubmitStatus("success");
         setFormData({ name: "", email: "", phone: "", message: "" });
-      } catch {
+      } catch (error) {
         setSubmitStatus("error");
+        const message = error instanceof Error ? error.message : "Something went wrong. Please try again in a moment.";
+        setSubmitErrorMessage(message);
       } finally {
         setIsSubmitting(false);
       }
@@ -431,7 +445,7 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
 
           {submitStatus === "error" ? (
             <div className="rounded-xl border border-[var(--error)] bg-[var(--error-bg)] px-4 py-3 text-sm text-[var(--error)]">
-              Something went wrong. Please try again in a moment.
+              {submitErrorMessage || "Something went wrong. Please try again in a moment."}
             </div>
           ) : null}
         </form>
