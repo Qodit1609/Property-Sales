@@ -130,9 +130,9 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
     ? coordinates[0]
     : coordinates?.lng;
   const analytics = property.analytics;
-  const dealer = property.dealer ?? {};
-  const seller = property.seller ?? {};
-  const owner = property.ownerDetails ?? {};
+  const dealer: Property["dealer"] = property.dealer ?? {};
+  const seller: Property["seller"] = property.seller ?? {};
+  const owner: Partial<Property["ownerDetails"]> = property.ownerDetails ?? {};
   const areaValue = property.area ?? property.size ?? property.landSize;
   const areaUnit = property.areaUnit ?? property.landUnit;
   const translatedAmenities = translateDynamicList(property.amenities);
