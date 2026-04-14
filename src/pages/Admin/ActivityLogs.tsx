@@ -1,41 +1,306 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ClipboardList } from "lucide-react";
 
 import AdminLayout from "../../components/admin/AdminLayout";
 import ActivityFilters from "../../components/admin/ActivityFilters";
 import ActivityLogTable from "../../components/admin/ActivityLogTable";
 import ActivityStats from "../../components/admin/ActivityStats";
-import {
-  computeActivityStats,
-  filterActivityLogs,
-} from "../../components/admin/activityLogMockData";
 import type {
+  ActivityLogEntry,
+  ActivityLogRole,
+  ActivityStatusTone,
+  ActivityTypeCode,
   ActivityCategoryFilter,
   UserTypeFilter,
 } from "../../components/admin/activityLogTypes";
-import { useAppSelector } from "../../hooks/reduxHooks";
+import api from "../../lib/apiClient";
+
+type BackendLog = {
+  _id: string;
+  name: string;
+  email: string;
+  role: "buyer" | "seller" | "admin";
+  action: string;
+  createdAt: string;
+  status?: string;
+};
+
+type BackendUser = {
+  _id: string;
+  name: string;
+  role: "buyer" | "seller" | "admin";
+  lastLogin?: string;
+};
+
+type BackendAgent = {
+  _id: string;
+  name: string;
+  stats?: {
+    totalProperties?: number;
+  };
+};
+
+function classifyActivityType(action: string): ActivityTypeCode {
+  const value = action.toLowerCase();
+  const normalized = value.replace(/_/g, " ");
+  if (normalized.includes("seller login")) return "SELLER_LOGIN";
+  if (normalized.includes("seller logout")) return "SELLER_LOGOUT";
+  if (normalized.includes("buyer login")) return "BUYER_LOGIN";
+  if (normalized.includes("buyer logout")) return "BUYER_LOGOUT";
+  if (normalized.includes("login")) return "BUYER_LOGIN";
+  if (normalized.includes("logout")) return "BUYER_LOGOUT";
+  if (value.includes("approved")) return "PROPERTY_APPROVED";
+  if (value.includes("rejected")) return "PROPERTY_REJECTED";
+  if (value.includes("deleted")) return "PROPERTY_DELETED";
+  if (value.includes("edited") || value.includes("updated")) return "PROPERTY_EDITED";
+  if (value.includes("created") || value.includes("added")) return "PROPERTY_CREATED";
+  if (value.includes("document uploaded")) return "DOCUMENT_UPLOADED";
+  if (value.includes("document verified")) return "DOCUMENT_VERIFIED";
+  if (value.includes("blocked")) return "USER_BLOCKED";
+  if (value.includes("verified")) return "USER_VERIFIED";
+  return "SEARCH_ACTIVITY";
+}
+
+function classifyStatusTone(status: string): ActivityStatusTone {
+  const value = status.toLowerCase();
+  if (value.includes("success") || value.includes("approved") || value.includes("created")) {
+    return "success";
+  }
+  if (value.includes("pending")) return "warning";
+  if (value.includes("reject") || value.includes("fail")) return "danger";
+  if (value.includes("update") || value.includes("view")) return "info";
+  return "neutral";
+}
+
+function formatLogDate(iso: string): string {
+  const date = new Date(iso);
+  const dd = String(date.getDate()).padStart(2, "0");
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const yyyy = date.getFullYear();
+  const hh = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+}
+
+function formatDuration(startIso: string, endIso: string): string {
+  const start = new Date(startIso).getTime();
+  const end = new Date(endIso).getTime();
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return "-";
+  const diffMinutes = Math.floor((end - start) / 60000);
+  const hours = Math.floor(diffMinutes / 60);
+  const minutes = diffMinutes % 60;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+}
 
 const ActivityLogs: React.FC = () => {
-  const auditLogs = useAppSelector((s) => s.admin.auditLogs);
+  const [auditLogs, setAuditLogs] = useState<ActivityLogEntry[]>([]);
   const [userType, setUserType] = useState<UserTypeFilter>("all");
   const [activityCategory, setActivityCategory] =
     useState<ActivityCategoryFilter>("all");
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [sellerPropertyCountByName, setSellerPropertyCountByName] = useState<
+    Record<string, number>
+  >({});
 
-  const stats = useMemo(
-    () => computeActivityStats(auditLogs),
-    [auditLogs]
-  );
+  useEffect(() => {
+    let mounted = true;
+    const loadLogs = async () => {
+      try {
+        setLoading(true);
+        const [logsResponse, sellerUsersResponse, buyerUsersResponse, agentsResponse] = await Promise.all([
+          api.get("/admin/logs"),
+          api.get("/admin/users?role=seller&limit=1000"),
+          api.get("/admin/users?role=buyer&limit=1000"),
+          api.get("/admin/agents?limit=1000"),
+        ]);
+        const rows = Array.isArray(logsResponse.data?.data) ? logsResponse.data.data : [];
+        const sellerUsers = Array.isArray(sellerUsersResponse.data?.data)
+          ? sellerUsersResponse.data.data
+          : [];
+        const buyerUsers = Array.isArray(buyerUsersResponse.data?.data)
+          ? buyerUsersResponse.data.data
+          : [];
+        const agents = Array.isArray(agentsResponse.data?.data) ? agentsResponse.data.data : [];
+        if (!mounted) return;
+        const mappedLogs: ActivityLogEntry[] = (rows as BackendLog[]).map((log) => {
+          const status = log.status ?? "Success";
+          return {
+            id: String(log._id),
+            userName: String(log.name ?? ""),
+            role: (log.role ?? "buyer") as ActivityLogRole,
+            activity: String(log.action ?? ""),
+            activityType: classifyActivityType(String(log.action ?? "")),
+            target: "",
+            date: formatLogDate(String(log.createdAt ?? "")),
+            status,
+            statusTone: classifyStatusTone(status),
+            actorId: String(log._id),
+            timestamp: String(log.createdAt ?? ""),
+          };
+        });
 
-  const filteredRows = useMemo(
-    () =>
-      filterActivityLogs(auditLogs, {
-        userType,
-        activityCategory,
-        search,
-      }),
-    [auditLogs, userType, activityCategory, search]
-  );
+        const existingLoginKeys = new Set(
+          mappedLogs
+            .filter((entry) => entry.activityType === "SELLER_LOGIN" || entry.activityType === "BUYER_LOGIN")
+            .map((entry) => `${entry.role}|${entry.userName}|${entry.timestamp}`)
+        );
+
+        const users = [...sellerUsers, ...buyerUsers] as BackendUser[];
+        const fallbackLoginRows: ActivityLogEntry[] = users
+          .filter(
+            (user) =>
+              (user.role === "seller" || user.role === "buyer") &&
+              Boolean(user.lastLogin)
+          )
+          .filter((user) => {
+            const key = `${user.role}|${String(user.name ?? "")}|${String(user.lastLogin ?? "")}`;
+            return !existingLoginKeys.has(key);
+          })
+          .map((user) => ({
+            id: `lastlogin-${String(user._id)}`,
+            userName: String(user.name ?? ""),
+            role: user.role as ActivityLogRole,
+            activity: user.role === "seller" ? "SELLER_LOGIN" : "BUYER_LOGIN",
+            activityType: user.role === "seller" ? "SELLER_LOGIN" : "BUYER_LOGIN",
+            target: "",
+            date: formatLogDate(String(user.lastLogin ?? "")),
+            status: "Success",
+            statusTone: "success",
+            actorId: String(user._id),
+            timestamp: String(user.lastLogin ?? ""),
+          }));
+
+        const sellerCounts: Record<string, number> = {};
+        for (const agent of agents as BackendAgent[]) {
+          const key = String(agent.name ?? "").trim();
+          if (!key) continue;
+          sellerCounts[key] = Number(agent.stats?.totalProperties ?? 0);
+        }
+
+        setSellerPropertyCountByName(sellerCounts);
+        setAuditLogs([...mappedLogs, ...fallbackLoginRows]);
+      } catch {
+        if (mounted) {
+          setSellerPropertyCountByName({});
+          setAuditLogs([]);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+    loadLogs();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const stats = useMemo(() => {
+    return {
+      total: auditLogs.length,
+      seller: auditLogs.filter((l) => l.role === "seller").length,
+      buyer: auditLogs.filter((l) => l.role === "buyer").length,
+      admin: auditLogs.filter((l) => l.role === "admin").length,
+    };
+  }, [auditLogs]);
+
+  const filteredRows = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    const baseRows = auditLogs.filter((row) => {
+      if (userType !== "all" && row.role !== userType) return false;
+      if (activityCategory === "login") {
+        if (!(row.activityType === "SELLER_LOGIN" || row.activityType === "BUYER_LOGIN")) {
+          return false;
+        }
+      }
+      if (activityCategory === "property") {
+        if (!row.activityType.startsWith("PROPERTY_")) return false;
+      }
+      if (!q) return true;
+      return (
+        row.userName.toLowerCase().includes(q) ||
+        row.activity.toLowerCase().includes(q) ||
+        row.role.toLowerCase().includes(q) ||
+        row.status.toLowerCase().includes(q)
+      );
+    });
+
+    if (activityCategory !== "login") {
+      return baseRows;
+    }
+
+    const logoutRows = auditLogs.filter(
+      (row) => row.activityType === "SELLER_LOGOUT" || row.activityType === "BUYER_LOGOUT"
+    );
+
+    return baseRows.map((row) => {
+      const loginTs = new Date(row.timestamp).getTime();
+      const matchingLogout = logoutRows
+        .filter((log) => {
+          if (log.role !== row.role) return false;
+          if (log.userName !== row.userName) return false;
+          const logoutTs = new Date(log.timestamp).getTime();
+          return Number.isFinite(logoutTs) && Number.isFinite(loginTs) && logoutTs >= loginTs;
+        })
+        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())[0];
+
+      const logoutAt = matchingLogout ? formatLogDate(matchingLogout.timestamp) : "-";
+      return {
+        ...row,
+        loginAt: row.date,
+        logoutAt,
+        sessionDuration: matchingLogout
+          ? formatDuration(row.timestamp, matchingLogout.timestamp)
+          : "-",
+      };
+    });
+  }, [auditLogs, userType, activityCategory, search]);
+
+  const sellerSummary = useMemo(() => {
+    const sellerRows = auditLogs.filter((row) => row.role === "seller");
+    const map = new Map<
+      string,
+      { userName: string; propertyCount: number; addedAt: string[] }
+    >();
+    for (const row of sellerRows) {
+      const key = row.userName || row.id;
+      if (!map.has(key)) {
+        map.set(key, { userName: row.userName, propertyCount: 0, addedAt: [] });
+      }
+      if (row.activityType.startsWith("PROPERTY_")) {
+        const current = map.get(key)!;
+        current.propertyCount += 1;
+        current.addedAt.push(row.date);
+      }
+    }
+    for (const value of map.values()) {
+      if (Object.prototype.hasOwnProperty.call(sellerPropertyCountByName, value.userName)) {
+        value.propertyCount = sellerPropertyCountByName[value.userName];
+      }
+    }
+    return {
+      totalSellers: map.size,
+      rows: Array.from(map.values()),
+    };
+  }, [auditLogs, sellerPropertyCountByName]);
+
+  const buyerSummary = useMemo(() => {
+    const buyerRows = auditLogs.filter((row) => row.role === "buyer");
+    const map = new Map<string, { userName: string }>();
+    for (const row of buyerRows) {
+      const key = row.userName || row.id;
+      if (!map.has(key)) {
+        map.set(key, { userName: row.userName });
+      }
+    }
+    return {
+      totalBuyers: map.size,
+      rows: Array.from(map.values()),
+    };
+  }, [auditLogs]);
 
   return (
     <AdminLayout title="Audit logs">
@@ -83,11 +348,80 @@ const ActivityLogs: React.FC = () => {
           />
         </section>
 
+        <section className="grid gap-4 lg:grid-cols-2">
+          <div className="overflow-hidden rounded-xl border border-[var(--b2)]/90 bg-[var(--white)] shadow-md shadow-[var(--b1)]/5">
+            <div className="border-b border-[var(--b2)]/70 px-4 py-3 sm:px-5">
+              <h3 className="text-sm font-semibold text-[var(--b1)]">Seller activities</h3>
+              <p className="mt-1 text-xs text-[var(--muted)]">Total sellers: {sellerSummary.totalSellers}</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[420px] border-collapse text-left text-sm">
+                <thead>
+                  <tr className="border-b border-[var(--b2)] bg-[var(--b2-soft)]/80">
+                    <th className="px-4 py-3 font-semibold text-[var(--b1)] sm:px-5">Name</th>
+                    <th className="px-4 py-3 font-semibold text-[var(--b1)] sm:px-5">Properties Added</th>
+                    <th className="px-4 py-3 font-semibold text-[var(--b1)] sm:px-5">Added At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sellerSummary.rows.map((row, index) => (
+                    <tr
+                      key={`${row.userName}-${index}`}
+                      className={[
+                        "border-b border-[var(--b2)]/70",
+                        index % 2 === 1 ? "bg-[var(--b2-soft)]/35" : "bg-[var(--white)]",
+                      ].join(" ")}
+                    >
+                      <td className="px-4 py-3 text-[var(--b1)] sm:px-5">{row.userName}</td>
+                      <td className="px-4 py-3 text-[var(--b1-mid)] sm:px-5">{row.propertyCount}</td>
+                      <td className="px-4 py-3 text-[var(--b1-mid)] sm:px-5">
+                        {row.addedAt[0] ?? "-"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-[var(--b2)]/90 bg-[var(--white)] shadow-md shadow-[var(--b1)]/5">
+            <div className="border-b border-[var(--b2)]/70 px-4 py-3 sm:px-5">
+              <h3 className="text-sm font-semibold text-[var(--b1)]">Buyer activities</h3>
+              <p className="mt-1 text-xs text-[var(--muted)]">Total buyers: {buyerSummary.totalBuyers}</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[320px] border-collapse text-left text-sm">
+                <thead>
+                  <tr className="border-b border-[var(--b2)] bg-[var(--b2-soft)]/80">
+                    <th className="px-4 py-3 font-semibold text-[var(--b1)] sm:px-5">Name</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {buyerSummary.rows.map((row, index) => (
+                    <tr
+                      key={`${row.userName}-${index}`}
+                      className={[
+                        "border-b border-[var(--b2)]/70",
+                        index % 2 === 1 ? "bg-[var(--b2-soft)]/35" : "bg-[var(--white)]",
+                      ].join(" ")}
+                    >
+                      <td className="px-4 py-3 text-[var(--b1)] sm:px-5">{row.userName}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
         <section className="space-y-3">
           <h2 className="text-lg font-semibold text-[var(--b1)]">
             Activity table
           </h2>
-          <ActivityLogTable rows={filteredRows} />
+          <ActivityLogTable rows={filteredRows} activityCategory={activityCategory} />
+          {loading ? (
+            <p className="text-sm text-[var(--muted)]">Loading logs...</p>
+          ) : null}
         </section>
       </div>
     </AdminLayout>

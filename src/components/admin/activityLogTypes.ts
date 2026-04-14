@@ -22,8 +22,10 @@ export type ActivityTypeCode =
   | "PROPERTY_DELETED"
   | "DOCUMENT_UPLOADED"
   | "SELLER_LOGIN"
+  | "SELLER_LOGOUT"
   | "PROFILE_UPDATED"
   | "BUYER_LOGIN"
+  | "BUYER_LOGOUT"
   | "PROPERTY_VIEWED"
   | "CONTACT_REQUEST"
   | "PROPERTY_SAVED"
@@ -65,6 +67,9 @@ export interface ActivityLogEntry {
   entityId?: string;
   /** ISO timestamp for sorting / API */
   timestamp: string;
+  loginAt?: string;
+  logoutAt?: string;
+  sessionDuration?: string;
   /** Future: arbitrary payload from backend */
   metadata?: Record<string, unknown>;
 }

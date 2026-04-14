@@ -36,7 +36,7 @@ const FarmingPromoSection: React.FC = () => {
           </div>
           <div className="order-1 aspect-[4/3] lg:order-2 lg:aspect-auto">
             <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT94qPx6PaZ4ImbjlocymFqskbQgAhI5mR8yg&s"
+              src="https://images.financialexpressdigital.com/2025/04/diya-0001-58.jpg?w=1200"
               alt="Aerial view of cultivated farmland"
               loading="lazy"
               className="h-full w-full object-cover"

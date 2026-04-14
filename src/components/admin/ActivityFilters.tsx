@@ -10,16 +10,12 @@ const USER_OPTIONS: { value: UserTypeFilter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "seller", label: "Seller" },
   { value: "buyer", label: "Buyer" },
-  { value: "admin", label: "Admin" },
 ];
 
 const ACTIVITY_OPTIONS: { value: ActivityCategoryFilter; label: string }[] = [
   { value: "all", label: "All types" },
   { value: "login", label: "Login" },
   { value: "property", label: "Property" },
-  { value: "documents", label: "Documents" },
-  { value: "leads", label: "Leads" },
-  { value: "security", label: "Security" },
 ];
 
 interface ActivityFiltersProps {
@@ -80,19 +76,6 @@ const ActivityFilters: React.FC<ActivityFiltersProps> = ({
           </select>
         </label>
       </div>
-
-      <label className="flex w-full min-w-0 flex-col gap-1.5 lg:max-w-[200px]">
-        <span className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">
-          Date range
-        </span>
-        <input
-          type="text"
-          readOnly
-          placeholder="Select dates (soon)"
-          className={`${filterSelectClass} cursor-not-allowed bg-[var(--b2-soft)]/50 text-[var(--muted)]`}
-          aria-label="Date range placeholder"
-        />
-      </label>
 
       <label className="flex w-full min-w-0 flex-col gap-1.5 lg:min-w-[220px] lg:flex-1">
         <span className="text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">

@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 
 import type {
+  ActivityCategoryFilter,
   ActivityLogEntry,
   ActivityLogRole,
   ActivityStatusTone,
@@ -28,6 +29,7 @@ import type {
 
 interface ActivityLogTableProps {
   rows: ActivityLogEntry[];
+  activityCategory: ActivityCategoryFilter;
 }
 
 function roleBadgeClass(role: ActivityLogRole): string {
@@ -58,8 +60,10 @@ function activityIcon(type: ActivityTypeCode): React.ReactNode {
     PROPERTY_DELETED: <Trash2 className={common} aria-hidden />,
     DOCUMENT_UPLOADED: <FileUp className={common} aria-hidden />,
     SELLER_LOGIN: <LogIn className={common} aria-hidden />,
+    SELLER_LOGOUT: <KeyRound className={common} aria-hidden />,
     PROFILE_UPDATED: <UserPen className={common} aria-hidden />,
     BUYER_LOGIN: <KeyRound className={common} aria-hidden />,
+    BUYER_LOGOUT: <LogIn className={common} aria-hidden />,
     PROPERTY_VIEWED: <Eye className={common} aria-hidden />,
     CONTACT_REQUEST: <Phone className={common} aria-hidden />,
     PROPERTY_SAVED: <Bookmark className={common} aria-hidden />,
@@ -73,7 +77,8 @@ function activityIcon(type: ActivityTypeCode): React.ReactNode {
   return map[type] ?? <Mail className={common} aria-hidden />;
 }
 
-const ActivityLogTable: React.FC<ActivityLogTableProps> = ({ rows }) => {
+const ActivityLogTable: React.FC<ActivityLogTableProps> = ({ rows, activityCategory }) => {
+  const isLoginView = activityCategory === "login";
   return (
     <div className="overflow-hidden rounded-xl border border-[var(--b2)]/90 bg-[var(--white)] shadow-md shadow-[var(--b1)]/5">
       <div className="overflow-x-auto">
@@ -81,20 +86,31 @@ const ActivityLogTable: React.FC<ActivityLogTableProps> = ({ rows }) => {
           <thead>
             <tr className="border-b border-[var(--b2)] bg-[var(--b2-soft)]/80">
               <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
-                User
-              </th>
-              <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
                 Role
               </th>
               <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
                 Activity
               </th>
               <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
-                Target
+                Name
               </th>
-              <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
-                Date
-              </th>
+              {isLoginView ? (
+                <>
+                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
+                    Login at
+                  </th>
+                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
+                    Logout at
+                  </th>
+                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
+                    Duration
+                  </th>
+                </>
+              ) : (
+                <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
+                  Date
+                </th>
+              )}
               <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
                 Status
               </th>
@@ -112,9 +128,6 @@ const ActivityLogTable: React.FC<ActivityLogTableProps> = ({ rows }) => {
                   index % 2 === 1 ? "bg-[var(--b2-soft)]/35" : "bg-[var(--white)]",
                 ].join(" ")}
               >
-                <td className="px-4 py-3.5 font-medium text-[var(--b1)] sm:px-5">
-                  {row.userName}
-                </td>
                 <td className="px-4 py-3.5 sm:px-5">
                   <span
                     className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${roleBadgeClass(row.role)}`}
@@ -128,12 +141,26 @@ const ActivityLogTable: React.FC<ActivityLogTableProps> = ({ rows }) => {
                     <span className="text-[var(--b1)]">{row.activity}</span>
                   </span>
                 </td>
-                <td className="max-w-[200px] truncate px-4 py-3.5 text-[var(--b1-mid)] sm:max-w-xs sm:px-5">
-                  {row.target}
+                <td className="px-4 py-3.5 font-medium text-[var(--b1)] sm:px-5">
+                  {row.userName}
                 </td>
-                <td className="whitespace-nowrap px-4 py-3.5 text-[var(--b1-mid)] sm:px-5">
-                  {row.date}
-                </td>
+                {isLoginView ? (
+                  <>
+                    <td className="whitespace-nowrap px-4 py-3.5 text-[var(--b1-mid)] sm:px-5">
+                      {row.loginAt ?? row.date}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3.5 text-[var(--b1-mid)] sm:px-5">
+                      {row.logoutAt ?? "-"}
+                    </td>
+                    <td className="whitespace-nowrap px-4 py-3.5 text-[var(--b1-mid)] sm:px-5">
+                      {row.sessionDuration ?? "-"}
+                    </td>
+                  </>
+                ) : (
+                  <td className="whitespace-nowrap px-4 py-3.5 text-[var(--b1-mid)] sm:px-5">
+                    {row.date}
+                  </td>
+                )}
                 <td className="px-4 py-3.5 sm:px-5">
                   <span
                     className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusBadgeClass(row.statusTone)}`}
