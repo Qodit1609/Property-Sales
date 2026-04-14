@@ -33,6 +33,42 @@ const toStringArray = (value: unknown): string[] => {
   return value.filter((item): item is string => typeof item === "string" && item.trim() !== "");
 };
 
+const extractImageUrl = (value: unknown): string | undefined => {
+  if (typeof value === "string" && value.trim()) {
+    return value.trim();
+  }
+
+  if (value && typeof value === "object") {
+    const o = value as Record<string, unknown>;
+    const raw =
+      o.url ??
+      o.secure_url ??
+      o.cloudinaryUrl ??
+      o.src ??
+      o.image ??
+      o.path;
+    if (typeof raw === "string" && raw.trim()) {
+      return raw.trim();
+    }
+  }
+
+  return undefined;
+};
+
+const toImageUrlArray = (value: unknown): string[] => {
+  if (typeof value === "string" && value.trim()) {
+    return [value.trim()];
+  }
+
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value
+    .map(extractImageUrl)
+    .filter((item): item is string => Boolean(item));
+};
+
 const toBoolean = (value: unknown): boolean | undefined => {
   if (typeof value === "boolean") {
     return value;
@@ -126,9 +162,9 @@ const normalizeProperty = (payload: unknown): Property => {
   const highlights = toRecord(raw.highlights);
   const amenitiesObject = toRecord(raw.amenities);
 
-  const imagesRaw = toStringArray(raw.images).length
-    ? toStringArray(raw.images)
-    : toStringArray(media.images);
+  const rawImages = toImageUrlArray(raw.images);
+  const mediaImages = toImageUrlArray(media.images);
+  const imagesRaw = rawImages.length ? rawImages : mediaImages;
   const coverImage = toString(raw.coverImage);
   const imagesWithCover = coverImage ? [coverImage, ...imagesRaw] : imagesRaw;
   const images = imagesWithCover.map(sanitizeImageUrl);

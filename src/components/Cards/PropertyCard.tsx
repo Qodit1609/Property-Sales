@@ -60,9 +60,11 @@ const PropertyCard: React.FC<Props> = ({
     if (cyclic.length) return cyclic;
 
     if (property.images?.length) return property.images;
+    if (property.media?.images?.length) return property.media.images;
+    if (property.media?.gallery?.length) return property.media.gallery;
 
     return [FALLBACK_PROPERTY_IMAGE];
-  }, [property._id, property.images, propertyImagesMap, cloudinaryPool]);
+  }, [property._id, property.images, property.media, propertyImagesMap, cloudinaryPool]);
 
   const primaryImage = cardImages[0] ?? FALLBACK_PROPERTY_IMAGE;
 
