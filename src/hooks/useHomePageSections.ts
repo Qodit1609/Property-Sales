@@ -3,8 +3,29 @@ import { defaultHomeSectionsData } from "@/components/Home/data/homeStaticData";
 import type { HomeSectionsPayload } from "@/components/Home/models/homeTypes";
 import { getHomeSectionsFromAPI } from "@/components/Home/services/homeSectionsService";
 
-const asArrayOrFallback = <T>(value: unknown, fallback: T[]): T[] => {
-  return Array.isArray(value) && value.length > 0 ? (value as T[]) : fallback;
+const mergeArrayWithDefaults = <T extends { id: string }>(value: unknown, fallback: T[]): T[] => {
+  if (!Array.isArray(value) || value.length === 0) {
+    return fallback;
+  }
+
+  const items = value as T[];
+  if (items.length >= fallback.length) {
+    return items;
+  }
+
+  const existingIds = new Set(items.map((item) => item.id));
+  const merged = [...items];
+
+  for (const fallbackItem of fallback) {
+    if (merged.length >= fallback.length) {
+      break;
+    }
+    if (!existingIds.has(fallbackItem.id)) {
+      merged.push(fallbackItem);
+    }
+  }
+
+  return merged;
 };
 
 const mergeWithFallback = (
@@ -15,13 +36,13 @@ const mergeWithFallback = (
   }
 
   return {
-    featuredProperties: asArrayOrFallback(
+    featuredProperties: mergeArrayWithDefaults(
       payload.featuredProperties,
       defaultHomeSectionsData.featuredProperties,
     ),
-    districts: asArrayOrFallback(payload.districts, defaultHomeSectionsData.districts),
-    benefits: asArrayOrFallback(payload.benefits, defaultHomeSectionsData.benefits),
-    testimonials: asArrayOrFallback(
+    districts: mergeArrayWithDefaults(payload.districts, defaultHomeSectionsData.districts),
+    benefits: mergeArrayWithDefaults(payload.benefits, defaultHomeSectionsData.benefits),
+    testimonials: mergeArrayWithDefaults(
       payload.testimonials,
       defaultHomeSectionsData.testimonials,
     ),

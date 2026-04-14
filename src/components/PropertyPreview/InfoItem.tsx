@@ -38,7 +38,20 @@ const InfoItem = ({ label, value, suffix }: InfoItemProps) => {
   return (
     <div className="rounded-lg border border-[var(--b2-soft)] bg-[var(--b2-soft)]/20 px-3 py-2">
       <p className="text-xs text-[var(--muted)]">{label}</p>
-      <div className="mt-1 text-sm font-semibold text-[var(--b1)]">{displayValue}</div>
+      <div className="mt-1 text-sm font-semibold text-[var(--b1)] break-all">
+  {typeof displayValue === "string" && displayValue.startsWith("http") ? (
+    <a
+      href={displayValue}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-blue-600 underline"
+    >
+      View on Map
+    </a>
+  ) : (
+    displayValue
+  )}
+</div>
     </div>
   );
 };
