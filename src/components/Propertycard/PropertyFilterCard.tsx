@@ -120,6 +120,14 @@ const matchesBooleanFilter = (value: unknown, filter: TriBool) => {
 const getAddress = (property: Property) =>
   property.location?.address ?? property.address ?? "";
 
+const getDistrict = (property: Property) => {
+  const raw = (property as unknown as Record<string, unknown>).district;
+  if (typeof raw === "string" && raw.trim()) {
+    return raw.trim();
+  }
+  return "";
+};
+
 const getBedroomCount = (property: Property) =>
   parseNumberish(property.bedrooms ?? property.beds);
 
@@ -377,7 +385,9 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
           (p) =>
             normalizeText(p.title).includes(q) ||
             normalizeText(getAddress(p)).includes(q) ||
-            normalizeText(p.location?.city).includes(q)
+            normalizeText(p.location?.city).includes(q) ||
+            normalizeText(p.location?.locality).includes(q) ||
+            normalizeText(getDistrict(p)).includes(q)
         );
       }
 
@@ -538,14 +548,15 @@ const PropertyFilterCard: React.FC<PropertyFilterCardProps> = ({
   }, [properties]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    const district = (searchParams.get("district") ?? "").trim();
     const location = (searchParams.get("location") ?? "").trim();
     const type = (searchParams.get("type") ?? "").trim();
     const tag = (searchParams.get("tag") ?? "").trim();
     const budget = (searchParams.get("budget") ?? "").trim();
 
-    if (!location && !type && !tag && !budget) return;
+    if (!district && !location && !type && !tag && !budget) return;
 
-    const searchSeed = location || type || tag;
+    const searchSeed = district || location || type || tag;
     const budgetMax = budget ? parseBudgetToMaxPrice(budget) : "";
 
     setFilters((prev) => {

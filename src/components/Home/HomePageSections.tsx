@@ -31,7 +31,7 @@ const HomePageSections: React.FC = () => {
       </Suspense>
 
       <Suspense fallback={<SectionFallback />}>
-        <DistrictExplorerSection districts={sections.districts} />
+        <DistrictExplorerSection />
       </Suspense>
 
       <BenefitsSection benefits={sections.benefits} />

@@ -12,12 +12,9 @@ import {
 } from "@/utils/propertyImagePool";
 import { FALLBACK_PROPERTY_IMAGE } from "@/utils/propertyFormatters";
 import type { Property } from "@/features/properties/propertyType";
+import { isAgricultureLandType } from "@/features/properties/propertyTypeUtils";
 
-type DistrictExplorerSectionProps = {
-  districts: District[];
-};
-
-const DistrictExplorerSection: React.FC<DistrictExplorerSectionProps> = ({ districts }) => {
+const DistrictExplorerSection: React.FC = () => {
   const [dynamicDistricts, setDynamicDistricts] = useState<District[]>([]);
 
   useEffect(() => {
@@ -45,12 +42,26 @@ const DistrictExplorerSection: React.FC<DistrictExplorerSectionProps> = ({ distr
 
     const loadDistricts = async () => {
       try {
-        const [properties, mediaData] = await Promise.all([
-          fetchPropertiesAPI(1, 50),
-          fetchPropertyMediaAPI(),
-        ]);
+        const PAGE_SIZE = 100;
+        const MAX_PAGES = 5;
+        const collectedProperties: Property[] = [];
 
-        if (!properties.length) {
+        for (let page = 1; page <= MAX_PAGES; page += 1) {
+          const batch = await fetchPropertiesAPI(page, PAGE_SIZE);
+          if (!batch.length) {
+            break;
+          }
+
+          collectedProperties.push(...batch);
+
+          if (batch.length < PAGE_SIZE) {
+            break;
+          }
+        }
+
+        const mediaData = await fetchPropertyMediaAPI();
+
+        if (!collectedProperties.length) {
           if (mounted) {
             setDynamicDistricts([]);
           }
@@ -60,9 +71,13 @@ const DistrictExplorerSection: React.FC<DistrictExplorerSectionProps> = ({ distr
         const propertyImagesMap = mapMediaToProperties(mediaData.linked);
         const cloudinaryPool = collectCloudinaryUrlPool(mediaData.linked, mediaData.orphans);
 
-        const districtMap = new Map<string, { count: number; sampleProperty: Property }>();
+        const districtMap = new Map<string, { count: number; sampleProperty?: Property; name: string }>();
 
-        for (const property of properties) {
+        for (const property of collectedProperties) {
+          if (!isAgricultureLandType(property.propertyType)) {
+            continue;
+          }
+
           const districtName = getDistrictValue(property);
           if (!districtName) {
             continue;
@@ -72,31 +87,35 @@ const DistrictExplorerSection: React.FC<DistrictExplorerSectionProps> = ({ distr
           const existing = districtMap.get(key);
           if (existing) {
             existing.count += 1;
+            if (!existing.sampleProperty) {
+              existing.sampleProperty = property;
+            }
           } else {
-            districtMap.set(key, { count: 1, sampleProperty: property });
+            districtMap.set(key, { count: 1, sampleProperty: property, name: districtName });
           }
         }
 
-        const computedDistricts: District[] = Array.from(districtMap.entries())
-          .sort((a, b) => b[1].count - a[1].count)
+        const computedDistricts: District[] = Array.from(districtMap.values())
+          .sort((a, b) => b.count - a.count)
           .slice(0, 4)
-          .map(([_, value], index) => {
-            const property = value.sampleProperty;
-            const districtName = getDistrictValue(property);
-            const fromApi = propertyImagesMap[property._id];
-            const cyclic = pickCyclicImagesForProperty(property._id, cloudinaryPool, 1);
+          .map((districtData, index) => {
+            const property = districtData.sampleProperty;
+            const fromApi = property ? propertyImagesMap[property._id] : undefined;
+            const cyclic = property
+              ? pickCyclicImagesForProperty(property._id, cloudinaryPool, 1)
+              : [];
             const image =
               fromApi?.[0] ??
               cyclic[0] ??
-              property.images?.[0] ??
+              property?.images?.[0] ??
               FALLBACK_PROPERTY_IMAGE;
 
             return {
               id: `district-${index + 1}`,
-              name: districtName,
-              listingsText: `${value.count}+ farming lands`,
+              name: districtData.name,
+              listingsText: `${districtData.count}+ farming lands`,
               image,
-              slug: slugify(districtName),
+              slug: slugify(districtData.name),
             };
           });
 
@@ -117,20 +136,18 @@ const DistrictExplorerSection: React.FC<DistrictExplorerSectionProps> = ({ distr
     };
   }, []);
 
-  const renderedDistricts = dynamicDistricts.length ? dynamicDistricts : districts;
-
   return (
     <SectionWrapper className="py-12 sm:py-14" id="district-explorer">
       <SectionHeading
         eyebrow="Location explorer"
-        title="Explore farmland by district"
-        description="Discover district-level opportunities and quickly jump into available inventory."
+        title="Explore Top Agriculture Lands"
+        description="Discover opportunities and quickly jump into available inventory."
       />
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {renderedDistricts.map((district) => (
+        {dynamicDistricts.map((district) => (
           <Link
             key={district.id}
-            to={`/agriculture-land?district=${district.slug}`}
+            to={`/agriculture-land?district=${encodeURIComponent(district.name)}`}
             className="group overflow-hidden rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             aria-label={`Explore farmland listings in ${district.name}`}
           >
