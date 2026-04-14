@@ -10,6 +10,13 @@ functions = "functions"
 # VITE_AUTH_API_BASE_URL  
 # VITE_PRODUCT_API_BASE_URL
 
+# Proxy API requests through Netlify to avoid CORS issues with the backend
+[[redirects]]
+from = "/api/*"
+to = "https://property-sales-be-1.onrender.com/api/:splat"
+status = 200
+force = true
+
 # Redirect all routes to index.html for SPA routing
 [[redirects]]
 from = "/*"
