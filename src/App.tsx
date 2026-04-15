@@ -25,6 +25,7 @@ import AdminUsersPage from "./pages/Admin/AdminUsersPage";
 import AdminLogsPage from "./pages/Admin/AdminLogsPage";
 import ActivityLogs from "./pages/Admin/ActivityLogs";
 import AdminNotificationsPage from "./pages/Admin/AdminNotificationsPage";
+import AdminTestimonialPage from "./pages/Admin/AdminTestimonialPage";
 import AdminSellersPage from "./pages/Admin/AdminSellersPage";
 import AdminAccountPage from "./pages/Admin/AdminAccountPage";
 import BuyerDashboard from "./pages/Buyer/BuyerDashboard";
@@ -35,6 +36,7 @@ import BuyerAccountPage from "./pages/Buyer/BuyerAccountPage";
 import BuyerActivityPage from "./pages/Buyer/BuyerActivityPage";
 import BuyerEnquiriesPage from "./pages/Buyer/BuyerEnquiriesPage";
 import BuyerNotificationsPage from "./pages/Buyer/BuyerNotificationsPage";
+import BuyerTestimonialPage from "./pages/Buyer/BuyerTestimonialPage";
 import AgentDashboard from "./pages/Agent/AgentDashboard";
 import AgentLayout from "./pages/Agent/AgentLayout";
 import AgentPropertiesPage from "./pages/Agent/AgentPropertiesPage";
@@ -57,6 +59,7 @@ const SellerLeadsPage = React.lazy(() => import("./pages/Seller/SellerLeadsPage"
 const SellerAnalyticsPage = React.lazy(() => import("./pages/Seller/SellerAnalyticsPage"));
 const SellerMessagesPage = React.lazy(() => import("./pages/Seller/SellerMessagesPage"));
 const SellerNotificationsPage = React.lazy(() => import("./pages/Seller/SellerNotificationsPage"));
+const SellerTestimonialPage = React.lazy(() => import("./pages/Seller/SellerTestimonialPage"));
 const SellerPromotionsPage = React.lazy(() => import("./pages/Seller/SellerPromotionsPage"));
 const SellerProfilePage = React.lazy(() => import("./pages/Seller/SellerProfilePage"));
 const SellerSettingsPage = React.lazy(() => import("./pages/Seller/SellerSettingsPage"));
@@ -151,6 +154,7 @@ function App() {
           <Route path="account" element={<BuyerAccountPage />} />
           <Route path="activity" element={<BuyerActivityPage />} />
           <Route path="enquiries" element={<BuyerEnquiriesPage />} />
+          <Route path="testimonial" element={<BuyerTestimonialPage />} />
           <Route path="notifications" element={<BuyerNotificationsPage />} />
         </Route>
 
@@ -210,6 +214,18 @@ function App() {
               <SellerLayout>
                 <SellerLazy>
                   <SellerMessagesPage />
+                </SellerLazy>
+              </SellerLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/seller/testimonial"
+          element={
+            <ProtectedRoute requiredRoles={["seller"]}>
+              <SellerLayout>
+                <SellerLazy>
+                  <SellerTestimonialPage />
                 </SellerLazy>
               </SellerLayout>
             </ProtectedRoute>
@@ -290,6 +306,7 @@ function App() {
             path="/admin/notifications"
             element={<AdminNotificationsPage />}
           />
+          <Route path="/admin/testimonial" element={<AdminTestimonialPage />} />
         </Route>
 
         {/* Login route WITHOUT header/footer */}

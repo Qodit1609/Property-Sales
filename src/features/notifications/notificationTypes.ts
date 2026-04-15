@@ -1,4 +1,9 @@
-export type NotificationType = "cart" | "property" | "approval" | "rejection";
+export type NotificationType =
+  | "cart"
+  | "property"
+  | "approval"
+  | "rejection"
+  | "testimonial";
 
 export interface AppNotification {
   id: string;

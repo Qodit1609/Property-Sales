@@ -1,6 +1,8 @@
-import React, { Suspense, memo } from "react";
+import React, { Suspense, memo, useEffect, useState } from "react";
 import { useHomePageSections } from "@/hooks/useHomePageSections";
 import { SectionWrapper } from "./ui";
+import { getApprovedTestimonials } from "@/features/testimonials/testimonialApi";
+import type { Testimonial } from "./models/homeTypes";
 import {
   BenefitsSection,
   FarmingPromoSection,
@@ -21,6 +23,36 @@ const SectionFallback: React.FC = () => (
 
 const HomePageSections: React.FC = () => {
   const { sections } = useHomePageSections();
+  const [approvedTestimonials, setApprovedTestimonials] = useState<Testimonial[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        const data = await getApprovedTestimonials();
+        if (!mounted) return;
+        setApprovedTestimonials(
+          data.map((item) => ({
+            id: item.id,
+            name: item.fullName,
+            location: item.location,
+            occupation: item.occupation,
+            role: item.role,
+            rating: item.rating,
+            message: item.description,
+          }))
+        );
+      } catch {
+        if (mounted) {
+          setApprovedTestimonials([]);
+        }
+      }
+    };
+    void load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <>
@@ -35,7 +67,7 @@ const HomePageSections: React.FC = () => {
       </Suspense>
 
       <BenefitsSection benefits={sections.benefits} />
-      <TestimonialsSection testimonials={sections.testimonials} />
+      <TestimonialsSection testimonials={approvedTestimonials} />
       <FooterCTASection />
     </>
   );

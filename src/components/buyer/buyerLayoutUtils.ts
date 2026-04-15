@@ -41,6 +41,10 @@ export function buyerTopBarFromPath(pathname: string): {
       title: "Enquiries",
       subtitle: "Messages and requests you have sent.",
     },
+    "/buyer/testimonial": {
+      title: "Testimonial",
+      subtitle: "Share your experience with buyers and sellers.",
+    },
     "/buyer/notifications": {
       title: "Notifications",
       subtitle: "Alerts and updates for your account.",

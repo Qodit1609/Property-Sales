@@ -5,6 +5,7 @@ import {
   Megaphone,
   MessageSquare,
   Bell,
+  MessageCircleMore,
   Settings,
   UserRound,
   Building2,
@@ -26,6 +27,7 @@ export const SELLER_NAV_MAIN: SellerNavItem[] = [
   { key: "leads", to: "/seller/leads", icon: Users, labelKey: "sellerPanel.nav.leads" },
   { key: "analytics", to: "/seller/analytics", icon: LineChart, labelKey: "sellerPanel.nav.analytics" },
   { key: "messages", to: "/seller/messages", icon: MessageSquare, labelKey: "sellerPanel.nav.messages" },
+  { key: "testimonial", to: "/seller/testimonial", icon: MessageCircleMore, labelKey: "sellerPanel.nav.testimonial" },
   { key: "notifications", to: "/seller/notifications", icon: Bell, labelKey: "sellerPanel.nav.notifications" },
   { key: "promo", to: "/seller/promotions", icon: Megaphone, labelKey: "sellerPanel.nav.promotions" },
 ];

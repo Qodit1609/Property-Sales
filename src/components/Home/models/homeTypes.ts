@@ -28,7 +28,10 @@ export type Benefit = {
 export type Testimonial = {
   id: string;
   name: string;
-  role: string;
+  role?: string;
+  occupation?: string;
+  location?: string;
+  rating?: number;
   message: string;
 };
 

@@ -8,6 +8,7 @@ import {
   UserCircle,
   Bell,
   ClipboardList,
+  MessageCircleMore,
 } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 
@@ -18,6 +19,7 @@ const items = [
   { to: "/admin/users", label: "Access Management", icon: Users },
   { to: "/admin/logs", label: "Activity logs", icon: FileClock },
   { to: "/admin/activity-logs", label: "Audit logs", icon: ClipboardList },
+  { to: "/admin/testimonial", label: "Testimonial", icon: MessageCircleMore },
   { to: "/admin/notifications", label: "Notifications", icon: Bell },
 ];
 
