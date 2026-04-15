@@ -8,6 +8,7 @@ import { logout } from "../../features/auth/authSlice";
 import Header from "../Header/Header";
 import { DashboardPageTopBar } from "../common/DashboardPageTopBar";
 import { ProfileAvatar } from "../common/ProfileAvatar";
+import { useAdminProfileLocal } from "../../hooks/useAdminProfileLocal";
 import {
   ADMIN_SIDEBAR_WIDTH_COLLAPSED,
   ADMIN_SIDEBAR_WIDTH_EXPANDED,
@@ -39,6 +40,7 @@ type AdminShellSidebarProps = {
   mobile?: boolean;
   onNavigate?: () => void;
   displayName: string;
+  avatarUrl?: string | null;
   onLogout: () => void;
 };
 
@@ -48,6 +50,7 @@ function AdminShellSidebar({
   mobile,
   onNavigate,
   displayName,
+  avatarUrl,
   onLogout,
 }: AdminShellSidebarProps) {
   const headerExpanded = !collapsed || mobile;
@@ -97,6 +100,7 @@ function AdminShellSidebar({
         >
           <ProfileAvatar
             name={displayName}
+            photoUrl={avatarUrl}
             sizeClass={headerExpanded ? "h-10 w-10" : "h-9 w-9"}
           />
           {headerExpanded ? (
@@ -159,6 +163,29 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     user?.name?.trim() ||
     user?.email?.trim() ||
     "Admin";
+  const profileIdentity = String(user?.id ?? user?._id ?? user?.email ?? "").trim() || undefined;
+  const localProfile = useAdminProfileLocal(profileIdentity);
+  const rawUser = (user ?? {}) as Record<string, unknown>;
+  const rawDetails = rawUser.details;
+  const parsedDetails =
+    rawDetails && typeof rawDetails === "string"
+      ? (() => {
+          try {
+            const parsed = JSON.parse(rawDetails) as unknown;
+            return parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : null;
+          } catch {
+            return null;
+          }
+        })()
+      : rawDetails && typeof rawDetails === "object"
+        ? (rawDetails as Record<string, unknown>)
+        : null;
+  const avatarUrl =
+    localProfile?.profilePhotoUrl ||
+    (typeof rawUser.userIdProf === "string" ? rawUser.userIdProf : "") ||
+    (typeof rawUser.profileImage === "string" ? rawUser.profileImage : "") ||
+    (typeof parsedDetails?.profileImage === "string" ? parsedDetails.profileImage : "") ||
+    null;
 
   const overviewTitle = topBarTitle ?? title;
   const overviewSubtitle =
@@ -209,6 +236,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
           collapsed={collapsed}
           onToggleCollapsed={toggleCollapsed}
           displayName={displayName}
+          avatarUrl={avatarUrl}
           onLogout={handleLogout}
         />
 
@@ -249,6 +277,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                     onToggleCollapsed={() => {}}
                     onNavigate={closeMobile}
                     displayName={displayName}
+                    avatarUrl={avatarUrl}
                     onLogout={handleLogout}
                   />
                 </div>

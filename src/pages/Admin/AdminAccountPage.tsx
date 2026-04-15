@@ -3,7 +3,6 @@ import {
   Briefcase,
   Camera,
   Clock,
-  ImageIcon,
   Loader2,
   MapPin,
   Pencil,
@@ -29,6 +28,7 @@ import {
   validateBasicInfo,
   validatePasswordChange,
 } from "../../features/admin/adminAccountHelpers";
+import { saveAdminProfile } from "../../lib/adminProfileStorage";
 
 function cloneProfile(p: AdminProfileData): AdminProfileData {
   return JSON.parse(JSON.stringify(p)) as AdminProfileData;
@@ -40,7 +40,6 @@ const EDITABLE_SECTIONS: AdminProfileSection[] = [
   "professional",
   "address",
   "preferences",
-  "media",
 ];
 
 function formatDisplayDate(iso: string | null): string {
@@ -98,6 +97,7 @@ function AccountSkeleton() {
 const AdminAccountPage: React.FC = () => {
   const authUser = useAppSelector((s) => s.auth.user);
   const userId = String(authUser?.id ?? authUser?._id ?? "");
+  const profileIdentity = userId || authUser?.email || undefined;
 
   const [loading, setLoading] = useState(true);
   const [savingSection, setSavingSection] = useState<AdminProfileSection | "all" | null>(null);
@@ -109,7 +109,6 @@ const AdminAccountPage: React.FC = () => {
   const [pwd, setPwd] = useState({ current: "", next: "", confirm: "" });
   const [pendingAvatar, setPendingAvatar] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [docPending, setDocPending] = useState<File | null>(null);
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const pushToast = useCallback((t: Omit<ToastMessage, "id">) => {
@@ -146,11 +145,10 @@ const AdminAccountPage: React.FC = () => {
   const resetSectionFromProfile = useCallback(
     (s: AdminProfileSection) => {
       if (s === "security") setPwd({ current: "", next: "", confirm: "" });
-      if (s === "media") {
+      if (s === "basicInfo") {
         setPendingAvatar(null);
         if (avatarPreview) URL.revokeObjectURL(avatarPreview);
         setAvatarPreview(null);
-        setDocPending(null);
       }
       setForm((f) => {
         const next = cloneProfile(f);
@@ -158,13 +156,6 @@ const AdminAccountPage: React.FC = () => {
         if (s === "professional") next.professional = { ...profile.professional };
         if (s === "address") next.address = { ...profile.address };
         if (s === "preferences") next.preferences = { ...profile.preferences };
-        if (s === "media") {
-          next.media = {
-            profileImage: profile.media.profileImage,
-            otherDocuments: [...profile.media.otherDocuments],
-          };
-          next.basicInfo = { ...next.basicInfo, profileImage: profile.basicInfo.profileImage };
-        }
         return next;
       });
     },
@@ -187,6 +178,9 @@ const AdminAccountPage: React.FC = () => {
       setProfile(p);
       setForm(cloneProfile(p));
       setRawUser(raw);
+      saveAdminProfile(profileIdentity, {
+        profilePhotoUrl: p.media.profileImage || p.basicInfo.profileImage || null,
+      });
     } catch (e) {
       pushToast({
         kind: "error",
@@ -196,7 +190,7 @@ const AdminAccountPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [userId, pushToast]);
+  }, [profileIdentity, userId, pushToast]);
 
   useEffect(() => {
     void load();
@@ -213,6 +207,23 @@ const AdminAccountPage: React.FC = () => {
     return form.basicInfo.profileImage || form.media.profileImage || "";
   }, [avatarPreview, form.basicInfo.profileImage, form.media.profileImage]);
 
+  const profileCompletion = useMemo(() => {
+    const checks = [
+      form.basicInfo.fullName.trim(),
+      form.basicInfo.email.trim(),
+      form.basicInfo.phone.trim(),
+      (form.basicInfo.profileImage || form.media.profileImage || "").trim(),
+      form.professional.experience.trim(),
+      form.professional.department.trim(),
+      form.address.country.trim(),
+      form.address.state.trim(),
+      form.address.city.trim(),
+      form.address.zipCode.trim(),
+    ];
+    const filled = checks.filter(Boolean).length;
+    return Math.round((filled / checks.length) * 100);
+  }, [form]);
+
   const startEditAll = useCallback(() => {
     setForm(cloneProfile(profile));
     setPwd({ current: "", next: "", confirm: "" });
@@ -228,7 +239,6 @@ const AdminAccountPage: React.FC = () => {
     setPendingAvatar(null);
     if (avatarPreview) URL.revokeObjectURL(avatarPreview);
     setAvatarPreview(null);
-    setDocPending(null);
     setEditing(new Set());
   }, [profile, avatarPreview]);
 
@@ -256,7 +266,7 @@ const AdminAccountPage: React.FC = () => {
       setSavingSection(section);
       try {
         let working = form;
-        const allowUpload = section === "media" || section === "all";
+        const allowUpload = section === "basicInfo" || section === "all";
         if (allowUpload && pendingAvatar) {
           const url = await uploadAdminProfileAsset(pendingAvatar);
           working = cloneProfile(form);
@@ -265,16 +275,6 @@ const AdminAccountPage: React.FC = () => {
           setPendingAvatar(null);
           if (avatarPreview) URL.revokeObjectURL(avatarPreview);
           setAvatarPreview(null);
-          setForm(working);
-        }
-
-        if (allowUpload && docPending) {
-          const url = await uploadAdminProfileAsset(docPending);
-          working = cloneProfile(working);
-          if (!working.media.otherDocuments.includes(url)) {
-            working.media.otherDocuments = [...working.media.otherDocuments, url];
-          }
-          setDocPending(null);
           setForm(working);
         }
 
@@ -287,6 +287,9 @@ const AdminAccountPage: React.FC = () => {
         setProfile(updated);
         setForm(cloneProfile(updated));
         setRawUser(nextRaw);
+        saveAdminProfile(profileIdentity, {
+          profilePhotoUrl: updated.media.profileImage || updated.basicInfo.profileImage || null,
+        });
         setPwd({ current: "", next: "", confirm: "" });
         if (section === "all") setEditing(new Set());
         else stopEdit(section);
@@ -306,11 +309,11 @@ const AdminAccountPage: React.FC = () => {
       rawUser,
       form,
       pendingAvatar,
-      docPending,
       avatarPreview,
       pwd,
       pushToast,
       stopEdit,
+      profileIdentity,
     ]
   );
 
@@ -425,6 +428,16 @@ const AdminAccountPage: React.FC = () => {
                         </div>
                       )}
                     </div>
+                    <div
+                      className="pointer-events-none absolute -bottom-3 -right-3 h-14 w-14 rounded-full"
+                      style={{
+                        background: `conic-gradient(var(--b1) ${profileCompletion * 3.6}deg, var(--b2) 0deg)`,
+                      }}
+                    >
+                      <div className="absolute inset-1 flex items-center justify-center rounded-full bg-[var(--white)] text-[11px] font-semibold text-[var(--b1)]">
+                        {profileCompletion}%
+                      </div>
+                    </div>
                   </div>
                   <div className="grid flex-1 gap-3 sm:grid-cols-2">
                     <Input
@@ -462,6 +475,42 @@ const AdminAccountPage: React.FC = () => {
                       disabled={!isEditing("basicInfo")}
                       placeholder="+91 …"
                     />
+                    <div className="sm:col-span-2">
+                      <p className="mb-1.5 text-xs font-medium text-[var(--muted)]">Profile picture</p>
+                      <div className="flex items-center gap-3">
+                        <div className="h-14 w-14 overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]">
+                          {displayAvatar ? (
+                            <img src={displayAvatar} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-[var(--muted)]">
+                              <Camera className="h-5 w-5" />
+                            </div>
+                          )}
+                        </div>
+                        {isEditing("basicInfo") ? (
+                          <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]">
+                            <Camera className="h-4 w-4" />
+                            Upload
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                setPendingAvatar(file);
+                                if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+                                setAvatarPreview(URL.createObjectURL(file));
+                              }}
+                            />
+                          </label>
+                        ) : (
+                          <span className="text-sm text-[var(--muted)]">
+                            {displayAvatar ? "Uploaded" : "No image uploaded"}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </SectionShell>
@@ -799,147 +848,16 @@ const AdminAccountPage: React.FC = () => {
 
             {/* Activity */}
             <SectionShell title="Activity" icon={Clock}>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3">
                 <div>
                   <p className="text-xs font-medium text-[var(--muted)]">Last login</p>
                   <p className="text-sm text-[var(--b1)]">
                     {formatDisplayDate(form.activity.lastLogin)}
                   </p>
                 </div>
-                <div>
-                  <p className="text-xs font-medium text-[var(--muted)]">Account created</p>
-                  <p className="text-sm text-[var(--b1)]">
-                    {formatDisplayDate(form.activity.accountCreated)}
-                  </p>
-                </div>
               </div>
             </SectionShell>
 
-            {/* Media */}
-            <div className="lg:col-span-2">
-              <SectionShell
-                title="Media"
-                icon={ImageIcon}
-                actions={
-                  !isEditing("media") ? (
-                    <Button type="button" variant="ghost" size="sm" onClick={() => startEdit("media")}>
-                      Edit
-                    </Button>
-                  ) : (
-                    <>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          resetSectionFromProfile("media");
-                          stopEdit("media");
-                        }}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="primary"
-                        size="sm"
-                        disabled={savingSection !== null}
-                        onClick={() => void saveSection("media")}
-                      >
-                        {savingSection === "media" ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          "Save"
-                        )}
-                      </Button>
-                    </>
-                  )
-                }
-              >
-                <div className="flex flex-col gap-4 sm:flex-row">
-                  <div>
-                    <p className="mb-2 text-xs font-medium text-[var(--muted)]">
-                      Profile image
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <div className="h-20 w-20 overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]">
-                        {displayAvatar ? (
-                          <img
-                            src={displayAvatar}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center text-[var(--muted)]">
-                            <Camera className="h-8 w-8" />
-                          </div>
-                        )}
-                      </div>
-                      {isEditing("media") ? (
-                        <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]">
-                          <Camera className="h-4 w-4" />
-                          Upload
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (!file) return;
-                              setPendingAvatar(file);
-                              if (avatarPreview) URL.revokeObjectURL(avatarPreview);
-                              setAvatarPreview(URL.createObjectURL(file));
-                            }}
-                          />
-                        </label>
-                      ) : null}
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <p className="mb-2 text-xs font-medium text-[var(--muted)]">
-                      Other documents (optional)
-                    </p>
-                    {form.media.otherDocuments.length > 0 ? (
-                      <ul className="space-y-1 text-sm">
-                        {form.media.otherDocuments.map((url) => (
-                          <li key={url}>
-                            <a
-                              href={url}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-[var(--b1)] underline underline-offset-2"
-                            >
-                              {url.slice(0, 48)}
-                              {url.length > 48 ? "…" : ""}
-                            </a>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-[var(--muted)]">No documents uploaded.</p>
-                    )}
-                    {isEditing("media") ? (
-                      <label className="mt-2 inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-[var(--b1)]">
-                        <ImageIcon className="h-4 w-4" />
-                        Add document
-                        <input
-                          type="file"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) setDocPending(file);
-                          }}
-                        />
-                      </label>
-                    ) : null}
-                    {docPending ? (
-                      <p className="mt-1 text-xs text-[var(--muted)]">
-                        Ready to upload: {docPending.name}
-                      </p>
-                    ) : null}
-                  </div>
-                </div>
-              </SectionShell>
-            </div>
           </div>
         )}
       </div>
