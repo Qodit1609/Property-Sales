@@ -13,6 +13,25 @@ type AdminLogItem = {
   createdAt: string;
 };
 
+type BackendUser = {
+  _id: string;
+  email?: string;
+  role: "buyer" | "seller" | "admin";
+};
+
+function normalizeEmail(value: string | undefined): string {
+  return String(value ?? "").trim().toLowerCase();
+}
+
+function isLoginAction(action: string): boolean {
+  return action.toLowerCase().includes("login");
+}
+
+function toTimestamp(value: string): number {
+  const timestamp = new Date(value).getTime();
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
 function formatDate(iso: string): string {
   const date = new Date(iso);
   const dd = String(date.getDate()).padStart(2, "0");
@@ -39,10 +58,29 @@ const AdminLogsPage: React.FC = () => {
     const loadLogs = async () => {
       try {
         setLoading(true);
-        const response = await api.get("/admin/logs");
-        const items = Array.isArray(response.data?.data) ? response.data.data : [];
+        const [logsResponse, sellerUsersResponse, buyerUsersResponse] = await Promise.all([
+          api.get("/admin/logs"),
+          api.get("/admin/users?role=seller&limit=1000"),
+          api.get("/admin/users?role=buyer&limit=1000"),
+        ]);
+        const items = Array.isArray(logsResponse.data?.data) ? logsResponse.data.data : [];
+        const sellerUsers = Array.isArray(sellerUsersResponse.data?.data)
+          ? sellerUsersResponse.data.data
+          : [];
+        const buyerUsers = Array.isArray(buyerUsersResponse.data?.data)
+          ? buyerUsersResponse.data.data
+          : [];
+        const activeEmails = new Set(
+          [...(sellerUsers as BackendUser[]), ...(buyerUsers as BackendUser[])]
+            .map((user) => normalizeEmail(user.email))
+            .filter(Boolean)
+        );
+        const filteredItems = (items as AdminLogItem[]).filter((log) => {
+          if (log.role !== "buyer" && log.role !== "seller") return true;
+          return activeEmails.has(normalizeEmail(log.email));
+        });
         if (mounted) {
-          setLogs(items as AdminLogItem[]);
+          setLogs(filteredItems);
         }
       } catch (error) {
         if (mounted) {
@@ -62,18 +100,37 @@ const AdminLogsPage: React.FC = () => {
     };
   }, []);
 
+  const latestLoginDedupedLogs = useMemo(() => {
+    const latestLoginByUserKey = new Map<string, AdminLogItem>();
+    for (const log of logs) {
+      if (!isLoginAction(log.action)) continue;
+      const userKey = `${log.role}|${log.email.toLowerCase()}`;
+      const current = latestLoginByUserKey.get(userKey);
+      if (!current || toTimestamp(log.createdAt) > toTimestamp(current.createdAt)) {
+        latestLoginByUserKey.set(userKey, log);
+      }
+    }
+
+    return logs.filter((log) => {
+      if (!isLoginAction(log.action)) return true;
+      const userKey = `${log.role}|${log.email.toLowerCase()}`;
+      return latestLoginByUserKey.get(userKey)?._id === log._id;
+    });
+  }, [logs]);
+
   const filtered = useMemo(() => {
-    if (!search) return logs;
+    if (!search) return latestLoginDedupedLogs;
     const l = search.toLowerCase();
-    return logs.filter(
+    return latestLoginDedupedLogs.filter(
       (log) =>
         log.action.toLowerCase().includes(l) ||
         log.name.toLowerCase().includes(l) ||
         log.email.toLowerCase().includes(l) ||
         log.role.toLowerCase().includes(l)
     );
-  }, [search, logs]);
+  }, [search, latestLoginDedupedLogs]);
 
+  const hasNoRows = !loading && filtered.length === 0;
   return (
     <AdminLayout title="Activity logs">
       <section className="space-y-5 rounded-2xl border border-[var(--b2)]/90 bg-[var(--white)] p-4 shadow-md shadow-[var(--b1)]/5 sm:p-6">
@@ -135,7 +192,7 @@ const AdminLogsPage: React.FC = () => {
           </div>
         </div>
 
-        {!loading && filtered.length === 0 && (
+        {hasNoRows && (
           <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[var(--b2)] bg-[var(--b2-soft)]/30 py-14 text-center">
             <ScrollText className="h-10 w-10 text-[var(--b1-mid)]" />
             <p className="font-medium text-[var(--b1)]">No logs match your search</p>

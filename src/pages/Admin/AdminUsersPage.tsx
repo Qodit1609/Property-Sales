@@ -15,7 +15,7 @@ const AdminUsersPage: React.FC = () => {
   return (
     <AdminDashboard
       initialTab="users"
-      layoutTitle="Users"
+      layoutTitle="Access Management"
       initialUserRoleFilter={roleFilter}
     />
   );

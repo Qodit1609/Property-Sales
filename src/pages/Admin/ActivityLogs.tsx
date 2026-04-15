@@ -28,6 +28,7 @@ type BackendLog = {
 type BackendUser = {
   _id: string;
   name: string;
+  email?: string;
   role: "buyer" | "seller" | "admin";
   lastLogin?: string;
 };
@@ -37,8 +38,13 @@ type BackendAgent = {
   name: string;
   stats?: {
     totalProperties?: number;
+    lastPropertyAddedAt?: string | null;
   };
 };
+
+function normalizeEmail(value: string | undefined): string {
+  return String(value ?? "").trim().toLowerCase();
+}
 
 function classifyActivityType(action: string): ActivityTypeCode {
   const value = action.toLowerCase();
@@ -103,6 +109,9 @@ const ActivityLogs: React.FC = () => {
   const [sellerPropertyCountByName, setSellerPropertyCountByName] = useState<
     Record<string, number>
   >({});
+  const [sellerPropertyAddedAtByName, setSellerPropertyAddedAtByName] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     let mounted = true;
@@ -123,23 +132,33 @@ const ActivityLogs: React.FC = () => {
           ? buyerUsersResponse.data.data
           : [];
         const agents = Array.isArray(agentsResponse.data?.data) ? agentsResponse.data.data : [];
+        const activeEmails = new Set(
+          [...(sellerUsers as BackendUser[]), ...(buyerUsers as BackendUser[])]
+            .map((user) => normalizeEmail(user.email))
+            .filter(Boolean)
+        );
         if (!mounted) return;
-        const mappedLogs: ActivityLogEntry[] = (rows as BackendLog[]).map((log) => {
-          const status = log.status ?? "Success";
-          return {
-            id: String(log._id),
-            userName: String(log.name ?? ""),
-            role: (log.role ?? "buyer") as ActivityLogRole,
-            activity: String(log.action ?? ""),
-            activityType: classifyActivityType(String(log.action ?? "")),
-            target: "",
-            date: formatLogDate(String(log.createdAt ?? "")),
-            status,
-            statusTone: classifyStatusTone(status),
-            actorId: String(log._id),
-            timestamp: String(log.createdAt ?? ""),
-          };
-        });
+        const mappedLogs: ActivityLogEntry[] = (rows as BackendLog[])
+          .filter((log) => {
+            if (log.role !== "buyer" && log.role !== "seller") return true;
+            return activeEmails.has(normalizeEmail(log.email));
+          })
+          .map((log) => {
+            const status = log.status ?? "Success";
+            return {
+              id: String(log._id),
+              userName: String(log.name ?? ""),
+              role: (log.role ?? "buyer") as ActivityLogRole,
+              activity: String(log.action ?? ""),
+              activityType: classifyActivityType(String(log.action ?? "")),
+              target: "",
+              date: formatLogDate(String(log.createdAt ?? "")),
+              status,
+              statusTone: classifyStatusTone(status),
+              actorId: String(log._id),
+              timestamp: String(log.createdAt ?? ""),
+            };
+          });
 
         const existingLoginKeys = new Set(
           mappedLogs
@@ -173,17 +192,24 @@ const ActivityLogs: React.FC = () => {
           }));
 
         const sellerCounts: Record<string, number> = {};
+        const sellerAddedAt: Record<string, string> = {};
         for (const agent of agents as BackendAgent[]) {
           const key = String(agent.name ?? "").trim();
           if (!key) continue;
           sellerCounts[key] = Number(agent.stats?.totalProperties ?? 0);
+          const addedAt = String(agent.stats?.lastPropertyAddedAt ?? "").trim();
+          if (addedAt) {
+            sellerAddedAt[key] = addedAt;
+          }
         }
 
         setSellerPropertyCountByName(sellerCounts);
+        setSellerPropertyAddedAtByName(sellerAddedAt);
         setAuditLogs([...mappedLogs, ...fallbackLoginRows]);
       } catch {
         if (mounted) {
           setSellerPropertyCountByName({});
+          setSellerPropertyAddedAtByName({});
           setAuditLogs([]);
         }
       } finally {
@@ -198,14 +224,38 @@ const ActivityLogs: React.FC = () => {
     };
   }, []);
 
+  const dedupedAuditLogs = useMemo(() => {
+    const latestLoginByUser = new Map<string, ActivityLogEntry>();
+    for (const row of auditLogs) {
+      const isLoginRow = row.activityType === "SELLER_LOGIN" || row.activityType === "BUYER_LOGIN";
+      if (!isLoginRow) continue;
+      const key = `${row.role}|${row.userName.trim().toLowerCase()}`;
+      const current = latestLoginByUser.get(key);
+      const rowTs = new Date(row.timestamp).getTime();
+      const currentTs = current ? new Date(current.timestamp).getTime() : Number.NEGATIVE_INFINITY;
+      const normalizedRowTs = Number.isFinite(rowTs) ? rowTs : Number.NEGATIVE_INFINITY;
+      const normalizedCurrentTs = Number.isFinite(currentTs) ? currentTs : Number.NEGATIVE_INFINITY;
+      if (!current || normalizedRowTs >= normalizedCurrentTs) {
+        latestLoginByUser.set(key, row);
+      }
+    }
+
+    return auditLogs.filter((row) => {
+      const isLoginRow = row.activityType === "SELLER_LOGIN" || row.activityType === "BUYER_LOGIN";
+      if (!isLoginRow) return true;
+      const key = `${row.role}|${row.userName.trim().toLowerCase()}`;
+      return latestLoginByUser.get(key)?.id === row.id;
+    });
+  }, [auditLogs]);
+
   const stats = useMemo(() => {
     return {
-      total: auditLogs.length,
-      seller: auditLogs.filter((l) => l.role === "seller").length,
-      buyer: auditLogs.filter((l) => l.role === "buyer").length,
-      admin: auditLogs.filter((l) => l.role === "admin").length,
+      total: dedupedAuditLogs.length,
+      seller: dedupedAuditLogs.filter((l) => l.role === "seller").length,
+      buyer: dedupedAuditLogs.filter((l) => l.role === "buyer").length,
+      admin: dedupedAuditLogs.filter((l) => l.role === "admin").length,
     };
-  }, [auditLogs]);
+  }, [dedupedAuditLogs]);
 
   const filteredRows = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -228,15 +278,37 @@ const ActivityLogs: React.FC = () => {
       );
     });
 
+    const latestLoginByUser = new Map<string, ActivityLogEntry>();
+    for (const row of baseRows) {
+      const isLoginRow = row.activityType === "SELLER_LOGIN" || row.activityType === "BUYER_LOGIN";
+      if (!isLoginRow) continue;
+      const key = `${row.role}|${row.userName.trim().toLowerCase()}`;
+      const current = latestLoginByUser.get(key);
+      const rowTs = new Date(row.timestamp).getTime();
+      const currentTs = current ? new Date(current.timestamp).getTime() : Number.NEGATIVE_INFINITY;
+      const normalizedRowTs = Number.isFinite(rowTs) ? rowTs : Number.NEGATIVE_INFINITY;
+      const normalizedCurrentTs = Number.isFinite(currentTs) ? currentTs : Number.NEGATIVE_INFINITY;
+      if (!current || normalizedRowTs >= normalizedCurrentTs) {
+        latestLoginByUser.set(key, row);
+      }
+    }
+
+    const rowsWithLatestLoginsOnly = baseRows.filter((row) => {
+      const isLoginRow = row.activityType === "SELLER_LOGIN" || row.activityType === "BUYER_LOGIN";
+      if (!isLoginRow) return true;
+      const key = `${row.role}|${row.userName.trim().toLowerCase()}`;
+      return latestLoginByUser.get(key)?.id === row.id;
+    });
+
     if (activityCategory !== "login") {
-      return baseRows;
+      return rowsWithLatestLoginsOnly;
     }
 
     const logoutRows = auditLogs.filter(
       (row) => row.activityType === "SELLER_LOGOUT" || row.activityType === "BUYER_LOGOUT"
     );
 
-    return baseRows.map((row) => {
+    return rowsWithLatestLoginsOnly.map((row) => {
       const loginTs = new Date(row.timestamp).getTime();
       const matchingLogout = logoutRows
         .filter((log) => {
@@ -280,12 +352,18 @@ const ActivityLogs: React.FC = () => {
       if (Object.prototype.hasOwnProperty.call(sellerPropertyCountByName, value.userName)) {
         value.propertyCount = sellerPropertyCountByName[value.userName];
       }
+      if (
+        value.addedAt.length === 0 &&
+        Object.prototype.hasOwnProperty.call(sellerPropertyAddedAtByName, value.userName)
+      ) {
+        value.addedAt = [formatLogDate(sellerPropertyAddedAtByName[value.userName])];
+      }
     }
     return {
       totalSellers: map.size,
       rows: Array.from(map.values()),
     };
-  }, [auditLogs, sellerPropertyCountByName]);
+  }, [auditLogs, sellerPropertyCountByName, sellerPropertyAddedAtByName]);
 
   const buyerSummary = useMemo(() => {
     const buyerRows = auditLogs.filter((row) => row.role === "buyer");

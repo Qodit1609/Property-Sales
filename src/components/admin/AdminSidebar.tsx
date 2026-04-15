@@ -15,7 +15,7 @@ const items = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/account", label: "My Account", icon: UserCircle },
   { to: "/admin/properties", label: "Properties", icon: ListChecks },
-  { to: "/admin/users", label: "Users", icon: Users },
+  { to: "/admin/users", label: "Access Management", icon: Users },
   { to: "/admin/logs", label: "Activity logs", icon: FileClock },
   { to: "/admin/activity-logs", label: "Audit logs", icon: ClipboardList },
   { to: "/admin/notifications", label: "Notifications", icon: Bell },

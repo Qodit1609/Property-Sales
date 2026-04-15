@@ -114,7 +114,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0 shrink">
           <h2 className="text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
-            Users
+            Role
           </h2>
           <p className="mt-1 max-w-xl text-sm leading-relaxed text-[var(--muted)]">
             Filter by role, search, and manage accounts.
