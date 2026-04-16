@@ -7,6 +7,8 @@ export type StoredSellerProfile = {
   displayName: string;
   company?: string;
   phone?: string;
+  pan?: string;
+  aadhaar?: string;
   city?: string;
   gstin?: string;
   bio?: string;

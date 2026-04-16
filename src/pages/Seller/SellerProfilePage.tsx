@@ -44,6 +44,8 @@ const SellerProfilePage = () => {
       displayName: stored?.displayName ?? user?.name ?? "",
       company: stored?.company ?? "",
       phone: stored?.phone ?? (user?.mobile as string | undefined) ?? "",
+      pan: stored?.pan ?? "",
+      aadhaar: stored?.aadhaar ?? "",
       city: stored?.city ?? "",
       gstin: stored?.gstin ?? "",
       bio: stored?.bio ?? "",
@@ -54,6 +56,28 @@ const SellerProfilePage = () => {
 
   const [saved, setSaved] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
+  const [verificationUploads, setVerificationUploads] = useState({
+    aadhaar: false,
+    pan: false,
+  });
+
+  const persistPhoto = useCallback(
+    (nextPhotoUrl: string | null) => {
+      const current = loadSellerProfile(email);
+      saveSellerProfile(email, {
+        displayName: current?.displayName ?? defaults.displayName,
+        company: current?.company ?? defaults.company,
+        phone: current?.phone ?? defaults.phone,
+        pan: current?.pan ?? defaults.pan,
+        aadhaar: current?.aadhaar ?? defaults.aadhaar,
+        city: current?.city ?? defaults.city,
+        gstin: current?.gstin ?? defaults.gstin,
+        bio: current?.bio ?? defaults.bio,
+        profilePhotoUrl: nextPhotoUrl,
+      });
+    },
+    [defaults, email]
+  );
 
   const {
     register,
@@ -67,7 +91,53 @@ const SellerProfilePage = () => {
     values: defaults,
   });
 
-  const profilePhotoUrl = watch("profilePhotoUrl");
+  const [
+    watchedDisplayName,
+    watchedPhone,
+    watchedPan,
+    watchedAadhaar,
+    watchedCompany,
+    watchedCity,
+    watchedGstin,
+    watchedBio,
+    profilePhotoUrl,
+  ] = watch([
+    "displayName",
+    "phone",
+    "pan",
+    "aadhaar",
+    "company",
+    "city",
+    "gstin",
+    "bio",
+    "profilePhotoUrl",
+  ]);
+
+  const profileCompletion = useMemo(() => {
+    const checks = [
+      (watchedDisplayName || "").trim(),
+      (watchedPhone || "").trim(),
+      (watchedPan || "").trim(),
+      (watchedAadhaar || "").trim(),
+      (watchedCompany || "").trim(),
+      (watchedCity || "").trim(),
+      (watchedGstin || "").trim(),
+      (watchedBio || "").trim(),
+      (profilePhotoUrl || "").trim(),
+    ];
+    const filled = checks.filter(Boolean).length;
+    return Math.round((filled / checks.length) * 100);
+  }, [
+    watchedDisplayName,
+    watchedPhone,
+    watchedPan,
+    watchedAadhaar,
+    watchedCompany,
+    watchedCity,
+    watchedGstin,
+    watchedBio,
+    profilePhotoUrl,
+  ]);
 
   const onPhotoChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,22 +157,36 @@ const SellerProfilePage = () => {
       reader.onload = () => {
         const dataUrl = typeof reader.result === "string" ? reader.result : null;
         setValue("profilePhotoUrl", dataUrl, { shouldDirty: true, shouldValidate: true });
+        persistPhoto(dataUrl);
       };
       reader.readAsDataURL(file);
     },
-    [setValue, t]
+    [persistPhoto, setValue, t]
   );
 
   const clearPhoto = useCallback(() => {
     setPhotoError(null);
     setValue("profilePhotoUrl", null, { shouldDirty: true });
-  }, [setValue]);
+    persistPhoto(null);
+  }, [persistPhoto, setValue]);
+
+  const onVerificationUpload = useCallback(
+    (docType: "aadhaar" | "pan") => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      if (!file) return;
+      setVerificationUploads((prev) => ({ ...prev, [docType]: true }));
+    },
+    []
+  );
 
   const onSubmit = handleSubmit((data) => {
     saveSellerProfile(email, {
       displayName: data.displayName,
       company: data.company,
       phone: data.phone,
+      pan: data.pan,
+      aadhaar: data.aadhaar,
       city: data.city,
       gstin: data.gstin,
       bio: data.bio,
@@ -129,14 +213,26 @@ const SellerProfilePage = () => {
         className="rounded-2xl border border-[var(--b2)]/90 bg-[var(--white)] p-6 shadow-sm"
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-[var(--b2)] bg-[var(--b2-soft)] shadow-inner shadow-[var(--b2)]/30">
-            {profilePhotoUrl ? (
-              <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <span className="flex h-full w-full items-center justify-center font-serif text-2xl font-semibold text-[var(--b1-mid)]">
-                {displayInitial}
-              </span>
-            )}
+          <div className="relative h-20 w-20 shrink-0">
+            <div className="h-20 w-20 overflow-hidden rounded-full border border-[var(--b2)] bg-[var(--b2-soft)] shadow-inner shadow-[var(--b2)]/30">
+              {profilePhotoUrl ? (
+                <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center font-serif text-2xl font-semibold text-[var(--b1-mid)]">
+                  {displayInitial}
+                </span>
+              )}
+            </div>
+            <div
+              className="pointer-events-none absolute -bottom-3 -right-3 h-14 w-14 rounded-full"
+              style={{
+                background: `conic-gradient(var(--b1) ${profileCompletion * 3.6}deg, var(--b2) 0deg)`,
+              }}
+            >
+              <div className="absolute inset-1 flex items-center justify-center rounded-full bg-[var(--white)] text-[11px] font-semibold text-[var(--b1)]">
+                {profileCompletion}%
+              </div>
+            </div>
           </div>
           <div className="min-w-0 flex-1 space-y-2">
             <p className="text-sm font-medium text-[var(--b1)]">{t("sellerPanel.profile.photoLabel")}</p>
@@ -227,6 +323,29 @@ const SellerProfilePage = () => {
                 {...register("phone")}
                 className="mt-1 w-full rounded-xl border border-[var(--b2)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--b2)]"
               />
+              {errors.phone ? (
+                <span className="mt-1 block text-xs text-[var(--error)]">{errors.phone.message}</span>
+              ) : null}
+            </label>
+            <label className="block text-sm">
+              <span className="font-medium text-[var(--b1)]">PAN</span>
+              <input
+                {...register("pan")}
+                className="mt-1 w-full rounded-xl border border-[var(--b2)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--b2)]"
+              />
+              {errors.pan ? (
+                <span className="mt-1 block text-xs text-[var(--error)]">{errors.pan.message}</span>
+              ) : null}
+            </label>
+            <label className="block text-sm">
+              <span className="font-medium text-[var(--b1)]">Aadhaar</span>
+              <input
+                {...register("aadhaar")}
+                className="mt-1 w-full rounded-xl border border-[var(--b2)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--b2)]"
+              />
+              {errors.aadhaar ? (
+                <span className="mt-1 block text-xs text-[var(--error)]">{errors.aadhaar.message}</span>
+              ) : null}
             </label>
             <label className="block text-sm">
               <span className="font-medium text-[var(--b1)]">{t("sellerPanel.profile.city")}</span>
@@ -281,16 +400,38 @@ const SellerProfilePage = () => {
             <li className="flex items-center justify-between rounded-xl border border-[var(--b2)]/80 bg-[var(--white)] px-3 py-2">
               <span className="inline-flex items-center gap-2">
                 <FileText className="h-4 w-4 text-[var(--b1-mid)]" />
-                {t("sellerPanel.profile.docPan")}
+                Aadhaar Card Upload
               </span>
-              <span className="text-xs font-medium text-[var(--warning)]">{t("sellerPanel.profile.pending")}</span>
+              {verificationUploads.aadhaar ? (
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--success)]">
+                  <span aria-hidden>✔</span>
+                  <span>Successfully</span>
+                </span>
+              ) : (
+                <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-medium text-[var(--warning)]">
+                  <span>{t("sellerPanel.profile.pending")}</span>
+                  <span className="text-[var(--b1)]">Upload</span>
+                  <input type="file" className="sr-only" onChange={onVerificationUpload("aadhaar")} />
+                </label>
+              )}
             </li>
             <li className="flex items-center justify-between rounded-xl border border-[var(--b2)]/80 bg-[var(--white)] px-3 py-2">
               <span className="inline-flex items-center gap-2">
                 <FileText className="h-4 w-4 text-[var(--b1-mid)]" />
-                {t("sellerPanel.profile.docAddress")}
+                PAN Card Upload
               </span>
-              <span className="text-xs font-medium text-[var(--muted)]">{t("sellerPanel.profile.optional")}</span>
+              {verificationUploads.pan ? (
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--success)]">
+                  <span aria-hidden>✔</span>
+                  <span>Successfully</span>
+                </span>
+              ) : (
+                <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-medium text-[var(--warning)]">
+                  <span>{t("sellerPanel.profile.pending")}</span>
+                  <span className="text-[var(--b1)]">Upload</span>
+                  <input type="file" className="sr-only" onChange={onVerificationUpload("pan")} />
+                </label>
+              )}
             </li>
           </ul>
         </motion.aside>

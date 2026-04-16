@@ -22,11 +22,11 @@ function pathAllowedForRole(pathname: string, role: AppRole | undefined): boolea
   return true;
 }
 
-function dashboardPathForRole(role: AppRole | undefined): string {
+function accountPathForRole(role: AppRole | undefined): string {
   const r = role ?? "";
-  if (r === "buyer") return "/buyer/dashboard";
-  if (r === "admin") return "/admin";
-  if (r === "seller") return "/seller/dashboard";
+  if (r === "buyer") return "/buyer/account";
+  if (r === "admin") return "/admin/account";
+  if (r === "seller") return "/seller/profile";
   if (r === "agent") return "/agent/dashboard";
   return "/post-property/basic";
 }
@@ -85,14 +85,18 @@ const Login: React.FC = () => {
         touchBuyerSession(result.payload.user.email);
       }
 
-      // Only honor `from` when this role is allowed on that route. Otherwise a
-      // buyer who hit login via a seller URL would be bounced to "/" by ProtectedRoute.
+      if (role === "buyer" || role === "seller" || role === "admin") {
+        navigate(accountPathForRole(role), { replace: true });
+        return;
+      }
+
+      // Keep existing navigation behavior for non-requested roles.
       if (from && from !== "/" && pathAllowedForRole(from, role)) {
         navigate(from, { replace: true });
         return;
       }
 
-      navigate(dashboardPathForRole(role), { replace: true });
+      navigate(accountPathForRole(role), { replace: true });
     }
   };
 

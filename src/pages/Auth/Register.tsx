@@ -9,9 +9,9 @@ import { Input, Button } from "@/components/common";
 
 type Role = RegisterRequest["role"];
 
-const roleToDashboard = (role: Role) => {
-  if (role === "buyer") return "/buyer/dashboard";
-  if (role === "seller") return "/seller/dashboard";
+const roleToPostAuthPath = (role: Role) => {
+  if (role === "buyer") return "/buyer/account";
+  if (role === "seller") return "/seller/profile";
   return "/agent/dashboard";
 };
 
@@ -110,7 +110,7 @@ const Register: React.FC = () => {
       });
 
       const resolvedRole = backendRoleToUiRole(result.payload.user?.role, role);
-      navigate(roleToDashboard(resolvedRole), {
+      navigate(roleToPostAuthPath(resolvedRole), {
         replace: true,
       });
     }
