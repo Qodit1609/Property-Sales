@@ -26,6 +26,7 @@ import AdminLogsPage from "./pages/Admin/AdminLogsPage";
 import ActivityLogs from "./pages/Admin/ActivityLogs";
 import AdminNotificationsPage from "./pages/Admin/AdminNotificationsPage";
 import AdminTestimonialPage from "./pages/Admin/AdminTestimonialPage";
+import AdminPromotionsPage from "./pages/Admin/AdminPromotionsPage";
 import AdminSellersPage from "./pages/Admin/AdminSellersPage";
 import AdminAccountPage from "./pages/Admin/AdminAccountPage";
 import BuyerDashboard from "./pages/Buyer/BuyerDashboard";
@@ -307,6 +308,7 @@ function App() {
             element={<AdminNotificationsPage />}
           />
           <Route path="/admin/testimonial" element={<AdminTestimonialPage />} />
+          <Route path="/admin/promotions" element={<AdminPromotionsPage />} />
         </Route>
 
         {/* Login route WITHOUT header/footer */}

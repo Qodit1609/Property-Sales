@@ -207,27 +207,21 @@ const PropertyCard: React.FC<Props> = ({
           {tag}
         </span>
 
-        {showFeatured && (
-          <span
-            className="
-          absolute top-3 left-20
-          bg-amber-100
-          px-2 py-1
-          rounded-full
-          text-xs
-          text-amber-700
-          "
-          >
-            <Star size={11} />
-            {t("propertyCard.featured")}
-          </span>
-        )}
-
-        {showVerified && (
-          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-semibold text-emerald-700">
-            <ShieldCheck size={11} />
-            {t("propertyCard.verified")}
-          </span>
+        {(showFeatured || showVerified) && (
+          <div className="absolute right-3 top-3 flex flex-col items-end gap-1">
+            {showFeatured && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-300 px-2.5 py-1 text-[10px] font-semibold text-amber-900 shadow">
+                <Star size={11} className="fill-current text-amber-700" />
+                {t("propertyCard.featured")}
+              </span>
+            )}
+            {showVerified && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-[10px] font-semibold text-emerald-700 shadow">
+                <ShieldCheck size={11} />
+                {t("propertyCard.verified")}
+              </span>
+            )}
+          </div>
         )}
 
         {isBuyer && (

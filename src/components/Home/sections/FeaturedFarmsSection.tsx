@@ -10,8 +10,9 @@ type FeaturedFarmsSectionProps = {
   properties: FeaturedFarmProperty[];
 };
 
-const FeaturedFarmsSection: React.FC<FeaturedFarmsSectionProps> = ({ properties: _properties }) => {
+const FeaturedFarmsSection: React.FC<FeaturedFarmsSectionProps> = () => {
   const [apiProperties, setApiProperties] = useState<Property[]>([]);
+  const [currentTime] = useState(() => Date.now());
 
   useEffect(() => {
     let mounted = true;
@@ -36,45 +37,34 @@ const FeaturedFarmsSection: React.FC<FeaturedFarmsSectionProps> = ({ properties:
     };
   }, []);
 
-  const topFarmingProperties = useMemo<Array<{ property: Property; farmingPercentage: number }>>(() => {
-    const toNumber = (value: unknown): number | null => {
-      if (typeof value === "number" && Number.isFinite(value)) {
-        return value;
-      }
-      if (typeof value === "string" && value.trim() !== "") {
-        const parsed = Number(value);
-        return Number.isFinite(parsed) ? parsed : null;
-      }
-      return null;
-    };
-
+  const topFarmingProperties = useMemo<Array<{ property: Property; daysRemaining: number }>>(() => {
     return apiProperties
       .map((property) => {
-        const farmingPercentage =
-          toNumber(property.soilAndFarming?.farmingPercentage ?? property.soilAndFarming?.farmingPercent) ?? null;
-        if (farmingPercentage === null) {
+        const isFeatured = Boolean(property.isFeatured ?? property.featured ?? property.statusDetails?.featured);
+        if (!isFeatured || !property.featuredExpiryDate) {
           return null;
         }
-        return { property, farmingPercentage };
+        const diff = new Date(property.featuredExpiryDate).getTime() - currentTime;
+        if (diff <= 0) return null;
+        const daysRemaining = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        return { property, daysRemaining };
       })
       .filter(
-        (item): item is { property: Property; farmingPercentage: number } => item !== null,
+        (item): item is { property: Property; daysRemaining: number } => item !== null,
       )
-      .sort((a, b) => {
-        return b.farmingPercentage - a.farmingPercentage;
-      })
+      .sort((a, b) => a.daysRemaining - b.daysRemaining)
       .slice(0, 4);
-  }, [apiProperties]);
+  }, [apiProperties, currentTime]);
 
   return (
     <SectionWrapper className="py-12 sm:py-14" id="featured-farms">
       <SectionHeading
-        eyebrow="Featured farms"
-        title="Handpicked farming land opportunities"
-        description="Compare high-potential farmland parcels with practical metrics to make faster and safer buying decisions."
+        eyebrow="Featured"
+        title="Featured properties BhoomiWala Assured Highly recommended"
+        description="Only active featured properties are shown here."
       />
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {topFarmingProperties.map(({ property, farmingPercentage }, index) => (
+        {topFarmingProperties.map(({ property, daysRemaining }, index) => (
           <motion.div
             key={property._id}
             initial={{ opacity: 0, y: 16 }}
@@ -83,9 +73,6 @@ const FeaturedFarmsSection: React.FC<FeaturedFarmsSectionProps> = ({ properties:
             transition={{ duration: 0.35, delay: index * 0.05 }}
             className="relative"
           >
-            <div className="pointer-events-none absolute left-3 top-3 z-30 rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-semibold text-emerald-800 shadow-sm">
-              Farming %: {farmingPercentage}
-            </div>
             <PropertyCard property={property} />
           </motion.div>
         ))}

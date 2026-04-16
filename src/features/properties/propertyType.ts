@@ -29,6 +29,12 @@ export interface Property {
   createdAt?: string;
   postedAt?: string;
   featured?: boolean;
+  isFeatured?: boolean;
+  featuredExpiryDate?: string | null;
+  promotionStatus?: "none" | "pending" | "approved" | "rejected";
+  requestedDuration?: 1 | 3 | 6 | number | null;
+  requestedAt?: string | null;
+  approvedAt?: string;
   verified?: boolean;
   ownerDetails?: {
     name: string;

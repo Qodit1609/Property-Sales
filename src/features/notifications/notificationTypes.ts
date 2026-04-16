@@ -3,7 +3,8 @@ export type NotificationType =
   | "property"
   | "approval"
   | "rejection"
-  | "testimonial";
+  | "testimonial"
+  | "promotion_request";
 
 export interface AppNotification {
   id: string;

@@ -154,6 +154,30 @@ export const clearSellerLeadRowsAPI = async (propertyId?: string) => {
   });
 };
 
+export interface PromotionRequestPayload {
+  durationMonths: 1 | 3 | 6;
+}
+
+export interface PromotionRequestResponse {
+  property: Property;
+  isFirstPromotionFree: boolean;
+}
+
+export const requestPropertyPromotionAPI = async (
+  propertyId: string,
+  payload: PromotionRequestPayload
+): Promise<PromotionRequestResponse> => {
+  const res = await api.post(`/properties/${propertyId}/promotion-request`, payload);
+  const data = (res.data?.data ?? res.data) as {
+    property?: Property;
+    isFirstPromotionFree?: boolean;
+  };
+  return {
+    property: (data.property ?? {}) as Property,
+    isFirstPromotionFree: Boolean(data.isFirstPromotionFree),
+  };
+};
+
 export interface BuyerUser {
   _id: string;
   name?: string;

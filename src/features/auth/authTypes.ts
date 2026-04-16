@@ -7,6 +7,7 @@ export interface AuthUser {
   email?: string;
   mobile?: string;
   role?: AppRole;
+  hasUsedFreePromotion?: boolean;
   [key: string]: unknown;
 }
 

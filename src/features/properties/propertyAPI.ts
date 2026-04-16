@@ -257,6 +257,12 @@ const normalizeProperty = (payload: unknown): Property => {
     createdAt: toString(raw.createdAt),
     postedAt: toString(status.postedAt),
     featured: Boolean(status.featured),
+    isFeatured: toBoolean(raw.isFeatured) ?? toBoolean(status.featured),
+    featuredExpiryDate: toString(raw.featuredExpiryDate),
+    promotionStatus:
+      (toString(raw.promotionStatus) as Property["promotionStatus"]) ?? "none",
+    requestedDuration: toNumber(raw.requestedDuration),
+    requestedAt: toString(raw.requestedAt),
     verified: Boolean(status.verified) || Boolean(dealer.verified),
     ownerDetails: {
       name: toString(dealer.name) ?? toString(seller.name) ?? toString(agent.name) ?? "",

@@ -75,6 +75,10 @@ function quickNormalize(raw: unknown): Property {
   ).map((x) => String(x));
 
   const sellerId = extractSellerId(r);
+  const sellerObj =
+    r.sellerId && typeof r.sellerId === "object"
+      ? (r.sellerId as Record<string, unknown>)
+      : {};
 
   return {
     _id: String(r._id ?? ""),
@@ -95,6 +99,23 @@ function quickNormalize(raw: unknown): Property {
       featured: Boolean(statusObj.featured),
       verified: Boolean(statusObj.verified),
       isActive: Boolean(statusObj.isActive),
+    },
+    isFeatured: Boolean(r.isFeatured) || Boolean(statusObj.featured),
+    featuredExpiryDate:
+      r.featuredExpiryDate != null ? String(r.featuredExpiryDate) : null,
+    promotionStatus:
+      (String(r.promotionStatus ?? "none").toLowerCase() as Property["promotionStatus"]) ??
+      "none",
+    requestedDuration:
+      typeof r.requestedDuration === "number"
+        ? r.requestedDuration
+        : Number(r.requestedDuration) || null,
+    requestedAt: r.requestedAt != null ? String(r.requestedAt) : null,
+    approvedAt: r.approvedAt != null ? String(r.approvedAt) : undefined,
+    seller: {
+      name: typeof sellerObj.name === "string" ? sellerObj.name : undefined,
+      email: typeof sellerObj.email === "string" ? sellerObj.email : undefined,
+      phone: typeof sellerObj.contact === "string" ? sellerObj.contact : undefined,
     },
   } as Property;
 }
@@ -243,4 +264,27 @@ export const updateAdminPropertyAPI = async (
 ): Promise<Property> => {
   const res = await api.put(`/properties/${id}`, payload);
   return quickNormalize(res.data.data ?? res.data);
+};
+
+export const fetchPromotionRequestsAPI = async (): Promise<Property[]> => {
+  const res = await api.get("/properties/admin/promotions");
+  const list = Array.isArray(res.data?.data) ? res.data.data : [];
+  return list.map((item: unknown) => quickNormalize(item));
+};
+
+export const approvePromotionRequestAPI = async (id: string): Promise<Property> => {
+  const res = await api.put(`/properties/${id}/promotion/approve`);
+  return quickNormalize(res.data?.data ?? res.data);
+};
+
+export const rejectPromotionRequestAPI = async (id: string): Promise<Property> => {
+  const res = await api.put(`/properties/${id}/promotion/reject`, {
+    reason: "Promotion rejected by admin",
+  });
+  return quickNormalize(res.data?.data ?? res.data);
+};
+
+export const deletePromotionRequestAPI = async (id: string): Promise<Property> => {
+  const res = await api.delete(`/properties/${id}/promotion-request`);
+  return quickNormalize(res.data?.data ?? res.data);
 };
