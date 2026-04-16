@@ -69,6 +69,9 @@ const buyerSlice = createSlice({
   name: "buyer",
   initialState: initialBuyerState,
   reducers: {
+    setBuyerState(_state, action: PayloadAction<BuyerState>) {
+      return action.payload;
+    },
     clearCompareNotice(state) {
       state.compareNotice = null;
     },
@@ -262,6 +265,7 @@ const buyerSlice = createSlice({
 });
 
 export const {
+  setBuyerState,
   clearCompareNotice,
   setCompareHighlightDiff,
   toggleWishlist,

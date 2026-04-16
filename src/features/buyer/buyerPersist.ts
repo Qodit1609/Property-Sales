@@ -3,7 +3,8 @@ import { propertyToMeta } from "./propertyToMeta";
 import type { BuyerState } from "./buyerSlice";
 import { initialBuyerState } from "./buyerSlice";
 
-const STORAGE_KEY = "bhoomi_buyer_state_v2";
+const STORAGE_KEY_PREFIX = "bhoomi_buyer_state_v3";
+const LEGACY_STORAGE_KEY = "bhoomi_buyer_state_v2";
 
 type LegacyBuyer = Partial<BuyerState> & {
   wishlist?: Property[];
@@ -55,10 +56,15 @@ function migrateLegacy(o: LegacyBuyer): BuyerState {
   };
 }
 
-export function loadPersistedBuyerState(): BuyerState | undefined {
+function getStorageKey(ownerKey?: string): string {
+  const owner = (ownerKey ?? "guest").trim().toLowerCase();
+  return `${STORAGE_KEY_PREFIX}:${owner}`;
+}
+
+export function loadPersistedBuyerState(ownerKey?: string): BuyerState | undefined {
   if (typeof window === "undefined") return undefined;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(getStorageKey(ownerKey));
     if (!raw) return undefined;
     const parsed = JSON.parse(raw) as LegacyBuyer;
     return migrateLegacy(parsed);
@@ -67,23 +73,35 @@ export function loadPersistedBuyerState(): BuyerState | undefined {
   }
 }
 
-export function persistBuyerState(state: BuyerState): void {
+export function loadLegacyBuyerState(): BuyerState | undefined {
+  if (typeof window === "undefined") return undefined;
+  try {
+    const raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (!raw) return undefined;
+    const parsed = JSON.parse(raw) as LegacyBuyer;
+    return migrateLegacy(parsed);
+  } catch {
+    return undefined;
+  }
+}
+
+export function persistBuyerState(state: BuyerState, ownerKey?: string): void {
   if (typeof window === "undefined") return;
   try {
     const serializable: BuyerState = {
       ...state,
       compareNotice: null,
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(serializable));
+    localStorage.setItem(getStorageKey(ownerKey), JSON.stringify(serializable));
   } catch {
     /* ignore quota */
   }
 }
 
-export function clearPersistedBuyerState(): void {
+export function clearPersistedBuyerState(ownerKey?: string): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(getStorageKey(ownerKey));
   } catch {
     /* ignore */
   }

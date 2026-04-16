@@ -1,29 +1,48 @@
 import { Bell } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
-import { markNotificationRead } from "../../features/notifications/notificationSlice";
+import {
+  clearReadNotifications,
+  markNotificationRead,
+} from "../../features/notifications/notificationSlice";
 import { Button } from "@/components/common";
 
 const SellerNotificationsPage = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const notifications = useAppSelector((state) => state.notifications.items);
+  const user = useAppSelector((state) => state.auth.user);
+  const userId = String(user?.id ?? user?._id ?? "");
+  const hasReadNotifications = notifications.some((n) => n.isRead);
 
   return (
     <section className="space-y-6">
       <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] px-4 py-4 shadow-sm sm:px-5 sm:py-5">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--b2)]/80 bg-[var(--b2-soft)] text-[var(--b1-mid)]">
-            <Bell className="h-5 w-5" />
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--b2)]/80 bg-[var(--b2-soft)] text-[var(--b1-mid)]">
+              <Bell className="h-5 w-5" />
+            </div>
+            <div className="min-w-0">
+              <h1 className="truncate text-lg font-semibold text-[var(--b1)] sm:text-xl">
+                {t("sellerPanel.notifications.pageTitle")}
+              </h1>
+              <p className="mt-0.5 text-xs text-[var(--muted)] sm:text-sm">
+                {t("sellerPanel.notifications.pageSub")}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0">
-            <h1 className="truncate text-lg font-semibold text-[var(--b1)] sm:text-xl">
-              {t("sellerPanel.notifications.pageTitle")}
-            </h1>
-            <p className="mt-0.5 text-xs text-[var(--muted)] sm:text-sm">
-              {t("sellerPanel.notifications.pageSub")}
-            </p>
-          </div>
+          {hasReadNotifications && userId ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => dispatch(clearReadNotifications(userId))}
+              className="shrink-0 text-xs"
+            >
+              Clear all
+            </Button>
+          ) : null}
         </div>
       </div>
 

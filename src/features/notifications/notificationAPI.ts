@@ -20,6 +20,13 @@ export const markNotificationReadAPI = async (
   return res.data?.data;
 };
 
+export const clearReadNotificationsAPI = async (
+  userId: string
+): Promise<{ deletedCount: number }> => {
+  const res = await api.delete(`/notifications/${userId}/read`);
+  return res.data?.data ?? { deletedCount: 0 };
+};
+
 export const createNotificationAPI = async (payload: {
   title: string;
   message: string;

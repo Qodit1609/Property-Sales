@@ -1,16 +1,22 @@
 import React from "react";
 import { Bell } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
-import { markNotificationRead } from "../../features/notifications/notificationSlice";
+import {
+  clearReadNotifications,
+  markNotificationRead,
+} from "../../features/notifications/notificationSlice";
 import { Button } from "@/components/common";
 
 const NotificationPanel: React.FC = () => {
   const dispatch = useAppDispatch();
   const notifications = useAppSelector((state) => state.notifications.items);
+  const user = useAppSelector((state) => state.auth.user);
+  const userId = String(user?.id ?? user?._id ?? "");
+  const hasReadNotifications = notifications.some((n) => n.isRead);
 
   return (
     <div className="space-y-3 rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--b2-soft)] text-[var(--b1-mid)]">
             <Bell className="h-4 w-4" />
@@ -24,7 +30,17 @@ const NotificationPanel: React.FC = () => {
             </p>
           </div>
         </div>
-
+        {hasReadNotifications && userId ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => dispatch(clearReadNotifications(userId))}
+            className="shrink-0 text-xs"
+          >
+            Clear all
+          </Button>
+        ) : null}
       </div>
 
       {notifications.length === 0 ? (

@@ -3,6 +3,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import {
   fetchNotificationsAPI,
   markNotificationReadAPI,
+  clearReadNotificationsAPI,
 } from "./notificationAPI";
 import type { AppNotification } from "./notificationTypes";
 
@@ -44,6 +45,19 @@ export const markNotificationRead = createAsyncThunk<
   }
 });
 
+export const clearReadNotifications = createAsyncThunk<
+  { deletedCount: number },
+  string,
+  { rejectValue: string }
+>("notifications/clearRead", async (userId, { rejectWithValue }) => {
+  try {
+    return await clearReadNotificationsAPI(userId);
+  } catch (error: unknown) {
+    const err = error as { message?: string };
+    return rejectWithValue(err.message ?? "Failed to clear read notifications");
+  }
+});
+
 const notificationsSlice = createSlice({
   name: "notifications",
   initialState,
@@ -82,6 +96,10 @@ const notificationsSlice = createSlice({
             state.unreadCount = Math.max(0, state.unreadCount - 1);
           }
         }
+      })
+      .addCase(clearReadNotifications.fulfilled, (state) => {
+        state.items = state.items.filter((item) => !item.isRead);
+        state.unreadCount = state.items.filter((item) => !item.isRead).length;
       });
   },
 });
