@@ -1,46 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
-import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { fetchBuyerUsersAPI, type BuyerUser } from "@/features/seller/sellerAPI";
-
-type LeadRow = {
-  id: string;
-  buyer: string;
-  email: string;
-  contact: string;
-  verified: string;
-  active: string;
-  details: string;
-  lastLogin: string;
-  joinedAt: string;
-};
-
-function formatDate(value?: string) {
-  if (!value) return "";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleString();
-}
-
-function mapBuyerToRow(buyer: BuyerUser): LeadRow {
-  return {
-    id: buyer._id,
-    buyer: buyer.name?.trim() || "-",
-    email: buyer.email?.trim() || "-",
-    contact: buyer.contact?.trim() || "-",
-    verified: buyer.verified?.trim() || "-",
-    active: typeof buyer.isActive === "boolean" ? (buyer.isActive ? "active" : "inactive") : "-",
-    details: buyer.details?.trim() || "-",
-    lastLogin: formatDate(buyer.lastLogin) || "-",
-    joinedAt: formatDate(buyer.createdAt),
-  };
-}
+import { PropertyLeadsCard } from "@/components/seller/PropertyLeadsCard";
+import {
+  clearSellerLeadRowsAPI,
+  deleteSellerLeadRowAPI,
+  fetchSellerLeadsAPI,
+  type SellerPropertyLeads,
+} from "@/features/seller/sellerAPI";
 
 function SellerLeadsPage() {
   const { t } = useTranslation();
   const [q, setQ] = useState("");
-  const [leadRows, setLeadRows] = useState<LeadRow[]>([]);
+  const [propertyLeads, setPropertyLeads] = useState<SellerPropertyLeads[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -50,9 +22,9 @@ function SellerLeadsPage() {
       try {
         setLoading(true);
         setError("");
-        const leads = await fetchBuyerUsersAPI();
+        const leads = await fetchSellerLeadsAPI();
         if (!mounted) return;
-        setLeadRows(leads.map(mapBuyerToRow));
+        setPropertyLeads(leads);
       } catch (err) {
         if (!mounted) return;
         const message = err instanceof Error ? err.message : "Failed to load leads.";
@@ -69,18 +41,62 @@ function SellerLeadsPage() {
   }, []);
 
   const rows = useMemo(() => {
-    let r = leadRows;
-    if (q.trim()) {
-      const s = q.trim().toLowerCase();
-      r = r.filter(
-        (x) =>
-          x.buyer.toLowerCase().includes(s) ||
-          x.email.toLowerCase().includes(s) ||
-          x.contact.toLowerCase().includes(s)
+    const search = q.trim().toLowerCase();
+    if (!search) return propertyLeads;
+    return propertyLeads
+      .map((entry) => ({
+        ...entry,
+        leads: entry.leads.filter(
+          (lead) =>
+            lead.buyerName.toLowerCase().includes(search) ||
+            lead.propertyName.toLowerCase().includes(search) ||
+            lead.activityType.toLowerCase().includes(search)
+        ),
+      }))
+      .filter((entry) => entry.propertyName.toLowerCase().includes(search) || entry.leads.length > 0);
+  }, [q, propertyLeads]);
+
+  const hasLeads = useMemo(
+    () => rows.some((propertyEntry) => propertyEntry.leads.length > 0),
+    [rows]
+  );
+
+  const handleDeleteRow = async (
+    propertyId: string,
+    rowId: string,
+    leadId?: string,
+    activityType?: "cart" | "wishlist" | "compare"
+  ) => {
+    try {
+      if (leadId && activityType) {
+        await deleteSellerLeadRowAPI({ leadId, activityType });
+      }
+      setPropertyLeads((prev) =>
+        prev.map((entry) =>
+          entry.propertyId !== propertyId
+            ? entry
+            : { ...entry, leads: entry.leads.filter((lead) => lead.id !== rowId) }
+        )
       );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to delete row.";
+      setError(message);
     }
-    return r;
-  }, [q, leadRows]);
+  };
+
+  const handleClearAll = async (propertyId: string) => {
+    try {
+      await clearSellerLeadRowsAPI(propertyId);
+      setPropertyLeads((prev) =>
+        prev.map((entry) =>
+          entry.propertyId !== propertyId ? entry : { ...entry, leads: [] }
+        )
+      );
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to clear rows.";
+      setError(message);
+    }
+  };
 
   return (
     <section className="space-y-8">
@@ -103,70 +119,38 @@ function SellerLeadsPage() {
         </div>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="overflow-hidden rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] shadow-sm"
-      >
-        <div className="overflow-x-auto">
-          <table className="min-w-[680px] w-full text-sm">
-            <thead className="bg-[var(--b2-soft)]/90">
-              <tr>
-                <th className="px-4 py-3 text-left font-semibold">{t("sellerPanel.leadsPage.colBuyer")}</th>
-                <th className="px-4 py-3 text-left font-semibold">Email</th>
-                <th className="px-4 py-3 text-left font-semibold">{t("sellerPanel.leadsPage.colContact")}</th>
-                <th className="px-4 py-3 text-left font-semibold">Verified</th>
-                <th className="px-4 py-3 text-left font-semibold">Status</th>
-                <th className="px-4 py-3 text-left font-semibold">Last Login</th>
-                <th className="px-4 py-3 text-left font-semibold">Details</th>
-                <th className="px-4 py-3 text-left font-semibold">{t("sellerPanel.leadsPage.colActivity")}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--b2)]/70">
-              {loading && (
-                <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-[var(--muted)]">
-                    Loading leads...
-                  </td>
-                </tr>
-              )}
-              {!loading && error && (
-                <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-[var(--error)]">
-                    {error}
-                  </td>
-                </tr>
-              )}
-              {!loading && !error && rows.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="px-4 py-8 text-center text-[var(--muted)]">
-                    No leads found.
-                  </td>
-                </tr>
-              )}
-              {rows.map((row) => (
-                <motion.tr
-                  key={row.id}
-                  initial={false}
-                  whileHover={{ backgroundColor: "rgba(216, 243, 220, 0.35)" }}
-                  className="transition-colors"
-                >
-                  <td className="px-4 py-3 font-medium text-[var(--b1)]">{row.buyer}</td>
-                  <td className="px-4 py-3 text-[var(--b1)]">{row.email}</td>
-                  <td className="px-4 py-3 text-[var(--b1)]">{row.contact}</td>
-                  <td className="px-4 py-3 text-[var(--b1)] capitalize">{row.verified}</td>
-                  <td className="px-4 py-3 text-[var(--b1)] capitalize">{row.active}</td>
-                  <td className="px-4 py-3 text-[var(--muted)]">{row.lastLogin}</td>
-                  <td className="max-w-[280px] px-4 py-3 text-[var(--muted)]">
-                    <span className="line-clamp-2">{row.details}</span>
-                  </td>
-                  <td className="px-4 py-3 text-[var(--muted)]">{row.joinedAt}</td>
-                </motion.tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </motion.div>
+      <div className="space-y-5">
+        {loading && (
+          <div className="rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] px-4 py-8 text-center text-[var(--muted)] shadow-sm">
+            Loading leads...
+          </div>
+        )}
+        {!loading && error && (
+          <div className="rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] px-4 py-8 text-center text-[var(--error)] shadow-sm">
+            {error}
+          </div>
+        )}
+        {!loading && !error && rows.length === 0 && (
+          <div className="rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] px-4 py-8 text-center text-[var(--muted)] shadow-sm">
+            No approved properties found.
+          </div>
+        )}
+        {!loading && !error && rows.length > 0 && !hasLeads && (
+          <div className="rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] px-4 py-8 text-center text-[var(--muted)] shadow-sm">
+            No leads found.
+          </div>
+        )}
+        {!loading &&
+          !error &&
+          rows.map((propertyEntry) => (
+            <PropertyLeadsCard
+              key={propertyEntry.propertyId}
+              propertyLeads={propertyEntry}
+              onDeleteRow={handleDeleteRow}
+              onClearAll={handleClearAll}
+            />
+          ))}
+      </div>
     </section>
   );
 }

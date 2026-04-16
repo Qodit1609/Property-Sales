@@ -613,6 +613,26 @@ export const fetchPropertyByIdAPI = async (id: string) => {
   return normalizeProperty(res.data.data ?? res.data); // IMPORTANT: backend may wrap inside data
 };
 
+export type BuyerPropertyActivityType = "cart" | "wishlist" | "compare";
+
+export const trackPropertyActivityAPI = async (
+  propertyId: string,
+  activityType: BuyerPropertyActivityType
+) => {
+  const res = await api.post(`/properties/${propertyId}/activity`, { activityType });
+  return res.data?.data ?? res.data;
+};
+
+export const removePropertyActivityAPI = async (
+  propertyId: string,
+  activityType: BuyerPropertyActivityType
+) => {
+  const res = await api.delete(`/properties/${propertyId}/activity`, {
+    params: { activityType },
+  });
+  return res.data?.data ?? res.data;
+};
+
 export const getNewProjects = async (): Promise<Property[]> => {
   const res = await api.get(API_ENDPOINTS.NEW.PROPERTIES);
   return mapPropertyListPayload(res.data);

@@ -11,6 +11,7 @@ import PropertyCard from "../Cards/PropertyCard";
 import WishlistGrid from "./WishlistGrid";
 import { Button } from "@/components/common";
 import { createNotificationAPI } from "../../features/notifications/notificationAPI";
+import { trackPropertyActivityAPI } from "../../features/properties/propertyAPI";
 
 const Wishlist: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -80,6 +81,12 @@ const Wishlist: React.FC = () => {
                 type="button"
                 onClick={() => {
                   dispatch(moveWishlistToCart(property._id));
+                  void trackPropertyActivityAPI(property._id, "cart").then((result) => {
+                    if (result?.alreadyPresent) {
+                      // Keep UX consistent with quick action feedback patterns used elsewhere.
+                      // This action still keeps cart selected locally.
+                    }
+                  });
                   const rawSellerId = (property as { sellerId?: unknown }).sellerId;
                   const sellerId =
                     typeof rawSellerId === "string"

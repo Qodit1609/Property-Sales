@@ -7,6 +7,7 @@ import { toggleWishlist } from "../../features/buyer/buyerSlice";
 import type { Property } from "../../features/properties/propertyType";
 import type { RootState } from "../../app/store";
 import { showBuyerActionFeedback } from "./buyerActionFeedback";
+import { removePropertyActivityAPI, trackPropertyActivityAPI } from "../../features/properties/propertyAPI";
 
 interface Props {
   property: Property;
@@ -36,6 +37,15 @@ const WishlistButton: React.FC<Props> = ({
         showBuyerActionFeedback(
           after ? "Added to wishlist" : "Removed from wishlist"
         );
+        if (after) {
+          void trackPropertyActivityAPI(property._id, "wishlist").then((result) => {
+            if (result?.alreadyPresent) {
+              showBuyerActionFeedback("Property is already in wishlist");
+            }
+          });
+        } else {
+          void removePropertyActivityAPI(property._id, "wishlist");
+        }
       }
     },
     [dispatch, property, store]

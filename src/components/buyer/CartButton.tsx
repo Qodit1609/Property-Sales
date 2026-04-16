@@ -8,6 +8,7 @@ import type { Property } from "../../features/properties/propertyType";
 import type { RootState } from "../../app/store";
 import { showBuyerActionFeedback } from "./buyerActionFeedback";
 import { createNotificationAPI } from "../../features/notifications/notificationAPI";
+import { removePropertyActivityAPI, trackPropertyActivityAPI } from "../../features/properties/propertyAPI";
 
 interface Props {
   property: Property;
@@ -32,6 +33,11 @@ const CartButton: React.FC<Props> = ({ property, className = "" }) => {
       if (before !== after) {
         showBuyerActionFeedback(after ? "Added to cart" : "Removed from cart");
         if (after) {
+          void trackPropertyActivityAPI(property._id, "cart").then((result) => {
+            if (result?.alreadyPresent) {
+              showBuyerActionFeedback("Property is already in cart");
+            }
+          });
           const rawSellerId = (property as Property & { sellerId?: unknown }).sellerId;
           const sellerId =
             typeof rawSellerId === "string"
@@ -48,6 +54,8 @@ const CartButton: React.FC<Props> = ({ property, className = "" }) => {
               propertyId: property._id,
             });
           }
+        } else {
+          void removePropertyActivityAPI(property._id, "cart");
         }
       }
     },

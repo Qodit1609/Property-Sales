@@ -7,6 +7,7 @@ import { toggleCompare } from "../../features/buyer/buyerSlice";
 import type { Property } from "../../features/properties/propertyType";
 import type { RootState } from "../../app/store";
 import { showBuyerActionFeedback } from "./buyerActionFeedback";
+import { removePropertyActivityAPI, trackPropertyActivityAPI } from "../../features/properties/propertyAPI";
 
 interface Props {
   property: Property;
@@ -31,6 +32,15 @@ const CompareButton: React.FC<Props> = ({ property, className = "" }) => {
         showBuyerActionFeedback(
           after ? "Added to compare" : "Removed from compare"
         );
+        if (after) {
+          void trackPropertyActivityAPI(property._id, "compare").then((result) => {
+            if (result?.alreadyPresent) {
+              showBuyerActionFeedback("Property is already in compare");
+            }
+          });
+        } else {
+          void removePropertyActivityAPI(property._id, "compare");
+        }
       }
     },
     [dispatch, property, store]

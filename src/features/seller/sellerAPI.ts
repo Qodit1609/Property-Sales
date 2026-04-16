@@ -97,6 +97,23 @@ export const uploadPropertyImageAPI = async (
 
 /** Lead rows for the authenticated seller (buyers who viewed their listings). */
 export interface SellerLeadRecord {
+  id: string;
+  leadId?: string;
+  buyerId?: string;
+  buyerName: string;
+  propertyId: string;
+  propertyName: string;
+  activityType: "view" | "cart" | "wishlist" | "compare";
+  timestamp: string;
+}
+
+export interface SellerPropertyLeads {
+  propertyId: string;
+  propertyName: string;
+  leads: SellerLeadRecord[];
+}
+
+export interface SellerLeadLegacyRecord {
   _id: string;
   userId?: string;
   propertyId?: string;
@@ -120,11 +137,21 @@ export interface SellerLeadRecord {
   updatedAt?: string;
 }
 
-export const fetchSellerLeadsAPI = async (): Promise<SellerLeadRecord[]> => {
+export const fetchSellerLeadsAPI = async (): Promise<SellerPropertyLeads[]> => {
   const res = await api.get("/properties/my-leads/list");
-  const raw = (res.data?.data ?? res.data) as { leads?: SellerLeadRecord[] } | undefined;
-  const leads = raw?.leads;
-  return Array.isArray(leads) ? leads : [];
+  const raw = (res.data?.data ?? res.data) as { properties?: SellerPropertyLeads[] } | undefined;
+  const properties = raw?.properties;
+  return Array.isArray(properties) ? properties : [];
+};
+
+export const deleteSellerLeadRowAPI = async (payload: { leadId: string; activityType: "cart" | "wishlist" | "compare" }) => {
+  await api.delete("/properties/my-leads/row", { data: payload });
+};
+
+export const clearSellerLeadRowsAPI = async (propertyId?: string) => {
+  await api.delete("/properties/my-leads/clear", {
+    params: propertyId ? { propertyId } : undefined,
+  });
 };
 
 export interface BuyerUser {
