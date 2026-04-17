@@ -18,7 +18,8 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
   const AUTO_PLAY_MS = 4200;
 
   useEffect(() => {
-    setActiveIndex(0);
+    const t = setTimeout(() => setActiveIndex(0), 0);
+    return () => clearTimeout(t);
   }, [testimonials.length]);
 
   useEffect(() => {
@@ -36,11 +37,10 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
     };
   }, [AUTO_PLAY_MS, isFocusedWithin, isHovered, testimonials.length]);
 
-  if (!testimonials.length) {
-    return null;
-  }
+  if (!testimonials.length) return null;
 
   const activeTestimonial = testimonials[activeIndex];
+
   const initials = (activeTestimonial.name || "?")
     .split(" ")
     .filter(Boolean)
@@ -62,10 +62,44 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
   const safeMessage =
     activeTestimonial.message?.trim() ||
     "This customer shared a positive experience with BhoomiWala.";
+
   const pageTransition = shouldReduceMotion
     ? { duration: 0.01 }
     : { duration: 0.52, ease: [0.22, 1, 0.36, 1] as const };
+
   const swipeConfidenceThreshold = 80;
+
+  // ✅ Proper variants (fix for TS2322)
+  const variants = {
+    initial: (step: number) =>
+      shouldReduceMotion
+        ? { opacity: 0 }
+        : {
+            opacity: 0,
+            y: step > 0 ? 34 : -34,
+            scale: 0.992,
+            filter: "blur(4px)",
+          },
+
+    animate: shouldReduceMotion
+      ? { opacity: 1 }
+      : {
+          opacity: 1,
+          y: 0,
+          scale: 1,
+          filter: "blur(0px)",
+        },
+
+    exit: (step: number) =>
+      shouldReduceMotion
+        ? { opacity: 0 }
+        : {
+            opacity: 0,
+            y: step > 0 ? -28 : 28,
+            scale: 0.994,
+            filter: "blur(3px)",
+          },
+  };
 
   return (
     <SectionWrapper className="py-12 sm:py-14" id="testimonials">
@@ -74,6 +108,7 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
         title="Trusted by farmland buyers and sellers"
         description="Real customer stories from successful farmland discovery and closure journeys."
       />
+
       <div
         className="relative mx-auto mt-10 w-full max-w-6xl px-2 sm:mt-12 sm:px-4"
         onMouseEnter={() => setIsHovered(true)}
@@ -87,36 +122,10 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
           <motion.blockquote
             key={activeTestimonial.id}
             custom={direction}
-            initial={(step) =>
-              shouldReduceMotion
-                ? { opacity: 0 }
-                : {
-                    opacity: 0,
-                    y: step > 0 ? 34 : -34,
-                    scale: 0.992,
-                    filter: "blur(4px)",
-                  }
-            }
-            animate={
-              shouldReduceMotion
-                ? { opacity: 1 }
-                : {
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    filter: "blur(0px)",
-                  }
-            }
-            exit={(step) =>
-              shouldReduceMotion
-                ? { opacity: 0 }
-                : {
-                    opacity: 0,
-                    y: step > 0 ? -28 : 28,
-                    scale: 0.994,
-                    filter: "blur(3px)",
-                  }
-            }
+            variants={variants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
             transition={pageTransition}
             drag={testimonials.length > 1 ? "x" : false}
             dragElastic={0.18}
@@ -152,13 +161,19 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--b2-soft)] text-sm font-semibold text-[var(--b1)]">
                   {initials}
                 </div>
+
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-[var(--b1)]">{activeTestimonial.name}</p>
+                  <p className="truncate font-semibold text-[var(--b1)]">
+                    {activeTestimonial.name}
+                  </p>
                   <p className="truncate text-xs text-[var(--muted)] sm:text-sm">
                     {activeTestimonial.occupation || "Farmland User"}
-                    {activeTestimonial.location ? ` • ${activeTestimonial.location}` : ""}
+                    {activeTestimonial.location
+                      ? ` • ${activeTestimonial.location}`
+                      : ""}
                   </p>
                 </div>
+
                 <p className="ml-auto">
                   <StarRating
                     value={activeTestimonial.rating ?? 5}
@@ -182,6 +197,7 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
             >
               &#8249;
             </button>
+
             <div className="flex items-center gap-1.5 px-1">
               {testimonials.map((testimonial, index) => (
                 <motion.button
@@ -190,13 +206,16 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
                   aria-label={`Go to testimonial ${index + 1}`}
                   onClick={() => jumpToSlide(index)}
                   className={`h-2 rounded-full transition-all ${
-                    index === activeIndex ? "w-8 bg-[var(--b1)]" : "w-2 bg-[var(--b2-soft)]"
+                    index === activeIndex
+                      ? "w-8 bg-[var(--b1)]"
+                      : "w-2 bg-[var(--b2-soft)]"
                   }`}
                   animate={index === activeIndex ? { scale: 1.05 } : { scale: 1 }}
                   transition={{ type: "spring", stiffness: 300, damping: 24 }}
                 />
               ))}
             </div>
+
             <button
               type="button"
               onClick={() => changeSlide(1)}
@@ -207,7 +226,6 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
             </button>
           </div>
         ) : null}
-
       </div>
     </SectionWrapper>
   );
