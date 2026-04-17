@@ -16,10 +16,8 @@ export const sellerProfileFormSchema = z.object({
 export type SellerProfileFormValues = z.infer<typeof sellerProfileFormSchema>;
 
 export const sellerSettingsFormSchema = z.object({
-  emailDigest: z.boolean(),
   leadAlerts: z.boolean(),
   listingAlerts: z.boolean(),
-  marketingTips: z.boolean(),
 });
 
 export type SellerSettingsFormValues = z.infer<typeof sellerSettingsFormSchema>;

@@ -1,22 +1,44 @@
 import { motion } from "framer-motion";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Bell } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/common";
+import { useAppSelector } from "../../hooks/reduxHooks";
 import { sellerSettingsFormSchema, type SellerSettingsFormValues } from "./sellerProfileSchema";
 
 const SellerSettingsPage = () => {
   const { t } = useTranslation();
-  const { register, handleSubmit } = useForm<SellerSettingsFormValues>({
+  const user = useAppSelector((state) => state.auth.user);
+  const userId = String(user?.id ?? user?._id ?? "");
+  const settingsKey = useMemo(() => `sellerNotificationSettings:${userId || "guest"}`, [userId]);
+  const savedSettings = useMemo(() => {
+    try {
+      const raw = localStorage.getItem(settingsKey);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as Partial<SellerSettingsFormValues>;
+      return {
+        leadAlerts: !!parsed.leadAlerts,
+        listingAlerts: !!parsed.listingAlerts,
+      };
+    } catch {
+      return null;
+    }
+  }, [settingsKey]);
+  const { register, handleSubmit, watch } = useForm<SellerSettingsFormValues>({
     resolver: zodResolver(sellerSettingsFormSchema),
     defaultValues: {
-      emailDigest: true,
-      leadAlerts: true,
-      listingAlerts: true,
-      marketingTips: false,
+      leadAlerts: savedSettings?.leadAlerts ?? false,
+      listingAlerts: savedSettings?.listingAlerts ?? false,
     },
   });
+  const watchedValues = watch();
+
+  useEffect(() => {
+    localStorage.setItem(settingsKey, JSON.stringify(watchedValues));
+    window.dispatchEvent(new Event("seller-notification-settings-changed"));
+  }, [settingsKey, watchedValues]);
 
   const onSubmit = handleSubmit(() => {
     /* local preferences — wire to API when available */
@@ -42,10 +64,8 @@ const SellerSettingsPage = () => {
 
         {(
           [
-            ["emailDigest", t("sellerPanel.settings.digest")] as const,
             ["leadAlerts", t("sellerPanel.settings.leads")] as const,
             ["listingAlerts", t("sellerPanel.settings.listings")] as const,
-            ["marketingTips", t("sellerPanel.settings.marketing")] as const,
           ] as const
         ).map(([key, label]) => (
           <label

@@ -12,6 +12,9 @@ import api, { API_ENDPOINTS } from "../../lib/apiClient";
 import { mapPropertyListPayload } from "../../features/properties/propertyAPI";
 import { Button } from "@/components/common";
 import { normalizeLanguage, preloadLanguage } from "../../i18n";
+import { loadBuyerProfile } from "../../lib/buyerProfileStorage";
+import { loadSellerProfile } from "../../lib/sellerProfileStorage";
+import { loadAdminProfile } from "../../lib/adminProfileStorage";
 
 interface MegaSection {
   title: string;
@@ -775,6 +778,26 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
     })();
   };
 
+  const rawUser = (user ?? {}) as Record<string, unknown>;
+  const authPhoto =
+    (typeof rawUser.profilePhotoUrl === "string" ? rawUser.profilePhotoUrl : "") ||
+    (typeof rawUser.profileImage === "string" ? rawUser.profileImage : "") ||
+    (typeof rawUser.userIdProf === "string" ? rawUser.userIdProf : "") ||
+    "";
+  const localPhoto =
+    user?.role === "buyer"
+      ? loadBuyerProfile(user?.email)?.profilePhotoUrl ?? ""
+      : user?.role === "seller"
+        ? loadSellerProfile(user?.email)?.profilePhotoUrl ?? ""
+        : user?.role === "admin"
+          ? loadAdminProfile(String(user?.id ?? user?._id ?? user?.email ?? "").trim() || undefined)
+              ?.profilePhotoUrl ?? ""
+          : "";
+  const profilePhotoUrl = (localPhoto || authPhoto || "").trim();
+  const showProfilePhoto =
+    (user?.role === "admin" || user?.role === "seller" || user?.role === "buyer") &&
+    Boolean(profilePhotoUrl);
+
   return (
     <>
       <header className="fixed top-0 left-0 w-full z-50">
@@ -998,15 +1021,23 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                   <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
                     <Button className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-3 py-0 text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[2px] hover:bg-[var(--fg)]/12">
                       <span className="flex h-5 w-5 items-center justify-center rounded-full border border-[var(--fg)]">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="w-3.5 h-3.5"
-                          viewBox="0 0 24 24"
-                          fill="currentColor"
-                        >
-                          <circle cx="12" cy="8" r="4" />
-                          <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
-                        </svg>
+                        {showProfilePhoto ? (
+                          <img
+                            src={profilePhotoUrl}
+                            alt={user?.name ? `${user.name} profile` : "Profile"}
+                            className="h-full w-full rounded-full object-cover"
+                          />
+                        ) : (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-3.5 h-3.5"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                          >
+                            <circle cx="12" cy="8" r="4" />
+                            <path d="M4 20c0-4 4-6 8-6s8 2 8 6" />
+                          </svg>
+                        )}
                       </span>
                       <span className="max-w-[110px] truncate text-xs font-medium leading-none">
                         {user?.name}
