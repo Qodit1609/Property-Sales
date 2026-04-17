@@ -5,6 +5,9 @@
 
 export type StoredBuyerProfile = {
   profilePhotoUrl?: string | null;
+  mobileNumber?: string;
+  occupation?: string;
+  gender?: string;
 };
 
 export type BuyerActivityData = {
@@ -53,8 +56,19 @@ export function touchBuyerSession(email: string | undefined): void {
   const now = new Date().toISOString();
   const prev = loadBuyerActivity(email);
   if (!prev) {
-    writeBuyerActivity(email, { accountCreatedAt: now, lastLoginAt: now });
+    writeBuyerActivity(email, { accountCreatedAt: null, lastLoginAt: now });
     return;
   }
   writeBuyerActivity(email, { ...prev, lastLoginAt: now });
+}
+
+export function setBuyerAccountCreatedIfMissing(email: string | undefined): void {
+  const now = new Date().toISOString();
+  const prev = loadBuyerActivity(email);
+  if (!prev) {
+    writeBuyerActivity(email, { accountCreatedAt: now, lastLoginAt: now });
+    return;
+  }
+  if (prev.accountCreatedAt) return;
+  writeBuyerActivity(email, { ...prev, accountCreatedAt: now });
 }

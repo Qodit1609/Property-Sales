@@ -296,8 +296,6 @@ const PropertyCard: React.FC<Props> = ({
         )}
         </div>
 
-     
-
         <Button
           disabled={isBlocked}
           className="
@@ -309,6 +307,7 @@ const PropertyCard: React.FC<Props> = ({
         >
           {isDeactivated ? deactivatedMessage : t("propertyCard.viewDetails")}
         </Button>
+
       </div>
     </div>
   );

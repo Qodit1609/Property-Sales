@@ -7,6 +7,11 @@ import Dashboard from "../Dashboard/Dashboard";
 import { Input, Button } from "@/components/common";
 import { touchSellerSession } from "../../lib/sellerProfileStorage";
 import { touchBuyerSession } from "../../lib/buyerProfileStorage";
+import {
+  getDashboardPathForRole,
+  getMandatoryProfilePathForRole,
+  isProfileCompletionMandatory,
+} from "../../lib/profileCompletionGuard";
 
 const AUTH_ONLY_PATHS = new Set(["/login", "/register"]);
 
@@ -20,15 +25,6 @@ function pathAllowedForRole(pathname: string, role: AppRole | undefined): boolea
   if (pathname.startsWith("/post-property"))
     return r === "seller" || r === "buyer" || r === "agent" || r === "admin";
   return true;
-}
-
-function accountPathForRole(role: AppRole | undefined): string {
-  const r = role ?? "";
-  if (r === "buyer") return "/buyer/account";
-  if (r === "admin") return "/admin/account";
-  if (r === "seller") return "/seller/profile";
-  if (r === "agent") return "/agent/dashboard";
-  return "/post-property/basic";
 }
 
 const Login: React.FC = () => {
@@ -86,7 +82,18 @@ const Login: React.FC = () => {
       }
 
       if (role === "buyer" || role === "seller" || role === "admin") {
-        navigate(accountPathForRole(role), { replace: true });
+        if (role === "admin") {
+          navigate(getDashboardPathForRole(role), { replace: true });
+          return;
+        }
+
+        if (isProfileCompletionMandatory(result.payload.user)) {
+          const profilePath = getMandatoryProfilePathForRole(role);
+          navigate(profilePath ?? getDashboardPathForRole(role), { replace: true });
+          return;
+        }
+
+        navigate(getDashboardPathForRole(role), { replace: true });
         return;
       }
 
@@ -96,7 +103,7 @@ const Login: React.FC = () => {
         return;
       }
 
-      navigate(accountPathForRole(role), { replace: true });
+      navigate(getDashboardPathForRole(role), { replace: true });
     }
   };
 

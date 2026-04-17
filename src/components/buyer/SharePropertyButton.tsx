@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Copy, Mail, MessageCircle, Share2 } from "lucide-react";
+import { createPortal } from "react-dom";
 import type { Property } from "../../features/properties/propertyType";
 import { showBuyerActionFeedback } from "./buyerActionFeedback";
 
@@ -13,6 +14,8 @@ const SharePropertyButton: React.FC<Props> = ({ property, className = "" }) => {
   const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [menuPosition, setMenuPosition] = useState<{ top: number; left: number } | null>(null);
 
   const { url, shareBody, mailSubject } = useMemo(() => {
     const u = `${window.location.origin}/properties/${property._id}`;
@@ -35,6 +38,31 @@ const SharePropertyButton: React.FC<Props> = ({ property, className = "" }) => {
     };
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) {
+      setMenuPosition(null);
+      return;
+    }
+
+    const updatePosition = () => {
+      const trigger = triggerRef.current;
+      if (!trigger) return;
+      const rect = trigger.getBoundingClientRect();
+      setMenuPosition({
+        top: rect.bottom + 6,
+        left: Math.max(8, rect.right - 200),
+      });
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
   }, [open]);
 
   const copyLink = useCallback(() => {
@@ -77,6 +105,7 @@ const SharePropertyButton: React.FC<Props> = ({ property, className = "" }) => {
   return (
     <div ref={wrapRef} className={`relative inline-flex ${className}`}>
       <motion.button
+        ref={triggerRef}
         type="button"
         whileHover={reduceMotion ? undefined : { scale: 1.06 }}
         whileTap={reduceMotion ? undefined : { scale: 0.96 }}
@@ -92,64 +121,68 @@ const SharePropertyButton: React.FC<Props> = ({ property, className = "" }) => {
         <Share2 size={16} className={open ? "text-emerald-300" : "text-white"} />
       </motion.button>
 
-      {open && (
-        <div
-          className="absolute right-0 top-[calc(100%+6px)] z-[60] min-w-[12.5rem] overflow-hidden rounded-xl border border-[var(--b2-soft)] bg-white py-1.5 text-left shadow-[0_12px_32px_rgba(0,0,0,0.12)] ring-1 ring-black/5"
-          role="menu"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {"share" in navigator && typeof navigator.share === "function" && (
+      {open &&
+        menuPosition &&
+        createPortal(
+          <div
+            className="fixed z-[9999] min-w-[12.5rem] overflow-hidden rounded-xl border border-[var(--b2-soft)] bg-white py-1.5 text-left shadow-[0_12px_32px_rgba(0,0,0,0.12)] ring-1 ring-black/5"
+            style={{ top: `${menuPosition.top}px`, left: `${menuPosition.left}px` }}
+            role="menu"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {"share" in navigator && typeof navigator.share === "function" && (
+              <button
+                type="button"
+                role="menuitem"
+                className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]/60"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  tryNativeShare();
+                }}
+              >
+                <Share2 size={14} className="text-[var(--b1-mid)]" />
+                Share…
+              </button>
+            )}
             <button
               type="button"
               role="menuitem"
               className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]/60"
               onClick={(e) => {
                 e.stopPropagation();
-                tryNativeShare();
+                copyLink();
               }}
             >
-              <Share2 size={14} className="text-[var(--b1-mid)]" />
-              Share…
+              <Copy size={14} className="text-[var(--b1-mid)]" />
+              Copy link
             </button>
-          )}
-          <button
-            type="button"
-            role="menuitem"
-            className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]/60"
-            onClick={(e) => {
-              e.stopPropagation();
-              copyLink();
-            }}
-          >
-            <Copy size={14} className="text-[var(--b1-mid)]" />
-            Copy link
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]/60"
-            onClick={(e) => {
-              e.stopPropagation();
-              shareWhatsApp();
-            }}
-          >
-            <MessageCircle size={14} className="text-[var(--b1-mid)]" />
-            WhatsApp
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]/60"
-            onClick={(e) => {
-              e.stopPropagation();
-              shareEmail();
-            }}
-          >
-            <Mail size={14} className="text-[var(--b1-mid)]" />
-            Email
-          </button>
-        </div>
-      )}
+            <button
+              type="button"
+              role="menuitem"
+              className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]/60"
+              onClick={(e) => {
+                e.stopPropagation();
+                shareWhatsApp();
+              }}
+            >
+              <MessageCircle size={14} className="text-[var(--b1-mid)]" />
+              WhatsApp
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]/60"
+              onClick={(e) => {
+                e.stopPropagation();
+                shareEmail();
+              }}
+            >
+              <Mail size={14} className="text-[var(--b1-mid)]" />
+              Email
+            </button>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };

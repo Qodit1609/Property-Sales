@@ -35,7 +35,6 @@ import BuyerComparePage from "./pages/Buyer/BuyerComparePage";
 import BuyerCartPage from "./pages/Buyer/BuyerCartPage";
 import BuyerAccountPage from "./pages/Buyer/BuyerAccountPage";
 import BuyerActivityPage from "./pages/Buyer/BuyerActivityPage";
-import BuyerEnquiriesPage from "./pages/Buyer/BuyerEnquiriesPage";
 import BuyerNotificationsPage from "./pages/Buyer/BuyerNotificationsPage";
 import BuyerTestimonialPage from "./pages/Buyer/BuyerTestimonialPage";
 import AgentDashboard from "./pages/Agent/AgentDashboard";
@@ -154,7 +153,6 @@ function App() {
           <Route path="cart" element={<BuyerCartPage />} />
           <Route path="account" element={<BuyerAccountPage />} />
           <Route path="activity" element={<BuyerActivityPage />} />
-          <Route path="enquiries" element={<BuyerEnquiriesPage />} />
           <Route path="testimonial" element={<BuyerTestimonialPage />} />
           <Route path="notifications" element={<BuyerNotificationsPage />} />
         </Route>

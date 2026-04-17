@@ -1,11 +1,15 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Clock } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { useBuyerActivityLocal } from "../../hooks/useBuyerActivityLocal";
 import { useBuyerProfileLocal } from "../../hooks/useBuyerProfileLocal";
-import { loadBuyerProfile, saveBuyerProfile } from "../../lib/buyerProfileStorage";
+import {
+  loadBuyerProfile,
+  saveBuyerProfile,
+  setBuyerAccountCreatedIfMissing,
+} from "../../lib/buyerProfileStorage";
 import { Button, Input } from "@/components/common";
 
 import type { BuyerPreference } from "../../features/buyer/buyerTypes";
@@ -40,8 +44,27 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
   const storedProfile = useBuyerProfileLocal(email);
   const activity = useBuyerActivityLocal(email);
   const [photoError, setPhotoError] = useState<string | null>(null);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    fullName: "",
+    emailAddress: "",
+    mobileNumber: "",
+    occupation: "",
+    gender: "",
+  });
 
   const profilePhotoUrl = storedProfile?.profilePhotoUrl ?? null;
+  const profileCompletion = useMemo(() => {
+    const checks = [
+      profileForm.fullName.trim(),
+      profileForm.emailAddress.trim(),
+      profileForm.mobileNumber.trim(),
+      profileForm.occupation.trim(),
+      profileForm.gender.trim(),
+    ];
+    const filled = checks.filter(Boolean).length;
+    return Math.round((filled / checks.length) * 100);
+  }, [profileForm]);
 
   const displayInitial = useMemo(() => {
     const n = (user?.name ?? "B").trim();
@@ -85,6 +108,60 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
     persistPhoto(null);
   }, [persistPhoto]);
 
+  useEffect(() => {
+    if (profileCompletion !== 100) return;
+    setBuyerAccountCreatedIfMissing(email);
+  }, [email, profileCompletion]);
+
+  useEffect(() => {
+    setProfileForm({
+      fullName: (user?.name ?? "").trim(),
+      emailAddress: (user?.email ?? "").trim(),
+      mobileNumber: (storedProfile?.mobileNumber ?? "").trim(),
+      occupation: (storedProfile?.occupation ?? "").trim(),
+      gender: (storedProfile?.gender ?? "").trim(),
+    });
+  }, [
+    storedProfile?.gender,
+    storedProfile?.mobileNumber,
+    storedProfile?.occupation,
+    user?.email,
+    user?.name,
+  ]);
+
+  const handleProfileChange = useCallback(
+    (field: "fullName" | "emailAddress" | "mobileNumber" | "occupation" | "gender", value: string) => {
+      setProfileForm((prev) => ({ ...prev, [field]: value }));
+    },
+    []
+  );
+
+  const handleProfileEditToggle = useCallback(() => {
+    if (!isEditingProfile) {
+      setIsEditingProfile(true);
+      return;
+    }
+    const prev = loadBuyerProfile(email) ?? {};
+    saveBuyerProfile(email, {
+      ...prev,
+      mobileNumber: profileForm.mobileNumber.trim(),
+      occupation: profileForm.occupation.trim(),
+      gender: profileForm.gender.trim(),
+    });
+    setIsEditingProfile(false);
+  }, [email, isEditingProfile, profileForm.gender, profileForm.mobileNumber, profileForm.occupation]);
+
+  const handleCancelProfileEdit = useCallback(() => {
+    setProfileForm({
+      fullName: (user?.name ?? "").trim(),
+      emailAddress: (user?.email ?? "").trim(),
+      mobileNumber: (storedProfile?.mobileNumber ?? "").trim(),
+      occupation: (storedProfile?.occupation ?? "").trim(),
+      gender: (storedProfile?.gender ?? "").trim(),
+    });
+    setIsEditingProfile(false);
+  }, [storedProfile?.gender, storedProfile?.mobileNumber, storedProfile?.occupation, user?.email, user?.name]);
+
   return (
     <div className="space-y-4">
       <motion.div
@@ -94,14 +171,26 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
         className="rounded-2xl border border-[var(--b2)]/90 bg-[var(--white)] p-4 shadow-sm sm:p-6"
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <div className="relative mx-auto h-20 w-20 shrink-0 overflow-hidden rounded-full border border-[var(--b2)] bg-[var(--b2-soft)] shadow-inner shadow-[var(--b2)]/30 sm:mx-0">
-            {profilePhotoUrl ? (
-              <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <span className="flex h-full w-full items-center justify-center font-serif text-2xl font-semibold text-[var(--b1-mid)]">
-                {displayInitial}
-              </span>
-            )}
+          <div className="relative mx-auto h-20 w-20 shrink-0 sm:mx-0">
+            <div className="h-20 w-20 overflow-hidden rounded-full border border-[var(--b2)] bg-[var(--b2-soft)] shadow-inner shadow-[var(--b2)]/30">
+              {profilePhotoUrl ? (
+                <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center font-serif text-2xl font-semibold text-[var(--b1-mid)]">
+                  {displayInitial}
+                </span>
+              )}
+            </div>
+            <div
+              className="pointer-events-none absolute -bottom-3 -right-3 h-14 w-14 rounded-full"
+              style={{
+                background: `conic-gradient(var(--b1) ${profileCompletion * 3.6}deg, var(--b2) 0deg)`,
+              }}
+            >
+              <div className="absolute inset-1 flex items-center justify-center rounded-full bg-[var(--white)] text-[11px] font-semibold text-[var(--b1)]">
+                {profileCompletion}%
+              </div>
+            </div>
           </div>
           <div className="min-w-0 flex-1 space-y-2 text-center sm:text-left">
             <p className="font-serif text-sm font-semibold text-[var(--b1)]">
@@ -165,27 +254,94 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
       <div className="grid gap-4 md:grid-cols-[minmax(0,1.5fr)_minmax(0,2fr)]">
         {/* Profile Section */}
         <div className="space-y-4 rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm">
-          <h2 className="text-sm font-semibold text-[var(--b1)]">
-            Profile details
-          </h2>
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-sm font-semibold text-[var(--b1)]">
+              Profile details
+            </h2>
+            <div className="flex items-center gap-2">
+              {isEditingProfile ? (
+                <Button type="button" variant="ghost" className="text-[11px] px-3 py-1.5" onClick={handleCancelProfileEdit}>
+                  Cancel
+                </Button>
+              ) : null}
+              <Button type="button" variant="primary" className="text-[11px] px-3 py-1.5" onClick={handleProfileEditToggle}>
+                {isEditingProfile ? "Save" : "Edit"}
+              </Button>
+            </div>
+          </div>
 
           <div className="space-y-3 text-xs text-[var(--b1)]">
             <div>
               <p className="text-[11px] font-medium text-[var(--muted)]">
                 Full name
               </p>
-              <p className="mt-0.5 rounded-lg border border-[var(--b2-soft)] bg-[var(--b2-soft)] px-3 py-2 text-sm">
-                {user?.name ?? "—"}
-              </p>
+              <Input
+                value={profileForm.fullName}
+                readOnly
+                className="mt-1 text-sm bg-[var(--b2-soft)]"
+              />
             </div>
 
             <div>
               <p className="text-[11px] font-medium text-[var(--muted)]">
                 Email
               </p>
-              <p className="mt-0.5 rounded-lg border border-[var(--b2-soft)] bg-[var(--b2-soft)] px-3 py-2 text-sm">
-                {user?.email ?? "—"}
+              <Input
+                value={profileForm.emailAddress}
+                readOnly
+                className="mt-1 text-sm bg-[var(--b2-soft)]"
+              />
+            </div>
+
+            <div>
+              <p className="text-[11px] font-medium text-[var(--muted)]">
+                Mobile number
               </p>
+              <Input
+                value={profileForm.mobileNumber}
+                onChange={(e) => handleProfileChange("mobileNumber", e.target.value)}
+                onFocus={() => {
+                  if (!isEditingProfile) setIsEditingProfile(true);
+                }}
+                placeholder="Enter mobile number"
+                readOnly={!isEditingProfile}
+                className="mt-1 text-sm"
+              />
+            </div>
+
+            <div>
+              <p className="text-[11px] font-medium text-[var(--muted)]">
+                Occupation
+              </p>
+              <Input
+                value={profileForm.occupation}
+                onChange={(e) => handleProfileChange("occupation", e.target.value)}
+                onFocus={() => {
+                  if (!isEditingProfile) setIsEditingProfile(true);
+                }}
+                placeholder="Enter occupation"
+                readOnly={!isEditingProfile}
+                className="mt-1 text-sm"
+              />
+            </div>
+
+            <div>
+              <p className="text-[11px] font-medium text-[var(--muted)]">
+                Gender
+              </p>
+              <select
+                value={profileForm.gender}
+                onChange={(e) => handleProfileChange("gender", e.target.value)}
+                onFocus={() => {
+                  if (!isEditingProfile) setIsEditingProfile(true);
+                }}
+                className="mt-1 w-full rounded-xl border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm text-[var(--b1)] outline-none transition focus:border-[var(--b1)]"
+              >
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
 
             <div>

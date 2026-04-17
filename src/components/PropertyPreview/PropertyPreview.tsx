@@ -224,7 +224,7 @@ const PropertyPreview = ({ property }: Props) => {
                     </div>
                     {isBuyer && (
                       <div className="flex shrink-0 justify-start sm:justify-end">
-                        <BuyerActions property={property} showQuickView={false} />
+                        <BuyerActions property={property} />
                       </div>
                     )}
                   </div>

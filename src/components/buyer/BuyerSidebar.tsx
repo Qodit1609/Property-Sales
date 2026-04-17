@@ -8,7 +8,6 @@ import {
   UserCircle2,
   Bell,
   Clock3,
-  MessagesSquare,
   MessageCircleMore,
 } from "lucide-react";
 import { twMerge } from "tailwind-merge";
@@ -20,7 +19,6 @@ const navItems = [
   { to: "/buyer/cart", icon: ShoppingCart, label: "Cart" },
   { to: "/buyer/account", icon: UserCircle2, label: "Account" },
   { to: "/buyer/activity", icon: Clock3, label: "Activity" },
-  { to: "/buyer/enquiries", icon: MessagesSquare, label: "Enquiries" },
   { to: "/buyer/testimonial", icon: MessageCircleMore, label: "Testimonial" },
   { to: "/buyer/notifications", icon: Bell, label: "Notifications" },
 ];

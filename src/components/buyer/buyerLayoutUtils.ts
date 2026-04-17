@@ -3,7 +3,7 @@ export const BUYER_SIDEBAR_WIDTH_EXPANDED = 280;
 export const BUYER_SIDEBAR_WIDTH_COLLAPSED = 72;
 
 const DEFAULT_SUB =
-  "Track saved properties, enquiries, and activity at a glance.";
+  "Track saved properties and activity at a glance.";
 
 /**
  * Top overview strip title/subtitle from the current buyer route (pathname from react-router).
@@ -36,10 +36,6 @@ export function buyerTopBarFromPath(pathname: string): {
     "/buyer/activity": {
       title: "Activity",
       subtitle: "Recent views and interactions.",
-    },
-    "/buyer/enquiries": {
-      title: "Enquiries",
-      subtitle: "Messages and requests you have sent.",
     },
     "/buyer/testimonial": {
       title: "Testimonial",
