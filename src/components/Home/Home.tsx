@@ -35,6 +35,7 @@ const Home: React.FC = () => {
   const [location, setLocation] = useState(FILTER_ANY);
   const [category, setCategory] = useState(FILTER_ANY);
   const [listingType, setListingType] = useState(FILTER_ANY);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const cities = useMemo(() => {
     const set = new Set<string>();
@@ -93,12 +94,24 @@ const Home: React.FC = () => {
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
     if (!setAppliedCriteria) return;
+    setHasSearched(true);
+
+    const parsedSearch = search
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    // Keep compatibility with current criteria contract while supporting multi-term input parsing.
+    const normalizedSearch =
+      parsedSearch.length > 1
+        ? parsedSearch.join(", ")
+        : (parsedSearch[0] ?? search.trim());
 
     const criteria: AppliedCriteria = {
       city: location.trim(),
       propertyType: category.trim(),
       listingTypeKey: listingType.trim(),
-      search,
+      search: normalizedSearch,
     };
 
     const hasFilter =
@@ -113,6 +126,15 @@ const Home: React.FC = () => {
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
     }
+  };
+
+  const handleReset = () => {
+    setCategory(FILTER_ANY);
+    setListingType(FILTER_ANY);
+    setLocation(FILTER_ANY);
+    setSearch("");
+    setHasSearched(false);
+    setAppliedCriteria?.(null);
   };
 
   return (
@@ -286,26 +308,37 @@ const Home: React.FC = () => {
               />
             </div>
 
-            <button
-              type="submit"
-              className="w-full sm:w-auto px-4 py-2 rounded-md bg-gradient-to-r from-[var(--b1-mid)] to-[var(--b2)] hover:from-[var(--b1)] hover:to-[var(--b2-soft)] transition-all duration-200 text-fg text-sm font-semibold flex items-center justify-center gap-1 shadow border border-[var(--b2)] hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] focus-visible:ring-offset-2"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+            <div className="flex w-full sm:w-auto items-stretch gap-2">
+              <button
+                type="submit"
+                className="w-full sm:w-auto px-4 py-2 rounded-md bg-gradient-to-r from-[var(--b1-mid)] to-[var(--b2)] hover:from-[var(--b1)] hover:to-[var(--b2-soft)] transition-all duration-200 text-fg text-sm font-semibold flex items-center justify-center gap-1 shadow border border-[var(--b2)] hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] focus-visible:ring-offset-2"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-              {t("homePage.searchAction")}
-            </button>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                {t("homePage.searchAction")}
+              </button>
+              {hasSearched && (
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="w-full sm:w-auto px-4 py-2 rounded-md bg-gradient-to-r from-[var(--b1-mid)] to-[var(--b2)] hover:from-[var(--b1)] hover:to-[var(--b2-soft)] transition-all duration-200 text-fg text-sm font-semibold flex items-center justify-center gap-1 shadow border border-[var(--b2)] hover:shadow-md hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] focus-visible:ring-offset-2"
+                >
+                  Reset
+                </button>
+              )}
+            </div>
           </form>
         </div>
       </div>

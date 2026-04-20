@@ -168,6 +168,8 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
   );
 
   const handleLogout = () => {
+    const shouldLogout = window.confirm("Are you sure you want to logout?");
+    if (!shouldLogout) return;
     dispatch(logout());
     navigate("/login", { replace: true });
     setMobileNavOpen(false);

@@ -192,6 +192,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     topBarSubtitle ?? "Track your workspace and tasks at a glance.";
 
   const handleLogout = () => {
+    const shouldLogout = window.confirm("Are you sure you want to logout?");
+    if (!shouldLogout) return;
     dispatch(logout());
     navigate("/login", { replace: true });
     setMobileNavOpen(false);

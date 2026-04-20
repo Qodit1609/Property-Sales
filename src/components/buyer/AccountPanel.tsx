@@ -148,8 +148,11 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
       occupation: profileForm.occupation.trim(),
       gender: profileForm.gender.trim(),
     });
+    if (profileCompletion === 100) {
+      window.alert("Your profile is 100% completed");
+    }
     setIsEditingProfile(false);
-  }, [email, isEditingProfile, profileForm.gender, profileForm.mobileNumber, profileForm.occupation]);
+  }, [email, isEditingProfile, profileCompletion, profileForm.gender, profileForm.mobileNumber, profileForm.occupation]);
 
   const handleCancelProfileEdit = useCallback(() => {
     setProfileForm({

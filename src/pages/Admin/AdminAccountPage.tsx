@@ -294,6 +294,25 @@ const AdminAccountPage: React.FC = () => {
         if (section === "all") setEditing(new Set());
         else stopEdit(section);
         pushToast({ kind: "success", title: "Saved", detail: "Your profile was updated." });
+        const updatedCompletionChecks = [
+          updated.basicInfo.fullName.trim(),
+          updated.basicInfo.email.trim(),
+          updated.basicInfo.phone.trim(),
+          (updated.basicInfo.profileImage || updated.media.profileImage || "").trim(),
+          updated.professional.experience.trim(),
+          updated.professional.department.trim(),
+          updated.address.country.trim(),
+          updated.address.state.trim(),
+          updated.address.city.trim(),
+          updated.address.zipCode.trim(),
+        ];
+        const updatedFilled = updatedCompletionChecks.filter(Boolean).length;
+        const updatedProfileCompletion = Math.round(
+          (updatedFilled / updatedCompletionChecks.length) * 100
+        );
+        if (updatedProfileCompletion === 100) {
+          window.alert("Your profile is 100% completed");
+        }
       } catch (e) {
         pushToast({
           kind: "error",

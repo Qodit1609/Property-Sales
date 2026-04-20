@@ -165,6 +165,8 @@ export function SellerSidebar({
   const storedProfile = useSellerProfileLocal(user?.email);
 
   const handleLogout = () => {
+    const shouldLogout = window.confirm("Are you sure you want to logout?");
+    if (!shouldLogout) return;
     dispatch(logout());
     navigate("/login", { replace: true });
     onNavigate?.();

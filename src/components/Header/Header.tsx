@@ -604,12 +604,17 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
 
   const openMega = (label: string) => {
     if (megaTimer.current) clearTimeout(megaTimer.current);
-    setActiveMega(label);
+    megaTimer.current = setTimeout(() => {
+      setActiveMega(label);
+      megaTimer.current = null;
+    }, 180);
   };
 
   const closeMega = () => {
+    if (megaTimer.current) clearTimeout(megaTimer.current);
     megaTimer.current = setTimeout(() => {
       setActiveMega(null);
+      megaTimer.current = null;
     }, 600);
   };
 
@@ -774,6 +779,8 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   };
 
   const handleLogout = () => {
+    const shouldLogout = window.confirm("Are you sure you want to logout?");
+    if (!shouldLogout) return;
     dispatch(logout());
     navigate("/", { replace: true });
   };
@@ -879,6 +886,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                     >
                       <Link
                         to={item.href}
+                        onClick={() => setActiveMega(null)}
                         className={`relative inline-flex whitespace-nowrap pb-1 text-sm 2xl:text-[15px] font-medium transition-colors duration-300 ${
                           isActive
                             ? "text-[var(--b2)]"
@@ -976,7 +984,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                     <button
                       type="button"
                       onClick={() => changeLanguage(option.code)}
-                      className={`inline-flex min-h-[26px] min-w-[2rem] items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors duration-200 ${
+                      className={`inline-flex min-h-[26px] min-w-[2rem] items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors duration-200 cursor-pointer ${
                         activeLanguage === option.code
                           ? "bg-[var(--b1-mid)] text-[var(--fg)] shadow-sm ring-1 ring-[var(--fg)]/20"
                           : "text-[var(--fg)]/75 hover:bg-[var(--fg)]/10 hover:text-[var(--fg)]"
@@ -1011,7 +1019,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1, scale: 1.03 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}>
                 <Button
                   onClick={() => setContactOpen(true)}
-                  className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg border-2 border-[var(--fg)]/90 bg-transparent p-0 text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[2px] hover:bg-[var(--fg)]/12"
+                  className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg border-2 border-[var(--fg)]/90 bg-transparent p-0 text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[2px] hover:bg-[var(--fg)]/12 cursor-pointer"
                   aria-label={contactPhone || t("header.openContactForm")}
                 >
                   <svg
@@ -1029,7 +1037,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                 <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
                   <Link
                     to="/login"
-                    className="hidden lg:inline-flex h-8 items-center justify-center rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-3 text-[13px] font-semibold leading-none text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)] hover:bg-[var(--fg)]/12"
+                    className="hidden lg:inline-flex h-8 items-center justify-center rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-3 text-[13px] font-semibold leading-none text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)] hover:bg-[var(--fg)]/12 cursor-pointer"
                   >
                     {t("header.loginRegister")}
                   </Link>

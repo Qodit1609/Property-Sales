@@ -158,7 +158,7 @@ const Register: React.FC = () => {
             </div>
           )}
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-4" onSubmit={handleSubmit} autoComplete="off">
 
             {/* Role */}
             <div>
@@ -198,6 +198,7 @@ const Register: React.FC = () => {
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium">Name</label>
                 <Input
+                  autoComplete="off"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
@@ -210,6 +211,7 @@ const Register: React.FC = () => {
                 <label className="text-sm font-medium">Email</label>
                 <Input
                   type="email"
+                  autoComplete="off"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
@@ -221,6 +223,7 @@ const Register: React.FC = () => {
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium">Mobile</label>
                 <Input
+                  autoComplete="off"
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value)}
                   className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
@@ -234,6 +237,7 @@ const Register: React.FC = () => {
                     Investment Interest
                   </label>
                   <Input
+                    autoComplete="off"
                     value={investmentInterest}
                     onChange={(e) => setInvestmentInterest(e.target.value)}
                     className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
@@ -248,6 +252,7 @@ const Register: React.FC = () => {
                     Property focus type
                   </label>
                   <Input
+                    autoComplete="off"
                     value={propertyFocusType}
                     onChange={(e) => setPropertyFocusType(e.target.value)}
                     className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
@@ -262,6 +267,7 @@ const Register: React.FC = () => {
                     Experience (years)
                   </label>
                   <Input
+                    autoComplete="off"
                     value={experienceYears}
                     onChange={(e) => setExperienceYears(e.target.value)}
                     className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
@@ -275,6 +281,7 @@ const Register: React.FC = () => {
                 <div className="relative">
                   <Input
                     type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="border border-[var(--b2)] rounded-md px-3 py-2 pr-16 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
@@ -296,6 +303,7 @@ const Register: React.FC = () => {
                 <div className="relative">
                   <Input
                     type={showConfirmPassword ? "text" : "password"}
+                    autoComplete="new-password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="border border-[var(--b2)] rounded-md px-3 py-2 pr-16 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"

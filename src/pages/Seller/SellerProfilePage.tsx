@@ -194,6 +194,9 @@ const SellerProfilePage = () => {
     });
     setAccountCreatedIfMissing(email);
     setSaved(true);
+    if (profileCompletion === 100) {
+      window.alert("Your profile is 100% completed");
+    }
     window.setTimeout(() => setSaved(false), 4000);
   });
 
