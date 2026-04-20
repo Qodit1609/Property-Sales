@@ -1,25 +1,45 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { NavLink, Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, LogOut } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  LogOut,
+  LayoutDashboard,
+  LineChart,
+  Megaphone,
+  MessageSquare,
+  Bell,
+  MessageCircleMore,
+  Settings,
+  UserRound,
+  Building2,
+  Users,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { logout } from "../../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import { useSellerProfileLocal } from "../../hooks/useSellerProfileLocal";
-import { SELLER_NAV_ACCOUNT, SELLER_NAV_MAIN } from "./sellerNav";
+import { type SellerNavItem } from "./sellerNav";
 import {
   cn,
   SELLER_SIDEBAR_WIDTH_COLLAPSED,
   SELLER_SIDEBAR_WIDTH_EXPANDED,
 } from "./sellerUtils";
+import api from "@/lib/apiClient";
+
+type SidebarNavItem = SellerNavItem & { label?: string };
 
 type NavBlockProps = {
   collapsed: boolean;
   onNavigate?: () => void;
+  workspaceTitle?: string;
+  mainItems: SidebarNavItem[];
+  accountItems: SidebarNavItem[];
 };
 
-function NavBlock({ collapsed, onNavigate }: NavBlockProps) {
+function NavBlock({ collapsed, onNavigate, workspaceTitle, mainItems, accountItems }: NavBlockProps) {
   const { t } = useTranslation();
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -39,16 +59,16 @@ function NavBlock({ collapsed, onNavigate }: NavBlockProps) {
           collapsed && "sr-only"
         )}
       >
-        {t("sellerPanel.sidebar.workspace")}
+        {workspaceTitle ?? t("sellerPanel.sidebar.workspace")}
       </p>
       <ul className="space-y-1">
-        {SELLER_NAV_MAIN.map((item) => {
+        {mainItems.map((item) => {
           const Icon = item.icon;
           const inner = (
             <>
               <Icon className="h-[18px] w-[18px] shrink-0 opacity-90 transition group-hover:scale-[1.03]" />
               {!collapsed ? (
-                <span className="truncate">{t(item.labelKey)}</span>
+                <span className="truncate">{item.label ?? t(item.labelKey)}</span>
               ) : null}
             </>
           );
@@ -81,13 +101,13 @@ function NavBlock({ collapsed, onNavigate }: NavBlockProps) {
         {t("sellerPanel.sidebar.account")}
       </p>
       <ul className="space-y-1">
-        {SELLER_NAV_ACCOUNT.map((item) => {
+        {accountItems.map((item) => {
           const Icon = item.icon;
           return (
             <li key={item.key}>
               <NavLink to={item.to} className={linkClass} onClick={onNavigate}>
                 <Icon className="h-[18px] w-[18px] shrink-0 opacity-90" />
-                {!collapsed ? <span className="truncate">{t(item.labelKey)}</span> : null}
+                {!collapsed ? <span className="truncate">{item.label ?? t(item.labelKey)}</span> : null}
               </NavLink>
             </li>
           );
@@ -159,8 +179,122 @@ export function SellerSidebar({
     t("sellerPanel.sidebar.sellerFallback");
 
   const photoUrl = storedProfile?.profilePhotoUrl;
+  const [workspaceTitle, setWorkspaceTitle] = useState<string | undefined>();
+  const [mainItems, setMainItems] = useState<SidebarNavItem[]>([]);
+  const [accountItems, setAccountItems] = useState<SidebarNavItem[]>([]);
 
   const headerExpanded = !collapsed || mobile;
+
+  useEffect(() => {
+    let active = true;
+
+    const ICON_MAP = {
+      layoutdashboard: LayoutDashboard,
+      dashboard: LayoutDashboard,
+      building2: Building2,
+      properties: Building2,
+      users: Users,
+      leads: Users,
+      linechart: LineChart,
+      analytics: LineChart,
+      messagesquare: MessageSquare,
+      messages: MessageSquare,
+      messagecirclemore: MessageCircleMore,
+      testimonial: MessageCircleMore,
+      bell: Bell,
+      notifications: Bell,
+      megaphone: Megaphone,
+      promotions: Megaphone,
+      userround: UserRound,
+      profile: UserRound,
+      settings: Settings,
+    } as const;
+
+    const mapSidebarItems = (items: unknown) =>
+      (Array.isArray(items) ? items : [])
+        .map(
+          (item: {
+            title?: string;
+            label?: string;
+            name?: string;
+            icon?: string;
+            route?: string;
+            path?: string;
+            to?: string;
+            href?: string;
+            url?: string;
+          }) => {
+            const iconKey = (item.icon ?? "").replace(/[\s_-]/g, "").toLowerCase();
+            return {
+              key: item.route ?? item.path ?? item.to ?? item.href ?? item.url ?? item.title ?? item.label ?? item.name ?? "item",
+              to: item.route ?? item.path ?? item.to ?? item.href ?? item.url ?? "",
+              icon: ICON_MAP[iconKey as keyof typeof ICON_MAP] ?? LayoutDashboard,
+              labelKey: "sellerPanel.nav.dashboard",
+              label: item.title ?? item.label ?? item.name ?? "",
+            };
+          }
+        )
+        .filter((item: SidebarNavItem) => item.to && item.label);
+
+    const loadSidebar = async () => {
+      try {
+        const response = await api.get("/sidebar/seller");
+        const payload = response.data?.data ?? response.data;
+        if (!payload || !active) return;
+
+        const sections =
+          payload?.sidebar?.sections ??
+          payload?.sections ??
+          [];
+
+        const workspaceSection = (Array.isArray(sections) ? sections : []).find(
+          (section: { sectionTitle?: string }) =>
+            String(section?.sectionTitle ?? "").trim().toLowerCase() !== "account"
+        );
+        const accountSection = (Array.isArray(sections) ? sections : []).find(
+          (section: { sectionTitle?: string }) =>
+            String(section?.sectionTitle ?? "").trim().toLowerCase() === "account"
+        );
+
+        const rawMainItems =
+          workspaceSection?.items ??
+          payload?.items ??
+          payload?.menuItems ??
+          payload?.menu_items ??
+          payload?.sidebarItems ??
+          payload?.sidebar_items ??
+          payload?.links ??
+          (Array.isArray(payload) ? payload : []);
+
+        const rawAccountItems =
+          accountSection?.items ??
+          payload?.accountItems ??
+          payload?.account_items ??
+          payload?.account ??
+          payload?.profileItems ??
+          payload?.profile_items;
+
+        setMainItems(mapSidebarItems(rawMainItems));
+        setAccountItems(mapSidebarItems(rawAccountItems));
+
+        const title =
+          workspaceSection?.sectionTitle ??
+          payload?.sectionTitle ??
+          payload?.title ??
+          payload?.section_title;
+        if (title) {
+          setWorkspaceTitle(title);
+        }
+      } catch (error) {
+        console.error("Failed to load seller sidebar:", error);
+      }
+    };
+
+    loadSidebar();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <motion.aside
@@ -217,7 +351,13 @@ export function SellerSidebar({
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-4">
-        <NavBlock collapsed={!mobile && collapsed} onNavigate={onNavigate} />
+        <NavBlock
+          collapsed={!mobile && collapsed}
+          onNavigate={onNavigate}
+          workspaceTitle={workspaceTitle}
+          mainItems={mainItems}
+          accountItems={accountItems}
+        />
       </nav>
 
       <div className="border-t border-[var(--b2)]/80 p-2 pb-4">

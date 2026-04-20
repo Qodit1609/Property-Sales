@@ -41,6 +41,11 @@ export const API_ENDPOINTS = {
 
 const api = axios.create({
   baseURL: BASE_URL,
+  headers: {
+    "Cache-Control": "no-cache",
+    Pragma: "no-cache",
+    Expires: "0",
+  },
 });
 
 export const withAuthApi = (config: AxiosRequestConfig = {}): AxiosRequestConfig => ({

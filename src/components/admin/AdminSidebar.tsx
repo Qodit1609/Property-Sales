@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -12,18 +12,54 @@ import {
   Megaphone,
 } from "lucide-react";
 import { twMerge } from "tailwind-merge";
+import api from "@/lib/apiClient";
 
-const items = [
-  { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/admin/account", label: "My Account", icon: UserCircle },
-  { to: "/admin/properties", label: "Properties", icon: ListChecks },
-  { to: "/admin/users", label: "Access Management", icon: Users },
-  { to: "/admin/logs", label: "Activity logs", icon: FileClock },
-  { to: "/admin/activity-logs", label: "Audit logs", icon: ClipboardList },
-  { to: "/admin/testimonial", label: "Testimonial", icon: MessageCircleMore },
-  { to: "/admin/promotions", label: "Promotion Requests", icon: Megaphone },
-  { to: "/admin/notifications", label: "Notifications", icon: Bell },
-];
+type SidebarItem = {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
+
+const ADMIN_ROUTE_BY_LABEL: Record<string, string> = {
+  dashboard: "/admin",
+  "access management": "/admin/users",
+  "activity logs": "/admin/activity-logs",
+  "audit logs": "/admin/logs",
+  testimonial: "/admin/testimonial",
+  "promotion requests": "/admin/promotions",
+};
+
+const ADMIN_ROUTE_ALIASES: Record<string, string> = {
+  "/admin/dashboard": "/admin",
+  "/admin/access-management": "/admin/users",
+  "/admin/accessmanagement": "/admin/users",
+  "/admin/activitylogs": "/admin/activity-logs",
+  "/admin/audit-logs": "/admin/logs",
+  "/admin/auditlogs": "/admin/logs",
+  "/admin/testimonials": "/admin/testimonial",
+  "/admin/promotion-requests": "/admin/promotions",
+  "/admin/promotionrequests": "/admin/promotions",
+};
+
+const ICON_MAP = {
+  layoutdashboard: LayoutDashboard,
+  dashboard: LayoutDashboard,
+  listchecks: ListChecks,
+  properties: ListChecks,
+  users: Users,
+  fileclock: FileClock,
+  logs: FileClock,
+  usercircle: UserCircle,
+  account: UserCircle,
+  bell: Bell,
+  notifications: Bell,
+  clipboardlist: ClipboardList,
+  audit: ClipboardList,
+  messagecirclemore: MessageCircleMore,
+  testimonial: MessageCircleMore,
+  megaphone: Megaphone,
+  promotions: Megaphone,
+} as const;
 
 interface AdminSidebarProps {
   onNavigate?: () => void;
@@ -31,9 +67,94 @@ interface AdminSidebarProps {
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, collapsed }) => {
+  const [dynamicItems, setDynamicItems] = useState<SidebarItem[]>([]);
+  const [sectionTitle, setSectionTitle] = useState<string>("");
+  const normalizeAdminRoute = (rawTo: string, rawLabel: string) => {
+    const labelKey = rawLabel.trim().toLowerCase();
+    const byLabel = ADMIN_ROUTE_BY_LABEL[labelKey];
+    if (byLabel) return byLabel;
+
+    const cleaned = rawTo.trim();
+    if (!cleaned) return "";
+    const withSlash = cleaned.startsWith("/") ? cleaned : `/${cleaned}`;
+    const compact = withSlash.replace(/\s+/g, "-");
+    return ADMIN_ROUTE_ALIASES[compact] ?? compact;
+  };
+
+  const mapItem = (item: {
+    title?: string;
+    label?: string;
+    name?: string;
+    icon?: string;
+    route?: string;
+    path?: string;
+    to?: string;
+    href?: string;
+    url?: string;
+  }) => {
+    const iconKey = (item.icon ?? "").replace(/[\s_-]/g, "").toLowerCase();
+    const icon = ICON_MAP[iconKey as keyof typeof ICON_MAP] ?? LayoutDashboard;
+    const label = item.title ?? item.label ?? item.name ?? "";
+    const rawTo = item.route ?? item.path ?? item.to ?? item.href ?? item.url ?? "";
+    return { to: normalizeAdminRoute(rawTo, label), label, icon };
+  };
+
+  useEffect(() => {
+    let active = true;
+
+    const loadSidebar = async () => {
+      try {
+        const response = await api.get("/sidebar/admin");
+        const payload = response.data?.data ?? response.data;
+        if (!payload || !active) return;
+
+        const sections =
+          payload?.sidebar?.sections ??
+          payload?.sections ??
+          [];
+
+        const sectionItems = (Array.isArray(sections) ? sections : []).flatMap(
+          (section: { items?: unknown[] }) => (Array.isArray(section?.items) ? section.items : [])
+        );
+
+        const rawItems =
+          sectionItems.length
+            ? sectionItems
+            : payload?.items ??
+          payload?.menuItems ??
+          payload?.menu_items ??
+          payload?.sidebarItems ??
+          payload?.sidebar_items ??
+          payload?.links ??
+          (Array.isArray(payload) ? payload : []);
+
+        const mapped = (Array.isArray(rawItems) ? rawItems : [])
+          .map(mapItem)
+          .filter((item: { to: string; label: string }) => item.to && item.label);
+
+        setDynamicItems(mapped);
+        const title =
+          (Array.isArray(sections) ? sections[0]?.sectionTitle : undefined) ??
+          payload?.sectionTitle ??
+          payload?.title ??
+          payload?.section_title;
+        if (typeof title === "string") {
+          setSectionTitle(title);
+        }
+      } catch (error) {
+        console.error("Failed to load admin sidebar:", error);
+      }
+    };
+
+    loadSidebar();
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
-    <nav className="space-y-1">
-      {items.map((item) => {
+    <nav className="space-y-1" aria-label={sectionTitle || undefined}>
+      {dynamicItems.map((item) => {
         const Icon = item.icon;
         return (
           <NavLink

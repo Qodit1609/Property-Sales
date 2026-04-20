@@ -37,6 +37,7 @@ import BuyerAccountPage from "./pages/Buyer/BuyerAccountPage";
 import BuyerActivityPage from "./pages/Buyer/BuyerActivityPage";
 import BuyerNotificationsPage from "./pages/Buyer/BuyerNotificationsPage";
 import BuyerTestimonialPage from "./pages/Buyer/BuyerTestimonialPage";
+import BuyerEnquiriesPage from "./pages/Buyer/BuyerEnquiriesPage";
 import AgentDashboard from "./pages/Agent/AgentDashboard";
 import AgentLayout from "./pages/Agent/AgentLayout";
 import AgentPropertiesPage from "./pages/Agent/AgentPropertiesPage";
@@ -148,9 +149,11 @@ function App() {
         <Route path="/buyer" element={<ProtectedRoute requiredRoles={["buyer"]} />}>
           <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<BuyerDashboard />} />
+          <Route path="overview" element={<BuyerDashboard />} />
           <Route path="wishlist" element={<BuyerWishlistPage />} />
           <Route path="compare" element={<BuyerComparePage />} />
           <Route path="cart" element={<BuyerCartPage />} />
+          <Route path="enquiries" element={<BuyerEnquiriesPage />} />
           <Route path="account" element={<BuyerAccountPage />} />
           <Route path="activity" element={<BuyerActivityPage />} />
           <Route path="testimonial" element={<BuyerTestimonialPage />} />

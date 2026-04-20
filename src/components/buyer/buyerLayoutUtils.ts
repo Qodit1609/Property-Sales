@@ -17,6 +17,7 @@ export function buyerTopBarFromPath(pathname: string): {
   const map: Record<string, { title: string; subtitle: string }> = {
     "/buyer": { title: "Overview", subtitle: DEFAULT_SUB },
     "/buyer/dashboard": { title: "Overview", subtitle: DEFAULT_SUB },
+    "/buyer/overview": { title: "Overview", subtitle: DEFAULT_SUB },
     "/buyer/wishlist": {
       title: "Wishlist",
       subtitle: "Properties you saved for later.",
@@ -36,6 +37,10 @@ export function buyerTopBarFromPath(pathname: string): {
     "/buyer/activity": {
       title: "Activity",
       subtitle: "Recent views and interactions.",
+    },
+    "/buyer/enquiries": {
+      title: "Enquiries",
+      subtitle: "Status of your seller and agent conversations.",
     },
     "/buyer/testimonial": {
       title: "Testimonial",

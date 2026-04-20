@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Mail,
@@ -15,6 +15,7 @@ import {
   Leaf,
   TreePine,
 } from "lucide-react";
+import api from "@/lib/apiClient";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -32,69 +33,86 @@ interface SocialLink {
   icon: React.ReactNode;
 }
 
+interface FooterContact {
+  email?: string;
+  phone?: string;
+  address?: string;
+}
+
+interface FooterData {
+  brand?: {
+    name?: string;
+    description?: string;
+  };
+  socials?: SocialLink[];
+  quickLinks?: FooterLink[];
+  categories?: FooterLink[];
+  usefulLinks?: FooterLink[];
+  contact?: FooterContact;
+  trustBadges?: { text?: string; icon?: string }[];
+}
+
+type FooterApiItem = {
+  label?: string;
+  name?: string;
+  title?: string;
+  href?: string;
+  url?: string;
+  route?: string;
+  path?: string;
+  to?: string;
+  external?: boolean;
+};
+
+type FooterSocialApiItem = FooterApiItem & {
+  icon?: string;
+};
+
 interface FooterColumnProps {
   title: string;
   links: FooterLink[];
 }
 
-/* ------------------------------------------------------------------ */
-/*  Data                                                               */
-/* ------------------------------------------------------------------ */
+const mapSocialIcon = (iconKey: string) => {
+  const key = iconKey.trim().toLowerCase();
+  if (key.includes("instagram")) return <Instagram className="w-4 h-4" />;
+  if (key.includes("facebook")) return <Facebook className="w-4 h-4" />;
+  if (key.includes("youtube")) return <Youtube className="w-4 h-4" />;
+  if (key.includes("whatsapp") || key.includes("message")) return <MessageCircle className="w-4 h-4" />;
+  return <MessageCircle className="w-4 h-4" />;
+};
 
-const QUICK_LINKS: FooterLink[] = [
-  { label: "Home", href: "/" },
-  { label: "Buy Land", href: "/farmhouse" },
-  { label: "Agriculture Land", href: "/agriculture-land" },
-  { label: "Resort Properties", href: "/resort-properties" },
-  { label: "Rent Farmhouse", href: "/rent-farmhouse" },
-  { label: "About", href: "/" },
-  { label: "Blogs", href: "/" },
-];
+const renderBrandName = (name: string) => {
+  const trimmed = name.trim();
+  const [firstWord, ...restWords] = trimmed.split(/\s+/);
+  if (!restWords.length) {
+    return trimmed;
+  }
+  return (
+    <>
+      {firstWord}
+      <span className="text-[var(--b2)]"> {restWords.join(" ")}</span>
+    </>
+  );
+};
 
-const PROPERTY_CATEGORIES: FooterLink[] = [
-  { label: "Farm Land", href: "/farmhouse" },
-  { label: "Farmhouse", href: "/farmhouse" },
-  { label: "Agricultural Land", href: "/agriculture-land" },
-  { label: "Investment Land", href: "/resort-properties" },
-  { label: "Rent Properties", href: "/rent-farmhouse" },
-];
+const mapBadgeIcon = (iconKey: string) => {
+  const key = iconKey.trim().toLowerCase();
+  if (key.includes("shield")) return <ShieldCheck className="w-5 h-5" />;
+  if (key.includes("landmark")) return <Landmark className="w-5 h-5" />;
+  if (key.includes("leaf")) return <Leaf className="w-5 h-5" />;
+  if (key.includes("tree")) return <TreePine className="w-5 h-5" />;
+  return <ShieldCheck className="w-5 h-5" />;
+};
 
-const USEFUL_LINKS: FooterLink[] = [
-  { label: "Privacy Policy", href: "/" },
-  { label: "Terms & Conditions", href: "/" },
-  { label: "Sitemap", href: "/" },
-  { label: "FAQs", href: "/" },
-];
-
-const SOCIAL_LINKS: SocialLink[] = [
-  {
-    label: "Instagram",
-    href: "https://instagram.com",
-    icon: <Instagram className="w-4 h-4" />,
-  },
-  {
-    label: "Facebook",
-    href: "https://facebook.com",
-    icon: <Facebook className="w-4 h-4" />,
-  },
-  {
-    label: "WhatsApp",
-    href: "https://wa.me/919039055488",
-    icon: <MessageCircle className="w-4 h-4" />,
-  },
-  {
-    label: "YouTube",
-    href: "https://youtube.com",
-    icon: <Youtube className="w-4 h-4" />,
-  },
-];
-
-const TRUST_BADGES = [
-  { icon: <ShieldCheck className="w-5 h-5" />, text: "Verified Properties" },
-  { icon: <Landmark className="w-5 h-5" />, text: "Govt. Approved Lands" },
-  { icon: <Leaf className="w-5 h-5" />, text: "Eco-Friendly Farms" },
-  { icon: <TreePine className="w-5 h-5" />, text: "Premium Listings" },
-];
+const normalizeLinks = (input: unknown): FooterLink[] =>
+  (Array.isArray(input) ? input : [])
+    .map((item: FooterApiItem) => {
+      const label = item?.label ?? item?.name ?? item?.title ?? "";
+      const href = item?.href ?? item?.url ?? item?.route ?? item?.path ?? item?.to ?? "";
+      return { label, href, external: item?.external };
+    })
+    .filter((item) => item.label && item.href);
 
 /* ------------------------------------------------------------------ */
 /*  Subcomponents                                                      */
@@ -233,6 +251,88 @@ const Newsletter: React.FC = () => {
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
+  const [footerData, setFooterData] = useState<FooterData | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadFooter = async () => {
+      try {
+        const response = await api.get("/footer");
+        const payload = response.data?.data?.footerInfo ?? response.data?.data ?? response.data;
+        if (!payload || !active) return;
+
+        const rawSocials = payload?.socials ?? payload?.brand?.socials;
+
+        const mappedSocials: SocialLink[] = (Array.isArray(rawSocials) ? rawSocials : [])
+          .map((social: FooterSocialApiItem) => {
+              const label = social.label ?? social.name ?? social.title ?? (social as { platform?: string })?.platform ?? "";
+              return {
+                label,
+                href: social.href ?? social.url ?? social.route ?? social.path ?? social.to ?? "",
+                icon: mapSocialIcon(social.icon ?? label),
+              };
+            }).filter((social: SocialLink) => social.label && social.href)
+
+        const rawQuickLinks =
+          payload?.quickLinks ??
+          payload?.quicklinks ??
+          payload?.quick_links ??
+          payload?.links?.quickLinks ??
+          payload?.links?.quick_links;
+
+        const rawCategories =
+          payload?.categories ??
+          payload?.propertyCategories ??
+          payload?.property_categories ??
+          payload?.links?.categories;
+
+        const rawUsefulLinks =
+          payload?.usefulLinks ??
+          payload?.usefullinks ??
+          payload?.useful_links ??
+          payload?.links?.usefulLinks ??
+          payload?.links?.useful_links;
+
+        const rawTrustBadges =
+          payload?.trustBadges ??
+          payload?.trust_badges ??
+          payload?.badges;
+
+        setFooterData({
+          brand: {
+            name: payload?.brand?.name ?? payload?.brandName ?? payload?.name,
+            description:
+              payload?.brand?.description ??
+              payload?.description ??
+              payload?.brandDescription,
+          },
+          socials: mappedSocials,
+          quickLinks: normalizeLinks(rawQuickLinks),
+          categories: normalizeLinks(rawCategories),
+          usefulLinks: normalizeLinks(rawUsefulLinks),
+          contact: {
+            email: payload?.contact?.email ?? payload?.email,
+            phone: payload?.contact?.phone ?? payload?.phone,
+            address: payload?.contact?.address ?? payload?.address,
+          },
+          trustBadges: (Array.isArray(rawTrustBadges) ? rawTrustBadges : [])
+            .map((badge: { text?: string; label?: string; title?: string; icon?: string }) => ({
+              text: badge?.text ?? badge?.label ?? badge?.title ?? "",
+              icon: badge?.icon ?? "",
+            }))
+            .filter((badge: { text?: string; icon?: string }) => badge.text),
+        });
+      } catch (error) {
+        console.error("Failed to load footer data:", error);
+      }
+    };
+
+    loadFooter();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <footer
@@ -247,14 +347,14 @@ const Footer: React.FC = () => {
       <div className="border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            {TRUST_BADGES.map((badge) => (
+            {footerData?.trustBadges?.map((badge) => (
               <div
                 key={badge.text}
                 className="flex items-center gap-2.5 justify-center text-fg/80"
               >
-                <span className="text-[var(--b2)]">{badge.icon}</span>
+                <span className="text-[var(--b2)]">{mapBadgeIcon(badge?.icon ?? "")}</span>
                 <span className="text-xs sm:text-sm font-medium">
-                  {badge.text}
+                  {badge?.text}
                 </span>
               </div>
             ))}
@@ -272,18 +372,16 @@ const Footer: React.FC = () => {
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               className="inline-block text-2xl font-bold text-fg font-serif focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] rounded-sm"
             >
-              Bhoomi<span className="text-[var(--b2)]"> Wala</span>
+              {footerData?.brand?.name && renderBrandName(footerData.brand.name)}
             </Link>
 
             <p className="text-sm leading-relaxed text-fg/70 max-w-xs">
-              Your trusted partner in finding the perfect land investment.
-              Explore verified farm lands, farmhouses, and agricultural
-              properties across India.
+              {footerData?.brand?.description}
             </p>
 
             {/* Social Icons */}
             <div className="flex gap-3">
-              {SOCIAL_LINKS.map((social) => (
+              {footerData?.socials?.map((social) => (
                 <SocialIcon key={social.label} {...social} />
               ))}
             </div>
@@ -291,17 +389,17 @@ const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div className="lg:col-span-2">
-            <FooterColumn title="Quick Links" links={QUICK_LINKS} />
+            {footerData?.quickLinks && <FooterColumn title="Quick Links" links={footerData.quickLinks} />}
           </div>
 
           {/* Property Categories */}
           <div className="lg:col-span-2">
-            <FooterColumn title="Categories" links={PROPERTY_CATEGORIES} />
+            {footerData?.categories && <FooterColumn title="Categories" links={footerData.categories} />}
           </div>
 
           {/* Useful Links + Contact */}
           <div className="lg:col-span-4 space-y-8">
-            <FooterColumn title="Useful Links" links={USEFUL_LINKS} />
+            {footerData?.usefulLinks && <FooterColumn title="Useful Links" links={footerData.usefulLinks} />}
 
             {/* Contact Info */}
             <div>
@@ -310,22 +408,22 @@ const Footer: React.FC = () => {
               </h3>
               <address className="not-italic space-y-3">
                 <a
-                  href="mailto:info@1bigha.com"
+                  href={`mailto:${footerData?.contact?.email}`}
                   className="flex items-center gap-2.5 text-sm text-fg/70 hover:text-[var(--b2)] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] rounded-sm justify-center sm:justify-start"
                 >
                   <Mail className="w-4 h-4 shrink-0 text-[var(--b2)]" />
-                  info@bhoomiwala.com
+                  {footerData?.contact?.email}
                 </a>
                 <a
-                  href="tel:+919039055488"
+                  href={`tel:${footerData?.contact?.phone?.replace(/\s/g, "")}`}
                   className="flex items-center gap-2.5 text-sm text-fg/70 hover:text-[var(--b2)] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] rounded-sm justify-center sm:justify-start"
                 >
                   <Phone className="w-4 h-4 shrink-0 text-[var(--b2)]" />
-                  +0731 426 8367
+                  {footerData?.contact?.phone}
                 </a>
                 <p className="flex items-start gap-2.5 text-sm text-fg/70 justify-center sm:justify-start">
                   <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-[var(--b2)]" />
-                  <span>51, Electronic Complex,Indore, M.P 452007</span>
+                  <span>{footerData?.contact?.address}</span>
                 </p>
               </address>
             </div>

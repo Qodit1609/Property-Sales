@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutGrid,
@@ -11,16 +11,43 @@ import {
   MessageCircleMore,
 } from "lucide-react";
 import { twMerge } from "tailwind-merge";
+import api from "@/lib/apiClient";
 
-const navItems = [
-  { to: "/buyer/dashboard", icon: LayoutGrid, label: "Overview" },
-  { to: "/buyer/wishlist", icon: Heart, label: "Wishlist" },
-  { to: "/buyer/compare", icon: Scale, label: "Compare" },
-  { to: "/buyer/cart", icon: ShoppingCart, label: "Cart" },
-  { to: "/buyer/account", icon: UserCircle2, label: "Account" },
-  { to: "/buyer/activity", icon: Clock3, label: "Activity" },
-  { to: "/buyer/testimonial", icon: MessageCircleMore, label: "Testimonial" },
-  { to: "/buyer/notifications", icon: Bell, label: "Notifications" },
+type SidebarItem = {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+};
+
+const ICON_MAP = {
+  layoutgrid: LayoutGrid,
+  overview: LayoutGrid,
+  heart: Heart,
+  wishlist: Heart,
+  scale: Scale,
+  compare: Scale,
+  shoppingcart: ShoppingCart,
+  cart: ShoppingCart,
+  usercircle2: UserCircle2,
+  account: UserCircle2,
+  bell: Bell,
+  notifications: Bell,
+  clock3: Clock3,
+  activity: Clock3,
+  messagecirclemore: MessageCircleMore,
+  testimonial: MessageCircleMore,
+  enquiries: MessageCircleMore,
+} as const;
+
+const DEFAULT_ITEMS: SidebarItem[] = [
+  { to: "/buyer/overview", label: "Overview", icon: LayoutGrid },
+  { to: "/buyer/wishlist", label: "Wishlist", icon: Heart },
+  { to: "/buyer/compare", label: "Compare", icon: Scale },
+  { to: "/buyer/cart", label: "Cart", icon: ShoppingCart },
+  { to: "/buyer/enquiries", label: "Enquiries", icon: MessageCircleMore },
+  { to: "/buyer/activity", label: "Activity", icon: Clock3 },
+  { to: "/buyer/notifications", label: "Notifications", icon: Bell },
+  { to: "/buyer/account", label: "Account", icon: UserCircle2 },
 ];
 
 interface BuyerSidebarProps {
@@ -32,9 +59,99 @@ const BuyerSidebar: React.FC<BuyerSidebarProps> = ({
   collapsed,
   onNavigate,
 }) => {
+  const [dynamicItems, setDynamicItems] = useState<SidebarItem[]>([]);
+  const [sectionTitle, setSectionTitle] = useState<string>("");
+  const normalizeRoute = (route: string) => {
+    const raw = route.trim();
+    if (!raw) return "";
+    if (/^https?:\/\//i.test(raw)) return "";
+    if (raw.startsWith("/buyer/")) return raw;
+    if (raw === "/buyer") return "/buyer/overview";
+    if (raw.startsWith("/")) return `/buyer${raw}`;
+    return `/buyer/${raw}`;
+  };
+
+  const mapItem = (item: {
+    title?: string;
+    label?: string;
+    name?: string;
+    icon?: string;
+    route?: string;
+    path?: string;
+    to?: string;
+    href?: string;
+    url?: string;
+  }) => {
+    const iconKey = (item.icon ?? "").replace(/[\s_-]/g, "").toLowerCase();
+    const icon = ICON_MAP[iconKey as keyof typeof ICON_MAP] ?? LayoutGrid;
+    return {
+      to: normalizeRoute(
+        item.route ?? item.path ?? item.to ?? item.href ?? item.url ?? ""
+      ),
+      label: item.title ?? item.label ?? item.name ?? "",
+      icon,
+    };
+  };
+
+  useEffect(() => {
+    let active = true;
+
+    const loadSidebar = async () => {
+      try {
+        const response = await api.get("/sidebar/buyer");
+        const payload = response.data?.data ?? response.data;
+        if (!payload || !active) return;
+
+        const sections =
+          payload?.sidebar?.sections ??
+          payload?.sections ??
+          [];
+
+        const sectionItems = (Array.isArray(sections) ? sections : []).flatMap(
+          (section: { items?: unknown[] }) => (Array.isArray(section?.items) ? section.items : [])
+        );
+
+        const rawItems =
+          sectionItems.length
+            ? sectionItems
+            : payload?.items ??
+          payload?.menuItems ??
+          payload?.menu_items ??
+          payload?.sidebarItems ??
+          payload?.sidebar_items ??
+          payload?.links ??
+          (Array.isArray(payload) ? payload : []);
+
+        const mapped = (Array.isArray(rawItems) ? rawItems : [])
+          .map(mapItem)
+          .filter((item: { to: string; label: string }) => item.to && item.label);
+
+        setDynamicItems(mapped.length ? mapped : DEFAULT_ITEMS);
+        const title =
+          (Array.isArray(sections) ? sections[0]?.sectionTitle : undefined) ??
+          payload?.sectionTitle ??
+          payload?.title ??
+          payload?.section_title;
+        if (typeof title === "string") {
+          setSectionTitle(title);
+        }
+      } catch (error) {
+        console.error("Failed to load buyer sidebar:", error);
+        if (active) {
+          setDynamicItems(DEFAULT_ITEMS);
+        }
+      }
+    };
+
+    loadSidebar();
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
-    <nav className="space-y-1 text-sm">
-      {navItems.map((item) => {
+    <nav className="space-y-1 text-sm" aria-label={sectionTitle || undefined}>
+      {dynamicItems.map((item) => {
         const Icon = item.icon;
         return (
           <NavLink
