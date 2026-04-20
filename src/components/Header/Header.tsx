@@ -31,24 +31,39 @@ interface HeaderProps {
   forceSolid?: boolean;
 }
 
+interface HeaderApiResponse {
+  header?: {
+    brand?: { name?: string; logo?: string };
+    navLinks?: Array<{ label?: string; url?: string }>;
+    languageOptions?: Array<{ code?: string; label?: string }>;
+    ctaButtons?: Array<{ label?: string; tag?: string; url?: string }>;
+    contact?: { phone?: string };
+    profile?: { enabled?: boolean };
+  };
+  data?: {
+    header?: {
+      brand?: { name?: string; logo?: string };
+      navLinks?: Array<{ label?: string; url?: string }>;
+      languageOptions?: Array<{ code?: string; label?: string }>;
+      ctaButtons?: Array<{ label?: string; tag?: string; url?: string }>;
+      contact?: { phone?: string };
+      profile?: { enabled?: boolean };
+    };
+  };
+}
+
 const NAV_ITEMS: NavItem[] = [
-  { label: "Home", href: "/" },
+  {
+    label: "Home",
+    href: "/",
+  },
   {
     label: "Farmhouse / Farmland",
     href: "/farmhouse",
     mega: [
-      {
-        title: "Popular Locations",
-        items: [],
-      },
-      {
-        title: "Property Type",
-        items: [],
-      },
-      {
-        title: "Budget",
-        items: [],
-      },
+      { title: "Popular Locations", items: [] },
+      { title: "Property Type", items: [] },
+      { title: "Budget", items: [] },
       { title: "Explore", items: [] },
     ],
   },
@@ -56,15 +71,9 @@ const NAV_ITEMS: NavItem[] = [
     label: "Agriculture Land",
     href: "/agriculture-land",
     mega: [
-      {
-        title: "Land Types",
-        items: [],
-      },
+      { title: "Land Types", items: [] },
       { title: "Investment", items: [] },
-      {
-        title: "Locations",
-        items: [],
-      },
+      { title: "Locations", items: [] },
       { title: "Guides", items: [] },
     ],
   },
@@ -90,72 +99,19 @@ const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-const NAV_LABEL_KEY_MAP: Record<string, string> = {
-  Home: "header.home",
-  "Farmhouse / Farmland": "header.farmhouseFarmland",
-  "Agriculture Land": "header.agricultureLand",
-  "Resort Properties": "header.resortProperties",
-  "Rent Farmhouse": "header.rentFarmhouse",
-};
+const NAV_LABEL_KEY_MAP: Record<string, string> = {};
 
-const SECTION_TITLE_KEY_MAP: Record<string, string> = {
-  "Popular Locations": "header.popularLocations",
-  "Property Type": "header.propertyType",
-  Budget: "header.budget",
-  Explore: "header.explore",
-  "Land Types": "header.landTypes",
-  Investment: "header.investment",
-  Locations: "header.locations",
-  Guides: "header.guides",
-  "Resort Type": "header.resortType",
-  Insights: "header.insights",
-  Occasion: "header.occasion",
-};
+const SECTION_TITLE_KEY_MAP: Record<string, string> = {};
 
-const SECTION_ITEM_KEY_MAP: Record<string, string> = {
-  Goa: "header.goa",
-  Lonavala: "header.lonavala",
-  Pune: "header.pune",
-  Alibaug: "header.alibaug",
-  "Luxury Farmhouse": "header.luxuryFarmhouse",
-  "Weekend Farmhouse": "header.weekendFarmhouse",
-  "Organic Farm": "header.organicFarm",
-  "Under 50L": "header.under50L",
-  "Under 1Cr": "header.under1Cr",
-  "Under 2Cr": "header.under2Cr",
-  "New Listings": "header.newListings",
-  "Premium Farms": "header.premiumFarms",
-  "Top Deals": "header.topDeals",
-  "Organic Land": "header.organicLand",
-  "Dry Land": "header.dryLand",
-  "Irrigated Land": "header.irrigatedLand",
-  "Short Term": "header.shortTerm",
-  "Long Term": "header.longTerm",
-  Maharashtra: "header.maharashtra",
-  Gujarat: "header.gujarat",
-  Karnataka: "header.karnataka",
-  "Buying Guide": "header.buyingGuide",
-  "Legal Documents": "header.legalDocuments",
-  "Luxury Resort": "header.luxuryResort",
-  "Boutique Resort": "header.boutiqueResort",
-  "Beach Resorts": "header.beachResorts",
-  "Hill Resorts": "header.hillResorts",
-  "Under 5Cr": "header.under5Cr",
-  "Under 10Cr": "header.under10Cr",
-  "ROI Guide": "header.roiGuide",
-  "Investment Tips": "header.investmentTips",
-  Wedding: "header.wedding",
-  Party: "header.party",
-  Weekend: "header.weekend",
-  "Under 10k": "header.under10k",
-  "Under 25k": "header.under25k",
-  Delhi: "header.delhi",
-  Mumbai: "header.mumbai",
-  Featured: "header.featured",
-  Trending: "header.trending",
-};
+const SECTION_ITEM_KEY_MAP: Record<string, string> = {};
 
 const normalizeValue = (value: string): string => value.trim().toLowerCase();
+const normalizePath = (value: string): string =>
+  (value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\/[^/]+/i, "")
+    .replace(/\/+$/, "") || "/";
 
 const toTitleCase = (value: string) =>
   value
@@ -289,6 +245,13 @@ const roleDashboardPath = (role: AppRole) => {
   if (role === "seller") return "/seller/dashboard";
   if (role === "agent") return "/agent/dashboard";
   return "/admin";
+};
+
+const resolveLanguageCode = (value?: string): "en" | "hi" | null => {
+  const normalized = normalizeValue(value ?? "");
+  if (normalized === "en" || normalized === "english") return "en";
+  if (normalized === "hi" || normalized === "hindi" || normalized === "हिंदी") return "hi";
+  return null;
 };
 
 const navStagger = {
@@ -633,6 +596,8 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   const [loginOpen, setLoginOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [menuProperties, setMenuProperties] = useState<Property[]>([]);
+  const [headerData, setHeaderData] =
+    useState<NonNullable<NonNullable<HeaderApiResponse["data"]>["header"]> | null>(null);
 
   const megaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loginTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -711,6 +676,26 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   }, []);
 
   useEffect(() => {
+    let active = true;
+
+    void (async () => {
+      try {
+        const response = await api.get<HeaderApiResponse>("/header");
+        const incoming = response.data?.header ?? response.data?.data?.header;
+        if (active && incoming) {
+          setHeaderData(incoming);
+        }
+      } catch {
+        // Keep current header state when API is unavailable.
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         closeMobileMenu();
@@ -723,13 +708,52 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
     return () => window.removeEventListener("keydown", handleEscape);
   }, []);
 
-  const visibleNavItems = NAV_ITEMS.map((item) => {
+  const dynamicNavItems: NavItem[] =
+    headerData?.navLinks
+      ?.filter((link): link is { label: string; url: string } => Boolean(link?.label && link?.url))
+      .map((link) => {
+        const normalizedLabel = normalizeValue(link.label);
+        const normalizedUrl = normalizePath(link.url);
+        const existing = NAV_ITEMS.find(
+          (item) =>
+            normalizeValue(item.label) === normalizedLabel || normalizePath(item.href) === normalizedUrl
+        );
+        const href = existing?.href ?? link.url;
+        return {
+          label: link.label,
+          href,
+          mega: existing?.mega,
+        };
+      }) ?? [];
+
+  const visibleNavItems = dynamicNavItems.map((item) => {
     if (!item.mega || menuProperties.length === 0) return item;
     return {
       ...item,
       mega: getFilteredMenuData(item.label, menuProperties, item.mega),
     };
   });
+
+  const brandName = headerData?.brand?.name ?? "";
+  const brandLogo = headerData?.brand?.logo || "";
+  const primaryCta = headerData?.ctaButtons?.[0];
+  const ctaLabel = primaryCta?.label ?? "";
+  const ctaTag = primaryCta?.tag ?? "";
+  const ctaUrl = primaryCta?.url ?? "";
+  const contactPhone = headerData?.contact?.phone || "";
+  const profileEnabled = headerData?.profile?.enabled ?? false;
+  const languageOptions = (
+    headerData?.languageOptions
+      ?.map((option) => {
+        const resolvedCode = resolveLanguageCode(option?.code ?? option?.label);
+        if (!resolvedCode) return null;
+        return {
+          code: resolvedCode,
+          label: option?.label?.trim() || (resolvedCode === "en" ? "English" : "हिंदी"),
+        };
+      })
+      .filter((option): option is { code: "en" | "hi"; label: string } => Boolean(option)) ?? []
+  ).filter((option, index, arr) => arr.findIndex((x) => x.code === option.code) === index);
 
   const handleMegaItemClick = (item: NavItem, sectionTitle: string, value: string) => {
     const params = new URLSearchParams();
@@ -824,7 +848,11 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               to="/"
                 className="font-semibold text-base sm:text-xl lg:text-2xl text-[var(--fg)] tracking-wide whitespace-nowrap"
               >
-                {t("header.brand")}
+                {brandLogo ? (
+                  <img src={brandLogo} alt={brandName} className="h-8 w-auto" />
+                ) : (
+                  brandName
+                )}
               </Link>
             </motion.div>
 
@@ -926,10 +954,10 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
 
                           {/* Preserve routing for Post Property */}
                           <Link
-                            to="/post-property/basic"
+                            to={ctaUrl}
                             className="shrink-0 btn-brand px-4 py-2 rounded-lg shadow text-center"
                           >
-                            {t("header.postProperty")}
+                            {ctaLabel}
                           </Link>
                         </div>
                         </motion.div>
@@ -943,44 +971,38 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
             {/* Right Section */}
             <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
               <div className="inline-flex h-8 min-w-[86px] items-center justify-center gap-0.5 rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[2px]">
-                <button
-                  type="button"
-                  onClick={() => changeLanguage("en")}
-                  className={`inline-flex min-h-[26px] min-w-[2rem] items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors duration-200 ${
-                    activeLanguage === "en"
-                      ? "bg-[var(--b1-mid)] text-[var(--fg)] shadow-sm ring-1 ring-[var(--fg)]/20"
-                      : "text-[var(--fg)]/75 hover:bg-[var(--fg)]/10 hover:text-[var(--fg)]"
-                  }`}
-                  aria-pressed={activeLanguage === "en"}
-                >
-                  {t("language.en")}
-                </button>
-                <span className="shrink-0 text-[var(--fg)]/35 select-none" aria-hidden>
-                  |
-                </span>
-                <button
-                  type="button"
-                  onClick={() => changeLanguage("hi")}
-                  className={`inline-flex min-h-[26px] min-w-[2rem] items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors duration-200 ${
-                    activeLanguage === "hi"
-                      ? "bg-[var(--b1-mid)] text-[var(--fg)] shadow-sm ring-1 ring-[var(--fg)]/20"
-                      : "text-[var(--fg)]/75 hover:bg-[var(--fg)]/10 hover:text-[var(--fg)]"
-                  }`}
-                  aria-pressed={activeLanguage === "hi"}
-                >
-                  {t("language.hi")}
-                </button>
+                {languageOptions.map((option, index) => (
+                  <React.Fragment key={option.code}>
+                    <button
+                      type="button"
+                      onClick={() => changeLanguage(option.code)}
+                      className={`inline-flex min-h-[26px] min-w-[2rem] items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors duration-200 ${
+                        activeLanguage === option.code
+                          ? "bg-[var(--b1-mid)] text-[var(--fg)] shadow-sm ring-1 ring-[var(--fg)]/20"
+                          : "text-[var(--fg)]/75 hover:bg-[var(--fg)]/10 hover:text-[var(--fg)]"
+                      }`}
+                      aria-pressed={activeLanguage === option.code}
+                    >
+                      {option.label}
+                    </button>
+                    {index < languageOptions.length - 1 && (
+                      <span className="shrink-0 text-[var(--fg)]/35 select-none" aria-hidden>
+                        |
+                      </span>
+                    )}
+                  </React.Fragment>
+                ))}
               </div>
 
               {/* Post Property CTA restored (button only, not in nav) */}
               <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
                 <Link
-                  to="/post-property/basic"
+                  to={ctaUrl}
                   className="hidden lg:inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-2.5 xl:px-3 text-[13px] text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)]/70 hover:bg-[var(--fg)]/8"
                 >
-                  {t("header.postProperty")}
+                  {ctaLabel}
                   <span className="inline-flex h-[18px] min-w-[2rem] items-center justify-center rounded-md border border-[var(--fg)]/25 bg-[var(--b1-mid)] px-1.5 text-[9px] font-bold leading-none tracking-wide text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
-                    {t("header.freeTag")}
+                    {ctaTag}
                   </span>
                 </Link>
               </motion.div>
@@ -990,7 +1012,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                 <Button
                   onClick={() => setContactOpen(true)}
                   className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg border-2 border-[var(--fg)]/90 bg-transparent p-0 text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[2px] hover:bg-[var(--fg)]/12"
-                  aria-label={t("header.openContactForm")}
+                  aria-label={contactPhone || t("header.openContactForm")}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1012,7 +1034,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                     {t("header.loginRegister")}
                   </Link>
                 </motion.div>
-              ) : (
+              ) : profileEnabled ? (
                 <div
                   className="relative hidden lg:block"
                   onMouseEnter={openLogin}
@@ -1089,7 +1111,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                     )}
                   </AnimatePresence>
                 </div>
-              )}
+              ) : null}
 
               {/* Mobile menu toggle */}
               <Button
@@ -1134,7 +1156,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
             >
               <div className="relative flex items-center px-5 sm:px-6 h-14 sm:h-[68px] border-b border-[var(--b2-soft)]">
                 <span className="font-semibold text-lg text-[var(--b1)]">
-                  {t("header.brand")}
+                  {brandName}
                 </span>
 
                 <Button
@@ -1222,11 +1244,11 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
 
                 <motion.div variants={navItemMotion} className="border-t border-[var(--b2-soft)] pt-6 space-y-4">
                   <Link
-                    to="/post-property/basic"
+                    to={ctaUrl}
                     onClick={closeMobileMenu}
                     className="flex h-11 w-full items-center justify-center rounded-lg bg-[var(--b1)] px-4 text-center font-medium text-[var(--white)]"
                   >
-                    {t("header.postProperty")}
+                    {ctaLabel}
                   </Link>
 
                   {!isAuthenticated ? (
