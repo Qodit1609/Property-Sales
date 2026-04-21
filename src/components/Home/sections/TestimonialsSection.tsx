@@ -174,14 +174,14 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
                   </p>
                 </div>
 
-                <p className="ml-auto">
+                <div className="ml-auto">
                   <StarRating
                     value={activeTestimonial.rating ?? 5}
                     readOnly
                     filledClassName="fill-[#F5B301] text-[#F5B301]"
                     emptyClassName="text-[var(--b2)]"
                   />
-                </p>
+                </div>
               </div>
             </footer>
           </motion.blockquote>

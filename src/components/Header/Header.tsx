@@ -31,7 +31,13 @@ interface HeaderProps {
   forceSolid?: boolean;
 }
 
-interface HeaderApiResponse {
+type HeaderPayload = {
+  brand?: { name?: string; logo?: string };
+  navLinks?: Array<{ label?: string; url?: string }>;
+  languageOptions?: Array<{ code?: string; label?: string }>;
+  ctaButtons?: Array<{ label?: string; tag?: string; url?: string }>;
+  contact?: { phone?: string };
+  profile?: { enabled?: boolean };
   header?: {
     brand?: { name?: string; logo?: string };
     navLinks?: Array<{ label?: string; url?: string }>;
@@ -40,64 +46,14 @@ interface HeaderApiResponse {
     contact?: { phone?: string };
     profile?: { enabled?: boolean };
   };
-  data?: {
-    header?: {
-      brand?: { name?: string; logo?: string };
-      navLinks?: Array<{ label?: string; url?: string }>;
-      languageOptions?: Array<{ code?: string; label?: string }>;
-      ctaButtons?: Array<{ label?: string; tag?: string; url?: string }>;
-      contact?: { phone?: string };
-      profile?: { enabled?: boolean };
-    };
-  };
-}
+};
 
-const NAV_ITEMS: NavItem[] = [
-  {
-    label: "Home",
-    href: "/",
-  },
-  {
-    label: "Farmhouse / Farmland",
-    href: "/farmhouse",
-    mega: [
-      { title: "Popular Locations", items: [] },
-      { title: "Property Type", items: [] },
-      { title: "Budget", items: [] },
-      { title: "Explore", items: [] },
-    ],
-  },
-  {
-    label: "Agriculture Land",
-    href: "/agriculture-land",
-    mega: [
-      { title: "Land Types", items: [] },
-      { title: "Investment", items: [] },
-      { title: "Locations", items: [] },
-      { title: "Guides", items: [] },
-    ],
-  },
-  {
-    label: "Resort Properties",
-    href: "/resort-properties",
-    mega: [
-      { title: "Resort Type", items: [] },
-      { title: "Locations", items: [] },
-      { title: "Investment", items: [] },
-      { title: "Insights", items: [] },
-    ],
-  },
-  {
-    label: "Rent Farmhouse",
-    href: "/rent-farmhouse",
-    mega: [
-      { title: "Occasion", items: [] },
-      { title: "Budget", items: [] },
-      { title: "Locations", items: [] },
-      { title: "Explore", items: [] },
-    ],
-  },
-];
+interface HeaderApiResponse {
+  success?: boolean;
+  message?: string;
+  data?: HeaderPayload;
+  header?: HeaderPayload;
+}
 
 const NAV_LABEL_KEY_MAP: Record<string, string> = {};
 
@@ -187,15 +143,14 @@ const matchesNavCategory = (property: Property, navLabel: string) => {
   return true;
 };
 
-const getFilteredMenuData = (
+const getDynamicMegaMenuData = (
   navLabel: string,
   properties: Property[],
-  fallbackMega: MegaSection[],
 ): MegaSection[] => {
   const scoped = properties.filter((property) =>
     matchesNavCategory(property, navLabel),
   );
-  if (scoped.length === 0) return fallbackMega;
+  if (scoped.length === 0) return [];
 
   const locations = Array.from(
     new Set(
@@ -226,36 +181,12 @@ const getFilteredMenuData = (
     ),
   ).slice(0, 8);
 
-  const sectionValueMap = (title: string): string[] => {
-    if (title === "Popular Locations" || title === "Locations") {
-      return locations;
-    }
-    if (
-      title === "Property Type" ||
-      title === "Land Types" ||
-      title === "Resort Type"
-    ) {
-      return propertyTypes;
-    }
-    if (title === "Budget" || title === "Investment") {
-      return budgets;
-    }
-    return tags;
-  };
-
-  const mapped = fallbackMega.map((section) => {
-    const dynamicItems = sectionValueMap(section.title);
-    return {
-      ...section,
-      items: dynamicItems.length > 0 ? dynamicItems : section.items,
-    };
-  });
-
-  const hasDynamicValue = mapped.some((section, index) =>
-    section.items.some((item) => !fallbackMega[index].items.includes(item)),
-  );
-
-  return hasDynamicValue ? mapped : fallbackMega;
+  return [
+    { title: "Locations", items: locations },
+    { title: "Property Type", items: propertyTypes },
+    { title: "Budget", items: budgets },
+    { title: "Tags", items: tags },
+  ].filter((section) => section.items.length > 0);
 };
 
 const roleDashboardPath = (role: AppRole) => {
@@ -789,10 +720,11 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
 
     void (async () => {
       try {
-        const response = await api.get<HeaderApiResponse>("/ui-config");
-        const incoming = response.data?.header ?? response.data?.data?.header;
-        console.log("HEADER API RESPONSE:", response.data);
-        console.log("HEADER INCOMING:", incoming);
+        const response = await api.get<HeaderApiResponse>("/header");
+        const incoming =
+          response.data?.data?.header ??
+          response.data?.data ??
+          response.data?.header;
         if (active && incoming) {
           setHeaderData(incoming);
         }
@@ -824,51 +756,38 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
       ?.filter((link): link is { label: string; url: string } =>
         Boolean(link?.label && link?.url),
       )
-      .map((link) => {
-        const normalizedLabel = normalizeValue(link.label);
-        const normalizedUrl = normalizePath(link.url);
-        const existing = NAV_ITEMS.find(
-          (item) =>
-            normalizeValue(item.label) === normalizedLabel ||
-            normalizePath(item.href) === normalizedUrl,
-        );
-        const href = existing?.href ?? link.url;
-        return {
-          label: link.label,
-          href,
-          mega: existing?.mega,
-        };
-      }) ?? [];
+      .map((link) => ({
+        label: link.label,
+        href: link.url,
+      })) ?? [];
 
-const visibleNavItems =
-  dynamicNavItems.length > 0
-    ? dynamicNavItems.map((item) => {
-        if (!item.mega || menuProperties.length === 0) return item;
-        return {
-          ...item,
-          mega: getFilteredMenuData(item.label, menuProperties, item.mega),
-        };
-      })
-    : NAV_ITEMS; // 👈 fallback (VERY IMPORTANT)
+  const visibleNavItems = dynamicNavItems.map((item) => ({
+    ...item,
+    mega:
+      menuProperties.length > 0
+        ? getDynamicMegaMenuData(item.label, menuProperties)
+        : undefined,
+  }));
 
-const brandName = headerData?.brand?.name ?? "BhoomiWala";
-const brandLogo = headerData?.brand?.logo || "";
+  const brandName = headerData?.brand?.name ?? "";
+  const brandLogo = headerData?.brand?.logo ?? "";
   const primaryCta = headerData?.ctaButtons?.[0];
   const ctaLabel = primaryCta?.label ?? "";
   const ctaTag = primaryCta?.tag ?? "";
   const ctaUrl = primaryCta?.url ?? "";
-  const contactPhone = headerData?.contact?.phone || "";
-  const profileEnabled = headerData?.profile?.enabled ?? false;
+  const hasCta = Boolean(ctaLabel && ctaUrl);
+  const contactPhone = headerData?.contact?.phone ?? "";
+  const profileEnabled = headerData?.profile?.enabled ?? true;
   const languageOptions = (
     headerData?.languageOptions
       ?.map((option) => {
         const resolvedCode = resolveLanguageCode(option?.code ?? option?.label);
         if (!resolvedCode) return null;
+        const optionLabel = option?.label?.trim() || option?.code?.trim() || "";
+        if (!optionLabel) return null;
         return {
           code: resolvedCode,
-          label:
-            option?.label?.trim() ||
-            (resolvedCode === "en" ? "English" : "हिंदी"),
+          label: optionLabel,
         };
       })
       .filter((option): option is { code: "en" | "hi"; label: string } =>
@@ -878,6 +797,7 @@ const brandLogo = headerData?.brand?.logo || "";
     (option, index, arr) =>
       arr.findIndex((x) => x.code === option.code) === index,
   );
+  const safeLanguageOptions = languageOptions;
 
   const handleMegaItemClick = (
     item: NavItem,
@@ -1123,13 +1043,14 @@ const brandLogo = headerData?.brand?.logo || "";
                               prefersReducedMotion={prefersReducedMotion}
                             />
 
-                            {/* Preserve routing for Post Property */}
-                            <Link
-                              to={ctaUrl}
-                              className="shrink-0 btn-brand px-4 py-2 rounded-lg shadow text-center"
-                            >
-                              {ctaLabel}
-                            </Link>
+                            {hasCta && (
+                              <Link
+                                to={ctaUrl}
+                                className="shrink-0 btn-brand px-4 py-2 rounded-lg shadow text-center"
+                              >
+                                {ctaLabel}
+                              </Link>
+                            )}
                           </div>
                         </motion.div>
                       )}
@@ -1141,47 +1062,53 @@ const brandLogo = headerData?.brand?.logo || "";
 
             {/* Right Section */}
             <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-              <div className="inline-flex h-8 min-w-[86px] items-center justify-center gap-0.5 rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[2px]">
-                {languageOptions.map((option, index) => (
-                  <React.Fragment key={option.code}>
-                    <button
-                      type="button"
-                      onClick={() => changeLanguage(option.code)}
-                      className={`inline-flex min-h-[26px] min-w-[2rem] items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors duration-200 cursor-pointer ${
-                        activeLanguage === option.code
-                          ? "bg-[var(--b1-mid)] text-[var(--fg)] shadow-sm ring-1 ring-[var(--fg)]/20"
-                          : "text-[var(--fg)]/75 hover:bg-[var(--fg)]/10 hover:text-[var(--fg)]"
-                      }`}
-                      aria-pressed={activeLanguage === option.code}
-                    >
-                      {option.label}
-                    </button>
-                    {index < languageOptions.length - 1 && (
-                      <span
-                        className="shrink-0 text-[var(--fg)]/35 select-none"
-                        aria-hidden
+              {safeLanguageOptions.length > 0 && (
+                <div className="inline-flex h-8 min-w-[86px] items-center justify-center gap-0.5 rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-0.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] backdrop-blur-[2px]">
+                  {safeLanguageOptions.map((option, index) => (
+                    <React.Fragment key={option.code}>
+                      <button
+                        type="button"
+                        onClick={() => changeLanguage(option.code)}
+                        className={`inline-flex min-h-[26px] min-w-[2rem] items-center justify-center rounded-md px-1.5 py-0.5 text-[11px] font-semibold transition-colors duration-200 cursor-pointer ${
+                          activeLanguage === option.code
+                            ? "bg-[var(--b1-mid)] text-[var(--fg)] shadow-sm ring-1 ring-[var(--fg)]/20"
+                            : "text-[var(--fg)]/75 hover:bg-[var(--fg)]/10 hover:text-[var(--fg)]"
+                        }`}
+                        aria-pressed={activeLanguage === option.code}
                       >
-                        |
-                      </span>
-                    )}
-                  </React.Fragment>
-                ))}
-              </div>
+                        {option.label}
+                      </button>
+                      {index < safeLanguageOptions.length - 1 && (
+                        <span
+                          className="shrink-0 text-[var(--fg)]/35 select-none"
+                          aria-hidden
+                        >
+                          |
+                        </span>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
+              )}
 
               {/* Post Property CTA restored (button only, not in nav) */}
               <motion.div
                 whileHover={prefersReducedMotion ? undefined : { y: -1 }}
                 whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
               >
-                <Link
-                  to={ctaUrl}
-                  className="hidden lg:inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-2.5 xl:px-3 text-[13px] text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)]/70 hover:bg-[var(--fg)]/8"
-                >
-                  {ctaLabel}
-                  <span className="inline-flex h-[18px] min-w-[2rem] items-center justify-center rounded-md border border-[var(--fg)]/25 bg-[var(--b1-mid)] px-1.5 text-[9px] font-bold leading-none tracking-wide text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
-                    {ctaTag}
-                  </span>
-                </Link>
+                {hasCta && (
+                  <Link
+                    to={ctaUrl}
+                    className="hidden lg:inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-2.5 xl:px-3 text-[13px] text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)]/70 hover:bg-[var(--fg)]/8"
+                  >
+                    {ctaLabel}
+                    {ctaTag && (
+                      <span className="inline-flex h-[18px] min-w-[2rem] items-center justify-center rounded-md border border-[var(--fg)]/25 bg-[var(--b1-mid)] px-1.5 text-[9px] font-bold leading-none tracking-wide text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+                        {ctaTag}
+                      </span>
+                    )}
+                  </Link>
+                )}
               </motion.div>
 
               {/* Contact button keeps existing modal behavior */}
@@ -1479,13 +1406,15 @@ const brandLogo = headerData?.brand?.logo || "";
                   variants={navItemMotion}
                   className="border-t border-[var(--b2-soft)] pt-6 space-y-4"
                 >
-                  <Link
-                    to={ctaUrl}
-                    onClick={closeMobileMenu}
-                    className="flex h-11 w-full items-center justify-center rounded-lg bg-[var(--b1)] px-4 text-center font-medium text-[var(--white)]"
-                  >
-                    {ctaLabel}
-                  </Link>
+                  {hasCta && (
+                    <Link
+                      to={ctaUrl}
+                      onClick={closeMobileMenu}
+                      className="flex h-11 w-full items-center justify-center rounded-lg bg-[var(--b1)] px-4 text-center font-medium text-[var(--white)]"
+                    >
+                      {ctaLabel}
+                    </Link>
+                  )}
 
                   {!isAuthenticated ? (
                     <>
