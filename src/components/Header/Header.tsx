@@ -116,7 +116,9 @@ const normalizePath = (value: string): string =>
 const toTitleCase = (value: string) =>
   value
     .split(" ")
-    .map((part) => (part ? `${part.charAt(0).toUpperCase()}${part.slice(1)}` : part))
+    .map((part) =>
+      part ? `${part.charAt(0).toUpperCase()}${part.slice(1)}` : part,
+    )
     .join(" ");
 
 const formatBudgetLabel = (value: number) => {
@@ -133,13 +135,17 @@ const formatBudgetLabel = (value: number) => {
 };
 
 const buildBudgetRanges = (prices: number[]): string[] => {
-  const unique = Array.from(new Set(prices.filter((price) => Number.isFinite(price) && price > 0))).sort(
-    (a, b) => a - b
-  );
+  const unique = Array.from(
+    new Set(prices.filter((price) => Number.isFinite(price) && price > 0)),
+  ).sort((a, b) => a - b);
 
   if (unique.length === 0) return [];
 
-  const points = [Math.floor(unique.length * 0.33), Math.floor(unique.length * 0.66), unique.length - 1]
+  const points = [
+    Math.floor(unique.length * 0.33),
+    Math.floor(unique.length * 0.66),
+    unique.length - 1,
+  ]
     .map((index) => unique[Math.max(0, Math.min(index, unique.length - 1))])
     .filter((value): value is number => Number.isFinite(value));
 
@@ -147,7 +153,9 @@ const buildBudgetRanges = (prices: number[]): string[] => {
 };
 
 const matchesNavCategory = (property: Property, navLabel: string) => {
-  const source = normalizeValue(`${property.propertyType ?? ""} ${property.listingType ?? ""}`);
+  const source = normalizeValue(
+    `${property.propertyType ?? ""} ${property.listingType ?? ""}`,
+  );
 
   if (navLabel === "Farmhouse / Farmland") {
     return (
@@ -179,8 +187,14 @@ const matchesNavCategory = (property: Property, navLabel: string) => {
   return true;
 };
 
-const getFilteredMenuData = (navLabel: string, properties: Property[], fallbackMega: MegaSection[]): MegaSection[] => {
-  const scoped = properties.filter((property) => matchesNavCategory(property, navLabel));
+const getFilteredMenuData = (
+  navLabel: string,
+  properties: Property[],
+  fallbackMega: MegaSection[],
+): MegaSection[] => {
+  const scoped = properties.filter((property) =>
+    matchesNavCategory(property, navLabel),
+  );
   if (scoped.length === 0) return fallbackMega;
 
   const locations = Array.from(
@@ -188,8 +202,8 @@ const getFilteredMenuData = (navLabel: string, properties: Property[], fallbackM
       scoped
         .map((property) => property.location?.city ?? property.location?.state)
         .filter((value): value is string => Boolean(value && value.trim()))
-        .map((value) => toTitleCase(value.trim()))
-    )
+        .map((value) => toTitleCase(value.trim())),
+    ),
   ).slice(0, 8);
 
   const propertyTypes = Array.from(
@@ -197,8 +211,8 @@ const getFilteredMenuData = (navLabel: string, properties: Property[], fallbackM
       scoped
         .map((property) => property.propertyType)
         .filter((value): value is string => Boolean(value && value.trim()))
-        .map((value) => toTitleCase(value.trim()))
-    )
+        .map((value) => toTitleCase(value.trim())),
+    ),
   ).slice(0, 8);
 
   const budgets = buildBudgetRanges(scoped.map((property) => property.price));
@@ -208,15 +222,19 @@ const getFilteredMenuData = (navLabel: string, properties: Property[], fallbackM
       scoped
         .flatMap((property) => property.tags ?? [])
         .filter((value): value is string => Boolean(value && value.trim()))
-        .map((value) => toTitleCase(value.trim()))
-    )
+        .map((value) => toTitleCase(value.trim())),
+    ),
   ).slice(0, 8);
 
   const sectionValueMap = (title: string): string[] => {
     if (title === "Popular Locations" || title === "Locations") {
       return locations;
     }
-    if (title === "Property Type" || title === "Land Types" || title === "Resort Type") {
+    if (
+      title === "Property Type" ||
+      title === "Land Types" ||
+      title === "Resort Type"
+    ) {
       return propertyTypes;
     }
     if (title === "Budget" || title === "Investment") {
@@ -234,7 +252,7 @@ const getFilteredMenuData = (navLabel: string, properties: Property[], fallbackM
   });
 
   const hasDynamicValue = mapped.some((section, index) =>
-    section.items.some((item) => !fallbackMega[index].items.includes(item))
+    section.items.some((item) => !fallbackMega[index].items.includes(item)),
   );
 
   return hasDynamicValue ? mapped : fallbackMega;
@@ -250,7 +268,8 @@ const roleDashboardPath = (role: AppRole) => {
 const resolveLanguageCode = (value?: string): "en" | "hi" | null => {
   const normalized = normalizeValue(value ?? "");
   if (normalized === "en" || normalized === "english") return "en";
-  if (normalized === "hi" || normalized === "hindi" || normalized === "हिंदी") return "hi";
+  if (normalized === "hi" || normalized === "hindi" || normalized === "हिंदी")
+    return "hi";
   return null;
 };
 
@@ -283,8 +302,16 @@ const MegaMenuLeftDecor: React.FC<{
     : {
         y: [0, -4, 0],
       };
-  const floatSlow = { duration: 4.5, repeat: Infinity, ease: "easeInOut" as const };
-  const floatMed = { duration: 3.8, repeat: Infinity, ease: "easeInOut" as const };
+  const floatSlow = {
+    duration: 4.5,
+    repeat: Infinity,
+    ease: "easeInOut" as const,
+  };
+  const floatMed = {
+    duration: 3.8,
+    repeat: Infinity,
+    ease: "easeInOut" as const,
+  };
 
   let inner: React.ReactNode;
 
@@ -379,7 +406,14 @@ const MegaMenuLeftDecor: React.FC<{
               fill="var(--b2)"
               opacity={0.55}
             />
-            <rect x="66" y="52" width="4" height="34" fill="var(--b1)" opacity={0.75} />
+            <rect
+              x="66"
+              y="52"
+              width="4"
+              height="34"
+              fill="var(--b1)"
+              opacity={0.75}
+            />
             <path
               d="M48 52 Q68 32 88 52 Z"
               fill="var(--b1-mid)"
@@ -393,8 +427,20 @@ const MegaMenuLeftDecor: React.FC<{
               strokeLinecap="round"
               opacity={0.55}
             />
-            <rect x="38" y="58" width="22" height="18" rx="2" fill="var(--b1)" opacity={0.55} />
-            <path d="M38 58 L49 48 L60 58 Z" fill="var(--b1-mid)" opacity={0.8} />
+            <rect
+              x="38"
+              y="58"
+              width="22"
+              height="18"
+              rx="2"
+              fill="var(--b1)"
+              opacity={0.55}
+            />
+            <path
+              d="M38 58 L49 48 L60 58 Z"
+              fill="var(--b1-mid)"
+              opacity={0.8}
+            />
           </svg>
         </motion.div>
       );
@@ -422,9 +468,28 @@ const MegaMenuLeftDecor: React.FC<{
               fill="var(--b2)"
               opacity={0.5}
             />
-            <rect x="44" y="56" width="40" height="30" rx="2" fill="var(--b1)" opacity={0.85} />
-            <path d="M38 56 L64 36 L90 56 Z" fill="var(--b1-mid)" opacity={0.92} />
-            <rect x="58" y="68" width="12" height="18" rx="1" fill="var(--b2-soft)" />
+            <rect
+              x="44"
+              y="56"
+              width="40"
+              height="30"
+              rx="2"
+              fill="var(--b1)"
+              opacity={0.85}
+            />
+            <path
+              d="M38 56 L64 36 L90 56 Z"
+              fill="var(--b1-mid)"
+              opacity={0.92}
+            />
+            <rect
+              x="58"
+              y="68"
+              width="12"
+              height="18"
+              rx="1"
+              fill="var(--b2-soft)"
+            />
             <rect
               x="88"
               y="38"
@@ -494,9 +559,28 @@ const MegaMenuLeftDecor: React.FC<{
               fill="var(--b1-mid)"
               opacity={0.28}
             />
-            <rect x="48" y="58" width="44" height="32" rx="2" fill="var(--b1)" opacity={0.88} />
-            <path d="M42 58 L70 38 L98 58 Z" fill="var(--b1-mid)" opacity={0.95} />
-            <rect x="62" y="72" width="16" height="18" rx="1" fill="var(--b2-soft)" />
+            <rect
+              x="48"
+              y="58"
+              width="44"
+              height="32"
+              rx="2"
+              fill="var(--b1)"
+              opacity={0.88}
+            />
+            <path
+              d="M42 58 L70 38 L98 58 Z"
+              fill="var(--b1-mid)"
+              opacity={0.95}
+            />
+            <rect
+              x="62"
+              y="72"
+              width="16"
+              height="18"
+              rx="1"
+              fill="var(--b2-soft)"
+            />
           </svg>
         </motion.div>
       );
@@ -555,7 +639,15 @@ const MegaMenuSellDecor: React.FC<{ prefersReducedMotion: boolean | null }> = ({
           strokeWidth="2.2"
           strokeLinejoin="round"
         />
-        <rect x="52" y="64" width="16" height="26" rx="1" fill="var(--b1-mid)" opacity={0.28} />
+        <rect
+          x="52"
+          y="64"
+          width="16"
+          height="26"
+          rx="1"
+          fill="var(--b1-mid)"
+          opacity={0.28}
+        />
         <motion.g
           initial={false}
           animate={
@@ -567,7 +659,14 @@ const MegaMenuSellDecor: React.FC<{ prefersReducedMotion: boolean | null }> = ({
           }
           transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
         >
-          <circle cx="80" cy="18" r="5.5" fill="none" stroke="var(--brown)" strokeWidth="2" />
+          <circle
+            cx="80"
+            cy="18"
+            r="5.5"
+            fill="none"
+            stroke="var(--brown)"
+            strokeWidth="2"
+          />
           <path
             d="M86 18 h10 v6 h-4 v10 h-4 v-6 h-4 v-4 Z"
             fill="var(--brown)"
@@ -587,17 +686,22 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   const prefersReducedMotion = useReducedMotion();
   const { user, token } = useAppSelector((state) => state.auth);
   const isAuthenticated = Boolean(token && user);
-  const activeLanguage = normalizeLanguage(i18n.resolvedLanguage ?? i18n.language);
+  const activeLanguage = normalizeLanguage(
+    i18n.resolvedLanguage ?? i18n.language,
+  );
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const [activeMega, setActiveMega] = useState<string | null>(null);
-  const [mobileActiveSections, setMobileActiveSections] = useState<string[]>([]);
+  const [mobileActiveSections, setMobileActiveSections] = useState<string[]>(
+    [],
+  );
   const [loginOpen, setLoginOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [menuProperties, setMenuProperties] = useState<Property[]>([]);
-  const [headerData, setHeaderData] =
-    useState<NonNullable<NonNullable<HeaderApiResponse["data"]>["header"]> | null>(null);
+  const [headerData, setHeaderData] = useState<NonNullable<
+    NonNullable<HeaderApiResponse["data"]>["header"]
+  > | null>(null);
 
   const megaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const loginTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -685,8 +789,10 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
 
     void (async () => {
       try {
-        const response = await api.get<HeaderApiResponse>("/header");
+        const response = await api.get<HeaderApiResponse>("/ui-config");
         const incoming = response.data?.header ?? response.data?.data?.header;
+        console.log("HEADER API RESPONSE:", response.data);
+        console.log("HEADER INCOMING:", incoming);
         if (active && incoming) {
           setHeaderData(incoming);
         }
@@ -715,13 +821,16 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
 
   const dynamicNavItems: NavItem[] =
     headerData?.navLinks
-      ?.filter((link): link is { label: string; url: string } => Boolean(link?.label && link?.url))
+      ?.filter((link): link is { label: string; url: string } =>
+        Boolean(link?.label && link?.url),
+      )
       .map((link) => {
         const normalizedLabel = normalizeValue(link.label);
         const normalizedUrl = normalizePath(link.url);
         const existing = NAV_ITEMS.find(
           (item) =>
-            normalizeValue(item.label) === normalizedLabel || normalizePath(item.href) === normalizedUrl
+            normalizeValue(item.label) === normalizedLabel ||
+            normalizePath(item.href) === normalizedUrl,
         );
         const href = existing?.href ?? link.url;
         return {
@@ -731,16 +840,19 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
         };
       }) ?? [];
 
-  const visibleNavItems = dynamicNavItems.map((item) => {
-    if (!item.mega || menuProperties.length === 0) return item;
-    return {
-      ...item,
-      mega: getFilteredMenuData(item.label, menuProperties, item.mega),
-    };
-  });
+const visibleNavItems =
+  dynamicNavItems.length > 0
+    ? dynamicNavItems.map((item) => {
+        if (!item.mega || menuProperties.length === 0) return item;
+        return {
+          ...item,
+          mega: getFilteredMenuData(item.label, menuProperties, item.mega),
+        };
+      })
+    : NAV_ITEMS; // 👈 fallback (VERY IMPORTANT)
 
-  const brandName = headerData?.brand?.name ?? "";
-  const brandLogo = headerData?.brand?.logo || "";
+const brandName = headerData?.brand?.name ?? "BhoomiWala";
+const brandLogo = headerData?.brand?.logo || "";
   const primaryCta = headerData?.ctaButtons?.[0];
   const ctaLabel = primaryCta?.label ?? "";
   const ctaTag = primaryCta?.tag ?? "";
@@ -754,19 +866,39 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
         if (!resolvedCode) return null;
         return {
           code: resolvedCode,
-          label: option?.label?.trim() || (resolvedCode === "en" ? "English" : "हिंदी"),
+          label:
+            option?.label?.trim() ||
+            (resolvedCode === "en" ? "English" : "हिंदी"),
         };
       })
-      .filter((option): option is { code: "en" | "hi"; label: string } => Boolean(option)) ?? []
-  ).filter((option, index, arr) => arr.findIndex((x) => x.code === option.code) === index);
+      .filter((option): option is { code: "en" | "hi"; label: string } =>
+        Boolean(option),
+      ) ?? []
+  ).filter(
+    (option, index, arr) =>
+      arr.findIndex((x) => x.code === option.code) === index,
+  );
 
-  const handleMegaItemClick = (item: NavItem, sectionTitle: string, value: string) => {
+  const handleMegaItemClick = (
+    item: NavItem,
+    sectionTitle: string,
+    value: string,
+  ) => {
     const params = new URLSearchParams();
-    params.set("category", normalizeValue(item.label).replace(/\s*\/\s*/g, " ").replace(/\s+/g, "-"));
+    params.set(
+      "category",
+      normalizeValue(item.label)
+        .replace(/\s*\/\s*/g, " ")
+        .replace(/\s+/g, "-"),
+    );
 
     if (sectionTitle === "Popular Locations" || sectionTitle === "Locations") {
       params.set("location", value);
-    } else if (sectionTitle === "Property Type" || sectionTitle === "Land Types" || sectionTitle === "Resort Type") {
+    } else if (
+      sectionTitle === "Property Type" ||
+      sectionTitle === "Land Types" ||
+      sectionTitle === "Resort Type"
+    ) {
       params.set("type", value);
     } else if (sectionTitle === "Budget" || sectionTitle === "Investment") {
       params.set("budget", value);
@@ -787,7 +919,9 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
 
   const toggleMobileSection = (label: string) => {
     setMobileActiveSections((prev) =>
-      prev.includes(label) ? prev.filter((value) => value !== label) : [...prev, label]
+      prev.includes(label)
+        ? prev.filter((value) => value !== label)
+        : [...prev, label],
     );
   };
 
@@ -796,7 +930,10 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   };
 
   const translateHeaderValue = (value: string) => {
-    const key = NAV_LABEL_KEY_MAP[value] ?? SECTION_TITLE_KEY_MAP[value] ?? SECTION_ITEM_KEY_MAP[value];
+    const key =
+      NAV_LABEL_KEY_MAP[value] ??
+      SECTION_TITLE_KEY_MAP[value] ??
+      SECTION_ITEM_KEY_MAP[value];
     return key ? t(key) : value;
   };
 
@@ -811,22 +948,28 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
 
   const rawUser = (user ?? {}) as Record<string, unknown>;
   const authPhoto =
-    (typeof rawUser.profilePhotoUrl === "string" ? rawUser.profilePhotoUrl : "") ||
+    (typeof rawUser.profilePhotoUrl === "string"
+      ? rawUser.profilePhotoUrl
+      : "") ||
     (typeof rawUser.profileImage === "string" ? rawUser.profileImage : "") ||
     (typeof rawUser.userIdProf === "string" ? rawUser.userIdProf : "") ||
     "";
   const localPhoto =
     user?.role === "buyer"
-      ? loadBuyerProfile(user?.email)?.profilePhotoUrl ?? ""
+      ? (loadBuyerProfile(user?.email)?.profilePhotoUrl ?? "")
       : user?.role === "seller"
-        ? loadSellerProfile(user?.email)?.profilePhotoUrl ?? ""
+        ? (loadSellerProfile(user?.email)?.profilePhotoUrl ?? "")
         : user?.role === "admin"
-          ? loadAdminProfile(String(user?.id ?? user?._id ?? user?.email ?? "").trim() || undefined)
-              ?.profilePhotoUrl ?? ""
+          ? (loadAdminProfile(
+              String(user?.id ?? user?._id ?? user?.email ?? "").trim() ||
+                undefined,
+            )?.profilePhotoUrl ?? "")
           : "";
   const profilePhotoUrl = (localPhoto || authPhoto || "").trim();
   const showProfilePhoto =
-    (user?.role === "admin" || user?.role === "seller" || user?.role === "buyer") &&
+    (user?.role === "admin" ||
+      user?.role === "seller" ||
+      user?.role === "buyer") &&
     Boolean(profilePhotoUrl);
 
   return (
@@ -837,9 +980,9 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
           animate={prefersReducedMotion ? { opacity: 1 } : { y: 0, opacity: 1 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           className={`px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 transition-all duration-300 ${
-           scrolled || forceSolid
-  ? "header-bg shadow-xl backdrop-blur-md"
-  : "header-bg/80 backdrop-blur-sm"
+            scrolled || forceSolid
+              ? "header-bg shadow-xl backdrop-blur-md"
+              : "header-bg/80 backdrop-blur-sm"
           }`}
         >
           <div className="mx-auto flex h-14 sm:h-[68px] w-full max-w-[1480px] items-center justify-between gap-2 sm:gap-4">
@@ -852,7 +995,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
             >
               <Link
-              to="/"
+                to="/"
                 className="font-semibold text-base sm:text-xl lg:text-2xl text-[var(--fg)] tracking-wide whitespace-nowrap"
               >
                 {brandLogo ? (
@@ -888,9 +1031,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         to={item.href}
                         onClick={() => setActiveMega(null)}
                         className={`relative inline-flex whitespace-nowrap pb-1 text-sm 2xl:text-[15px] font-medium transition-colors duration-300 ${
-                          isActive
-                            ? "text-[var(--b2)]"
-                            : "text-[var(--fg)]"
+                          isActive ? "text-[var(--b2)]" : "text-[var(--fg)]"
                         } hover:text-[var(--b2)]`}
                       >
                         {translateHeaderValue(item.label)}
@@ -906,68 +1047,90 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                     <AnimatePresence>
                       {item.mega && activeMega === item.label && (
                         <motion.div
-                          initial={prefersReducedMotion ? false : { opacity: 0, y: 14, scale: 0.98 }}
-                          animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-                          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 10, scale: 0.98 }}
+                          initial={
+                            prefersReducedMotion
+                              ? false
+                              : { opacity: 0, y: 14, scale: 0.98 }
+                          }
+                          animate={
+                            prefersReducedMotion
+                              ? { opacity: 1 }
+                              : { opacity: 1, y: 0, scale: 1 }
+                          }
+                          exit={
+                            prefersReducedMotion
+                              ? { opacity: 0 }
+                              : { opacity: 0, y: 10, scale: 0.98 }
+                          }
                           transition={{ duration: 0.24, ease: "easeOut" }}
                           className="absolute left-1/2 -translate-x-1/2 top-full mt-4 w-[min(950px,92vw)] max-h-[75vh] overflow-y-auto bg-[var(--white)] rounded-xl shadow-2xl grid grid-cols-[200px_1fr_230px] 2xl:grid-cols-[220px_1fr_260px] overflow-hidden border border-[var(--b2-soft)]/70"
                           onMouseEnter={() => openMega(item.label)}
                           onMouseLeave={closeMega}
                         >
-                        <div className="bg-[var(--b2-soft)] p-6 flex flex-col h-full min-h-0 text-[var(--b1)]">
-                          <div className="shrink-0 space-y-4">
-                            <div className="font-semibold">{t("header.ownerOfferings")}</div>
-                            <div>{t("header.articlesNews")}</div>
-                          </div>
-                          <MegaMenuLeftDecor
-                            prefersReducedMotion={prefersReducedMotion}
-                            navLabel={item.label}
-                          />
-                        </div>
-
-                        <div className="p-8 grid grid-cols-2 gap-8 text-[var(--b1)]">
-                          {item.mega.map((section) => (
-                            <div key={section.title}>
-                              <h4 className="font-semibold mb-3 text-[14px] uppercase tracking-wide">
-                                {translateHeaderValue(section.title)}
-                              </h4>
-                              <ul className="space-y-2 text-sm">
-                                {(section.items ?? []).map((sub) => (
-                                  <li key={sub}>
-                                    <button
-                                      type="button"
-                                      className="hover:text-[var(--b1-mid)] transition"
-                                      onClick={() => handleMegaItemClick(item, section.title, sub)}
-                                    >
-                                      {translateHeaderValue(sub)}
-                                    </button>
-                                  </li>
-                                ))}
-                              </ul>
+                          <div className="bg-[var(--b2-soft)] p-6 flex flex-col h-full min-h-0 text-[var(--b1)]">
+                            <div className="shrink-0 space-y-4">
+                              <div className="font-semibold">
+                                {t("header.ownerOfferings")}
+                              </div>
+                              <div>{t("header.articlesNews")}</div>
                             </div>
-                          ))}
-                        </div>
-
-                        <div className="bg-[var(--b2-soft)] p-6 flex flex-col h-full min-h-0 justify-between gap-3">
-                          <div className="shrink-0">
-                            <h3 className="font-semibold text-lg text-[var(--b1)]">
-                              {t("header.sellOrRentFaster")}
-                            </h3>
-                            <p className="text-sm text-[var(--brown)] mt-2">
-                              {t("header.listPropertyFree")}
-                            </p>
+                            <MegaMenuLeftDecor
+                              prefersReducedMotion={prefersReducedMotion}
+                              navLabel={item.label}
+                            />
                           </div>
 
-                          <MegaMenuSellDecor prefersReducedMotion={prefersReducedMotion} />
+                          <div className="p-8 grid grid-cols-2 gap-8 text-[var(--b1)]">
+                            {item.mega.map((section) => (
+                              <div key={section.title}>
+                                <h4 className="font-semibold mb-3 text-[14px] uppercase tracking-wide">
+                                  {translateHeaderValue(section.title)}
+                                </h4>
+                                <ul className="space-y-2 text-sm">
+                                  {(section.items ?? []).map((sub) => (
+                                    <li key={sub}>
+                                      <button
+                                        type="button"
+                                        className="hover:text-[var(--b1-mid)] transition"
+                                        onClick={() =>
+                                          handleMegaItemClick(
+                                            item,
+                                            section.title,
+                                            sub,
+                                          )
+                                        }
+                                      >
+                                        {translateHeaderValue(sub)}
+                                      </button>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                            ))}
+                          </div>
 
-                          {/* Preserve routing for Post Property */}
-                          <Link
-                            to={ctaUrl}
-                            className="shrink-0 btn-brand px-4 py-2 rounded-lg shadow text-center"
-                          >
-                            {ctaLabel}
-                          </Link>
-                        </div>
+                          <div className="bg-[var(--b2-soft)] p-6 flex flex-col h-full min-h-0 justify-between gap-3">
+                            <div className="shrink-0">
+                              <h3 className="font-semibold text-lg text-[var(--b1)]">
+                                {t("header.sellOrRentFaster")}
+                              </h3>
+                              <p className="text-sm text-[var(--brown)] mt-2">
+                                {t("header.listPropertyFree")}
+                              </p>
+                            </div>
+
+                            <MegaMenuSellDecor
+                              prefersReducedMotion={prefersReducedMotion}
+                            />
+
+                            {/* Preserve routing for Post Property */}
+                            <Link
+                              to={ctaUrl}
+                              className="shrink-0 btn-brand px-4 py-2 rounded-lg shadow text-center"
+                            >
+                              {ctaLabel}
+                            </Link>
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -994,7 +1157,10 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                       {option.label}
                     </button>
                     {index < languageOptions.length - 1 && (
-                      <span className="shrink-0 text-[var(--fg)]/35 select-none" aria-hidden>
+                      <span
+                        className="shrink-0 text-[var(--fg)]/35 select-none"
+                        aria-hidden
+                      >
                         |
                       </span>
                     )}
@@ -1003,7 +1169,10 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               </div>
 
               {/* Post Property CTA restored (button only, not in nav) */}
-              <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
+              <motion.div
+                whileHover={prefersReducedMotion ? undefined : { y: -1 }}
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+              >
                 <Link
                   to={ctaUrl}
                   className="hidden lg:inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-2.5 xl:px-3 text-[13px] text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)]/70 hover:bg-[var(--fg)]/8"
@@ -1016,7 +1185,12 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               </motion.div>
 
               {/* Contact button keeps existing modal behavior */}
-              <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1, scale: 1.03 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}>
+              <motion.div
+                whileHover={
+                  prefersReducedMotion ? undefined : { y: -1, scale: 1.03 }
+                }
+                whileTap={prefersReducedMotion ? undefined : { scale: 0.96 }}
+              >
                 <Button
                   onClick={() => setContactOpen(true)}
                   className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg border-2 border-[var(--fg)]/90 bg-transparent p-0 text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[2px] hover:bg-[var(--fg)]/12 cursor-pointer"
@@ -1034,7 +1208,10 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
               </motion.div>
 
               {!isAuthenticated ? (
-                <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
+                <motion.div
+                  whileHover={prefersReducedMotion ? undefined : { y: -1 }}
+                  whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
+                >
                   <Link
                     to="/login"
                     className="hidden lg:inline-flex h-8 items-center justify-center rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-3 text-[13px] font-semibold leading-none text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-[2px] transition hover:border-[var(--fg)] hover:bg-[var(--fg)]/12 cursor-pointer"
@@ -1048,13 +1225,20 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                   onMouseEnter={openLogin}
                   onMouseLeave={closeLogin}
                 >
-                  <motion.div whileHover={prefersReducedMotion ? undefined : { y: -1 }} whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}>
+                  <motion.div
+                    whileHover={prefersReducedMotion ? undefined : { y: -1 }}
+                    whileTap={
+                      prefersReducedMotion ? undefined : { scale: 0.98 }
+                    }
+                  >
                     <Button className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border-2 border-[var(--fg)]/90 bg-transparent px-3 py-0 text-[var(--fg)] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[2px] hover:bg-[var(--fg)]/12">
                       <span className="flex h-5 w-5 items-center justify-center rounded-full border border-[var(--fg)]">
                         {showProfilePhoto ? (
                           <img
                             src={profilePhotoUrl}
-                            alt={user?.name ? `${user.name} profile` : "Profile"}
+                            alt={
+                              user?.name ? `${user.name} profile` : "Profile"
+                            }
                             className="h-full w-full rounded-full object-cover"
                           />
                         ) : (
@@ -1078,9 +1262,21 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                   <AnimatePresence initial={false}>
                     {loginOpen && (
                       <motion.div
-                        initial={prefersReducedMotion ? false : { opacity: 0, y: 12, scale: 0.98 }}
-                        animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
-                        exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
+                        initial={
+                          prefersReducedMotion
+                            ? false
+                            : { opacity: 0, y: 12, scale: 0.98 }
+                        }
+                        animate={
+                          prefersReducedMotion
+                            ? { opacity: 1 }
+                            : { opacity: 1, y: 0, scale: 1 }
+                        }
+                        exit={
+                          prefersReducedMotion
+                            ? { opacity: 0 }
+                            : { opacity: 0, y: 8, scale: 0.98 }
+                        }
                         transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
                         className="absolute right-0 top-full z-50 mt-2 w-52 overflow-hidden rounded-xl border border-[var(--b2-soft)]/70 bg-[var(--white)] p-2 shadow-xl"
                         onMouseEnter={openLogin}
@@ -1092,9 +1288,9 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                               ? "/buyer/account"
                               : user?.role === "seller"
                                 ? "/seller/profile"
-                              : user?.role === "admin"
-                                ? "/admin/account"
-                                : roleDashboardPath(user?.role ?? "buyer")
+                                : user?.role === "admin"
+                                  ? "/admin/account"
+                                  : roleDashboardPath(user?.role ?? "buyer")
                           }
                           className="flex h-10 items-center rounded-md px-3 text-sm font-medium text-[var(--b1)] transition-colors hover:bg-[var(--b2-soft)]/50 hover:text-[var(--b1-mid)]"
                         >
@@ -1174,7 +1370,10 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                   className="absolute right-5 sm:right-6 top-1/2 -translate-y-1/2 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[var(--b2-soft)] bg-[var(--white)] text-[var(--b1)] hover:bg-[var(--b2-soft)]/60 transition-colors p-0"
                   aria-label={t("header.closeMenu")}
                 >
-                  <span className="text-xl leading-none font-semibold" aria-hidden="true">
+                  <span
+                    className="text-xl leading-none font-semibold"
+                    aria-hidden="true"
+                  >
                     ×
                   </span>
                 </Button>
@@ -1187,7 +1386,11 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                 className="flex-1 overflow-y-auto px-5 sm:px-6 py-5 space-y-5"
               >
                 {visibleNavItems.map((item) => (
-                  <motion.div key={item.label} variants={navItemMotion} className="space-y-2">
+                  <motion.div
+                    key={item.label}
+                    variants={navItemMotion}
+                    className="space-y-2"
+                  >
                     <div className="flex items-center justify-between gap-2">
                       <Link
                         to={item.href}
@@ -1202,55 +1405,80 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                           type="button"
                           onClick={() => toggleMobileSection(item.label)}
                           className="text-[var(--fg)] text-base leading-none"
-                          aria-label={t("header.toggleOptions", { item: translateHeaderValue(item.label) })}
-                          aria-expanded={mobileActiveSections.includes(item.label)}
+                          aria-label={t("header.toggleOptions", {
+                            item: translateHeaderValue(item.label),
+                          })}
+                          aria-expanded={mobileActiveSections.includes(
+                            item.label,
+                          )}
                         >
-                          {mobileActiveSections.includes(item.label) ? "−" : "+"}
+                          {mobileActiveSections.includes(item.label)
+                            ? "−"
+                            : "+"}
                         </Button>
                       )}
                     </div>
 
                     <AnimatePresence initial={false}>
-                      {item.mega && mobileActiveSections.includes(item.label) && (
-                        <motion.div
-                          initial={prefersReducedMotion ? false : { opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
-                          transition={{ duration: 0.22, ease: "easeOut" }}
-                          className="overflow-hidden"
-                        >
-                          <div className="pl-3 space-y-3 border-l border-[var(--b2-soft)]">
-                            {item.mega.map((section) => (
-                              <div key={section.title} className="space-y-1.5">
-                                <div className="text-xs uppercase tracking-wide font-semibold text-[var(--brown)]">
-                                  {translateHeaderValue(section.title)}
+                      {item.mega &&
+                        mobileActiveSections.includes(item.label) && (
+                          <motion.div
+                            initial={
+                              prefersReducedMotion
+                                ? false
+                                : { opacity: 0, height: 0 }
+                            }
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={
+                              prefersReducedMotion
+                                ? { opacity: 0 }
+                                : { opacity: 0, height: 0 }
+                            }
+                            transition={{ duration: 0.22, ease: "easeOut" }}
+                            className="overflow-hidden"
+                          >
+                            <div className="pl-3 space-y-3 border-l border-[var(--b2-soft)]">
+                              {item.mega.map((section) => (
+                                <div
+                                  key={section.title}
+                                  className="space-y-1.5"
+                                >
+                                  <div className="text-xs uppercase tracking-wide font-semibold text-[var(--brown)]">
+                                    {translateHeaderValue(section.title)}
+                                  </div>
+                                  <ul className="space-y-1">
+                                    {(section.items ?? []).map((sub) => (
+                                      <li key={sub}>
+                                        <button
+                                          type="button"
+                                          className="text-sm text-[var(--b1-mid)]"
+                                          onClick={() => {
+                                            closeMobileMenu();
+                                            handleMegaItemClick(
+                                              item,
+                                              section.title,
+                                              sub,
+                                            );
+                                          }}
+                                        >
+                                          {translateHeaderValue(sub)}
+                                        </button>
+                                      </li>
+                                    ))}
+                                  </ul>
                                 </div>
-                                <ul className="space-y-1">
-                                  {(section.items ?? []).map((sub) => (
-                                    <li key={sub}>
-                                      <button
-                                        type="button"
-                                        className="text-sm text-[var(--b1-mid)]"
-                                        onClick={() => {
-                                          closeMobileMenu();
-                                          handleMegaItemClick(item, section.title, sub);
-                                        }}
-                                      >
-                                        {translateHeaderValue(sub)}
-                                      </button>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
                     </AnimatePresence>
                   </motion.div>
                 ))}
 
-                <motion.div variants={navItemMotion} className="border-t border-[var(--b2-soft)] pt-6 space-y-4">
+                <motion.div
+                  variants={navItemMotion}
+                  className="border-t border-[var(--b2-soft)] pt-6 space-y-4"
+                >
                   <Link
                     to={ctaUrl}
                     onClick={closeMobileMenu}
@@ -1310,10 +1538,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
         )}
       </AnimatePresence>
 
-      <Modal
-        open={contactOpen}
-        onClose={closeContactModal}
-      >
+      <Modal open={contactOpen} onClose={closeContactModal}>
         <ContactPopup onClose={closeContactModal} />
       </Modal>
     </>
