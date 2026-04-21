@@ -30,18 +30,47 @@ import { SellerStatsSkeleton } from "@/components/seller/SellerSkeleton";
 import type { SellerStatItem } from "@/components/seller/SellerStats";
 import { cn } from "@/components/seller/sellerUtils";
 import { SellerNotificationsBell } from "@/components/seller/SellerNotificationsBell";
+import { fetchSellerDashboardInsightsAPI, type SellerDashboardInsights } from "@/features/seller/sellerAPI";
 
 const SellerDashboard = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { listings, loading, error, actionLoading } = useAppSelector((state: RootState) => state.seller);
   const [banner, setBanner] = useState<{ text: string; variant: "success" | "error" } | null>(null);
+  const [dashboardInsights, setDashboardInsights] = useState<SellerDashboardInsights>({ trend: [], recentLeads: [] });
 
   useEffect(() => {
     dispatch(fetchMyListings());
   }, [dispatch]);
 
+  useEffect(() => {
+    let mounted = true;
+    const loadInsights = async () => {
+      try {
+        const insights = await fetchSellerDashboardInsightsAPI();
+        if (!mounted) return;
+        setDashboardInsights(insights);
+      } catch {
+        if (!mounted) return;
+        setDashboardInsights({ trend: [], recentLeads: [] });
+      }
+    };
+
+    loadInsights();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const agg = useSellerAggregates(listings as Property[]);
+  const propertyInsights = useMemo(
+    () => ({
+      views: agg.totalViews,
+      inquiries: agg.totalLeads,
+      saved: (listings as Property[]).reduce((sum, listing) => sum + (Number(listing.analytics?.saves) || 0), 0),
+    }),
+    [agg.totalLeads, agg.totalViews, listings]
+  );
 
   const statItems: SellerStatItem[] = useMemo(
     () => [
@@ -237,13 +266,13 @@ const SellerDashboard = () => {
 
       {!loading && listings.length > 0 ? (
         <>
-          <SellerCharts listings={listings as Property[]} />
+          <SellerCharts listings={listings as Property[]} trendData={dashboardInsights.trend} />
           <div className="grid grid-cols-1 gap-5 lg:gap-6 xl:grid-cols-5">
             <div className="xl:col-span-2">
-              <SellerLeadsCard />
+              <SellerLeadsCard recentLeads={dashboardInsights.recentLeads} />
             </div>
             <div className="space-y-5 xl:col-span-3">
-              <PropertyInsights />
+              <PropertyInsights analytics={propertyInsights} />
               <div className="overflow-hidden rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] shadow-sm ring-1 ring-black/[0.02]">
                 <div className="flex flex-col gap-2 border-b border-[var(--b2)]/70 bg-gradient-to-r from-[var(--white)] to-[var(--b2-soft)]/30 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                   <h2 className="font-serif text-base font-semibold text-[var(--b1)]">{t("sellerDashboard.recentHeading")}</h2>

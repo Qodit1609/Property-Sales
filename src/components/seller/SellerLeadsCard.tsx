@@ -1,9 +1,10 @@
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Flame, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "./sellerUtils";
+import type { SellerDashboardRecentLead } from "@/features/seller/sellerAPI";
 
 export type SellerLeadPreview = {
   id: string;
@@ -13,20 +14,40 @@ export type SellerLeadPreview = {
   lastActivity: string;
 };
 
-const MOCK: SellerLeadPreview[] = [
-  { id: "L1", buyer: "R. Sharma", propertyTitle: "Indore fringe farmland", interest: "hot", lastActivity: "2h ago" },
-  { id: "L2", buyer: "A. Patel", propertyTitle: "Weekend farmhouse", interest: "warm", lastActivity: "Yesterday" },
-  { id: "L3", buyer: "K. Verma", propertyTitle: "Resort plot", interest: "cold", lastActivity: "3d ago" },
-];
-
 function interestStyles(interest: SellerLeadPreview["interest"]) {
   if (interest === "hot") return "bg-[var(--error-bg)] text-[var(--error)] border-[var(--error)]/25";
   if (interest === "warm") return "bg-[var(--warning-bg)] text-[var(--warning)] border-[var(--warning)]/25";
   return "bg-[var(--b2-soft)] text-[var(--b1-mid)] border-[var(--b2)]";
 }
 
-function SellerLeadsCardComponent() {
+const getLastActivityLabel = (timestamp: string) => {
+  const time = new Date(timestamp).getTime();
+  if (Number.isNaN(time)) return "";
+  const diffMs = Date.now() - time;
+  const minute = 60 * 1000;
+  const hour = 60 * minute;
+  const day = 24 * hour;
+  if (diffMs < hour) return `${Math.max(1, Math.floor(diffMs / minute))}m ago`;
+  if (diffMs < day) return `${Math.floor(diffMs / hour)}h ago`;
+  return `${Math.floor(diffMs / day)}d ago`;
+};
+
+type SellerLeadsCardProps = {
+  recentLeads?: SellerDashboardRecentLead[];
+};
+
+function SellerLeadsCardComponent({ recentLeads }: SellerLeadsCardProps) {
   const { t } = useTranslation();
+  const items = useMemo<SellerLeadPreview[]>(() => {
+    if (!Array.isArray(recentLeads) || recentLeads.length === 0) return [];
+    return recentLeads.map((lead) => ({
+      id: lead.id,
+      buyer: lead.buyer,
+      propertyTitle: lead.propertyTitle,
+      interest: lead.interest,
+      lastActivity: getLastActivityLabel(lead.timestamp),
+    }));
+  }, [recentLeads]);
 
   return (
     <motion.div
@@ -49,7 +70,7 @@ function SellerLeadsCardComponent() {
         </Link>
       </div>
       <ul className="divide-y divide-[var(--b2)]/60">
-        {MOCK.map((lead, i) => (
+        {items.map((lead, i) => (
           <motion.li
             key={lead.id}
             initial={{ opacity: 0, x: -6 }}
@@ -74,6 +95,9 @@ function SellerLeadsCardComponent() {
             </span>
           </motion.li>
         ))}
+        {items.length === 0 ? (
+          <li className="px-5 py-4 text-sm text-[var(--muted)]">No recent leads yet.</li>
+        ) : null}
       </ul>
     </motion.div>
   );

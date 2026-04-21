@@ -1,4 +1,4 @@
-import { memo, useMemo, useState } from "react";
+import { memo, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Eye, Heart, MessageCircle, TrendingUp } from "lucide-react";
@@ -13,12 +13,6 @@ export type PropertyInsightsAnalytics = {
   saved: number;
 };
 
-const MOCK_ANALYTICS: PropertyInsightsAnalytics = {
-  views: 142,
-  inquiries: 12,
-  saved: 28,
-};
-
 function popularityLevel(views: number): "High" | "Medium" | "Low" {
   if (views > 150) return "High";
   if (views > 50) return "Medium";
@@ -31,9 +25,12 @@ function popularityTone(level: "High" | "Medium" | "Low"): PropertyInsightBadgeT
   return "low";
 }
 
-function PropertyInsightsComponent() {
+type PropertyInsightsProps = {
+  analytics: PropertyInsightsAnalytics;
+};
+
+function PropertyInsightsComponent({ analytics }: PropertyInsightsProps) {
   const { t } = useTranslation();
-  const [analytics] = useState<PropertyInsightsAnalytics>(() => ({ ...MOCK_ANALYTICS }));
 
   const level = useMemo(() => popularityLevel(analytics.views), [analytics.views]);
   const tone = useMemo(() => popularityTone(level), [level]);

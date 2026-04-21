@@ -12,6 +12,7 @@ import {
 import { useTranslation } from "react-i18next";
 import type { Property } from "../../features/properties/propertyType";
 import { SELLER_CHART_WEEKS } from "./sellerNav";
+import type { SellerDashboardTrendPoint } from "@/features/seller/sellerAPI";
 
 type Point = { label: string; views: number; leads: number };
 
@@ -34,11 +35,17 @@ function buildTrendData(listings: Property[], weeks: number): Point[] {
 
 type SellerChartsProps = {
   listings: Property[];
+  trendData?: SellerDashboardTrendPoint[];
 };
 
-function SellerChartsComponent({ listings }: SellerChartsProps) {
+function SellerChartsComponent({ listings, trendData }: SellerChartsProps) {
   const { t } = useTranslation();
-  const data = useMemo(() => buildTrendData(listings, SELLER_CHART_WEEKS), [listings]);
+  const data = useMemo(() => {
+    if (Array.isArray(trendData) && trendData.length > 0) {
+      return trendData;
+    }
+    return buildTrendData(listings, SELLER_CHART_WEEKS);
+  }, [listings, trendData]);
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">

@@ -144,6 +144,34 @@ export const fetchSellerLeadsAPI = async (): Promise<SellerPropertyLeads[]> => {
   return Array.isArray(properties) ? properties : [];
 };
 
+export type SellerDashboardTrendPoint = {
+  label: string;
+  views: number;
+  leads: number;
+};
+
+export type SellerDashboardRecentLead = {
+  id: string;
+  buyer: string;
+  propertyTitle: string;
+  interest: "hot" | "warm" | "cold";
+  timestamp: string;
+};
+
+export interface SellerDashboardInsights {
+  trend: SellerDashboardTrendPoint[];
+  recentLeads: SellerDashboardRecentLead[];
+}
+
+export const fetchSellerDashboardInsightsAPI = async (): Promise<SellerDashboardInsights> => {
+  const res = await api.get("/properties/my-dashboard/insights");
+  const raw = (res.data?.data ?? res.data) as Partial<SellerDashboardInsights> | undefined;
+  return {
+    trend: Array.isArray(raw?.trend) ? raw.trend : [],
+    recentLeads: Array.isArray(raw?.recentLeads) ? raw.recentLeads : [],
+  };
+};
+
 export const deleteSellerLeadRowAPI = async (payload: { leadId: string; activityType: "cart" | "wishlist" | "compare" }) => {
   await api.delete("/properties/my-leads/row", { data: payload });
 };
