@@ -47,6 +47,8 @@ import AgentLeadsPage from "./pages/Agent/AgentLeadsPage";
 import AgentVisitsPage from "./pages/Agent/AgentVisitsPage";
 import AgentClientsPage from "./pages/Agent/AgentClientsPage";
 import AgentProfilePage from "./pages/Agent/AgentProfilePage";
+import AgentFieldEntryPage from "./pages/Agent/AgentFieldEntryPage";
+import AgentDetailedEntryPage from "./pages/Agent/AgentDetailedEntryPage";
 import { useAppDispatch } from "./store/hooks";
 import { fetchProperties } from "./features/properties/propertySlice";
 import { fetchPropertyMedia } from "./features/media/mediaSlice";
@@ -291,6 +293,8 @@ function App() {
         <Route element={<ProtectedRoute requiredRole="agent" />}>
           <Route element={<AgentLayout />}>
             <Route path="/agent/dashboard" element={<AgentDashboard />} />
+            <Route path="/agent/field-entry" element={<AgentFieldEntryPage />} />
+            <Route path="/agent/detailed-entry" element={<AgentDetailedEntryPage />} />
             <Route path="/agent/properties" element={<AgentPropertiesPage />} />
             <Route path="/agent/add-property" element={<AgentAddPropertyPage />} />
             <Route path="/agent/leads" element={<AgentLeadsPage />} />

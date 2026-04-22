@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useAppSelector } from "../../hooks/reduxHooks";
+import { useAgentCollection } from "./AgentCollectionContext";
 
 type StatCardProps = {
   label: string;
@@ -20,21 +20,25 @@ function StatCard({ label, value, hint }: StatCardProps) {
 }
 
 const AgentDashboardPage: React.FC = () => {
-  const { data } = useAppSelector((state) => state.properties);
-
-  const totals = useMemo(() => {
-    const approved = data.filter((p) => p.status === "approved").length;
-    const pending = data.filter((p) => p.status !== "approved").length;
-    return { total: data.length, approved, pending };
-  }, [data]);
+  const { properties } = useAgentCollection();
 
   const recentActivity = useMemo(() => {
-    return data.slice(0, 5).map((p) => ({
-      id: p._id,
-      title: p.title,
-      status: p.status ?? "pending",
+    return properties.slice(0, 5).map((p) => ({
+      id: p.id,
+      title: p.step1.village,
+      status: p.status,
     }));
-  }, [data]);
+  }, [properties]);
+
+  const statusTotals = useMemo(() => {
+    return properties.reduce(
+      (acc, property) => {
+        acc[property.status] += 1;
+        return acc;
+      },
+      { draft: 0, incomplete: 0, ready: 0 }
+    );
+  }, [properties]);
 
   return (
     <section className="space-y-6 px-4 sm:px-6 lg:px-8 py-6">
@@ -49,24 +53,24 @@ const AgentDashboardPage: React.FC = () => {
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          label="Total Properties"
-          value={String(totals.total)}
-          hint="All visible listings in the system."
+          label="Collected Properties"
+          value={String(properties.length)}
+          hint="Agent property collection entries."
         />
         <StatCard
-          label="Active Leads"
-          value="0"
-          hint="Leads module connected next."
+          label="Draft"
+          value={String(statusTotals.draft)}
+          hint="Step 1 saved and editable."
         />
         <StatCard
-          label="Scheduled Visits"
-          value="0"
-          hint="Visit scheduling connected next."
+          label="Incomplete"
+          value={String(statusTotals.incomplete)}
+          hint="Step 2 pending final details."
         />
         <StatCard
-          label="Pending Review"
-          value={String(totals.pending)}
-          hint={`${totals.approved} approved.`}
+          label="Ready"
+          value={String(statusTotals.ready)}
+          hint="Ready for admin approval flow."
         />
       </div>
 

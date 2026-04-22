@@ -15,6 +15,7 @@ import { normalizeLanguage, preloadLanguage } from "../../i18n";
 import { loadBuyerProfile } from "../../lib/buyerProfileStorage";
 import { loadSellerProfile } from "../../lib/sellerProfileStorage";
 import { loadAdminProfile } from "../../lib/adminProfileStorage";
+import { loadAgentProfile } from "../../lib/agentProfileStorage";
 
 interface MegaSection {
   title: string;
@@ -879,6 +880,8 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
       ? (loadBuyerProfile(user?.email)?.profilePhotoUrl ?? "")
       : user?.role === "seller"
         ? (loadSellerProfile(user?.email)?.profilePhotoUrl ?? "")
+        : user?.role === "agent"
+          ? (loadAgentProfile(user?.email)?.profilePhotoUrl ?? "")
         : user?.role === "admin"
           ? (loadAdminProfile(
               String(user?.id ?? user?._id ?? user?.email ?? "").trim() ||
@@ -889,7 +892,8 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   const showProfilePhoto =
     (user?.role === "admin" ||
       user?.role === "seller" ||
-      user?.role === "buyer") &&
+      user?.role === "buyer" ||
+      user?.role === "agent") &&
     Boolean(profilePhotoUrl);
 
   return (
