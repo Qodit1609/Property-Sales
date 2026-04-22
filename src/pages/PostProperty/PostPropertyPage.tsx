@@ -10,7 +10,8 @@ export default function PostPropertyPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const userRole = useAppSelector((state) => state.auth.user?.role);
+  const rawUserRole = useAppSelector((state) => state.auth.user?.role);
+  const userRole = String(rawUserRole ?? "").trim().toLowerCase();
   const canAccess = userRole === "seller" || userRole === "admin";
   const editPropertyId = useAppSelector((state) => state.postProperty.editPropertyId);
 

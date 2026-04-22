@@ -133,6 +133,10 @@ function App() {
               <ProtectedRoute requiredRoles={["seller", "buyer", "agent", "admin"]} />
             }
           >
+            <Route
+              path="/add-property"
+              element={<Navigate to="/post-property/basic" replace />}
+            />
             <Route path="/post-property" element={<PostPropertyPage />}>
               <Route index element={<Navigate to="basic" replace />} />
               <Route path="basic" element={<BasicDetailsForm />} />
