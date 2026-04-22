@@ -10,6 +10,7 @@ import {
   ClipboardList,
   MessageCircleMore,
   Megaphone,
+  Images,
 } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import api from "@/lib/apiClient";
@@ -27,6 +28,7 @@ const ADMIN_ROUTE_BY_LABEL: Record<string, string> = {
   "audit logs": "/admin/logs",
   testimonial: "/admin/testimonial",
   "promotion requests": "/admin/promotions",
+  images: "/admin/images",
 };
 
 const ADMIN_ROUTE_ALIASES: Record<string, string> = {
@@ -39,6 +41,7 @@ const ADMIN_ROUTE_ALIASES: Record<string, string> = {
   "/admin/testimonials": "/admin/testimonial",
   "/admin/promotion-requests": "/admin/promotions",
   "/admin/promotionrequests": "/admin/promotions",
+  "/admin/image": "/admin/images",
 };
 
 const ICON_MAP = {
@@ -59,6 +62,7 @@ const ICON_MAP = {
   testimonial: MessageCircleMore,
   megaphone: Megaphone,
   promotions: Megaphone,
+  images: Images,
 } as const;
 
 interface AdminSidebarProps {
@@ -69,6 +73,11 @@ interface AdminSidebarProps {
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, collapsed }) => {
   const [dynamicItems, setDynamicItems] = useState<SidebarItem[]>([]);
   const [sectionTitle, setSectionTitle] = useState<string>("");
+  const imagesFallbackItem: SidebarItem = {
+    to: "/admin/images",
+    label: "Images",
+    icon: Images,
+  };
   const normalizeAdminRoute = (rawTo: string, rawLabel: string) => {
     const labelKey = rawLabel.trim().toLowerCase();
     const byLabel = ADMIN_ROUTE_BY_LABEL[labelKey];
@@ -152,9 +161,13 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, collapsed }) =>
     };
   }, []);
 
+  const sidebarItems = dynamicItems.some((item) => item.to === "/admin/images")
+    ? dynamicItems
+    : [...dynamicItems, imagesFallbackItem];
+
   return (
     <nav className="space-y-1" aria-label={sectionTitle || undefined}>
-      {dynamicItems.map((item) => {
+      {sidebarItems.map((item) => {
         const Icon = item.icon;
         return (
           <NavLink

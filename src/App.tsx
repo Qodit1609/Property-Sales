@@ -29,6 +29,7 @@ import AdminTestimonialPage from "./pages/Admin/AdminTestimonialPage";
 import AdminPromotionsPage from "./pages/Admin/AdminPromotionsPage";
 import AdminSellersPage from "./pages/Admin/AdminSellersPage";
 import AdminAccountPage from "./pages/Admin/AdminAccountPage";
+import AdminImagesPage from "./pages/Admin/AdminImagesPage";
 import BuyerDashboard from "./pages/Buyer/BuyerDashboard";
 import BuyerWishlistPage from "./pages/Buyer/BuyerWishlistPage";
 import BuyerComparePage from "./pages/Buyer/BuyerComparePage";
@@ -310,6 +311,7 @@ function App() {
           />
           <Route path="/admin/testimonial" element={<AdminTestimonialPage />} />
           <Route path="/admin/promotions" element={<AdminPromotionsPage />} />
+          <Route path="/admin/images" element={<AdminImagesPage />} />
         </Route>
 
         {/* Login route WITHOUT header/footer */}
