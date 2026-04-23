@@ -1,8 +1,9 @@
 /* Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap");
 
-/* Tailwind import */
+/* Tailwind import — @config loads theme extensions (primary, muted, fonts, etc.) */
 @import "tailwindcss";
+@config "./tailwind.config.js";
 
 /* Custom font */
 @font-face {
@@ -35,6 +36,8 @@
 @layer base {
   body {
     @apply font-serif;
+    font-variant-numeric: lining-nums tabular-nums;
+    font-feature-settings: "lnum" 1, "tnum" 1;
     overflow-x: hidden;
   }
 }

@@ -1,25 +1,25 @@
-import api from "../../lib/apiClient";
-import type { User } from "../users/userType";
+import api, { API_ENDPOINTS, withAuthApi } from "../../lib/apiClient";
+import type { AuthResponse, LoginRequest, RegisterRequest } from "./authTypes";
+import { normalizeAuthUser } from "./roleUtils";
 
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  token: string;
-  user: User & { role: NonNullable<User["role"]> };
-}
-
-export const loginAPI = async (payload: LoginPayload): Promise<AuthResponse> => {
-  const res = await api.post("/auth/login", payload);
-
-  // Expecting shape: { token, user } (optionally wrapped in data)
-  const data = res.data?.data ?? res.data;
-
+const unwrapAuthResponse = (payload: AuthResponse) => {
+  const root = payload.data ?? payload;
   return {
-    token: data.token,
-    user: data.user,
+    token: root.token ?? root.accessToken ?? null,
+    user: normalizeAuthUser(root.user ?? null),
   };
 };
 
+export const loginUser = async (data: LoginRequest) => {
+  const response = await api.post<AuthResponse>(API_ENDPOINTS.AUTH.LOGIN, data, withAuthApi());
+  return unwrapAuthResponse(response.data);
+};
+
+export const registerUser = async (data: RegisterRequest) => {
+  const response = await api.post<AuthResponse>(
+    API_ENDPOINTS.AUTH.REGISTER,
+    data,
+    withAuthApi()
+  );
+  return unwrapAuthResponse(response.data);
+};

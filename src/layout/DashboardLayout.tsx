@@ -1,6 +1,6 @@
 import React from "react";
-import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
-import { logout } from "../features/auth/authSlice";
+import { useAppSelector } from "../hooks/reduxHooks";
+import Header from "../components/Header/Header";
 
 interface DashboardLayoutProps {
   title: string;
@@ -13,15 +13,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   sidebar,
   children,
 }) => {
-  const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
-  const handleLogout = () => {
-    dispatch(logout());
-  };
-
   return (
-    <div className="min-h-screen flex bg-[var(--b2-soft)] text-[var(--b1)]">
+    <div className="min-h-screen bg-[var(--b2-soft)] text-[var(--b1)]">
+      <Header forceSolid/>
+      <div className="pt-[68px] flex min-h-screen">
       {/* Sidebar */}
       <aside className="hidden md:flex md:w-64 bg-[var(--white)] border-r border-[var(--b2)] flex-col">
         <div className="px-6 py-4 border-b border-[var(--b2)]">
@@ -39,32 +36,10 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 
       {/* Main */}
       <div className="flex-1 flex flex-col">
-        <header className="h-16 bg-[var(--white)] border-b border-[var(--b2)] flex items-center justify-between px-4 md:px-6">
-          <div className="md:hidden">
-            <h2 className="text-base font-semibold">{title}</h2>
-          </div>
-
-          <div className="flex-1" />
-
-          {user && (
-            <div className="flex items-center gap-3">
-              <span className="hidden sm:inline text-xs text-[var(--muted)]">
-                {user.role?.toUpperCase()}
-              </span>
-              <button
-                type="button"
-                onClick={handleLogout}
-                className="inline-flex items-center rounded-md border border-[var(--b1-mid)] bg-[var(--white)] px-3 py-1.5 text-xs font-medium text-[var(--b1)] shadow-sm hover:bg-[var(--b1-mid)] hover:text-[var(--fg)] transition"
-              >
-                Logout
-              </button>
-            </div>
-          )}
-        </header>
-
         <main className="flex-1 p-4 md:p-6 overflow-y-auto">
           {children}
         </main>
+      </div>
       </div>
     </div>
   );

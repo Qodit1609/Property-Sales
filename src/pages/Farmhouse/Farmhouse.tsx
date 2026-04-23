@@ -1,5 +1,5 @@
 import React from "react";
-import PropertyCard from "../../components/Crads/PropertyCard";
+import PropertyCard from "../../components/Cards/PropertyCard";
 import PropertyLayout from "../PropertyDetails/PropertyLayout";
 import { useAppSelector } from "../../hooks/reduxHooks";
 
