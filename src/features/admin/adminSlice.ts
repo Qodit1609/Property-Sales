@@ -5,6 +5,7 @@ import type { Property } from "../properties/propertyType";
 import {
   fetchAdminUsersAPI,
   deleteAdminUserAPI,
+  toggleUserBlockStatusAPI,
   fetchAdminListingsAPI,
   fetchAllAdminListingsAPI,
   approveListingAPI,
@@ -305,6 +306,21 @@ export const deleteUserById = createAsyncThunk<
   }
 });
 
+export const toggleUserBlockStatusById = createAsyncThunk<
+  ManagedAccount,
+  string,
+  { rejectValue: string }
+>("admin/toggleUserBlockStatus", async (userId, { rejectWithValue }) => {
+  try {
+    return await toggleUserBlockStatusAPI(userId);
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    const message =
+      err.response?.data?.message ?? err.message ?? "Failed to update user block status";
+    return rejectWithValue(message);
+  }
+});
+
 const adminSlice = createSlice({
   name: "admin",
   initialState,
@@ -583,6 +599,19 @@ const adminSlice = createSlice({
         );
       })
       .addCase(deleteUserById.rejected, (state) => {
+        state.actionLoading = false;
+      })
+
+      .addCase(toggleUserBlockStatusById.pending, (state) => {
+        state.actionLoading = true;
+      })
+      .addCase(toggleUserBlockStatusById.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        state.users = state.users.map((user) =>
+          String(user.id) === String(action.payload.id) ? action.payload : user
+        );
+      })
+      .addCase(toggleUserBlockStatusById.rejected, (state) => {
         state.actionLoading = false;
       });
   },

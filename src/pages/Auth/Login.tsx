@@ -105,6 +105,13 @@ const Login: React.FC = () => {
 
       navigate(getDashboardPathForRole(role), { replace: true });
     }
+
+    if (
+      loginUser.rejected.match(result) &&
+      result.payload === "You are blocked by Admin"
+    ) {
+      window.alert("You are blocked by Admin");
+    }
   };
 
   return (

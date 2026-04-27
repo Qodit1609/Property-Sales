@@ -12,6 +12,7 @@ import {
   fetchAdminListings,
   fetchAdminUsers,
   rejectListing,
+  toggleUserBlockStatusById,
 } from "../../features/admin/adminSlice";
 
 type Tab = "overview" | "users" | "listings";
@@ -63,6 +64,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     dispatch(deleteUserById(String(userId)));
   };
 
+  const handleToggleUserBlock = (userId: string | number) => {
+    dispatch(toggleUserBlockStatusById(String(userId)));
+  };
+
   const handleStatsCardClick = (
     section: "listings" | "users",
     label: string
@@ -106,6 +111,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       error={usersError}
       actionLoading={actionLoading}
       onDelete={handleDeleteUser}
+      onToggleBlock={handleToggleUserBlock}
       initialRoleFilter={initialUserRoleFilter}
     />
   );

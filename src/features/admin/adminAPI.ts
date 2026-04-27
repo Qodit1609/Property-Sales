@@ -16,6 +16,7 @@ function normalizeAdminUser(raw: unknown): ManagedAccount {
     id: id as string | number,
     name: String(r.name ?? ""),
     email: String(r.email ?? ""),
+    isBlocked: Boolean(r.isBlocked),
     ...(role ? { role } : {}),
   };
 }
@@ -29,6 +30,14 @@ export const fetchAdminUsersAPI = async (): Promise<ManagedAccount[]> => {
 
 export const deleteAdminUserAPI = async (userId: string): Promise<void> => {
   await api.delete(`/admin/users/${userId}`);
+};
+
+export const toggleUserBlockStatusAPI = async (
+  userId: string
+): Promise<ManagedAccount> => {
+  const res = await api.patch(`/admin/users/${userId}/block-toggle`);
+  const raw = res.data?.data ?? res.data;
+  return normalizeAdminUser(raw);
 };
 
 /* =========================

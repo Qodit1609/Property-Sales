@@ -26,6 +26,7 @@ interface AccountManagementProps {
   error: string | null;
   actionLoading: boolean;
   onDelete: (id: string | number) => void;
+  onToggleBlock: (id: string | number) => void;
   initialRoleFilter?: "all" | "buyer" | "seller" | "agent" | "user";
 }
 
@@ -64,6 +65,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
   error,
   actionLoading,
   onDelete,
+  onToggleBlock,
   initialRoleFilter = "all",
 }) => {
   const [query, setQuery] = useState("");
@@ -213,7 +215,17 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
                     {row.role ?? "N/A"}
                   </span>
                 </div>
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    disabled={actionLoading}
+                    onClick={() => onToggleBlock(row.id)}
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 border-rose-300 text-rose-700 hover:bg-rose-50"
+                  >
+                    {row.isBlocked ? "Unblock" : "Block"}
+                  </Button>
                   <Button
                     type="button"
                     disabled={actionLoading}
@@ -276,6 +288,17 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
                       </td>
 
                       <td className="w-[1%] whitespace-nowrap px-4 py-3.5 text-center">
+                        <Button
+                          type="button"
+                          disabled={actionLoading}
+                          onClick={() => onToggleBlock(row.id)}
+                          variant="outline"
+                          size="sm"
+                          className="inline-flex gap-1.5 border-rose-300 text-rose-700 hover:bg-rose-50"
+                        >
+                          {row.isBlocked ? "Unblock" : "Block"}
+                        </Button>
+                        {" "}
                         <Button
                           type="button"
                           disabled={actionLoading}
