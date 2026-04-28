@@ -43,6 +43,15 @@ const EDITABLE_SECTIONS: AdminProfileSection[] = [
   "preferences",
 ];
 
+const THEME_KEY = "theme";
+
+function applyGlobalTheme(theme: "light" | "dark") {
+  const root = document.documentElement;
+  root.classList.toggle("dark", theme === "dark");
+  root.classList.toggle("light", theme === "light");
+  localStorage.setItem(THEME_KEY, theme);
+}
+
 function formatDisplayDate(iso: string | null): string {
   if (!iso) return "—";
   try {
@@ -180,6 +189,7 @@ const AdminAccountPage: React.FC = () => {
       setProfile(p);
       setForm(cloneProfile(p));
       setRawUser(raw);
+      applyGlobalTheme(p.preferences.theme);
       saveAdminProfile(profileIdentity, {
         profilePhotoUrl: p.media.profileImage || p.basicInfo.profileImage || null,
       });
@@ -289,6 +299,7 @@ const AdminAccountPage: React.FC = () => {
         setProfile(updated);
         setForm(cloneProfile(updated));
         setRawUser(nextRaw);
+        applyGlobalTheme(updated.preferences.theme);
         saveAdminProfile(profileIdentity, {
           profilePhotoUrl: updated.media.profileImage || updated.basicInfo.profileImage || null,
         });
@@ -829,10 +840,13 @@ const AdminAccountPage: React.FC = () => {
                       type="button"
                       disabled={!isEditing("preferences")}
                       onClick={() =>
-                        setForm((f) => ({
-                          ...f,
-                          preferences: { ...f.preferences, theme: t },
-                        }))
+                        setForm((f) => {
+                          applyGlobalTheme(t);
+                          return {
+                            ...f,
+                            preferences: { ...f.preferences, theme: t },
+                          };
+                        })
                       }
                       className={[
                         "rounded-lg px-3 py-1.5 text-sm font-medium capitalize transition-colors",

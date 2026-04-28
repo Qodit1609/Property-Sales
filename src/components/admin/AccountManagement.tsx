@@ -76,6 +76,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
     return "All";
   });
   const [deleteTarget, setDeleteTarget] = useState<ManagedAccount | null>(null);
+  const [blockTarget, setBlockTarget] = useState<ManagedAccount | null>(null);
 
   useEffect(() => {
     if (initialRoleFilter === "buyer" || initialRoleFilter === "user") {
@@ -94,7 +95,11 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
   }, [initialRoleFilter]);
 
   const filtered = useMemo(() => {
-    const byRole = accounts.filter((u) => matchesRoleFilter(u, roleFilter));
+    const visibleAccounts = accounts.filter((u) => {
+      const role = (u.role ?? "").toLowerCase().trim();
+      return role !== "admin" && role !== "super admin" && role !== "superadmin";
+    });
+    const byRole = visibleAccounts.filter((u) => matchesRoleFilter(u, roleFilter));
     if (!query.trim()) return byRole;
     const lower = query.toLowerCase();
     return byRole.filter(
@@ -109,6 +114,12 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
     if (!deleteTarget) return;
     onDelete(deleteTarget.id);
     setDeleteTarget(null);
+  };
+
+  const confirmToggleBlock = () => {
+    if (!blockTarget) return;
+    onToggleBlock(blockTarget.id);
+    setBlockTarget(null);
   };
 
   return (
@@ -219,7 +230,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
                   <Button
                     type="button"
                     disabled={actionLoading}
-                    onClick={() => onToggleBlock(row.id)}
+                    onClick={() => setBlockTarget(row)}
                     variant="outline"
                     size="sm"
                     className="gap-1.5 border-rose-300 text-rose-700 hover:bg-rose-50"
@@ -291,7 +302,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
                         <Button
                           type="button"
                           disabled={actionLoading}
-                          onClick={() => onToggleBlock(row.id)}
+                          onClick={() => setBlockTarget(row)}
                           variant="outline"
                           size="sm"
                           className="inline-flex gap-1.5 border-rose-300 text-rose-700 hover:bg-rose-50"
@@ -335,7 +346,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
 
       <AdminConfirmDialog
         open={deleteTarget !== null}
-        title="Delete this account?"
+        title="Are you sure you want to Delete?"
         description={
           deleteTarget
             ? `This will permanently remove ${deleteTarget.name} (${deleteTarget.email}). This action cannot be undone.`
@@ -347,6 +358,25 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
         loading={actionLoading}
         onClose={() => setDeleteTarget(null)}
         onConfirm={confirmDelete}
+      />
+
+      <AdminConfirmDialog
+        open={blockTarget !== null}
+        title={
+          blockTarget?.isBlocked
+            ? "Are you sure you want to Unblock?"
+            : "Are you sure you want to Block?"
+        }
+        description={
+          blockTarget
+            ? `${blockTarget.isBlocked ? "Unblock" : "Block"} ${blockTarget.name} (${blockTarget.email})?`
+            : ""
+        }
+        confirmLabel={blockTarget?.isBlocked ? "Unblock" : "Block"}
+        cancelLabel="Cancel"
+        loading={actionLoading}
+        onClose={() => setBlockTarget(null)}
+        onConfirm={confirmToggleBlock}
       />
     </div>
   );

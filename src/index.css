@@ -32,6 +32,24 @@
   --muted: var(--brown);
 }
 
+:root.dark {
+  --b1: #D8F3DC;
+  --b1-mid: #95D5B2;
+  --b2: #2D6A4F;
+  --b2-soft: #1B4332;
+  --fg: #0f1f18;
+  --white: #0f1f18;
+  --brown: #c8d5ce;
+
+  --success: #95D5B2;
+  --success-bg: #1B4332;
+  --error: #fca5a5;
+  --error-bg: #3b1212;
+  --warning: #fcd34d;
+  --warning-bg: #3a2a10;
+  --muted: var(--brown);
+}
+
 /* ===== BASE STYLES ===== */
 @layer base {
   body {
