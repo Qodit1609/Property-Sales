@@ -4,6 +4,7 @@ import { Button } from "@/components/common";
 import { ToastStack, type ToastMessage } from "@/components/propertyPost/Toast";
 import AdminLayout from "@/components/admin/AdminLayout";
 import api from "@/lib/apiClient";
+import CustomAlert from "@/components/common/CustomAlert";
 
 type MediaImage = {
   id: string;
@@ -90,6 +91,7 @@ const AdminImagesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingDeleteImage, setPendingDeleteImage] = useState<MediaImage | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   const pushToast = useCallback((toast: Omit<ToastMessage, "id">) => {
@@ -154,9 +156,6 @@ const AdminImagesPage: React.FC = () => {
   };
 
   const onDelete = async (image: MediaImage) => {
-    const confirmed = window.confirm("Delete this image permanently?");
-    if (!confirmed) return;
-
     setDeletingId(image.id);
     try {
       await api.delete(`/media/${encodeURIComponent(image.id)}`);
@@ -236,7 +235,7 @@ const AdminImagesPage: React.FC = () => {
                       variant="outline"
                       className="w-full text-red-600 hover:text-red-700"
                       disabled={deletingId === image.id}
-                      onClick={() => void onDelete(image)}
+                      onClick={() => setPendingDeleteImage(image)}
                     >
                       <Trash2 className="mr-1 h-4 w-4" />
                       {deletingId === image.id ? "Deleting..." : "Delete"}
@@ -248,6 +247,18 @@ const AdminImagesPage: React.FC = () => {
           </div>
         )}
       </section>
+      <CustomAlert
+        open={Boolean(pendingDeleteImage)}
+        title="Delete image?"
+        message="Delete this image permanently?"
+        showCancel
+        onCancel={() => setPendingDeleteImage(null)}
+        onConfirm={() => {
+          if (!pendingDeleteImage) return;
+          void onDelete(pendingDeleteImage);
+          setPendingDeleteImage(null);
+        }}
+      />
     </AdminLayout>
   );
 };

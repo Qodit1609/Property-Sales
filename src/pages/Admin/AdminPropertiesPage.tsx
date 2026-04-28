@@ -22,6 +22,7 @@ import {
   fetchAdminListings,
   rejectListing,
 } from "../../features/admin/adminSlice";
+import CustomAlert from "@/components/common/CustomAlert";
 
 const PROPERTY_TYPES = [
   "Farmhouse",
@@ -112,6 +113,7 @@ const AdminPropertiesPage: React.FC = () => {
 
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [viewGuardAlertOpen, setViewGuardAlertOpen] = useState(false);
   const [viewedIds, setViewedIds] = useState<Set<string>>(() =>
     getViewedIdsFromSession()
   );
@@ -197,7 +199,7 @@ const AdminPropertiesPage: React.FC = () => {
 
   const handleApprove = (listing: Property) => {
     if (!isListingViewed(listing)) {
-      window.alert("First view the property");
+      setViewGuardAlertOpen(true);
       return;
     }
 
@@ -616,6 +618,12 @@ const AdminPropertiesPage: React.FC = () => {
             </p>
           </Modal>
         )}
+        <CustomAlert
+          open={viewGuardAlertOpen}
+          title="Action blocked"
+          message="First view the property"
+          onConfirm={() => setViewGuardAlertOpen(false)}
+        />
       </div>
     </AdminLayout>
   );

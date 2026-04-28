@@ -8,6 +8,7 @@ import type { RootState } from "../../app/store";
 import { createListing, deleteListing, fetchMyListings, updateListing } from "../../features/seller/sellerSlice";
 import type { Property } from "../../features/properties/propertyType";
 import { Button } from "@/components/common";
+import CustomAlert from "@/components/common/CustomAlert";
 import { buildDuplicateListingPayload, getSellerListingDisplayStatus } from "../../lib/sellerHelpers";
 import { SellerPropertiesTable } from "@/components/seller/SellerPropertiesTable";
 import { SellerEmptyState } from "@/components/seller/SellerEmptyState";
@@ -20,14 +21,20 @@ const SellerPropertiesPage = () => {
   const [searchParams] = useSearchParams();
   const { listings, loading, error, actionLoading } = useAppSelector((state: RootState) => state.seller);
   const [banner, setBanner] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(fetchMyListings());
   }, [dispatch]);
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm(t("sellerDashboard.confirmDelete"))) return;
-    await dispatch(deleteListing(id));
+    setPendingDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
+    await dispatch(deleteListing(pendingDeleteId));
+    setPendingDeleteId(null);
   };
 
   const handleDuplicate = useCallback(
@@ -188,6 +195,14 @@ const SellerPropertiesPage = () => {
           onActivate={handleActivate}
         />
       )}
+      <CustomAlert
+        open={Boolean(pendingDeleteId)}
+        title={t("sellerDashboard.confirmDelete")}
+        message={t("sellerDashboard.confirmDelete")}
+        showCancel
+        onCancel={() => setPendingDeleteId(null)}
+        onConfirm={() => void confirmDelete()}
+      />
     </section>
   );
 };

@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import type { RootState } from "../../app/store";
 import { Button } from "@/components/common";
+import CustomAlert from "@/components/common/CustomAlert";
 import { sellerProfileFormSchema, type SellerProfileFormValues } from "./sellerProfileSchema";
 import {
   loadSellerProfile,
@@ -55,6 +56,7 @@ const SellerProfilePage = () => {
   );
 
   const [saved, setSaved] = useState(false);
+  const [completionAlertOpen, setCompletionAlertOpen] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [verificationUploads, setVerificationUploads] = useState({
     aadhaar: false,
@@ -195,7 +197,7 @@ const SellerProfilePage = () => {
     setAccountCreatedIfMissing(email);
     setSaved(true);
     if (profileCompletion === 100) {
-      window.alert("Your profile is 100% completed");
+      setCompletionAlertOpen(true);
     }
     window.setTimeout(() => setSaved(false), 4000);
   });
@@ -439,6 +441,12 @@ const SellerProfilePage = () => {
           </ul>
         </motion.aside>
       </div>
+      <CustomAlert
+        open={completionAlertOpen}
+        title="Profile Completed"
+        message="Your profile is 100% completed"
+        onConfirm={() => setCompletionAlertOpen(false)}
+      />
     </section>
   );
 };

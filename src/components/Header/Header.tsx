@@ -11,6 +11,7 @@ import type { Property } from "../../features/properties/propertyType";
 import api, { API_ENDPOINTS } from "../../lib/apiClient";
 import { mapPropertyListPayload } from "../../features/properties/propertyAPI";
 import { Button } from "@/components/common";
+import CustomAlert from "@/components/common/CustomAlert";
 import { normalizeLanguage, preloadLanguage } from "../../i18n";
 import { loadBuyerProfile } from "../../lib/buyerProfileStorage";
 import { loadSellerProfile } from "../../lib/sellerProfileStorage";
@@ -630,6 +631,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   );
   const [loginOpen, setLoginOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
   const [menuProperties, setMenuProperties] = useState<Property[]>([]);
   const [headerData, setHeaderData] = useState<NonNullable<
     NonNullable<HeaderApiResponse["data"]>["header"]
@@ -832,11 +834,11 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   };
 
   const handleLogout = () => {
-    const shouldLogout = window.confirm("Are you sure you want to logout?");
-    if (!shouldLogout) return;
+    setLogoutAlertOpen(false);
     dispatch(logout());
     navigate("/", { replace: true });
   };
+  const requestLogout = () => setLogoutAlertOpen(true);
 
   const toggleMobileSection = (label: string) => {
     setMobileActiveSections((prev) =>
@@ -1237,7 +1239,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
 
                         <button
                           type="button"
-                          onClick={handleLogout}
+                          onClick={requestLogout}
                           className="flex h-10 w-full items-center rounded-md px-3 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
                         >
                           {t("header.logout")}
@@ -1444,7 +1446,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         type="button"
                         onClick={() => {
                           closeMobileMenu();
-                          handleLogout();
+                          requestLogout();
                         }}
                         className="flex h-11 w-full items-center justify-center rounded-lg border border-red-500 bg-white px-4 text-center font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
                       >
@@ -1474,6 +1476,14 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
       <Modal open={contactOpen} onClose={closeContactModal}>
         <ContactPopup onClose={closeContactModal} />
       </Modal>
+      <CustomAlert
+        open={logoutAlertOpen}
+        title="Confirm Logout"
+        message="Are you sure you want to logout?"
+        showCancel
+        onCancel={() => setLogoutAlertOpen(false)}
+        onConfirm={handleLogout}
+      />
     </>
   );
 };

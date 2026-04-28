@@ -10,6 +10,7 @@ import {
   rejectTestimonial,
 } from "@/features/testimonials/testimonialApi";
 import type { Testimonial } from "@/features/testimonials/testimonialTypes";
+import CustomAlert from "@/components/common/CustomAlert";
 
 const toLabel = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
 
@@ -26,6 +27,7 @@ const AdminTestimonialPage: React.FC = () => {
   const [selected, setSelected] = useState<Testimonial | null>(null);
   const [viewedIds, setViewedIds] = useState<Set<string>>(new Set());
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
+  const [guardAlertOpen, setGuardAlertOpen] = useState(false);
 
   const pushToast = useCallback((toast: Omit<ToastMessage, "id">) => {
     const id =
@@ -60,7 +62,7 @@ const AdminTestimonialPage: React.FC = () => {
 
   const withViewedGuard = (item: Testimonial, cb: () => Promise<void>) => {
     if (!viewedIds.has(item.id)) {
-      window.alert("First click View to enable this action.");
+      setGuardAlertOpen(true);
       return;
     }
     void cb();
@@ -256,6 +258,12 @@ const AdminTestimonialPage: React.FC = () => {
           </div>
         </div>
       )}
+      <CustomAlert
+        open={guardAlertOpen}
+        title="Action blocked"
+        message="First click View to enable this action."
+        onConfirm={() => setGuardAlertOpen(false)}
+      />
     </AdminLayout>
   );
 };

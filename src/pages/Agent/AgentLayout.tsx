@@ -11,6 +11,7 @@ import { DashboardPageTopBar } from "../../components/common/DashboardPageTopBar
 import { ProfileAvatar } from "../../components/common/ProfileAvatar";
 import { twMerge } from "tailwind-merge";
 import { logout } from "../../features/auth/authSlice";
+import CustomAlert from "@/components/common/CustomAlert";
 
 const AGENT_SIDEBAR_WIDTH_EXPANDED = 280;
 const AGENT_SIDEBAR_WIDTH_COLLAPSED = 72;
@@ -203,6 +204,7 @@ const AgentLayout: React.FC = () => {
   const { profile } = useAgentProfileLocal(user?.email);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
 
   const displayName =
     profile.displayName.trim() || user?.name?.trim() || "Agent";
@@ -226,11 +228,14 @@ const AgentLayout: React.FC = () => {
   const overview = useMemo(() => agentTopBarFromPath(location.pathname), [location.pathname]);
 
   const handleLogout = () => {
-    const shouldLogout = window.confirm("Are you sure you want to logout?");
-    if (!shouldLogout) return;
+    setLogoutAlertOpen(true);
+  };
+
+  const confirmLogout = () => {
     dispatch(logout());
     navigate("/login", { replace: true });
     setMobileNavOpen(false);
+    setLogoutAlertOpen(false);
   };
 
   useEffect(() => {
@@ -344,6 +349,14 @@ const AgentLayout: React.FC = () => {
           </motion.main>
         </div>
       </div>
+      <CustomAlert
+        open={logoutAlertOpen}
+        title="Confirm Logout"
+        message="Are you sure you want to logout?"
+        showCancel
+        onCancel={() => setLogoutAlertOpen(false)}
+        onConfirm={confirmLogout}
+      />
     </div>
   );
 };

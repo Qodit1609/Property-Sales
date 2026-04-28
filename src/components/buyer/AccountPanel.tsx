@@ -11,6 +11,7 @@ import {
   setBuyerAccountCreatedIfMissing,
 } from "../../lib/buyerProfileStorage";
 import { Button, Input } from "@/components/common";
+import CustomAlert from "@/components/common/CustomAlert";
 
 import type { BuyerPreference } from "../../features/buyer/buyerTypes";
 
@@ -45,6 +46,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
   const activity = useBuyerActivityLocal(email);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [completionAlertOpen, setCompletionAlertOpen] = useState(false);
   const [profileForm, setProfileForm] = useState({
     fullName: "",
     emailAddress: "",
@@ -149,7 +151,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
       gender: profileForm.gender.trim(),
     });
     if (profileCompletion === 100) {
-      window.alert("Your profile is 100% completed");
+      setCompletionAlertOpen(true);
     }
     setIsEditingProfile(false);
   }, [email, isEditingProfile, profileCompletion, profileForm.gender, profileForm.mobileNumber, profileForm.occupation]);
@@ -166,6 +168,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
   }, [storedProfile?.gender, storedProfile?.mobileNumber, storedProfile?.occupation, user?.email, user?.name]);
 
   return (
+    <>
     <div className="space-y-4">
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -455,6 +458,13 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
         </div>
       </div>
     </div>
+    <CustomAlert
+      open={completionAlertOpen}
+      title="Profile Completed"
+      message="Your profile is 100% completed"
+      onConfirm={() => setCompletionAlertOpen(false)}
+    />
+    </>
   );
 };
 

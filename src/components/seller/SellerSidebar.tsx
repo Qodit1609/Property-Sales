@@ -28,6 +28,7 @@ import {
   SELLER_SIDEBAR_WIDTH_EXPANDED,
 } from "./sellerUtils";
 import api from "@/lib/apiClient";
+import CustomAlert from "@/components/common/CustomAlert";
 
 type SidebarNavItem = SellerNavItem & { label?: string };
 
@@ -165,8 +166,7 @@ export function SellerSidebar({
   const storedProfile = useSellerProfileLocal(user?.email);
 
   const handleLogout = () => {
-    const shouldLogout = window.confirm("Are you sure you want to logout?");
-    if (!shouldLogout) return;
+    setLogoutAlertOpen(false);
     dispatch(logout());
     navigate("/login", { replace: true });
     onNavigate?.();
@@ -184,6 +184,7 @@ export function SellerSidebar({
   const [workspaceTitle, setWorkspaceTitle] = useState<string | undefined>();
   const [mainItems, setMainItems] = useState<SidebarNavItem[]>([]);
   const [accountItems, setAccountItems] = useState<SidebarNavItem[]>([]);
+  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
 
   const headerExpanded = !collapsed || mobile;
 
@@ -365,7 +366,7 @@ export function SellerSidebar({
       <div className="border-t border-[var(--b2)]/80 p-2 pb-4">
         <button
           type="button"
-          onClick={handleLogout}
+          onClick={() => setLogoutAlertOpen(true)}
           className={cn(
             "flex w-full items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-[var(--error)] transition hover:border-[var(--error)]/30 hover:bg-[var(--error-bg)]",
             collapsed && !mobile ? "justify-center px-2" : ""
@@ -375,6 +376,14 @@ export function SellerSidebar({
           {(!collapsed || mobile) && <span>{t("header.logout")}</span>}
         </button>
       </div>
+      <CustomAlert
+        open={logoutAlertOpen}
+        title="Confirm Logout"
+        message="Are you sure you want to logout?"
+        showCancel
+        onCancel={() => setLogoutAlertOpen(false)}
+        onConfirm={handleLogout}
+      />
     </motion.aside>
   );
 }

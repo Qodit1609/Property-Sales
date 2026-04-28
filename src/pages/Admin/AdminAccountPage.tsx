@@ -29,6 +29,7 @@ import {
   validatePasswordChange,
 } from "../../features/admin/adminAccountHelpers";
 import { saveAdminProfile } from "../../lib/adminProfileStorage";
+import CustomAlert from "@/components/common/CustomAlert";
 
 function cloneProfile(p: AdminProfileData): AdminProfileData {
   return JSON.parse(JSON.stringify(p)) as AdminProfileData;
@@ -109,6 +110,7 @@ const AdminAccountPage: React.FC = () => {
   const [pwd, setPwd] = useState({ current: "", next: "", confirm: "" });
   const [pendingAvatar, setPendingAvatar] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [completionAlertOpen, setCompletionAlertOpen] = useState(false);
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const pushToast = useCallback((t: Omit<ToastMessage, "id">) => {
@@ -311,7 +313,7 @@ const AdminAccountPage: React.FC = () => {
           (updatedFilled / updatedCompletionChecks.length) * 100
         );
         if (updatedProfileCompletion === 100) {
-          window.alert("Your profile is 100% completed");
+          setCompletionAlertOpen(true);
         }
       } catch (e) {
         pushToast({
@@ -880,6 +882,12 @@ const AdminAccountPage: React.FC = () => {
           </div>
         )}
       </div>
+      <CustomAlert
+        open={completionAlertOpen}
+        title="Profile Completed"
+        message="Your profile is 100% completed"
+        onConfirm={() => setCompletionAlertOpen(false)}
+      />
     </AdminLayout>
   );
 };

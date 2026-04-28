@@ -19,6 +19,7 @@ import { createListing, deleteListing, fetchMyListings, updateListing } from "..
 import { buildDuplicateListingPayload } from "../../lib/sellerHelpers";
 import type { Property } from "../../features/properties/propertyType";
 import { Button } from "@/components/common";
+import CustomAlert from "@/components/common/CustomAlert";
 import { useSellerAggregates } from "../../hooks/useSellerAggregates";
 import { SellerCharts } from "@/components/seller/SellerCharts";
 import { SellerLeadsCard } from "@/components/seller/SellerLeadsCard";
@@ -37,6 +38,7 @@ const SellerDashboard = () => {
   const dispatch = useAppDispatch();
   const { listings, loading, error, actionLoading } = useAppSelector((state: RootState) => state.seller);
   const [banner, setBanner] = useState<{ text: string; variant: "success" | "error" } | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [dashboardInsights, setDashboardInsights] = useState<SellerDashboardInsights>({ trend: [], recentLeads: [] });
 
   useEffect(() => {
@@ -127,8 +129,13 @@ const SellerDashboard = () => {
   );
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm(t("sellerDashboard.confirmDelete"))) return;
-    await dispatch(deleteListing(id));
+    setPendingDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
+    await dispatch(deleteListing(pendingDeleteId));
+    setPendingDeleteId(null);
   };
 
   const handleDuplicate = useCallback(
@@ -316,6 +323,14 @@ const SellerDashboard = () => {
           }
         />
       ) : null}
+      <CustomAlert
+        open={Boolean(pendingDeleteId)}
+        title={t("sellerDashboard.confirmDelete")}
+        message={t("sellerDashboard.confirmDelete")}
+        showCancel
+        onCancel={() => setPendingDeleteId(null)}
+        onConfirm={() => void confirmDelete()}
+      />
     </section>
   );
 };

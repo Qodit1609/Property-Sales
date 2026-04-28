@@ -1,9 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import PostPropertyLayout from "../../components/propertyPost/PostPropertyLayout";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { loadEditProperty, setEditPropertyId } from "../../features/postProperty/postPropertySlice";
 import { useTranslation } from "react-i18next";
+import CustomAlert from "@/components/common/CustomAlert";
 
 export default function PostPropertyPage() {
   const { t } = useTranslation();
@@ -14,6 +15,11 @@ export default function PostPropertyPage() {
   const userRole = String(rawUserRole ?? "").trim().toLowerCase();
   const canAccess = userRole === "seller" || userRole === "admin";
   const editPropertyId = useAppSelector((state) => state.postProperty.editPropertyId);
+  const [unauthorizedAlert, setUnauthorizedAlert] = useState<{
+    open: boolean;
+    message: string;
+    redirectTo: string;
+  }>({ open: false, message: "", redirectTo: "/" });
 
   useEffect(() => {
     if (canAccess) return;
@@ -22,14 +28,12 @@ export default function PostPropertyPage() {
       userRole === "buyer"
         ? t("postProperty.page.buyerUnauthorized")
         : t("postProperty.page.roleUnauthorized");
-    window.alert(message);
-
-    if (userRole === "buyer") {
-      navigate("/buyer/dashboard", { replace: true });
-      return;
-    }
-    navigate("/", { replace: true });
-  }, [canAccess, navigate, userRole]);
+    setUnauthorizedAlert({
+      open: true,
+      message,
+      redirectTo: userRole === "buyer" ? "/buyer/dashboard" : "/",
+    });
+  }, [canAccess, userRole, t]);
 
   useEffect(() => {
     if (!canAccess) return;
@@ -40,7 +44,17 @@ export default function PostPropertyPage() {
   }, [canAccess, dispatch, editPropertyId, searchParams]);
 
   if (!canAccess) {
-    return null;
+    return (
+      <CustomAlert
+        open={unauthorizedAlert.open}
+        title="Access Restricted"
+        message={unauthorizedAlert.message}
+        onConfirm={() => {
+          setUnauthorizedAlert((prev) => ({ ...prev, open: false }));
+          navigate(unauthorizedAlert.redirectTo, { replace: true });
+        }}
+      />
+    );
   }
 
   return <PostPropertyLayout />;

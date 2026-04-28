@@ -1,11 +1,12 @@
-import React from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
 import type { AppRole } from "../../features/auth/roleTypes";
 import {
   getMandatoryProfilePathForRole,
   isProfileCompletionMandatory,
 } from "../../lib/profileCompletionGuard";
+import CustomAlert from "@/components/common/CustomAlert";
 
 interface ProtectedRouteProps {
   requiredRole?: AppRole;
@@ -19,7 +20,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
 }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const [showProfileAlert, setShowProfileAlert] = useState(false);
 
   if (!isAuthenticated || !user) {
     return (
@@ -43,11 +46,24 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const isOnMandatoryProfilePath =
     Boolean(mandatoryProfilePath) && location.pathname === mandatoryProfilePath;
 
+  useEffect(() => {
+    setShowProfileAlert(
+      Boolean(restrictedToProfile && mandatoryProfilePath && !isOnMandatoryProfilePath),
+    );
+  }, [restrictedToProfile, mandatoryProfilePath, isOnMandatoryProfilePath]);
+
   if (restrictedToProfile && mandatoryProfilePath && !isOnMandatoryProfilePath) {
-    if (typeof window !== "undefined") {
-      window.alert("Please complete your profile 100% to access this page.");
-    }
-    return <Navigate to={mandatoryProfilePath} replace />;
+    return (
+      <CustomAlert
+        open={showProfileAlert}
+        title="Profile Incomplete"
+        message="Please complete your profile 100% to access this page."
+        onConfirm={() => {
+          setShowProfileAlert(false);
+          navigate(mandatoryProfilePath, { replace: true });
+        }}
+      />
+    );
   }
 
   if (children != null) {

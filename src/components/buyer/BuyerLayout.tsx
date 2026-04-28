@@ -22,6 +22,7 @@ import {
   buyerTopBarFromPath,
 } from "./buyerLayoutUtils";
 import { twMerge } from "tailwind-merge";
+import CustomAlert from "@/components/common/CustomAlert";
 
 function BuyerNotificationsBell() {
   const unreadCount = useAppSelector((state) => state.notifications.unreadCount);
@@ -154,6 +155,7 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
   const location = useLocation();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
   const storedBuyer = useBuyerProfileLocal(user?.email);
   const profilePhotoUrl = storedBuyer?.profilePhotoUrl ?? null;
 
@@ -168,12 +170,12 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
   );
 
   const handleLogout = () => {
-    const shouldLogout = window.confirm("Are you sure you want to logout?");
-    if (!shouldLogout) return;
+    setLogoutAlertOpen(false);
     dispatch(logout());
     navigate("/login", { replace: true });
     setMobileNavOpen(false);
   };
+  const requestLogout = () => setLogoutAlertOpen(true);
 
   useEffect(() => {
     setMobileNavOpen(false);
@@ -215,7 +217,7 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
           onToggleCollapsed={toggleCollapsed}
           displayName={displayName}
           profilePhotoUrl={profilePhotoUrl}
-          onLogout={handleLogout}
+          onLogout={requestLogout}
         />
 
         <AnimatePresence>
@@ -256,7 +258,7 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
                     onNavigate={closeMobile}
                     displayName={displayName}
                     profilePhotoUrl={profilePhotoUrl}
-                    onLogout={handleLogout}
+                    onLogout={requestLogout}
                   />
                 </div>
               </motion.div>
@@ -282,6 +284,14 @@ const BuyerLayout: React.FC<BuyerLayoutProps> = ({ children }) => {
           </motion.main>
         </div>
       </div>
+      <CustomAlert
+        open={logoutAlertOpen}
+        title="Confirm Logout"
+        message="Are you sure you want to logout?"
+        showCancel
+        onCancel={() => setLogoutAlertOpen(false)}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 };

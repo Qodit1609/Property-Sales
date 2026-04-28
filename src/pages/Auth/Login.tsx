@@ -5,6 +5,7 @@ import { loginUser, resetError } from "../../features/auth/authSlice";
 import type { AppRole } from "../../features/auth/roleTypes";
 import Dashboard from "../Dashboard/Dashboard";
 import { Input, Button } from "@/components/common";
+import CustomAlert from "@/components/common/CustomAlert";
 import { touchSellerSession } from "../../lib/sellerProfileStorage";
 import { touchBuyerSession } from "../../lib/buyerProfileStorage";
 import {
@@ -37,6 +38,7 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [blockedAlertOpen, setBlockedAlertOpen] = useState(false);
 
   const from = (location.state as { from?: string } | null)?.from ?? "/";
 
@@ -110,7 +112,7 @@ const Login: React.FC = () => {
       loginUser.rejected.match(result) &&
       result.payload === "You are blocked by Admin"
     ) {
-      window.alert("You are blocked by Admin");
+      setBlockedAlertOpen(true);
     }
   };
 
@@ -238,6 +240,12 @@ const Login: React.FC = () => {
           </form>
         </div>
       </div>
+      <CustomAlert
+        open={blockedAlertOpen}
+        title="Alert"
+        message="You are blocked by Admin"
+        onConfirm={() => setBlockedAlertOpen(false)}
+      />
     </div>
   );
 };

@@ -14,6 +14,7 @@ import {
   ADMIN_SIDEBAR_WIDTH_EXPANDED,
 } from "./adminLayoutUtils";
 import { twMerge } from "tailwind-merge";
+import CustomAlert from "@/components/common/CustomAlert";
 
 function AdminNotificationsBell() {
   const unreadCount = useAppSelector((s) => s.notifications.unreadCount);
@@ -155,6 +156,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   const location = useLocation();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
 
   const toggleCollapsed = useCallback(() => setCollapsed((c) => !c), []);
   const closeMobile = useCallback(() => setMobileNavOpen(false), []);
@@ -192,12 +194,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     topBarSubtitle ?? "Track your workspace and tasks at a glance.";
 
   const handleLogout = () => {
-    const shouldLogout = window.confirm("Are you sure you want to logout?");
-    if (!shouldLogout) return;
+    setLogoutAlertOpen(false);
     dispatch(logout());
     navigate("/login", { replace: true });
     setMobileNavOpen(false);
   };
+  const requestLogout = () => setLogoutAlertOpen(true);
 
   useEffect(() => {
     setMobileNavOpen(false);
@@ -239,7 +241,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
           onToggleCollapsed={toggleCollapsed}
           displayName={displayName}
           avatarUrl={avatarUrl}
-          onLogout={handleLogout}
+          onLogout={requestLogout}
         />
 
         <AnimatePresence>
@@ -280,7 +282,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                     onNavigate={closeMobile}
                     displayName={displayName}
                     avatarUrl={avatarUrl}
-                    onLogout={handleLogout}
+                    onLogout={requestLogout}
                   />
                 </div>
               </motion.div>
@@ -306,6 +308,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
           </motion.main>
         </div>
       </div>
+      <CustomAlert
+        open={logoutAlertOpen}
+        title="Confirm Logout"
+        message="Are you sure you want to logout?"
+        showCancel
+        onCancel={() => setLogoutAlertOpen(false)}
+        onConfirm={handleLogout}
+      />
     </div>
   );
 };
