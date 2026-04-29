@@ -33,7 +33,9 @@ const AgentDashboardPage: React.FC = () => {
   const statusTotals = useMemo(() => {
     return properties.reduce(
       (acc, property) => {
-        acc[property.status] += 1;
+        if (property.status === "draft" || property.status === "incomplete" || property.status === "ready") {
+          acc[property.status] += 1;
+        }
         return acc;
       },
       { draft: 0, incomplete: 0, ready: 0 }

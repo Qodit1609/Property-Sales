@@ -90,23 +90,27 @@ const AgentFieldEntryPage: React.FC = () => {
       <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm">
         <form
           className="space-y-4"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            saveFieldEntry({
-              propertyId,
-              agentName,
-              village,
-              tehsil,
-              district,
-              landType,
-              propertySize: `${propertySizeValue.trim()} ${propertySizeUnit}`.trim(),
-              roadAccess,
-              waterAvailability,
-              ownerName: ownerName.trim() || undefined,
-              ownerContact: ownerContact.trim() || undefined,
-              images,
-            });
-            navigate("/agent/detailed-entry", { replace: false });
+            try {
+              await saveFieldEntry({
+                propertyId,
+                agentName,
+                village,
+                tehsil,
+                district,
+                landType,
+                propertySize: `${propertySizeValue.trim()} ${propertySizeUnit}`.trim(),
+                roadAccess,
+                waterAvailability,
+                ownerName: ownerName.trim() || undefined,
+                ownerContact: ownerContact.trim() || undefined,
+                images,
+              });
+              navigate("/agent/detailed-entry", { replace: false });
+            } catch (error) {
+              console.error("Unable to save agent step 1", error);
+            }
           }}
         >
           <div className="rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]/40 px-3 py-2">

@@ -98,40 +98,44 @@ const AgentDetailedEntryPage: React.FC = () => {
       <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm">
         <form
           className="space-y-4"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            saveFieldEntry({
-              ...activeDraft,
-              landType,
-              propertySize: `${propertySizeValue.trim()} ${propertySizeUnit}`.trim(),
-              roadAccess,
-              waterAvailability,
-            });
-            saveDetailedEntry({
-              propertyId,
-              expectedPrice,
-              negotiable,
-              ownershipType,
-              registryAvailable,
-              khasraAvailable,
-              landDispute,
-              electricity,
-              cropHistory,
-              ownerContact,
-              exactLocation,
-              nearbyLandmarks,
-              roadType,
-              waterSourceDetails,
-              connectivityInfo,
-              propertyHighlights,
-              issuesDrawbacks,
-              attachments,
-              khasraFiles,
-              khatauniFiles,
-              nakshaFiles,
-              notes,
-            });
-            navigate("/agent/dashboard", { replace: true });
+            try {
+              await saveFieldEntry({
+                ...activeDraft,
+                landType,
+                propertySize: `${propertySizeValue.trim()} ${propertySizeUnit}`.trim(),
+                roadAccess,
+                waterAvailability,
+              });
+              await saveDetailedEntry({
+                propertyId,
+                expectedPrice,
+                negotiable,
+                ownershipType,
+                registryAvailable,
+                khasraAvailable,
+                landDispute,
+                electricity,
+                cropHistory,
+                ownerContact,
+                exactLocation,
+                nearbyLandmarks,
+                roadType,
+                waterSourceDetails,
+                connectivityInfo,
+                propertyHighlights,
+                issuesDrawbacks,
+                attachments,
+                khasraFiles,
+                khatauniFiles,
+                nakshaFiles,
+                notes,
+              });
+              navigate("/agent/dashboard", { replace: true });
+            } catch (error) {
+              console.error("Unable to save agent step 2", error);
+            }
           }}
         >
           <div className="rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]/40 px-3 py-2">
