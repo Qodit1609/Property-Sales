@@ -125,10 +125,21 @@ const AgentSidebar: React.FC<AgentSidebarProps> = ({ collapsed = false, onNaviga
           </NavLink>
         </li>
         <li>
-          <div className={twMerge(linkBase, collapsed && "justify-center px-2")} title={collapsed ? "Notifications" : undefined}>
+          <NavLink
+            to="/agent/notifications"
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              twMerge(linkBase, collapsed && "justify-center px-2", isActive && (
+                isActive
+                  ? "border-[var(--b2)] bg-gradient-to-r from-[var(--b2-soft)] to-[var(--white)] text-[var(--b1)] shadow-sm"
+                  : ""
+              ))
+            }
+            title={collapsed ? "Notifications" : undefined}
+          >
             <Bell className="h-[18px] w-[18px] shrink-0 opacity-90 transition group-hover:scale-[1.03]" />
             {!collapsed ? <span className="truncate">Notifications</span> : null}
-          </div>
+          </NavLink>
         </li>
         <li>
           <NavLink

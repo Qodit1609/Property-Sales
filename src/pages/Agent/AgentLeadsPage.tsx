@@ -1,16 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Modal from "../../components/Modal/Modal";
 import { Input, Button } from "@/components/common";
+import { fetchAgentLeadsAPI, type AgentLead } from "@/features/agent/agentAPI";
 
 type LeadStatus = "new" | "contacted" | "qualified" | "closed";
-
-type Lead = {
-  id: string;
-  name: string;
-  email: string;
-  property: string;
-  status: LeadStatus;
-};
 
 type Visit = {
   id: string;
@@ -20,25 +13,35 @@ type Visit = {
 };
 
 const AgentLeadsPage: React.FC = () => {
-  const [leads, setLeads] = useState<Lead[]>([
-    {
-      id: "L-1001",
-      name: "Rahul Sharma",
-      email: "rahul@example.com",
-      property: "Farmhouse - Goa",
-      status: "new",
-    },
-    {
-      id: "L-1002",
-      name: "Aakanshi",
-      email: "aakanshi@example.com",
-      property: "Resort - Lonavala",
-      status: "contacted",
-    },
-  ]);
+  const [leads, setLeads] = useState<AgentLead[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [visits, setVisits] = useState<Visit[]>([]);
-  const [scheduling, setScheduling] = useState<Lead | null>(null);
+  const [scheduling, setScheduling] = useState<AgentLead | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadLeads = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const rows = await fetchAgentLeadsAPI();
+        if (!mounted) return;
+        setLeads(rows);
+      } catch (err) {
+        if (!mounted) return;
+        const message = err instanceof Error ? err.message : "Failed to load leads.";
+        setError(message);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    loadLeads();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const activeCount = useMemo(
     () => leads.filter((l) => l.status !== "closed").length,
@@ -69,7 +72,7 @@ const AgentLeadsPage: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--b2)]">
-            {leads.map((l) => (
+            {!loading && !error && leads.map((l) => (
               <tr key={l.id} className="hover:bg-[var(--b2-soft)]">
                 <td className="px-4 py-3">
                   <p className="font-medium text-[var(--b1)]">{l.name}</p>
@@ -107,7 +110,27 @@ const AgentLeadsPage: React.FC = () => {
                 </td>
               </tr>
             ))}
-            {leads.length === 0 && (
+            {loading && (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="px-4 py-6 text-center text-sm text-[var(--muted)]"
+                >
+                  Loading leads...
+                </td>
+              </tr>
+            )}
+            {!loading && error && (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="px-4 py-6 text-center text-sm text-[var(--error)]"
+                >
+                  {error}
+                </td>
+              </tr>
+            )}
+            {!loading && !error && leads.length === 0 && (
               <tr>
                 <td
                   colSpan={4}
@@ -191,7 +214,7 @@ function ScheduleForm({
   onCancel,
   onCreate,
 }: {
-  lead: Lead;
+  lead: AgentLead;
   onCancel: () => void;
   onCreate: (when: string, notes?: string) => void;
 }) {

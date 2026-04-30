@@ -1,31 +1,67 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Modal from "../../components/Modal/Modal";
 import { Input, Button } from "@/components/common";
+import {
+  createAgentVisitAPI,
+  deleteAgentVisitAPI,
+  fetchAgentClientsAPI,
+  fetchAgentVisitsAPI,
+  type AgentClient,
+  type AgentVisit,
+  type AgentVisitStatus,
+} from "@/features/agent/agentAPI";
 
-type VisitStatus = "scheduled" | "rescheduled" | "cancelled";
+const toDateTimeLocalValue = (value?: string): string => {
+  if (!value) return "";
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) return value;
 
-type Visit = {
-  id: string;
-  clientName: string;
-  property: string;
-  when: string;
-  status: VisitStatus;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "";
+
+  const year = parsed.getFullYear();
+  const month = String(parsed.getMonth() + 1).padStart(2, "0");
+  const day = String(parsed.getDate()).padStart(2, "0");
+  const hour = String(parsed.getHours()).padStart(2, "0");
+  const minute = String(parsed.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day}T${hour}:${minute}`;
 };
 
 const AgentVisitsPage: React.FC = () => {
-  const [visits, setVisits] = useState<Visit[]>([
-    {
-      id: "V-2001",
-      clientName: "Rahul Sharma",
-      property: "Farmhouse - Goa",
-      when: "2026-03-20 11:30 AM",
-      status: "scheduled",
-    },
-  ]);
+  const [visits, setVisits] = useState<AgentVisit[]>([]);
+  const [clients, setClients] = useState<AgentClient[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [creating, setCreating] = useState(false);
-  const [editing, setEditing] = useState<Visit | null>(null);
-  const [cancelling, setCancelling] = useState<Visit | null>(null);
+  const [editing, setEditing] = useState<AgentVisit | null>(null);
+  const [cancelling, setCancelling] = useState<AgentVisit | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const [visitRows, clientRows] = await Promise.all([
+          fetchAgentVisitsAPI(),
+          fetchAgentClientsAPI(),
+        ]);
+        if (!mounted) return;
+        setVisits(visitRows);
+        setClients(clientRows);
+      } catch (err) {
+        if (!mounted) return;
+        const message = err instanceof Error ? err.message : "Failed to load visits.";
+        setError(message);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    loadData();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const active = useMemo(
     () => visits.filter((v) => v.status !== "cancelled").length,
@@ -64,7 +100,7 @@ const AgentVisitsPage: React.FC = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--b2)]">
-            {visits.map((v) => (
+            {!loading && !error && visits.map((v) => (
               <tr key={v.id} className="hover:bg-[var(--b2-soft)]">
                 <td className="px-4 py-3 font-medium text-[var(--b1)]">
                   {v.clientName}
@@ -96,7 +132,27 @@ const AgentVisitsPage: React.FC = () => {
                 </td>
               </tr>
             ))}
-            {visits.length === 0 && (
+            {loading && (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="px-4 py-6 text-center text-sm text-[var(--muted)]"
+                >
+                  Loading visits...
+                </td>
+              </tr>
+            )}
+            {!loading && error && (
+              <tr>
+                <td
+                  colSpan={5}
+                  className="px-4 py-6 text-center text-sm text-[var(--error)]"
+                >
+                  {error}
+                </td>
+              </tr>
+            )}
+            {!loading && !error && visits.length === 0 && (
               <tr>
                 <td
                   colSpan={5}
@@ -112,14 +168,25 @@ const AgentVisitsPage: React.FC = () => {
 
       <Modal open={creating} onClose={() => setCreating(false)} title="Create Visit">
         <VisitForm
+          clients={clients}
           submitLabel="Create"
           onCancel={() => setCreating(false)}
-          onSubmit={(payload) => {
-            setVisits((prev) => [
-              ...prev,
-              { id: `V-${Date.now()}`, status: "scheduled", ...payload },
-            ]);
-            setCreating(false);
+          onSubmit={async (payload) => {
+            try {
+              const created = await createAgentVisitAPI({
+                clientId: payload.clientId,
+                clientName: payload.clientName,
+                type: payload.property,
+                date: payload.when,
+                notes: payload.notes,
+                status: "scheduled",
+              });
+              setVisits((prev) => [...prev, created]);
+              setCreating(false);
+            } catch (err) {
+              const message = err instanceof Error ? err.message : "Failed to create visit.";
+              setError(message);
+            }
           }}
         />
       </Modal>
@@ -131,8 +198,10 @@ const AgentVisitsPage: React.FC = () => {
       >
         {editing && (
           <VisitForm
+            clients={clients}
             submitLabel="Save"
             initial={{
+              clientId: editing.clientId,
               clientName: editing.clientName,
               property: editing.property,
               when: editing.when,
@@ -167,19 +236,21 @@ const AgentVisitsPage: React.FC = () => {
               <Button
                 type="button"
                 onClick={() => setCancelling(null)}
-                className="rounded-md border border-[var(--b2)] bg-[var(--white)] px-4 py-2 text-sm"
+                className="rounded-md border border-[var(--b2)] bg-[var(--white)] px-4 py-2 text-sm text-[var(--b1)] hover:bg-[var(--bg)]"
               >
                 Keep
               </Button>
               <Button
                 type="button"
-                onClick={() => {
-                  setVisits((prev) =>
-                    prev.map((x) =>
-                      x.id === cancelling.id ? { ...x, status: "cancelled" } : x
-                    )
-                  );
-                  setCancelling(null);
+                onClick={async () => {
+                  try {
+                    await deleteAgentVisitAPI(cancelling.id);
+                    setVisits((prev) => prev.filter((x) => x.id !== cancelling.id));
+                    setCancelling(null);
+                  } catch (err) {
+                    const message = err instanceof Error ? err.message : "Failed to cancel visit.";
+                    setError(message);
+                  }
                 }}
                 className="rounded-md border border-[var(--error)] bg-[var(--error-bg)] px-4 py-2 text-sm font-semibold text-[var(--error)] hover:opacity-80 transition"
               >
@@ -194,26 +265,43 @@ const AgentVisitsPage: React.FC = () => {
 };
 
 function VisitForm({
+  clients,
   initial,
   submitLabel,
   onCancel,
   onSubmit,
 }: {
-  initial?: { clientName: string; property: string; when: string };
+  clients: AgentClient[];
+  initial?: { clientId?: string; clientName: string; property: string; when: string };
   submitLabel: string;
   onCancel: () => void;
-  onSubmit: (payload: { clientName: string; property: string; when: string }) => void;
+  onSubmit: (payload: {
+    clientId?: string;
+    clientName: string;
+    property: string;
+    when: string;
+    notes?: string;
+    status?: AgentVisitStatus;
+  }) => void;
 }) {
+  const [clientId] = useState(initial?.clientId ?? "");
   const [clientName, setClientName] = useState(initial?.clientName ?? "");
   const [property, setProperty] = useState(initial?.property ?? "");
-  const [when, setWhen] = useState(initial?.when ?? "");
+  const [when, setWhen] = useState(toDateTimeLocalValue(initial?.when));
 
   return (
     <form
       className="space-y-4"
       onSubmit={(e) => {
         e.preventDefault();
-        onSubmit({ clientName, property, when });
+        const selectedClient = clients.find((client) => client.id === clientId);
+        const fallbackClient = clients.find((client) => client.name === clientName);
+        onSubmit({
+          clientId: selectedClient?.id || fallbackClient?.id || undefined,
+          clientName: selectedClient?.name || clientName,
+          property,
+          when,
+        });
       }}
     >
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -226,6 +314,7 @@ function VisitForm({
             value={clientName}
             onChange={(e) => setClientName(e.target.value)}
             className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            placeholder="Enter client name"
             required
           />
         </div>
@@ -235,10 +324,10 @@ function VisitForm({
           </label>
           <Input
             id="when"
+            type="datetime-local"
             value={when}
             onChange={(e) => setWhen(e.target.value)}
             className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
-            placeholder="e.g. 2026-03-20 11:30 AM"
             required
           />
         </div>

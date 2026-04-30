@@ -47,6 +47,7 @@ import AgentLeadsPage from "./pages/Agent/AgentLeadsPage";
 import AgentVisitsPage from "./pages/Agent/AgentVisitsPage";
 import AgentClientsPage from "./pages/Agent/AgentClientsPage";
 import AgentProfilePage from "./pages/Agent/AgentProfilePage";
+import AgentNotificationsPage from "./pages/Agent/AgentNotificationsPage";
 import AgentFieldEntryPage from "./pages/Agent/AgentFieldEntryPage";
 import AgentDetailedEntryPage from "./pages/Agent/AgentDetailedEntryPage";
 import { useAppDispatch } from "./store/hooks";
@@ -300,6 +301,7 @@ function App() {
             <Route path="/agent/leads" element={<AgentLeadsPage />} />
             <Route path="/agent/visits" element={<AgentVisitsPage />} />
             <Route path="/agent/clients" element={<AgentClientsPage />} />
+            <Route path="/agent/notifications" element={<AgentNotificationsPage />} />
             <Route path="/agent/profile" element={<AgentProfilePage />} />
           </Route>
         </Route>

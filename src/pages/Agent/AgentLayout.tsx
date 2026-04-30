@@ -55,16 +55,21 @@ function agentTopBarFromPath(pathname: string): { title: string; subtitle: strin
       title: "Agent Profile",
       subtitle: "Update your professional profile details.",
     },
+    "/agent/notifications": {
+      title: "Notifications",
+      subtitle: "Track latest alerts and updates.",
+    },
   };
 
   return map[p] ?? map["/agent/dashboard"];
 }
 
-function AgentNotificationsBell() {
+function AgentNotificationsBell({ onClick }: { onClick: () => void }) {
   const unreadCount = useAppSelector((state) => state.notifications.unreadCount);
   return (
     <button
       type="button"
+      onClick={onClick}
       className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--b2)]/80 bg-[var(--white)] text-[var(--b1)] shadow-sm transition hover:bg-[var(--b2-soft)] hover:shadow-md"
       aria-label="Notifications"
     >
@@ -340,7 +345,7 @@ const AgentLayout: React.FC = () => {
               <DashboardPageTopBar
                 title={overview.title}
                 subtitle={overview.subtitle}
-                rightSlot={<AgentNotificationsBell />}
+                rightSlot={<AgentNotificationsBell onClick={() => navigate("/agent/notifications")} />}
               />
               <AgentCollectionProvider>
                 <Outlet />
