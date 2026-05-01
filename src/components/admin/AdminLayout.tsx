@@ -215,7 +215,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   }, [mobileNavOpen]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-gradient-to-b from-[var(--b2-soft)] to-[var(--white)] text-[var(--b1)] antialiased">
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-[var(--b2-soft)] to-[var(--white)] text-[var(--b1)] antialiased">
       <Header forceSolid />
       <button
         type="button"
@@ -290,12 +290,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
           ) : null}
         </AnimatePresence>
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <motion.main
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.22 }}
-            className="mx-auto w-full max-w-[min(100%,88rem)] min-h-0 flex-1 overflow-y-auto py-5 pl-14 pr-4 md:px-6 md:py-6 md:pl-6 lg:px-8 lg:py-8"
+            className="mx-auto w-full max-w-[min(100%,88rem)] flex-1 py-5 pl-14 pr-4 md:px-6 md:py-6 md:pl-6 lg:px-8 lg:py-8"
           >
             <div className="space-y-6">
               <DashboardPageTopBar
