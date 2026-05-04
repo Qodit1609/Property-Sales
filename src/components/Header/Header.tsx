@@ -198,6 +198,14 @@ const roleDashboardPath = (role: AppRole) => {
   return "/admin";
 };
 
+const roleMyAccountPath = (role: AppRole): string => {
+  if (role === "buyer") return "/buyer/account";
+  if (role === "seller") return "/seller/profile";
+  if (role === "admin") return "/admin/account";
+  if (role === "agent") return "/agent/profile";
+  return roleDashboardPath(role);
+};
+
 const resolveLanguageCode = (value?: string): "en" | "hi" | null => {
   const normalized = normalizeValue(value ?? "");
   if (normalized === "en" || normalized === "english") return "en";
@@ -1216,15 +1224,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         onMouseLeave={closeLogin}
                       >
                         <Link
-                          to={
-                            user?.role === "buyer"
-                              ? "/buyer/account"
-                              : user?.role === "seller"
-                                ? "/seller/profile"
-                                : user?.role === "admin"
-                                  ? "/admin/account"
-                                  : roleDashboardPath(user?.role ?? "buyer")
-                          }
+                          to={roleMyAccountPath(user?.role ?? "buyer")}
                           className="flex h-10 items-center rounded-md px-3 text-sm font-medium text-[var(--b1)] transition-colors hover:bg-[var(--b2-soft)]/50 hover:text-[var(--b1-mid)]"
                         >
                           {t("header.myAccount")}

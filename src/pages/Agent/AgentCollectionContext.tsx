@@ -1,5 +1,6 @@
 import React, {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -30,6 +31,9 @@ export type AgentFieldEntryData = {
   images: File[];
 };
 
+/** Local `File` picks or persisted HTTPS URLs from the server */
+export type AgentStep2FileEntry = File | string;
+
 export type AgentDetailedEntryData = {
   propertyId: string;
   expectedPrice: string;
@@ -48,10 +52,10 @@ export type AgentDetailedEntryData = {
   connectivityInfo: string;
   propertyHighlights: string;
   issuesDrawbacks: string;
-  attachments: File[];
-  khasraFiles: File[];
-  khatauniFiles: File[];
-  nakshaFiles: File[];
+  attachments: AgentStep2FileEntry[];
+  khasraFiles: AgentStep2FileEntry[];
+  khatauniFiles: AgentStep2FileEntry[];
+  nakshaFiles: AgentStep2FileEntry[];
   notes: string;
 };
 
@@ -63,6 +67,8 @@ export type AgentCollectedProperty = {
   status: AgentPropertyStatus;
   createdAt: string;
   updatedAt: string;
+  /** Raw-ish snapshot from the listing API for display/export (Mixed fields, URLs, metadata). */
+  serverDoc?: Record<string, unknown>;
 };
 
 type AgentCollectionContextValue = {
@@ -73,6 +79,7 @@ type AgentCollectionContextValue = {
   clearActiveDraft: () => void;
   setPropertyStatus: (propertyId: string, status: AgentPropertyStatus) => void;
   getPropertyById: (propertyId: string) => AgentCollectedProperty | undefined;
+  refreshProperties: () => Promise<void>;
 };
 
 const AgentCollectionContext = createContext<AgentCollectionContextValue | null>(
@@ -84,6 +91,60 @@ const asObject = (value: unknown): Record<string, unknown> =>
   value && typeof value === "object" ? (value as Record<string, unknown>) : {};
 const asString = (value: unknown, fallback = "") =>
   typeof value === "string" ? value : fallback;
+export const parseAgentStep2DocUrls = (value: unknown): AgentStep2FileEntry[] => {
+  if (!Array.isArray(value)) return [];
+  const out: string[] = [];
+  for (const item of value) {
+    if (typeof item === "string" && /^https?:\/\//i.test(item)) {
+      out.push(item);
+      continue;
+    }
+    if (item && typeof item === "object") {
+      const o = item as Record<string, unknown>;
+      const url =
+        (typeof o.url === "string" && o.url) ||
+        (typeof o.cloudinaryUrl === "string" && o.cloudinaryUrl) ||
+        (typeof o.secure_url === "string" && o.secure_url);
+      if (typeof url === "string" && /^https?:\/\//i.test(url)) out.push(url);
+    }
+  }
+  return out;
+};
+
+/** Upload land-document files and return Cloudinary HTTPS URLs (JSON-safe for step2). */
+export async function uploadAgentDocumentFiles(
+  files: File[],
+  tag: "agent-khasra" | "agent-khatauni" | "agent-naksha" | "agent-attachment"
+): Promise<string[]> {
+  const urls: string[] = [];
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("tag", tag);
+    formData.append("name", file.name);
+    const res = await api.post("/media/upload", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    const data = res.data?.data as { url?: string } | undefined;
+    const url = data?.url;
+    if (!url) throw new Error("Document upload failed: missing URL");
+    urls.push(url);
+  }
+  return urls;
+}
+
+async function serializeStep2Files(
+  items: AgentStep2FileEntry[],
+  tag: "agent-khasra" | "agent-khatauni" | "agent-naksha" | "agent-attachment"
+): Promise<string[]> {
+  const existing = items.filter(
+    (x): x is string => typeof x === "string" && /^https?:\/\//i.test(x)
+  );
+  const files = items.filter((x): x is File => x instanceof File);
+  const uploaded = files.length ? await uploadAgentDocumentFiles(files, tag) : [];
+  return [...existing, ...uploaded];
+}
+
 const normalizeStatus = (value: unknown): AgentPropertyStatus => {
   const status = String(value ?? "").toLowerCase();
   if (
@@ -145,10 +206,10 @@ const mapBackendProperty = (raw: unknown): AgentCollectedProperty | null => {
         connectivityInfo: asString(step2Obj.connectivityInfo),
         propertyHighlights: asString(step2Obj.propertyHighlights),
         issuesDrawbacks: asString(step2Obj.issuesDrawbacks),
-        attachments: [],
-        khasraFiles: [],
-        khatauniFiles: [],
-        nakshaFiles: [],
+        attachments: parseAgentStep2DocUrls(step2Obj.attachments),
+        khasraFiles: parseAgentStep2DocUrls(step2Obj.khasraFiles),
+        khatauniFiles: parseAgentStep2DocUrls(step2Obj.khatauniFiles),
+        nakshaFiles: parseAgentStep2DocUrls(step2Obj.nakshaFiles),
         notes: asString(step2Obj.notes),
       }
     : undefined;
@@ -161,6 +222,7 @@ const mapBackendProperty = (raw: unknown): AgentCollectedProperty | null => {
     status: normalizeStatus(obj.status),
     createdAt: asString(obj.createdAt, nowIso()),
     updatedAt: asString(obj.updatedAt, nowIso()),
+    serverDoc: obj as Record<string, unknown>,
   };
 };
 
@@ -176,25 +238,25 @@ export const AgentCollectionProvider: React.FC<{ children: React.ReactNode }> = 
   const [activeDraft, setActiveDraft] = useState<AgentFieldEntryData | null>(null);
   const hasLoadedRef = useRef(false);
 
+  const refreshProperties = useCallback(async () => {
+    try {
+      const res = await api.get("/agent/properties");
+      const rows = Array.isArray(res.data?.data) ? res.data.data : [];
+      const mapped = rows
+        .map((row: unknown) => mapBackendProperty(row))
+        .filter((row: AgentCollectedProperty | null): row is AgentCollectedProperty => Boolean(row));
+      setProperties(mapped);
+    } catch (error) {
+      console.error("Failed to load agent properties", error);
+    }
+  }, []);
+
   useEffect(() => {
     if (hasLoadedRef.current) return;
     hasLoadedRef.current = true;
 
-    const loadProperties = async () => {
-      try {
-        const res = await api.get("/agent/properties");
-        const rows = Array.isArray(res.data?.data) ? res.data.data : [];
-        const mapped = rows
-          .map((row: unknown) => mapBackendProperty(row))
-          .filter((row: AgentCollectedProperty | null): row is AgentCollectedProperty => Boolean(row));
-        setProperties(mapped);
-      } catch (error) {
-        console.error("Failed to load agent properties", error);
-      }
-    };
-
-    void loadProperties();
-  }, []);
+    void refreshProperties();
+  }, [refreshProperties]);
 
   const saveFieldEntry = async (payload: AgentFieldEntryData) => {
     const timestamp = nowIso();
@@ -233,14 +295,33 @@ export const AgentCollectionProvider: React.FC<{ children: React.ReactNode }> = 
       throw new Error("Missing backend property reference for step 2");
     }
 
-    const res = await api.put(`/agent/property/${current.backendId}/step2`, payload);
+    const step2Json = {
+      ...payload,
+      attachments: await serializeStep2Files(payload.attachments, "agent-attachment"),
+      khasraFiles: await serializeStep2Files(payload.khasraFiles, "agent-khasra"),
+      khatauniFiles: await serializeStep2Files(payload.khatauniFiles, "agent-khatauni"),
+      nakshaFiles: await serializeStep2Files(payload.nakshaFiles, "agent-naksha"),
+    };
+
+    const res = await api.put(`/agent/property/${current.backendId}/step2`, step2Json);
     const updated = mapBackendProperty(res.data?.data);
 
     setProperties((prev) =>
       prev.map((item) => {
         if (item.id !== payload.propertyId) return item;
         if (!updated) {
-          return { ...item, step2: payload, status: "ready", updatedAt: timestamp };
+          return {
+            ...item,
+            step2: {
+              ...payload,
+              attachments: step2Json.attachments,
+              khasraFiles: step2Json.khasraFiles,
+              khatauniFiles: step2Json.khatauniFiles,
+              nakshaFiles: step2Json.nakshaFiles,
+            },
+            status: "ready",
+            updatedAt: timestamp,
+          };
         }
         return {
           ...item,
@@ -276,6 +357,7 @@ export const AgentCollectionProvider: React.FC<{ children: React.ReactNode }> = 
       clearActiveDraft,
       setPropertyStatus,
       getPropertyById,
+      refreshProperties,
     }),
     [properties, activeDraft]
   );
