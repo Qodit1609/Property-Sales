@@ -13,12 +13,7 @@ import {
   truncateText,
 } from "../../utils/propertyFormatters";
 import { useAppSelector } from "../../hooks/reduxHooks";
-import {
-  selectCloudinaryUrlPool,
-  selectMediaLoading,
-  selectPropertyImagesMap,
-} from "../../features/media/mediaSelectors";
-import { pickCyclicImagesForProperty } from "../../utils/propertyImagePool";
+import { selectMediaLoading } from "../../features/media/mediaSelectors";
 
 interface Props {
   property: BackendProperty;
@@ -28,7 +23,6 @@ interface Props {
 
 const PropertyCard: React.FC<Props> = ({
   property,
-  propertyImagesMap: propertyImagesMapProp,
   mediaLoading: mediaLoadingProp,
 }) => {
   const { t, i18n } = useTranslation();
@@ -40,38 +34,23 @@ const PropertyCard: React.FC<Props> = ({
 
   const isBuyer = Boolean(user?.role === "buyer");
 
-  const mapFromStore = useAppSelector(selectPropertyImagesMap);
-
-  const cloudinaryPool = useAppSelector(selectCloudinaryUrlPool);
-
   const loadingFromStore = useAppSelector(selectMediaLoading);
-
-  const propertyImagesMap = propertyImagesMapProp ?? mapFromStore;
 
   const mediaLoading = mediaLoadingProp ?? loadingFromStore;
 
   const cardImages = useMemo(() => {
-    const fromApi = propertyImagesMap[property._id];
-
-    if (fromApi?.length) return fromApi;
-
-    const cyclic = pickCyclicImagesForProperty(property._id, cloudinaryPool, 3);
-
-    if (cyclic.length) return cyclic;
-
-    if (property.images?.length) return property.images;
     if (property.media?.images?.length) return property.media.images;
+    if (property.images?.length) return property.images;
     if (property.media?.gallery?.length) return property.media.gallery;
 
     return [FALLBACK_PROPERTY_IMAGE];
-  }, [property._id, property.images, property.media, propertyImagesMap, cloudinaryPool]);
+  }, [property.images, property.media]);
 
   const primaryImage = cardImages[0] ?? FALLBACK_PROPERTY_IMAGE;
 
   const showImageSkeleton =
     mediaLoading &&
-    !propertyImagesMap[property._id]?.length &&
-    !cloudinaryPool.length &&
+    !property.media?.images?.length &&
     !property.images?.length;
 
   const areaValue = property.area ?? property.size ?? property.landSize;

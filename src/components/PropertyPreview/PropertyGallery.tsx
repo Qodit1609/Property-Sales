@@ -17,11 +17,14 @@ const PropertyGallery = ({ property }: PropertyGalleryProps) => {
   const { t } = useTranslation();
   const propertyImagesMap = useAppSelector(selectPropertyImagesMap);
   const cloudinaryPool = useAppSelector(selectCloudinaryUrlPool);
-  const images = resolvePropertyGalleryImages(
-    property,
-    propertyImagesMap,
-    cloudinaryPool,
-  );
+  const images =
+    property.media?.images?.length
+      ? property.media.images
+      : resolvePropertyGalleryImages(
+          property,
+          propertyImagesMap,
+          cloudinaryPool,
+        );
   const videos = property.media?.videos ?? (property.media?.videoUrl ? [property.media.videoUrl] : property.videos ?? []);
   const droneView = Array.isArray(property.media?.droneView)
     ? property.media?.droneView[0]
