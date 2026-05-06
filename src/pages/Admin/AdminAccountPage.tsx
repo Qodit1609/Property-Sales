@@ -192,6 +192,7 @@ const AdminAccountPage: React.FC = () => {
       applyGlobalTheme(p.preferences.theme);
       saveAdminProfile(profileIdentity, {
         profilePhotoUrl: p.media.profileImage || p.basicInfo.profileImage || null,
+        phone: p.basicInfo.phone || "",
       });
     } catch (e) {
       pushToast({
@@ -302,6 +303,7 @@ const AdminAccountPage: React.FC = () => {
         applyGlobalTheme(updated.preferences.theme);
         saveAdminProfile(profileIdentity, {
           profilePhotoUrl: updated.media.profileImage || updated.basicInfo.profileImage || null,
+          phone: updated.basicInfo.phone || "",
         });
         setPwd({ current: "", next: "", confirm: "" });
         if (section === "all") setEditing(new Set());

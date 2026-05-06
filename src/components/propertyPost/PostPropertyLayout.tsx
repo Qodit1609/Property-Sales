@@ -16,6 +16,9 @@ import {
 } from "../../features/postProperty/postPropertyValidation";
 import Header from "../Header/Header";  // 👈 ADD THIS
 import { useTranslation } from "react-i18next";
+import { loadSellerProfile } from "../../lib/sellerProfileStorage";
+import { loadAdminProfile } from "../../lib/adminProfileStorage";
+import { fetchAdminUserById } from "../../features/admin/adminProfileAPI";
 
 function nowId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -39,9 +42,57 @@ export default function PostPropertyLayout() {
   }, []);
 
   useEffect(() => {
-    if (authUser) {
-      dispatch(hydrateFromAuth({ name: authUser.name, email: authUser.email }));
-    }
+    if (!authUser) return;
+    const authUserRecord = authUser as Record<string, unknown>;
+    const readText = (value: unknown): string | undefined => {
+      if (typeof value === "string" && value.trim()) return value.trim();
+      if (typeof value === "number" && Number.isFinite(value)) return String(value);
+      return undefined;
+    };
+    const mobile =
+      readText(authUser.mobile) ??
+      readText(authUserRecord.mobileNumber) ??
+      readText(authUserRecord.phone) ??
+      readText(authUserRecord.phoneNumber) ??
+      readText(authUserRecord.contact) ??
+      readText(authUserRecord.contactNumber) ??
+      readText(loadSellerProfile(authUser.email ?? undefined)?.phone) ??
+      readText(
+        loadAdminProfile(
+          String(authUser.id ?? authUser._id ?? authUser.email ?? "").trim() || undefined
+        )?.phone
+      );
+
+    dispatch(hydrateFromAuth({ name: authUser.name, email: authUser.email, mobile }));
+
+    const isAdmin = String(authUser.role ?? "").toLowerCase() === "admin";
+    const adminId = String(authUser.id ?? authUser._id ?? "").trim();
+    if (!isAdmin || mobile || !adminId) return;
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { raw } = await fetchAdminUserById(adminId);
+        const rawPhone =
+          readText(raw.contact) ??
+          readText(raw.phone) ??
+          readText(raw.mobile) ??
+          readText(raw.mobileNumber);
+        if (!rawPhone || cancelled) return;
+        dispatch(
+          hydrateFromAuth({
+            name: authUser.name,
+            email: authUser.email,
+            mobile: rawPhone,
+          })
+        );
+      } catch {
+        // Keep current fallback behavior if admin profile fetch fails.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [authUser, dispatch]);
 
   // Debounced autosave draft into localStorage

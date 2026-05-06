@@ -5,6 +5,9 @@ export interface Property {
   title: string;
   description: string;
   shortDescription?: string;
+  contactName?: string;
+  contactEmail?: string;
+  contactMobile?: string;
   address: string;
   locationText?: string;
   price: number;

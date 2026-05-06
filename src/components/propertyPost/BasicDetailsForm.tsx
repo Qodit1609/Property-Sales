@@ -51,7 +51,6 @@ export default function BasicDetailsForm() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const basic = useAppSelector((s) => s.postProperty.basicDetails);
-
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   const propertyTypeOptions = useMemo(() => {

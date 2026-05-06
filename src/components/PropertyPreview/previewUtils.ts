@@ -310,13 +310,119 @@ export const getLatLng = (property: Property): { lat: number; lng: number } | un
 };
 
 export const getPrimaryContact = (property: Property) => {
+  const normalizeContact = (value?: string | number): string | undefined => {
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+    return undefined;
+  };
+  const findNestedMobile = (value: unknown, depth = 0): string | undefined => {
+    if (depth > 4 || !value || typeof value !== "object") return undefined;
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const found = findNestedMobile(item, depth + 1);
+        if (found) return found;
+      }
+      return undefined;
+    }
+    const record = value as Record<string, unknown>;
+    const preferredKeys = [
+      "contactMobile",
+      "mobileNumber",
+      "phoneNumber",
+      "mobile",
+      "phone",
+      "contact",
+    ];
+    for (const key of preferredKeys) {
+      const direct = normalizeContact(record[key] as string | number | undefined);
+      if (direct) return direct;
+    }
+    for (const nested of Object.values(record)) {
+      const found = findNestedMobile(nested, depth + 1);
+      if (found) return found;
+    }
+    return undefined;
+  };
+  const propertyWithContact = property as Property & {
+    contactName?: string;
+    contactEmail?: string;
+    contactMobile?: string;
+    phoneNumber?: string;
+    mobileNumber?: string;
+    phone?: string;
+    mobile?: string;
+    contact?: string;
+    agent?: {
+      name?: string;
+      phone?: string | number;
+      mobile?: string | number;
+      mobileNumber?: string | number;
+      phoneNumber?: string | number;
+      email?: string;
+      contactEmail?: string;
+    };
+  };
+  const ownerDetails = property.ownerDetails as Property["ownerDetails"] & {
+    email?: string;
+    contactEmail?: string;
+    mobile?: string;
+    mobileNumber?: string;
+    phoneNumber?: string;
+  };
+  const dealer = property.dealer as Property["dealer"] & {
+    email?: string;
+    contactEmail?: string;
+    mobile?: string;
+    mobileNumber?: string;
+    phoneNumber?: string;
+  };
+  const seller = property.seller as Property["seller"] & {
+    contactEmail?: string;
+    mobile?: string;
+    mobileNumber?: string;
+    phoneNumber?: string;
+  };
   const agentName =
-    property.dealer?.name ||
-    property.seller?.name ||
-    property.ownerDetails?.name ||
+    propertyWithContact.contactName ||
+    propertyWithContact.agent?.name ||
+    dealer?.name ||
+    seller?.name ||
+    ownerDetails?.name ||
     i18n.t("propertyPreview.messages.agentDetailsNotAvailable");
-  const phone =
-    property.dealer?.phone || property.seller?.phone || property.ownerDetails?.phone;
+  const mobile =
+    normalizeContact(propertyWithContact.contactMobile) ||
+    normalizeContact(propertyWithContact.mobileNumber) ||
+    normalizeContact(propertyWithContact.phoneNumber) ||
+    normalizeContact(propertyWithContact.phone) ||
+    normalizeContact(propertyWithContact.mobile) ||
+    normalizeContact(propertyWithContact.contact) ||
+    normalizeContact(propertyWithContact.agent?.phone) ||
+    normalizeContact(propertyWithContact.agent?.mobile) ||
+    normalizeContact(propertyWithContact.agent?.mobileNumber) ||
+    normalizeContact(propertyWithContact.agent?.phoneNumber) ||
+    normalizeContact(dealer?.phone) ||
+    normalizeContact(dealer?.mobile) ||
+    normalizeContact(dealer?.mobileNumber) ||
+    normalizeContact(dealer?.phoneNumber) ||
+    normalizeContact(seller?.phone) ||
+    normalizeContact(seller?.mobile) ||
+    normalizeContact(seller?.mobileNumber) ||
+    normalizeContact(seller?.phoneNumber) ||
+    normalizeContact(ownerDetails?.phone) ||
+    normalizeContact(ownerDetails?.mobile) ||
+    normalizeContact(ownerDetails?.mobileNumber) ||
+    normalizeContact(ownerDetails?.phoneNumber) ||
+    findNestedMobile(property);
+  const email =
+    propertyWithContact.contactEmail ||
+    propertyWithContact.agent?.email ||
+    propertyWithContact.agent?.contactEmail ||
+    seller?.email ||
+    seller?.contactEmail ||
+    dealer?.email ||
+    dealer?.contactEmail ||
+    ownerDetails?.email ||
+    ownerDetails?.contactEmail;
   const role = translatePersonType(property.dealer?.type || property.ownerDetails?.type) || i18n.t("propertyPreview.labels.agent");
   const verified =
     Boolean(property.dealer?.verified) ||
@@ -324,7 +430,7 @@ export const getPrimaryContact = (property: Property) => {
     Boolean(property.ownerDetails?.verified) ||
     Boolean(property.verified);
 
-  return { agentName, phone, role, verified };
+  return { agentName, phone: mobile, mobile, email, role, verified };
 };
 
 export const getGalleryImages = (property: Property): string[] => {

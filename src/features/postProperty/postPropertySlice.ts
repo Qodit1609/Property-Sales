@@ -217,7 +217,8 @@ export const submitPostProperty = createAsyncThunk<
   { state: RootState; rejectValue: string }
 >("postProperty/submit", async (_, { getState, rejectWithValue }) => {
   try {
-    const state = getState().postProperty;
+    const rootState = getState();
+    const state = rootState.postProperty;
 
     const imageUrls = state.media.images.map((i) => i.url).filter(Boolean);
 
@@ -277,6 +278,9 @@ export const submitPostProperty = createAsyncThunk<
       listingType,
       description: state.profileDetails.description,
       shortDescription: state.basicDetails.shortDescription,
+      contactName: state.basicDetails.contactName?.trim() || undefined,
+      contactEmail: state.basicDetails.contactEmail?.trim() || undefined,
+      contactMobile: state.basicDetails.contactMobile?.trim() || undefined,
       latitude: state.locationDetails.latitude ?? 0,
       longitude: state.locationDetails.longitude ?? 0,
       area: state.profileDetails.totalArea ?? undefined,
@@ -371,6 +375,29 @@ export const submitPostProperty = createAsyncThunk<
         expectedROI: state.profileDetails.roiPercent ?? undefined,
         appreciationRate: state.profileDetails.appreciationRate ?? undefined,
       },
+      ownerDetails: (() => {
+        const name = state.basicDetails.contactName?.trim();
+        const phone = state.basicDetails.contactMobile?.trim();
+        const role = rootState.auth.user?.role;
+        if (!name && !phone) return undefined;
+        return {
+          name: name || rootState.auth.user?.name,
+          phone: phone || rootState.auth.user?.mobile,
+          type: role,
+        };
+      })(),
+      seller: (() => {
+        const name = state.basicDetails.contactName?.trim();
+        const phone = state.basicDetails.contactMobile?.trim();
+        const email = state.basicDetails.contactEmail?.trim();
+        const authUser = rootState.auth.user;
+        if (!name && !phone && !email) return undefined;
+        return {
+          name: name || authUser?.name,
+          phone: phone || authUser?.mobile,
+          email: email || authUser?.email,
+        };
+      })(),
     };
 
     const cleanedPayload = sanitizeForApi(payload);
@@ -652,12 +679,11 @@ const postPropertySlice = createSlice({
   reducers: {
     hydrateFromAuth(
       state,
-      action: PayloadAction<{ name?: string; email?: string }>
+      action: PayloadAction<{ name?: string; email?: string; mobile?: string }>
     ) {
-      state.basicDetails.contactName =
-        state.basicDetails.contactName || action.payload.name || "";
-      state.basicDetails.contactEmail =
-        state.basicDetails.contactEmail || action.payload.email || "";
+      state.basicDetails.contactName = action.payload.name || "";
+      state.basicDetails.contactEmail = action.payload.email || "";
+      state.basicDetails.contactMobile = action.payload.mobile || "";
     },
     updateBasicDetails(state, action: PayloadAction<Partial<BasicDetails>>) {
       state.basicDetails = { ...state.basicDetails, ...action.payload };

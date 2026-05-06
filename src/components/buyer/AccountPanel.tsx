@@ -41,6 +41,14 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
   const { t, i18n } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const { preferences } = useAppSelector((state) => state.buyer);
+  const userRecord = user as Record<string, unknown> | null;
+  const userMobile = String(
+    user?.mobile ??
+      userRecord?.phone ??
+      userRecord?.phoneNumber ??
+      userRecord?.mobileNumber ??
+      ""
+  ).trim();
   const email = user?.email;
   const storedProfile = useBuyerProfileLocal(email);
   const activity = useBuyerActivityLocal(email);
@@ -119,7 +127,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
     setProfileForm({
       fullName: (user?.name ?? "").trim(),
       emailAddress: (user?.email ?? "").trim(),
-      mobileNumber: (storedProfile?.mobileNumber ?? "").trim(),
+      mobileNumber: (storedProfile?.mobileNumber ?? userMobile).trim(),
       occupation: (storedProfile?.occupation ?? "").trim(),
       gender: (storedProfile?.gender ?? "").trim(),
     });
@@ -128,7 +136,9 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
     storedProfile?.mobileNumber,
     storedProfile?.occupation,
     user?.email,
+    user?.mobile,
     user?.name,
+    userMobile,
   ]);
 
   const handleProfileChange = useCallback(
@@ -160,12 +170,12 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
     setProfileForm({
       fullName: (user?.name ?? "").trim(),
       emailAddress: (user?.email ?? "").trim(),
-      mobileNumber: (storedProfile?.mobileNumber ?? "").trim(),
+      mobileNumber: (storedProfile?.mobileNumber ?? userMobile).trim(),
       occupation: (storedProfile?.occupation ?? "").trim(),
       gender: (storedProfile?.gender ?? "").trim(),
     });
     setIsEditingProfile(false);
-  }, [storedProfile?.gender, storedProfile?.mobileNumber, storedProfile?.occupation, user?.email, user?.name]);
+  }, [storedProfile?.gender, storedProfile?.mobileNumber, storedProfile?.occupation, user?.email, user?.name, userMobile]);
 
   return (
     <>

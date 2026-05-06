@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import PostPropertyLayout from "../../components/propertyPost/PostPropertyLayout";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { loadEditProperty, setEditPropertyId } from "../../features/postProperty/postPropertySlice";
+import {
+  loadEditProperty,
+  resetPostProperty,
+  setEditPropertyId,
+} from "../../features/postProperty/postPropertySlice";
 import { useTranslation } from "react-i18next";
 import CustomAlert from "@/components/common/CustomAlert";
 
@@ -42,6 +46,14 @@ export default function PostPropertyPage() {
     if (editPropertyId === editId) return;
     void dispatch(loadEditProperty(editId));
   }, [canAccess, dispatch, editPropertyId, searchParams]);
+
+  useEffect(() => {
+    if (!canAccess) return;
+    const editId = searchParams.get("edit");
+    if (editId) return;
+    if (userRole !== "admin") return;
+    dispatch(resetPostProperty());
+  }, [canAccess, dispatch, searchParams, userRole]);
 
   if (!canAccess) {
     return (
