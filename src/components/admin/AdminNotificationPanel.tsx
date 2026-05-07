@@ -1,5 +1,6 @@
 import React from "react";
 import { Bell } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import {
   clearReadNotifications,
@@ -9,10 +10,58 @@ import { Button } from "@/components/common";
 
 const AdminNotificationPanel: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const notifications = useAppSelector((state) => state.notifications.items);
   const user = useAppSelector((state) => state.auth.user);
   const userId = String(user?.id ?? user?._id ?? "");
   const hasReadNotifications = notifications.some((n) => n.isRead);
+
+  const handleNotificationClick = (notification: {
+    id: string;
+    title: string;
+    message: string;
+    type?: string;
+  }) => {
+    dispatch(markNotificationRead(notification.id));
+
+    const normalizedType = (notification.type ?? "").trim().toLowerCase();
+    const normalizedTitle = notification.title.trim().toLowerCase();
+    const normalizedMessage = notification.message.trim().toLowerCase();
+
+    if (
+      normalizedType === "approval" ||
+      normalizedType === "property" ||
+      normalizedTitle.includes("new property submitted") ||
+      normalizedTitle.includes("property approved")
+    ) {
+      navigate("/admin/properties");
+      return;
+    }
+
+    if (
+      normalizedType === "testimonial" ||
+      normalizedTitle.includes("new testimonial submitted")
+    ) {
+      navigate("/admin/testimonial");
+      return;
+    }
+
+    if (
+      normalizedType === "promotion_request" ||
+      normalizedTitle.includes("new promotion request")
+    ) {
+      navigate("/admin/promotions");
+      return;
+    }
+
+    if (
+      normalizedType === "cart" ||
+      normalizedTitle.includes("property added to cart") ||
+      normalizedMessage.includes("added") && normalizedMessage.includes("to cart")
+    ) {
+      navigate("/admin/activity-logs");
+    }
+  };
 
   return (
     <div className="space-y-3 rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm">
@@ -59,7 +108,14 @@ const AdminNotificationPanel: React.FC = () => {
             <Button
               key={n.id}
               type="button"
-              onClick={() => dispatch(markNotificationRead(n.id))}
+              onClick={() =>
+                handleNotificationClick({
+                  id: n.id,
+                  title: n.title,
+                  message: n.message,
+                  type: n.type,
+                })
+              }
               variant="ghost"
               className={[
                 "w-full items-start gap-3 rounded-xl border px-3 py-2 text-left",

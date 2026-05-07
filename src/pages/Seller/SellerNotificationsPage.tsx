@@ -1,5 +1,6 @@
 import { Bell } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import {
   clearReadNotifications,
@@ -10,10 +11,25 @@ import { Button } from "@/components/common";
 const SellerNotificationsPage = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const notifications = useAppSelector((state) => state.notifications.items);
   const user = useAppSelector((state) => state.auth.user);
   const userId = String(user?.id ?? user?._id ?? "");
   const hasReadNotifications = notifications.some((n) => n.isRead);
+
+  const handleNotificationClick = (notificationId: string, notificationTitle: string) => {
+    dispatch(markNotificationRead(notificationId));
+
+    const normalizedTitle = notificationTitle.trim().toLowerCase();
+    if (normalizedTitle === "property approved") {
+      navigate("/seller/properties");
+      return;
+    }
+
+    if (normalizedTitle === "property added to cart") {
+      navigate("/seller/leads");
+    }
+  };
 
   return (
     <section className="space-y-6">
@@ -62,7 +78,7 @@ const SellerNotificationsPage = () => {
               <Button
                 key={n.id}
                 type="button"
-                onClick={() => dispatch(markNotificationRead(n.id))}
+                onClick={() => handleNotificationClick(n.id, n.title)}
                 variant="ghost"
                 className={[
                   "w-full items-start gap-3 rounded-xl border px-3 py-2 text-left",
