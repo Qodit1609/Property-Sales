@@ -26,6 +26,11 @@ const SellerNotificationsPage = () => {
       return;
     }
 
+    if (normalizedTitle === "promotion approved") {
+      navigate("/seller/promotions");
+      return;
+    }
+
     if (normalizedTitle === "property added to cart") {
       navigate("/seller/leads");
     }

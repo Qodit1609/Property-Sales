@@ -28,8 +28,8 @@ export function useSellerAggregates(listings: Property[]): SellerAggregateStats 
       else if (s === "rejected") rejected += 1;
       else pending += 1;
 
-      totalViews += p.analytics?.views ?? 0;
-      totalLeads += p.analytics?.contactClicks ?? 0;
+      totalViews += Number(p.analytics?.views) || 0;
+      totalLeads += Number(p.analytics?.contactClicks) || 0;
     }
 
     return {

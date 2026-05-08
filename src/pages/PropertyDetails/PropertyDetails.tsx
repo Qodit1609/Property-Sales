@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { fetchPropertyById } from "../../features/properties/propertySlice";
 import { recordPropertyView } from "../../features/buyer/buyerSlice";
+import api from "../../lib/apiClient";
 import PropertyPreview, {
   PropertyPreviewSkeleton,
 } from "../../components/PropertyPreview/PropertyPreview";
@@ -32,6 +33,13 @@ const PropertyDetails = () => {
       dispatch(recordPropertyView(selectedProperty));
     }
   }, [dispatch, selectedProperty, id, isBuyer]);
+
+  useEffect(() => {
+    if (!id || !isBuyer) return;
+    void api.patch(`/properties/${id}/view`).catch(() => {
+      // Keep preview page non-blocking if view tracking fails.
+    });
+  }, [id, isBuyer]);
 
   useEffect(() => {
     if (!isAdmin || !id || !selectedProperty || selectedProperty._id !== id) return;
