@@ -45,6 +45,7 @@ import AgentPropertiesPage from "./pages/Agent/AgentPropertiesPage";
 import AgentAddPropertyPage from "./pages/Agent/AgentAddPropertyPage";
 import AgentLeadsPage from "./pages/Agent/AgentLeadsPage";
 import AgentVisitsPage from "./pages/Agent/AgentVisitsPage";
+import AgentCalendarPage from "./pages/Agent/AgentCalendarPage";
 import AgentClientsPage from "./pages/Agent/AgentClientsPage";
 import AgentProfilePage from "./pages/Agent/AgentProfilePage";
 import AgentNotificationsPage from "./pages/Agent/AgentNotificationsPage";
@@ -300,6 +301,7 @@ function App() {
             <Route path="/agent/add-property" element={<AgentAddPropertyPage />} />
             <Route path="/agent/leads" element={<AgentLeadsPage />} />
             <Route path="/agent/visits" element={<AgentVisitsPage />} />
+            <Route path="/agent/calendar" element={<AgentCalendarPage />} />
             <Route path="/agent/clients" element={<AgentClientsPage />} />
             <Route path="/agent/notifications" element={<AgentNotificationsPage />} />
             <Route path="/agent/profile" element={<AgentProfilePage />} />

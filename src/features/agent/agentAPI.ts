@@ -164,6 +164,34 @@ export const deleteAgentVisitAPI = async (visitId: string): Promise<void> => {
   await api.delete(`/visits/${visitId}`);
 };
 
+export const updateAgentVisitAPI = async (
+  visitId: string,
+  payload: {
+    clientName?: string;
+    type?: string;
+    date?: string;
+    notes?: string;
+    status?: AgentVisitStatus;
+  }
+): Promise<AgentVisit> => {
+  const res = await api.put(`/visits/${visitId}`, payload);
+  const row = res.data?.data ?? res.data ?? {};
+  return {
+    id: String(row.id ?? row._id ?? visitId),
+    clientId: row.clientId ? String(row.clientId) : undefined,
+    clientName: String(row.clientName ?? payload.clientName ?? "Unknown Client"),
+    property: String(row.property ?? row.type ?? payload.type ?? ""),
+    when: String(row.when ?? row.date ?? payload.date ?? ""),
+    status:
+      String(row.status ?? payload.status ?? "scheduled").toLowerCase() === "cancelled"
+        ? "cancelled"
+        : String(row.status ?? payload.status ?? "").toLowerCase() === "rescheduled"
+          ? "rescheduled"
+          : "scheduled",
+    notes: row.notes ? String(row.notes) : payload.notes,
+  };
+};
+
 export const fetchAgentLeadsAPI = async (): Promise<AgentLead[]> => {
   const res = await api.get("/leads");
   const rows = res.data?.data ?? res.data ?? [];

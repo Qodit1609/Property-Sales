@@ -6,10 +6,12 @@ import {
   deleteAgentVisitAPI,
   fetchAgentClientsAPI,
   fetchAgentVisitsAPI,
+  updateAgentVisitAPI,
   type AgentClient,
   type AgentVisit,
   type AgentVisitStatus,
 } from "@/features/agent/agentAPI";
+import { formatDateTime } from "@/utils/propertyFormatters";
 
 const toDateTimeLocalValue = (value?: string): string => {
   if (!value) return "";
@@ -33,8 +35,16 @@ const AgentVisitsPage: React.FC = () => {
   const [error, setError] = useState("");
 
   const [creating, setCreating] = useState(false);
+  const [createSubmitting, setCreateSubmitting] = useState(false);
   const [editing, setEditing] = useState<AgentVisit | null>(null);
+  const [rescheduleSubmitting, setRescheduleSubmitting] = useState(false);
   const [cancelling, setCancelling] = useState<AgentVisit | null>(null);
+  const [cancelSubmitting, setCancelSubmitting] = useState(false);
+
+  const loadVisits = async () => {
+    const visitRows = await fetchAgentVisitsAPI();
+    setVisits(visitRows);
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -106,7 +116,7 @@ const AgentVisitsPage: React.FC = () => {
                   {v.clientName}
                 </td>
                 <td className="px-4 py-3">{v.property}</td>
-                <td className="px-4 py-3">{v.when}</td>
+                <td className="px-4 py-3">{formatDateTime(v.when)}</td>
                 <td className="px-4 py-3">
                   <span className="rounded-full bg-[var(--b2-soft)] px-2 py-0.5 text-[11px] font-semibold text-[var(--b1)] ring-1 ring-[var(--b2)]">
                     {v.status.toUpperCase()}
@@ -173,7 +183,9 @@ const AgentVisitsPage: React.FC = () => {
           onCancel={() => setCreating(false)}
           onSubmit={async (payload) => {
             try {
-              const created = await createAgentVisitAPI({
+              setCreateSubmitting(true);
+              setError("");
+              await createAgentVisitAPI({
                 clientId: payload.clientId,
                 clientName: payload.clientName,
                 type: payload.property,
@@ -181,13 +193,16 @@ const AgentVisitsPage: React.FC = () => {
                 notes: payload.notes,
                 status: "scheduled",
               });
-              setVisits((prev) => [...prev, created]);
+              await loadVisits();
               setCreating(false);
             } catch (err) {
               const message = err instanceof Error ? err.message : "Failed to create visit.";
               setError(message);
+            } finally {
+              setCreateSubmitting(false);
             }
           }}
+          submitting={createSubmitting}
         />
       </Modal>
 
@@ -207,16 +222,26 @@ const AgentVisitsPage: React.FC = () => {
               when: editing.when,
             }}
             onCancel={() => setEditing(null)}
-            onSubmit={(payload) => {
-              setVisits((prev) =>
-                prev.map((x) =>
-                  x.id === editing.id
-                    ? { ...x, ...payload, status: "rescheduled" }
-                    : x
-                )
-              );
-              setEditing(null);
+            onSubmit={async (payload) => {
+              try {
+                setRescheduleSubmitting(true);
+                setError("");
+                const updated = await updateAgentVisitAPI(editing.id, {
+                  clientName: payload.clientName,
+                  type: payload.property,
+                  date: payload.when,
+                  status: "rescheduled",
+                });
+                setVisits((prev) => prev.map((x) => (x.id === editing.id ? updated : x)));
+                setEditing(null);
+              } catch (err) {
+                const message = err instanceof Error ? err.message : "Failed to reschedule visit.";
+                setError(message);
+              } finally {
+                setRescheduleSubmitting(false);
+              }
             }}
+            submitting={rescheduleSubmitting}
           />
         )}
       </Modal>
@@ -244,17 +269,22 @@ const AgentVisitsPage: React.FC = () => {
                 type="button"
                 onClick={async () => {
                   try {
+                    setCancelSubmitting(true);
+                    setError("");
                     await deleteAgentVisitAPI(cancelling.id);
                     setVisits((prev) => prev.filter((x) => x.id !== cancelling.id));
                     setCancelling(null);
                   } catch (err) {
                     const message = err instanceof Error ? err.message : "Failed to cancel visit.";
                     setError(message);
+                  } finally {
+                    setCancelSubmitting(false);
                   }
                 }}
+                disabled={cancelSubmitting}
                 className="rounded-md border border-[var(--error)] bg-[var(--error-bg)] px-4 py-2 text-sm font-semibold text-[var(--error)] hover:opacity-80 transition"
               >
-                Cancel visit
+                {cancelSubmitting ? "Cancelling..." : "Cancel visit"}
               </Button>
             </div>
           </div>
@@ -268,12 +298,14 @@ function VisitForm({
   clients,
   initial,
   submitLabel,
+  submitting,
   onCancel,
   onSubmit,
 }: {
   clients: AgentClient[];
   initial?: { clientId?: string; clientName: string; property: string; when: string };
   submitLabel: string;
+  submitting?: boolean;
   onCancel: () => void;
   onSubmit: (payload: {
     clientId?: string;
@@ -351,15 +383,17 @@ function VisitForm({
         <Button
           type="button"
           onClick={onCancel}
+          disabled={submitting}
           className="w-full sm:w-auto rounded-md border border-[var(--b2)] px-4 py-2 text-sm"
         >
           Cancel
         </Button>
         <Button
           type="submit"
+          disabled={submitting}
           className="w-full sm:w-auto rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] hover:bg-[var(--b1)] transition"
         >
-          {submitLabel}
+          {submitting ? "Saving..." : submitLabel}
         </Button>
       </div>
     </form>

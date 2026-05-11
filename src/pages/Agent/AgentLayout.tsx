@@ -47,6 +47,10 @@ function agentTopBarFromPath(pathname: string): { title: string; subtitle: strin
       title: "Visits",
       subtitle: "Coordinate and monitor scheduled site visits.",
     },
+    "/agent/calendar": {
+      title: "Calendar",
+      subtitle: "Review scheduled visits date-wise.",
+    },
     "/agent/clients": {
       title: "Clients",
       subtitle: "Manage client information and follow-ups.",

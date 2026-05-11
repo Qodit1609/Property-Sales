@@ -6,6 +6,7 @@ import {
   FileText,
   Users,
   CalendarCheck2,
+  CalendarDays,
   Bell,
   UserRound,
 } from "lucide-react";
@@ -105,6 +106,23 @@ const AgentSidebar: React.FC<AgentSidebarProps> = ({ collapsed = false, onNaviga
           >
             <CalendarCheck2 className="h-[18px] w-[18px] shrink-0 opacity-90 transition group-hover:scale-[1.03]" />
             {!collapsed ? <span className="truncate">Visit Scheduling</span> : null}
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/agent/calendar"
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              twMerge(linkBase, collapsed && "justify-center px-2", isActive && (
+                isActive
+                  ? "border-[var(--b2)] bg-gradient-to-r from-[var(--b2-soft)] to-[var(--white)] text-[var(--b1)] shadow-sm"
+                  : ""
+              ))
+            }
+            title={collapsed ? "Calendar" : undefined}
+          >
+            <CalendarDays className="h-[18px] w-[18px] shrink-0 opacity-90 transition group-hover:scale-[1.03]" />
+            {!collapsed ? <span className="truncate">Calendar</span> : null}
           </NavLink>
         </li>
         <li>
