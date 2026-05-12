@@ -202,7 +202,7 @@ const Register: React.FC = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
-                  placeholder="Rahul"
+                  placeholder="Enter your full name"
                   required
                 />
               </div>
@@ -215,7 +215,7 @@ const Register: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
-                  placeholder="rahul@gmail.com"
+                  placeholder="Enter your email"
                   required
                 />
               </div>

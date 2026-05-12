@@ -11,6 +11,7 @@ import {
   MessageCircleMore,
   Megaphone,
   Images,
+  Inbox,
 } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import api from "@/lib/apiClient";
@@ -25,7 +26,7 @@ const ADMIN_ROUTE_BY_LABEL: Record<string, string> = {
   dashboard: "/admin",
   "access management": "/admin/users",
   "activity logs": "/admin/activity-logs",
-  "audit logs": "/admin/logs",
+  "leads management": "/admin/leads-management",
   testimonial: "/admin/testimonial",
   "promotion requests": "/admin/promotions",
   images: "/admin/images",
@@ -36,13 +37,21 @@ const ADMIN_ROUTE_ALIASES: Record<string, string> = {
   "/admin/access-management": "/admin/users",
   "/admin/accessmanagement": "/admin/users",
   "/admin/activitylogs": "/admin/activity-logs",
-  "/admin/audit-logs": "/admin/logs",
-  "/admin/auditlogs": "/admin/logs",
   "/admin/testimonials": "/admin/testimonial",
   "/admin/promotion-requests": "/admin/promotions",
   "/admin/promotionrequests": "/admin/promotions",
   "/admin/image": "/admin/images",
+  "/admin/leadsmanagement": "/admin/leads-management",
+  "/admin/leads": "/admin/leads-management",
 };
+
+const REMOVED_ADMIN_ROUTES = new Set<string>([
+  "/admin/logs",
+  "/admin/audit-logs",
+  "/admin/auditlogs",
+]);
+
+const REMOVED_ADMIN_LABELS = new Set<string>(["audit logs", "audit log"]);
 
 const ICON_MAP = {
   layoutdashboard: LayoutDashboard,
@@ -63,6 +72,9 @@ const ICON_MAP = {
   megaphone: Megaphone,
   promotions: Megaphone,
   images: Images,
+  inbox: Inbox,
+  leads: Inbox,
+  leadsmanagement: Inbox,
 } as const;
 
 interface AdminSidebarProps {
@@ -77,6 +89,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, collapsed }) =>
     to: "/admin/images",
     label: "Images",
     icon: Images,
+  };
+  const leadsManagementFallbackItem: SidebarItem = {
+    to: "/admin/leads-management",
+    label: "Leads Management",
+    icon: Inbox,
   };
   const normalizeAdminRoute = (rawTo: string, rawLabel: string) => {
     const labelKey = rawLabel.trim().toLowerCase();
@@ -139,7 +156,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, collapsed }) =>
 
         const mapped = (Array.isArray(rawItems) ? rawItems : [])
           .map(mapItem)
-          .filter((item: { to: string; label: string }) => item.to && item.label);
+          .filter((item: { to: string; label: string }) => item.to && item.label)
+          .filter((item: { to: string; label: string }) => {
+            const normalizedLabel = item.label.trim().toLowerCase();
+            const normalizedRoute = item.to.trim().toLowerCase();
+            if (REMOVED_ADMIN_LABELS.has(normalizedLabel)) return false;
+            if (REMOVED_ADMIN_ROUTES.has(normalizedRoute)) return false;
+            return true;
+          });
 
         setDynamicItems(mapped);
         const title =
@@ -161,9 +185,23 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, collapsed }) =>
     };
   }, []);
 
-  const sidebarItems = dynamicItems.some((item) => item.to === "/admin/images")
+  const withImages = dynamicItems.some((item) => item.to === "/admin/images")
     ? dynamicItems
     : [...dynamicItems, imagesFallbackItem];
+
+  const sidebarItems = withImages.some(
+    (item) => item.to === "/admin/leads-management"
+  )
+    ? withImages
+    : (() => {
+        const accountIndex = withImages.findIndex(
+          (item) => item.to === "/admin/users"
+        );
+        if (accountIndex === -1) return [...withImages, leadsManagementFallbackItem];
+        const next = [...withImages];
+        next.splice(accountIndex + 1, 0, leadsManagementFallbackItem);
+        return next;
+      })();
 
   return (
     <nav className="space-y-1" aria-label={sectionTitle || undefined}>

@@ -381,7 +381,7 @@ const ActivityLogs: React.FC = () => {
   }, [auditLogs]);
 
   return (
-    <AdminLayout title="Audit logs">
+    <AdminLayout title="Activity logs">
       <div className="space-y-6">
         <header className="relative overflow-hidden rounded-2xl border border-[var(--b2)]/60 bg-[var(--white)] p-5 shadow-[0_2px_16px_rgba(27,67,50,0.07)] sm:p-6">
           <div
