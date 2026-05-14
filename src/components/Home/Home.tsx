@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "@/hooks/reduxHooks";
@@ -8,6 +14,7 @@ import {
   useHomeFilterOptional,
   type AppliedCriteria,
 } from "./homeFilterContext";
+import HomeSearchSelect from "./HomeSearchSelect";
 
 export { HomeFilterProvider } from "./homeFilterContext";
 
@@ -69,20 +76,55 @@ const Home: React.FC = () => {
     );
   }, [properties]);
 
-  const translateCity = (city: string) => {
+  const translateCity = useCallback((city: string) => {
     const cityKey = city
       .trim()
       .toLowerCase()
       .replace(/\s+/g, "")
       .replace(/[^a-z]/g, "");
     return t(`homePage.cities.${cityKey}`, { defaultValue: city });
-  };
+  }, [t]);
 
-  const translateListingTypeLabel = (key: string, fallback: string) => {
+  const translateListingTypeLabel = useCallback((key: string, fallback: string) => {
     if (key === "sale") return t("homePage.buy");
     if (key === "rent") return t("homePage.rent");
     return fallback;
-  };
+  }, [t]);
+
+  const locationSelectOptions = useMemo(
+    () => [
+      { value: "", label: t("homePage.location") },
+      ...cities.map((city) => ({
+        value: city,
+        label: translateCity(city),
+      })),
+    ],
+    [cities, t, translateCity]
+  );
+
+  const categorySelectOptions = useMemo(
+    () => [
+      { value: "", label: t("homePage.category") },
+      ...categories.map((cat) => ({
+        value: cat,
+        label: t(`postProperty.options.propertyType.${cat}`, {
+          defaultValue: cat,
+        }),
+      })),
+    ],
+    [categories, t]
+  );
+
+  const listingTypeSelectOptions = useMemo(
+    () => [
+      { value: "", label: t("homePage.type") },
+      ...listingTypeOptions.map(([key, label]) => ({
+        value: key,
+        label: translateListingTypeLabel(key, label),
+      })),
+    ],
+    [listingTypeOptions, t, translateListingTypeLabel]
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -183,8 +225,8 @@ const Home: React.FC = () => {
             className="flex flex-col sm:flex-row flex-wrap gap-2 items-stretch sm:items-center justify-between"
             onSubmit={handleSearch}
           >
-            <div className="flex items-center bg-[var(--white)] rounded-md border border-[var(--b2)] px-2 w-full sm:w-auto flex-1 min-w-full sm:min-w-[130px] focus-within:ring-2 focus-within:ring-[var(--b2)] transition-shadow duration-200">
-              <span className="mr-1 text-[var(--b2)]">
+            <div className="relative flex w-full flex-1 min-w-full items-center rounded-md border border-[var(--b2)] bg-[var(--white)] px-2 transition-shadow duration-200 focus-within:ring-2 focus-within:ring-[var(--b2)] sm:w-auto sm:min-w-[130px]">
+              <span className="mr-1 shrink-0 text-[var(--b2)]">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-4 h-4"
@@ -200,23 +242,16 @@ const Home: React.FC = () => {
                   />
                 </svg>
               </span>
-              <select
-                className="bg-transparent outline-none w-full py-2 text-sm cursor-pointer rounded-md"
+              <HomeSearchSelect
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                aria-label={t("homePage.location")}
-              >
-                <option value="">{t("homePage.location")}</option>
-                {cities.map((city) => (
-                  <option key={city} value={city}>
-                    {translateCity(city)}
-                  </option>
-                ))}
-              </select>
+                onChange={setLocation}
+                options={locationSelectOptions}
+                ariaLabel={t("homePage.location")}
+              />
             </div>
 
-            <div className="flex items-center bg-[var(--white)] rounded-md border border-[var(--b2)] px-2 w-full sm:w-auto flex-1 min-w-full sm:min-w-[130px] focus-within:ring-2 focus-within:ring-[var(--b2)] transition-shadow duration-200">
-              <span className="mr-1 text-[var(--b2)]">
+            <div className="relative flex w-full flex-1 min-w-full items-center rounded-md border border-[var(--b2)] bg-[var(--white)] px-2 transition-shadow duration-200 focus-within:ring-2 focus-within:ring-[var(--b2)] sm:w-auto sm:min-w-[130px]">
+              <span className="mr-1 shrink-0 text-[var(--b2)]">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-4 h-4"
@@ -232,25 +267,16 @@ const Home: React.FC = () => {
                   />
                 </svg>
               </span>
-              <select
-                className="bg-transparent outline-none w-full py-2 text-sm cursor-pointer rounded-md"
+              <HomeSearchSelect
                 value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                aria-label={t("homePage.category")}
-              >
-                <option value="">{t("homePage.category")}</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {t(`postProperty.options.propertyType.${cat}`, {
-                      defaultValue: cat,
-                    })}
-                  </option>
-                ))}
-              </select>
+                onChange={setCategory}
+                options={categorySelectOptions}
+                ariaLabel={t("homePage.category")}
+              />
             </div>
 
-            <div className="flex items-center bg-[var(--white)] rounded-md border border-[var(--b2)] px-2 w-full sm:w-auto flex-1 min-w-full sm:min-w-[120px] focus-within:ring-2 focus-within:ring-[var(--b2)] transition-shadow duration-200">
-              <span className="mr-1 text-[var(--b2)]">
+            <div className="relative flex w-full flex-1 min-w-full items-center rounded-md border border-[var(--b2)] bg-[var(--white)] px-2 transition-shadow duration-200 focus-within:ring-2 focus-within:ring-[var(--b2)] sm:w-auto sm:min-w-[120px]">
+              <span className="mr-1 shrink-0 text-[var(--b2)]">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="w-4 h-4"
@@ -266,20 +292,13 @@ const Home: React.FC = () => {
                   />
                 </svg>
               </span>
-              <select
-                className="bg-transparent outline-none w-full py-2 text-sm cursor-pointer rounded-md"
+              <HomeSearchSelect
                 value={listingType}
-                onChange={(e) => setListingType(e.target.value)}
-                aria-label={t("homePage.type")}
+                onChange={setListingType}
+                options={listingTypeSelectOptions}
+                ariaLabel={t("homePage.type")}
                 disabled={listingTypeOptions.length === 0}
-              >
-                <option value="">{t("homePage.type")}</option>
-                {listingTypeOptions.map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {translateListingTypeLabel(key, label)}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
 
             <div className="flex items-center bg-[var(--white)] rounded-md border border-[var(--b2)] px-2 w-full sm:w-auto flex-[2] min-w-full sm:min-w-[150px] focus-within:ring-2 focus-within:ring-[var(--b2)] transition-shadow duration-200">
