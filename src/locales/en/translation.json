@@ -142,7 +142,8 @@
       "yes": "Yes",
       "no": "No",
       "required": "Required",
-      "optional": "Optional"
+      "optional": "Optional",
+      "wordCount": "{{current}} / {{max}} words"
     },
     "layout": {
       "loadingStep": "Loading step..."
@@ -474,6 +475,8 @@
       "enterFloor": "Enter floor",
       "enterFurnishing": "Enter furnishing",
       "addDescription": "Add description",
+      "descriptionWordLimit": "Description cannot exceed 150 words",
+      "shortDescriptionWordLimit": "Short description cannot exceed 40 words",
       "addAtLeastOneImage": "Add at least one image (upload files or paste an image URL)."
     }
   },

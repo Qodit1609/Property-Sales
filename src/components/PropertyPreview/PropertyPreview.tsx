@@ -30,6 +30,12 @@ import {
   translatePropertyType,
   yesNoOptional,
 } from "./previewUtils";
+import {
+  MAX_PROPERTY_DESCRIPTION_WORDS,
+  MAX_PROPERTY_SHORT_DESCRIPTION_WORDS,
+  PROPERTY_TEXT_WRAP_CLASS,
+  truncateWords,
+} from "../../utils/wordText";
 
 type Props = {
   property: Property;
@@ -100,6 +106,18 @@ const PropertyPreview = ({ property }: Props) => {
     { label: t("propertyPreview.labels.pricePerSqft"), value: formatSqftPrice(property) },
   ].filter((item): item is { label: string; value: string } => Boolean(item.value && item.value !== "\u2014"));
   const topOverviewSpecs = overviewSpecs.slice(0, 4);
+  const previewDescription = useMemo(
+    () => truncateWords(property.description || "", MAX_PROPERTY_DESCRIPTION_WORDS),
+    [property.description]
+  );
+  const previewShortDescription = useMemo(
+    () =>
+      truncateWords(
+        property.shortDescription || property.description || "",
+        MAX_PROPERTY_SHORT_DESCRIPTION_WORDS
+      ),
+    [property.shortDescription, property.description]
+  );
 
   const tabs: PropertyTab[] = [
     {
@@ -109,8 +127,10 @@ const PropertyPreview = ({ property }: Props) => {
         <div className="space-y-5">
           <div>
             <h3 className="text-base font-semibold text-[var(--b1)]">{t("propertyPreview.sections.description")}</h3>
-            <p className="mt-2 whitespace-pre-line text-sm leading-7 text-[var(--muted)] sm:text-base">
-              {property.description || "\u2014"}
+            <p
+              className={`mt-2 text-sm leading-7 text-[var(--muted)] sm:text-base ${PROPERTY_TEXT_WRAP_CLASS}`}
+            >
+              {previewDescription || "\u2014"}
             </p>
           </div>
           <div>
@@ -221,8 +241,10 @@ const PropertyPreview = ({ property }: Props) => {
                   {property.title}
                 </h1>
 
-                <p className="mt-2 text-sm text-[var(--muted)] sm:text-base">
-                  {property.shortDescription || property.description}
+                <p
+                  className={`mt-2 text-sm text-[var(--muted)] sm:text-base ${PROPERTY_TEXT_WRAP_CLASS}`}
+                >
+                  {previewShortDescription || "\u2014"}
                 </p>
 
                 <div className="mt-3 inline-flex max-w-full items-center gap-1.5 rounded-full bg-[var(--b2-soft)]/40 px-3 py-1.5 text-sm text-[var(--muted)]">

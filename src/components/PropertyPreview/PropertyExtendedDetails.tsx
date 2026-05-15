@@ -17,6 +17,11 @@ import {
   translateSoilType,
   translateStatusValue,
 } from "./previewUtils";
+import {
+  MAX_PROPERTY_DESCRIPTION_WORDS,
+  MAX_PROPERTY_SHORT_DESCRIPTION_WORDS,
+  truncateWords,
+} from "../../utils/wordText";
 
 type PropertyExtendedDetailsProps = {
   property: Property;
@@ -149,8 +154,14 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
           <InfoItem label={t("propertyPreview.detail.title")} value={property.title} />
           <InfoItem label={t("propertyPreview.detail.propertyType")} value={translatePropertyType(property.propertyType)} />
           <InfoItem label={t("propertyPreview.detail.listingType")} value={translateListingType(property.listingType)} />
-          <InfoItem label={t("propertyPreview.sections.description")} value={property.description} />
-          <InfoItem label={t("propertyPreview.detail.shortDescription")} value={property.shortDescription} />
+          <InfoItem
+            label={t("propertyPreview.sections.description")}
+            value={truncateWords(property.description ?? "", MAX_PROPERTY_DESCRIPTION_WORDS)}
+          />
+          <InfoItem
+            label={t("propertyPreview.detail.shortDescription")}
+            value={truncateWords(property.shortDescription ?? "", MAX_PROPERTY_SHORT_DESCRIPTION_WORDS)}
+          />
           <InfoItem label={t("propertyPreview.detail.tags")} value={translatedTags?.length ? translatedTags.join(", ") : undefined} />
         </div>
       </PropertySection>

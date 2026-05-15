@@ -15,6 +15,12 @@ import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
 import { Input, Button } from "@/components/common";
 import { useTranslation } from "react-i18next";
+import {
+  clampWords,
+  countWords,
+  MAX_PROPERTY_SHORT_DESCRIPTION_WORDS,
+  PROPERTY_TEXT_WRAP_CLASS,
+} from "../../utils/wordText";
 
 const CATEGORY_OPTIONS: PropertyCategory[] = [
   "Agriculture Land",
@@ -59,6 +65,10 @@ export default function BasicDetailsForm() {
   }, [basic.category]);
 
   const errors = useMemo(() => validateBasicDetails(basic), [basic]);
+  const shortDescriptionWordCount = useMemo(
+    () => countWords(basic.shortDescription),
+    [basic.shortDescription]
+  );
 
   const showError = (key: string) => {
     return Boolean(touched[key] && (errors as Record<string, string | undefined>)[key]);
@@ -212,14 +222,36 @@ export default function BasicDetailsForm() {
           <label className="block text-sm font-semibold text-[var(--b1)] mb-1">
             {t("postProperty.basic.shortDescription")}
           </label>
-          <Input
+          <textarea
             value={basic.shortDescription}
+            onBlur={() => setTouched((p) => ({ ...p, shortDescription: true }))}
             onChange={(e) =>
-              dispatch(updateBasicDetails({ shortDescription: e.target.value }))
+              dispatch(
+                updateBasicDetails({
+                  shortDescription: clampWords(
+                    e.target.value,
+                    MAX_PROPERTY_SHORT_DESCRIPTION_WORDS
+                  ),
+                })
+              )
             }
+            rows={2}
             placeholder={t("postProperty.basic.shortDescriptionPlaceholder")}
-            className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+            className={`w-full rounded-md border px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)] ${PROPERTY_TEXT_WRAP_CLASS} ${
+              showError("shortDescription") ? "border-[var(--error)]" : "border-[var(--b2)]"
+            }`}
           />
+          <p className="mt-1 text-right text-xs text-[var(--muted)]">
+            {t("postProperty.common.wordCount", {
+              current: shortDescriptionWordCount,
+              max: MAX_PROPERTY_SHORT_DESCRIPTION_WORDS,
+            })}
+          </p>
+          {showError("shortDescription") && (
+            <p className="mt-1 text-xs text-[var(--error)]">
+              {t(errors.shortDescription || "")}
+            </p>
+          )}
         </div>
       </div>
 

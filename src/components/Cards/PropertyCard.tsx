@@ -12,6 +12,7 @@ import {
   formatArea,
   truncateText,
 } from "../../utils/propertyFormatters";
+import { PROPERTY_TEXT_WRAP_CLASS } from "../../utils/wordText";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { selectMediaLoading } from "../../features/media/mediaSelectors";
 
@@ -266,10 +267,7 @@ const PropertyCard: React.FC<Props> = ({
 
         <div className="min-h-[44px]" >
              {cleanDescription && (
-          <p
-            className="
-          text-sm text-[var(--muted)] line-clamp-2
-          ">
+          <p className={`text-sm text-[var(--muted)] line-clamp-2 ${PROPERTY_TEXT_WRAP_CLASS}`}>
             {cleanDescription}
           </p>
         )}

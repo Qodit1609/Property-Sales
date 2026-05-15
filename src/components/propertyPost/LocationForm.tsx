@@ -123,7 +123,7 @@ export default function LocationForm() {
           onBlur={() => setTouched((p) => ({ ...p, state: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ state: v }))}
           error={showError("state") ? t(errors.state || "") : undefined}
-          placeholder={t("postProperty.location.statePlaceholder")}
+          placeholder="Enter state"
         />
         <Field
           label={t("postProperty.location.city")}
@@ -132,13 +132,13 @@ export default function LocationForm() {
           onBlur={() => setTouched((p) => ({ ...p, city: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ city: v }))}
           error={showError("city") ? t(errors.city || "") : undefined}
-          placeholder={t("postProperty.location.cityPlaceholder")}
+          placeholder="Enter city"
         />
         <Field
           label={t("postProperty.location.district")}
           value={location.district}
           onChange={(v) => dispatch(updateLocationDetails({ district: v }))}
-          placeholder={t("postProperty.location.districtPlaceholder")}
+          placeholder="Enter district"
         />
         <Field
           label={t("postProperty.location.tehsil")}
@@ -147,7 +147,7 @@ export default function LocationForm() {
           onBlur={() => setTouched((p) => ({ ...p, tehsil: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ tehsil: v }))}
           error={showError("tehsil") ? t(errors.tehsil || "") : undefined}
-          placeholder={t("postProperty.location.tehsilPlaceholder")}
+          placeholder="Enter tehsil"
         />
         <Field
           label={t("postProperty.location.village")}
@@ -156,7 +156,7 @@ export default function LocationForm() {
           onBlur={() => setTouched((p) => ({ ...p, village: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ village: v }))}
           error={showError("village") ? t(errors.village || "") : undefined}
-          placeholder={t("postProperty.location.villagePlaceholder")}
+          placeholder="Enter village"
         />
         <Field
           label={t("postProperty.location.address")}
@@ -186,7 +186,7 @@ export default function LocationForm() {
           onBlur={() => setTouched((p) => ({ ...p, pinCode: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ pinCode: v }))}
           error={showError("pinCode") ? t(errors.pinCode || "") : undefined}
-          placeholder="452001"
+          placeholder="Enter 6-digit pin code"
         />
 
         <Field
@@ -196,7 +196,7 @@ export default function LocationForm() {
           onBlur={() => setTouched((p) => ({ ...p, surveyNumber: true }))}
           onChange={(v) => dispatch(updateLocationDetails({ surveyNumber: v }))}
           error={showError("surveyNumber") ? t(errors.surveyNumber || "") : undefined}
-          placeholder={t("postProperty.location.surveyNumberPlaceholder")}
+          placeholder="Enter survey number (required for Agriculture Land)"
         />
 
         <div className="grid grid-cols-2 gap-3">
@@ -214,7 +214,7 @@ export default function LocationForm() {
                 )
               }
               className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
-              placeholder="22.7196"
+              placeholder="28.7041"
             />
           </div>
           <div>

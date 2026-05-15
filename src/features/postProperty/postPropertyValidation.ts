@@ -4,6 +4,11 @@ import type {
   MediaState,
   ProfileDetails,
 } from "./postPropertyTypes";
+import {
+  countWords,
+  MAX_PROPERTY_DESCRIPTION_WORDS,
+  MAX_PROPERTY_SHORT_DESCRIPTION_WORDS,
+} from "../../utils/wordText";
 
 export type ValidationErrors<T extends Record<string, unknown>> = Partial<
   Record<keyof T, string>
@@ -18,6 +23,12 @@ export function validateBasicDetails(values: BasicDetails) {
   if (!values.contactName.trim()) errors.contactName = "postProperty.validation.enterContactName";
   if (!values.contactEmail.trim()) errors.contactEmail = "postProperty.validation.enterEmail";
   if (!values.contactMobile.trim()) errors.contactMobile = "postProperty.validation.enterMobileNumber";
+  if (
+    values.shortDescription.trim() &&
+    countWords(values.shortDescription) > MAX_PROPERTY_SHORT_DESCRIPTION_WORDS
+  ) {
+    errors.shortDescription = "postProperty.validation.shortDescriptionWordLimit";
+  }
   return errors;
 }
 
@@ -74,6 +85,9 @@ export function validateProfileDetails(
     if (!values.furnishing.trim()) errors.furnishing = "postProperty.validation.enterFurnishing";
   }
   if (!values.description.trim()) errors.description = "postProperty.validation.addDescription";
+  if (countWords(values.description) > MAX_PROPERTY_DESCRIPTION_WORDS) {
+    errors.description = "postProperty.validation.descriptionWordLimit";
+  }
   return errors;
 }
 

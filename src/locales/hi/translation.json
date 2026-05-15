@@ -142,7 +142,8 @@
       "yes": "हाँ",
       "no": "नहीं",
       "required": "आवश्यक",
-      "optional": "वैकल्पिक"
+      "optional": "वैकल्पिक",
+      "wordCount": "{{current}} / {{max}} शब्द"
     },
     "layout": {
       "loadingStep": "चरण लोड हो रहा है..."
@@ -474,6 +475,8 @@
       "enterFloor": "फ़्लोर दर्ज करें",
       "enterFurnishing": "फर्निशिंग दर्ज करें",
       "addDescription": "विवरण जोड़ें",
+      "descriptionWordLimit": "विवरण 150 शब्दों से अधिक नहीं हो सकता",
+      "shortDescriptionWordLimit": "संक्षिप्त विवरण 40 शब्दों से अधिक नहीं हो सकता",
       "addAtLeastOneImage": "कम से कम एक इमेज जोड़ें (फ़ाइल अपलोड करें या इमेज URL पेस्ट करें)।"
     }
   },
