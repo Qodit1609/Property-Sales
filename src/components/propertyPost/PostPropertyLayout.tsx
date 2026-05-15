@@ -1,4 +1,4 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Stepper from "./Stepper";
 import { POST_PROPERTY_STEPS } from "./stepConfig";
@@ -28,10 +28,18 @@ export default function PostPropertyLayout() {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const dispatch = useAppDispatch();
 
   const authUser = useAppSelector((s) => s.auth.user);
   const post = useAppSelector((s) => s.postProperty);
+  const editIdFromUrl = searchParams.get("edit");
+  const showEditLoadError =
+    Boolean(editIdFromUrl) && Boolean(post.submitError) && !post.submitLoading;
+  const isEditLoading =
+    Boolean(editIdFromUrl) &&
+    !showEditLoadError &&
+    post.editPropertyId !== editIdFromUrl;
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const pushToast = useCallback((t: Omit<ToastMessage, "id">) => {
@@ -42,7 +50,7 @@ export default function PostPropertyLayout() {
   }, []);
 
   useEffect(() => {
-    if (!authUser) return;
+    if (!authUser || editIdFromUrl) return;
     const authUserRecord = authUser as Record<string, unknown>;
     const readText = (value: unknown): string | undefined => {
       if (typeof value === "string" && value.trim()) return value.trim();
@@ -93,7 +101,7 @@ export default function PostPropertyLayout() {
     return () => {
       cancelled = true;
     };
-  }, [authUser, dispatch]);
+  }, [authUser, dispatch, editIdFromUrl]);
 
   // Debounced autosave draft into localStorage
   useEffect(() => {
@@ -200,15 +208,23 @@ export default function PostPropertyLayout() {
 
             <section className="flex-1">
               <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-sm p-5 sm:p-6">
-                <Suspense
-                  fallback={
-                    <div className="py-10 text-sm text-[var(--muted)]">
-                      {t("postProperty.layout.loadingStep")}
-                    </div>
-                  }
-                >
-                  <Outlet context={{ pushToast }} />
-                </Suspense>
+                {isEditLoading ? (
+                  <div className="py-10 text-sm text-[var(--muted)]">
+                    {t("postProperty.layout.loadingStep")}
+                  </div>
+                ) : showEditLoadError ? (
+                  <div className="py-10 text-sm text-[var(--error)]">{post.submitError}</div>
+                ) : (
+                  <Suspense
+                    fallback={
+                      <div className="py-10 text-sm text-[var(--muted)]">
+                        {t("postProperty.layout.loadingStep")}
+                      </div>
+                    }
+                  >
+                    <Outlet context={{ pushToast }} />
+                  </Suspense>
+                )}
               </div>
             </section>
           </div>

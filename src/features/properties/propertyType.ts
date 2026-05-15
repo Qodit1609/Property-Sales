@@ -11,6 +11,7 @@ export interface Property {
   address: string;
   locationText?: string;
   price: number;
+  negotiable?: boolean;
   images: string[];
   videos?: string[];
   propertyType: string;

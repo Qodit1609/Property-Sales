@@ -282,6 +282,7 @@ const normalizeProperty = (payload: unknown): Property => {
     address: getLocationText(raw),
     locationText: getLocationText(raw),
     price: toNumber(raw.price) ?? 0,
+    negotiable: toBoolean(raw.negotiable),
     images,
     videos: toStringArray(media.videos),
     propertyType: toString(raw.propertyType) ?? toString(raw.category) ?? "Property",

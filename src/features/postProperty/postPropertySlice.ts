@@ -8,7 +8,7 @@ import {
 } from "../seller/sellerAPI";
 import { fetchPropertyByIdAPI } from "../properties/propertyAPI";
 import type { Property } from "../properties/propertyType";
-import { isSellerDirectRejectedListing } from "../../lib/sellerHelpers";
+import { extractPropertyLatLng, isSellerDirectRejectedListing } from "../../lib/sellerHelpers";
 import {
   clearPostPropertyDraft,
   loadPostPropertyDraft,
@@ -140,7 +140,31 @@ const initial: PostPropertyState = {
   editPropertyId: null,
 };
 
+function getEditIdFromUrl(): string | null {
+  if (typeof window === "undefined") return null;
+  const editId = new URLSearchParams(window.location.search).get("edit");
+  return editId && /^[a-fA-F0-9]{24}$/.test(editId) ? editId : null;
+}
+
+function toEditBool(value: unknown): boolean | null {
+  if (typeof value === "boolean") return value;
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (["true", "yes", "1", "available"].includes(normalized)) return true;
+    if (["false", "no", "0", "not available", "unavailable"].includes(normalized)) {
+      return false;
+    }
+  }
+  if (typeof value === "number") {
+    if (value === 1) return true;
+    if (value === 0) return false;
+  }
+  return null;
+}
+
 function hydrateInitialState(): PostPropertyState {
+  if (getEditIdFromUrl()) return initial;
+
   const draft = loadPostPropertyDraft();
   if (!draft) return initial;
   return {
@@ -466,9 +490,7 @@ const categoryFromPropertyType = (propertyType: string): BasicDetails["category"
 const mapPropertyToEditState = (property: Property): PostPropertyState => {
   const category = categoryFromPropertyType(property.propertyType ?? "");
   const mapDetails = property.location ?? {};
-  const mapCoordinates = Array.isArray(mapDetails.coordinates)
-    ? { lat: mapDetails.coordinates[0], lng: mapDetails.coordinates[1] }
-    : mapDetails.coordinates;
+  const { lat, lng } = extractPropertyLatLng(property);
   const images = (property.media?.images ?? property.images ?? []).filter(Boolean);
   const amenities = property.amenities ?? [];
   const hasAmenity = (key: string) => amenities.some((value) => value.toLowerCase().includes(key));
@@ -493,12 +515,15 @@ const mapPropertyToEditState = (property: Property): PostPropertyState => {
       title: property.title ?? "",
       shortDescription: property.shortDescription ?? "",
       contactName:
+        property.contactName ??
         property.ownerDetails?.name ??
         property.dealer?.name ??
         property.seller?.name ??
         "",
-      contactEmail: property.seller?.email ?? "",
+      contactEmail:
+        property.contactEmail ?? property.seller?.email ?? "",
       contactMobile:
+        property.contactMobile ??
         property.ownerDetails?.phone ??
         property.dealer?.phone ??
         property.seller?.phone ??
@@ -513,14 +538,15 @@ const mapPropertyToEditState = (property: Property): PostPropertyState => {
       address: mapDetails.address ?? property.address ?? "",
       landmark: "",
       pinCode: mapDetails.pincode ?? "",
-      latitude: mapCoordinates?.lat ?? null,
-      longitude: mapCoordinates?.lng ?? null,
+      latitude: Number.isFinite(lat) && lat !== 0 ? lat : null,
+      longitude: Number.isFinite(lng) && lng !== 0 ? lng : null,
     },
     profileDetails: {
       ...emptyProfileDetails,
       totalArea,
       areaUnit,
       price: property.price ?? null,
+      negotiable: property.negotiable ?? false,
       bedrooms:
         typeof property.bedrooms === "number"
           ? property.bedrooms
@@ -537,48 +563,40 @@ const mapPropertyToEditState = (property: Property): PostPropertyState => {
       furnishing: "",
       facing: String(property.features?.facing ?? property.facing ?? ""),
       parking:
-        typeof property.features?.parking === "boolean"
-          ? property.features.parking
-          : typeof property.parking === "number"
-          ? property.parking > 0
-          : null,
-      powerBackup:
-        typeof property.features?.powerBackup === "boolean" ? property.features.powerBackup : null,
-      security: typeof property.features?.security === "boolean" ? property.features.security : null,
+        toEditBool(property.features?.parking) ??
+        (typeof property.parking === "number" ? property.parking > 0 : null),
+      powerBackup: toEditBool(property.features?.powerBackup),
+      security: toEditBool(property.features?.security),
       constructionAllowed:
-        typeof property.features?.constructionAllowed === "boolean"
-          ? property.features.constructionAllowed
-          : typeof property.legal?.constructionAllowed === "boolean"
-          ? property.legal.constructionAllowed
-          : null,
-      farmhouseBuilt:
-        typeof property.features?.farmhouseBuilt === "boolean" ? property.features.farmhouseBuilt : null,
+        toEditBool(property.features?.constructionAllowed) ??
+        toEditBool(property.legal?.constructionAllowed),
+      farmhouseBuilt: toEditBool(property.features?.farmhouseBuilt),
       landRegistry:
-        typeof property.legal?.landRegistry === "boolean" ? property.legal.landRegistry : null,
+        toEditBool(property.legal?.landRegistry) ??
+        toEditBool(property.legal?.landRegistryAvailable),
       ownershipDocs:
-        typeof property.legal?.ownershipDocs === "boolean" ? property.legal.ownershipDocs : null,
+        toEditBool(property.legal?.ownershipDocs) ??
+        toEditBool(property.legal?.ownershipDocuments),
       encumbrance:
-        typeof property.legal?.encumbrance === "boolean" ? property.legal.encumbrance : null,
+        toEditBool(property.legal?.encumbrance) ?? toEditBool(property.legal?.encumbranceFree),
       landUseType: property.legal?.landUseType ?? "",
       waterAvailability:
         typeof property.waterResources?.waterAvailability === "string"
           ? property.waterResources.waterAvailability.toLowerCase() === "good"
           : null,
       waterAvailabilityText: property.waterResources?.waterAvailability ?? "",
-      borewell: typeof property.waterResources?.borewell === "boolean" ? property.waterResources.borewell : null,
-      irrigation: typeof property.waterResources?.irrigation === "boolean" ? property.waterResources.irrigation : null,
+      borewell:
+        toEditBool(property.waterResources?.borewell) ??
+        toEditBool(property.waterResources?.borewellAvailable),
+      irrigation:
+        toEditBool(property.waterResources?.irrigation) ??
+        toEditBool(property.waterResources?.irrigationSystem),
       borewellDepth: property.waterResources?.borewellDepth ?? null,
       nearbySources: (property.waterResources?.nearbySources ?? []).join(", "),
-      electricityAvailability:
-        typeof property.infrastructure?.electricityAvailable === "boolean"
-          ? property.infrastructure.electricityAvailable
-          : null,
-      roadAccess:
-        typeof property.infrastructure?.roadAccess === "boolean"
-          ? property.infrastructure.roadAccess
-          : null,
+      electricityAvailability: toEditBool(property.infrastructure?.electricityAvailable),
+      roadAccess: toEditBool(property.infrastructure?.roadAccess),
       roadType: property.infrastructure?.roadType ?? "",
-      gated: typeof property.infrastructure?.gated === "boolean" ? property.infrastructure.gated : null,
+      gated: toEditBool(property.infrastructure?.gated),
       airportDistance: property.location?.distances?.airport ?? property.infrastructure?.distances?.airport ?? null,
       railwayDistance:
         property.location?.distances?.railway ??
@@ -603,7 +621,10 @@ const mapPropertyToEditState = (property: Property): PostPropertyState => {
           property.infrastructure?.nearbyFacilities?.markets ??
           []
         ).join(", "),
-      soilType: (property.soilType as ProfileDetails["soilType"]) ?? "",
+      soilType:
+        (property.soilAndFarming?.soilType ??
+          property.soilType ??
+          "") as ProfileDetails["soilType"],
       soilQualityIndex: property.soilAndFarming?.soilQualityIndex ?? null,
       annualRainfall:
         typeof property.soilAndFarming?.rainfallData === "object"
@@ -626,21 +647,26 @@ const mapPropertyToEditState = (property: Property): PostPropertyState => {
     media: {
       ...emptyMedia,
       images: images.map((url, index) => ({
-        id: `edit-${index}-${Date.now()}`,
+        id: `edit-${property._id}-${index}`,
         url,
-        source: "remote",
+        source: "remote" as const,
       })),
       videoUrl: property.media?.videos?.[0] ?? "",
     },
     amenities: {
-      borewell: hasAmenity("borewell"),
-      dripIrrigation: hasAmenity("drip"),
-      fencing: hasAmenity("fencing"),
-      electricityConnection: hasAmenity("electric"),
-      farmRoad: hasAmenity("road"),
+      borewell:
+        toEditBool(property.waterResources?.borewell) === true || hasAmenity("borewell"),
+      dripIrrigation:
+        toEditBool(property.waterResources?.irrigation) === true || hasAmenity("drip"),
+      fencing: toEditBool(property.infrastructure?.fencing) === true || hasAmenity("fencing"),
+      electricityConnection:
+        toEditBool(property.infrastructure?.electricityAvailable) === true ||
+        hasAmenity("electric"),
+      farmRoad: toEditBool(property.infrastructure?.roadAccess) === true || hasAmenity("road"),
       nearbyHighway: hasAmenity("highway"),
       storageFacility: hasAmenity("storage"),
-      security: hasAmenity("security"),
+      security:
+        toEditBool(property.features?.security) === true || hasAmenity("security"),
     },
     completedSteps: {
       basic: true,
@@ -772,8 +798,10 @@ const postPropertySlice = createSlice({
       .addCase(loadEditProperty.pending, (state) => {
         state.submitLoading = true;
         state.submitError = null;
+        clearPostPropertyDraft();
       })
       .addCase(loadEditProperty.fulfilled, (_state, action) => {
+        clearPostPropertyDraft();
         return action.payload;
       })
       .addCase(loadEditProperty.rejected, (state, action) => {

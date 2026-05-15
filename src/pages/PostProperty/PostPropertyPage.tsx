@@ -5,8 +5,8 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   loadEditProperty,
   resetPostProperty,
-  setEditPropertyId,
 } from "../../features/postProperty/postPropertySlice";
+import { clearPostPropertyDraft } from "../../features/postProperty/postPropertyStorage";
 import { useTranslation } from "react-i18next";
 import CustomAlert from "@/components/common/CustomAlert";
 
@@ -18,7 +18,7 @@ export default function PostPropertyPage() {
   const rawUserRole = useAppSelector((state) => state.auth.user?.role);
   const userRole = String(rawUserRole ?? "").trim().toLowerCase();
   const canAccess = userRole === "seller" || userRole === "admin";
-  const editPropertyId = useAppSelector((state) => state.postProperty.editPropertyId);
+  const editIdFromUrl = searchParams.get("edit");
   const [unauthorizedAlert, setUnauthorizedAlert] = useState<{
     open: boolean;
     message: string;
@@ -40,12 +40,10 @@ export default function PostPropertyPage() {
   }, [canAccess, userRole, t]);
 
   useEffect(() => {
-    if (!canAccess) return;
-    const editId = searchParams.get("edit");
-    if (!editId) return;
-    if (editPropertyId === editId) return;
-    void dispatch(loadEditProperty(editId));
-  }, [canAccess, dispatch, editPropertyId, searchParams]);
+    if (!canAccess || !editIdFromUrl) return;
+    clearPostPropertyDraft();
+    void dispatch(loadEditProperty(editIdFromUrl));
+  }, [canAccess, dispatch, editIdFromUrl]);
 
   useEffect(() => {
     if (!canAccess) return;

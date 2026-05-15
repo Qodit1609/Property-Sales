@@ -428,19 +428,9 @@ const AdminPropertiesPage: React.FC = () => {
                     <tr
                       key={listing._id}
                       className={[
-                        "cursor-pointer transition-colors hover:bg-[var(--b2-soft)]/80",
+                        "transition-colors hover:bg-[var(--b2-soft)]/80",
                         index % 2 === 1 ? "bg-[var(--b2-soft)]/15" : "",
                       ].join(" ")}
-                      onClick={() => openDetails(listing)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          openDetails(listing);
-                        }
-                      }}
-                      tabIndex={0}
-                      role="link"
-                      aria-label={`Open details for ${listing.title || "property"}`}
                     >
                       <td className="px-4 py-3 align-top">
                         <p className="text-xs font-semibold text-[var(--b1)]">

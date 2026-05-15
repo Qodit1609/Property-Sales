@@ -1,9 +1,11 @@
 import React, { useMemo, useState } from "react";
 import { Clock, MapPin, Megaphone } from "lucide-react";
 import { Button } from "@/components/common";
+import CustomAlert from "@/components/common/CustomAlert";
 import type { Property } from "@/features/properties/propertyType";
 import { requestPropertyPromotionAPI } from "@/features/seller/sellerAPI";
 import { useAppSelector } from "@/hooks/reduxHooks";
+import { getSellerListingDisplayStatus } from "@/lib/sellerHelpers";
 import PromotionModal from "./PromotionModal";
 
 type Props = {
@@ -44,16 +46,33 @@ const getDaysRemaining = (p: Property): number | null => {
   return Math.ceil(diff / (1000 * 60 * 60 * 24));
 };
 
+const isListingApprovedForPromotion = (p: Property): boolean =>
+  getSellerListingDisplayStatus(p) === "approved";
+
 const SellerPromotionSection: React.FC<Props> = ({ properties, onPromotionSubmitted }) => {
   const authUser = useAppSelector((s) => s.auth.user);
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [promotionBlockedAlertOpen, setPromotionBlockedAlertOpen] = useState(false);
   const [hasUsedFreePromotion, setHasUsedFreePromotion] = useState(Boolean(authUser?.hasUsedFreePromotion));
 
   const items = useMemo(() => (Array.isArray(properties) ? properties : []), [properties]);
 
+  const handlePromoteClick = (property: Property) => {
+    if (!isListingApprovedForPromotion(property)) {
+      setPromotionBlockedAlertOpen(true);
+      return;
+    }
+    setSelectedProperty(property);
+  };
+
   const submitRequest = async (duration: 1 | 3 | 6) => {
     if (!selectedProperty) return;
+    if (!isListingApprovedForPromotion(selectedProperty)) {
+      setSelectedProperty(null);
+      setPromotionBlockedAlertOpen(true);
+      return;
+    }
     try {
       setSubmitting(true);
       const response = await requestPropertyPromotionAPI(selectedProperty._id, {
@@ -183,7 +202,7 @@ const SellerPromotionSection: React.FC<Props> = ({ properties, onPromotionSubmit
                   <div className="mt-1 flex justify-end">
                     <Button
                       className="!w-full !rounded-xl text-sm sm:text-[0.9rem]"
-                      onClick={() => setSelectedProperty(property)}
+                      onClick={() => handlePromoteClick(property)}
                       disabled={submitting}
                     >
                       {property.promotionStatus === "approved" ? "Extend Promotion" : "Promote Now"}
@@ -202,6 +221,13 @@ const SellerPromotionSection: React.FC<Props> = ({ properties, onPromotionSubmit
         onSubmit={submitRequest}
         loading={submitting}
         isFirstPromotionFree={!hasUsedFreePromotion}
+      />
+
+      <CustomAlert
+        open={promotionBlockedAlertOpen}
+        title="Promotion unavailable"
+        message="Only approved property can be promoted."
+        onConfirm={() => setPromotionBlockedAlertOpen(false)}
       />
     </section>
   );

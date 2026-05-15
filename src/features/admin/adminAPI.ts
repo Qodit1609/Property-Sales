@@ -319,6 +319,11 @@ export const rejectPromotionRequestAPI = async (id: string): Promise<Property> =
   return quickNormalize(res.data?.data ?? res.data);
 };
 
+export const repromotePromotionRequestAPI = async (id: string): Promise<Property> => {
+  const res = await api.put(`/properties/${id}/promotion/repromote`);
+  return quickNormalize(res.data?.data ?? res.data);
+};
+
 export const deletePromotionRequestAPI = async (id: string): Promise<Property> => {
   const res = await api.delete(`/properties/${id}/promotion-request`);
   return quickNormalize(res.data?.data ?? res.data);

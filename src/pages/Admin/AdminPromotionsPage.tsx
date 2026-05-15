@@ -2,11 +2,13 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/common";
 import { ToastStack, type ToastMessage } from "@/components/propertyPost/Toast";
 import AdminLayout from "@/components/admin/AdminLayout";
+import AdminConfirmDialog from "@/components/admin/AdminConfirmDialog";
 import type { Property } from "@/features/properties/propertyType";
 import {
   approvePromotionRequestAPI,
   fetchPromotionRequestsAPI,
   rejectPromotionRequestAPI,
+  repromotePromotionRequestAPI,
   deletePromotionRequestAPI,
 } from "@/features/admin/adminAPI";
 
@@ -28,6 +30,7 @@ const AdminPromotionsPage: React.FC = () => {
   const [promotionRequests, setPromotionRequests] = useState<Property[]>([]);
   const [promotionLoading, setPromotionLoading] = useState(false);
   const [promotionActionLoadingId, setPromotionActionLoadingId] = useState<string | null>(null);
+  const [repromoteConfirmId, setRepromoteConfirmId] = useState<string | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   const pushToast = useCallback((t: Omit<ToastMessage, "id">) => {
@@ -92,10 +95,41 @@ const AdminPromotionsPage: React.FC = () => {
     [pushToast, refreshPromotions]
   );
 
+  const handleRepromotePromotion = useCallback(
+    async (id: string) => {
+      try {
+        setPromotionActionLoadingId(id);
+        await repromotePromotionRequestAPI(id);
+        await refreshPromotions();
+        pushToast({ kind: "success", title: "Promotion extended for 30 days" });
+      } finally {
+        setPromotionActionLoadingId(null);
+        setRepromoteConfirmId(null);
+      }
+    },
+    [pushToast, refreshPromotions]
+  );
+
   return (
     <AdminLayout title="Promotion Requests">
       <div className="mx-auto max-w-7xl space-y-5">
         <ToastStack toasts={toasts} onDismiss={dismissToast} />
+        <AdminConfirmDialog
+          open={repromoteConfirmId !== null}
+          title="RePromotion Request"
+          description="This will reset the promotion for 30 days starting from today. Do you want to continue?"
+          confirmLabel="OK"
+          cancelLabel="Cancel"
+          loading={repromoteConfirmId !== null && promotionActionLoadingId === repromoteConfirmId}
+          onClose={() => {
+            if (promotionActionLoadingId === repromoteConfirmId) return;
+            setRepromoteConfirmId(null);
+          }}
+          onConfirm={() => {
+            if (!repromoteConfirmId) return;
+            void handleRepromotePromotion(repromoteConfirmId);
+          }}
+        />
         <section className="rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] p-4 shadow-sm sm:p-5">
           <h3 className="text-base font-semibold text-[var(--b1)]">Promotion Requests</h3>
           <p className="mt-1 text-sm text-[var(--muted)]">Dynamic list of seller promotion requests.</p>
@@ -127,14 +161,25 @@ const AdminPromotionsPage: React.FC = () => {
                   </>
                 ) : null}
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={promotionActionLoadingId === request._id}
-                    onClick={() => handleApprovePromotion(request._id)}
-                  >
-                    Approve
-                  </Button>
+                  {request.promotionStatus !== "approved" ? (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={promotionActionLoadingId === request._id}
+                      onClick={() => handleApprovePromotion(request._id)}
+                    >
+                      Approve
+                    </Button>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={promotionActionLoadingId === request._id}
+                      onClick={() => setRepromoteConfirmId(request._id)}
+                    >
+                      RePromotion Request
+                    </Button>
+                  )}
                   <Button
                     size="sm"
                     variant="outline"
