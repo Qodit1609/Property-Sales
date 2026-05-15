@@ -17,11 +17,18 @@ const SellerNotificationsPage = () => {
   const userId = String(user?.id ?? user?._id ?? "");
   const hasReadNotifications = notifications.some((n) => n.isRead);
 
+  const navigatesToMyProperties = (notificationTitle: string) => {
+    const normalizedTitle = notificationTitle.trim().toLowerCase();
+    return (
+      normalizedTitle === "property approved" || normalizedTitle === "property rejected"
+    );
+  };
+
   const handleNotificationClick = (notificationId: string, notificationTitle: string) => {
     dispatch(markNotificationRead(notificationId));
 
     const normalizedTitle = notificationTitle.trim().toLowerCase();
-    if (normalizedTitle === "property approved") {
+    if (normalizedTitle === "property approved" || normalizedTitle === "property rejected") {
       navigate("/seller/properties");
       return;
     }
@@ -87,6 +94,7 @@ const SellerNotificationsPage = () => {
                 variant="ghost"
                 className={[
                   "w-full items-start gap-3 rounded-xl border px-3 py-2 text-left",
+                  navigatesToMyProperties(n.title) ? "cursor-pointer" : "cursor-default",
                   n.isRead
                     ? "border-[var(--b2-soft)] bg-[var(--b2-soft)]"
                     : "border-[var(--b2)] bg-[var(--white)] shadow-sm",

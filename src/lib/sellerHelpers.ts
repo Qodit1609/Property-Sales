@@ -105,6 +105,15 @@ export function buildDuplicateListingPayload(p: Property): SellerListingPayload 
   };
 }
 
+/** True when admin rejected without allowing seller edit/resubmit. */
+export function isSellerDirectRejectedListing(p: Property): boolean {
+  return (
+    getSellerListingDisplayStatus(p) === "rejected" &&
+    p.rejectionType === "DIRECT" &&
+    p.canResubmit === false
+  );
+}
+
 export function sortPropertiesByRecency(listings: Property[]): Property[] {
   const time = (p: Property) => {
     const raw =

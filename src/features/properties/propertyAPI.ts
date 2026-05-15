@@ -577,6 +577,16 @@ const normalizeProperty = (payload: unknown): Property => {
       approvalStatus: toString(status.approvalStatus),
       postedAt: toString(status.postedAt),
     },
+    rejectionType:
+      String(raw.rejectionType ?? "").toUpperCase() === "DIRECT"
+        ? "DIRECT"
+        : String(raw.rejectionType ?? "").toUpperCase() === "WITH_REASON"
+          ? "WITH_REASON"
+          : undefined,
+    rejectionDescription: toString(raw.rejectionDescription),
+    rejectionMessage: toString(raw.rejectionMessage),
+    canResubmit: typeof raw.canResubmit === "boolean" ? raw.canResubmit : undefined,
+    rejectedAt: toString(raw.rejectedAt),
     soilType: toString(raw.soilType) ?? toString(soilAndFarming.soilType),
     location: {
       address: toString(location.address) ?? toString(raw.address),

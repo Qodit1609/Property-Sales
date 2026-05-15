@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import type { Property } from "../../features/properties/propertyType";
 import {
   getSellerListingDisplayStatus,
+  isSellerDirectRejectedListing,
   sortPropertiesByRecency,
   type SellerListingDisplayStatus,
 } from "../../lib/sellerHelpers";
@@ -222,6 +223,9 @@ function SellerPropertiesTableComponent({
                 const st = getSellerListingDisplayStatus(p);
                 const isDeactivated = st === "deactivated";
                 const isSold = st === "sold";
+                const blockEdit = isSellerDirectRejectedListing(p);
+                const showMoreActionsMenu =
+                  st === "approved" || st === "sold" || st === "deactivated";
                 const img = thumb(p);
                 const menuOpen = openMenu === p._id;
                 return (
@@ -275,7 +279,7 @@ function SellerPropertiesTableComponent({
                           <Eye className="h-3.5 w-3.5" />
                           <span className="hidden xl:inline">{t("sellerPanel.actions.view")}</span>
                         </Link>
-                        {isValidObjectId(p._id) ? (
+                        {isValidObjectId(p._id) && !blockEdit ? (
                           <Link
                             to={`/post-property/basic?edit=${p._id}`}
                             className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]"
@@ -287,6 +291,11 @@ function SellerPropertiesTableComponent({
                           <button
                             type="button"
                             disabled
+                            title={
+                              blockEdit
+                                ? t("sellerPanel.actions.editBlockedDirectReject")
+                                : undefined
+                            }
                             className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--muted)] opacity-60"
                           >
                             <Pencil className="h-3.5 w-3.5" />
@@ -302,89 +311,101 @@ function SellerPropertiesTableComponent({
                           <Copy className="h-3.5 w-3.5" />
                           <span className="hidden xl:inline">{t("sellerPanel.actions.duplicate")}</span>
                         </Button>
-                        <div className="relative inline-block shrink-0 text-left">
+                        {showMoreActionsMenu ? (
+                          <div className="relative inline-block shrink-0 text-left">
+                            <button
+                              type="button"
+                              className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenu(menuOpen ? null : p._id);
+                              }}
+                              aria-expanded={menuOpen}
+                            >
+                              <MoreHorizontal className="h-3.5 w-3.5" />
+                              <span className="hidden xl:inline">{t("sellerPanel.actions.more")}</span>
+                            </button>
+                            {menuOpen ? (
+                              <div
+                                className="absolute right-0 z-50 mt-1 w-48 overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--white)] py-1 shadow-lg"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {isSold ? (
+                                  <button
+                                    type="button"
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                                    onClick={() => {
+                                      onMarkUnsold(p);
+                                      setOpenMenu(null);
+                                    }}
+                                  >
+                                    <RotateCcw className="h-3.5 w-3.5" />
+                                    {t("sellerPanel.actions.markUnsold")}
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                                    onClick={() => {
+                                      onMarkSold(p);
+                                      setOpenMenu(null);
+                                    }}
+                                  >
+                                    <CircleCheck className="h-3.5 w-3.5" />
+                                    {t("sellerPanel.actions.markSold")}
+                                  </button>
+                                )}
+                                {isDeactivated ? (
+                                  <button
+                                    type="button"
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                                    onClick={() => {
+                                      onActivate(p);
+                                      setOpenMenu(null);
+                                    }}
+                                  >
+                                    <RotateCcw className="h-3.5 w-3.5" />
+                                    {t("sellerPanel.actions.activate")}
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                                    onClick={() => {
+                                      onDeactivate(p);
+                                      setOpenMenu(null);
+                                    }}
+                                  >
+                                    <Ban className="h-3.5 w-3.5" />
+                                    {t("sellerPanel.actions.deactivate")}
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  disabled={actionLoading}
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--error)] hover:bg-[var(--error-bg)] disabled:opacity-50"
+                                  onClick={() => {
+                                    onDelete(p._id);
+                                    setOpenMenu(null);
+                                  }}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                  {t("sellerDashboard.delete")}
+                                </button>
+                              </div>
+                            ) : null}
+                          </div>
+                        ) : (
                           <button
                             type="button"
-                            className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setOpenMenu(menuOpen ? null : p._id);
-                            }}
-                            aria-expanded={menuOpen}
+                            disabled={actionLoading}
+                            onClick={() => onDelete(p._id)}
+                            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--error)] transition hover:bg-[var(--error-bg)] disabled:opacity-50"
                           >
-                            <MoreHorizontal className="h-3.5 w-3.5" />
-                            <span className="hidden xl:inline">{t("sellerPanel.actions.more")}</span>
+                            <Trash2 className="h-3.5 w-3.5" />
+                            <span className="hidden xl:inline">{t("sellerDashboard.delete")}</span>
                           </button>
-                          {menuOpen ? (
-                            <div
-                              className="absolute right-0 z-50 mt-1 w-48 overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--white)] py-1 shadow-lg"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {isSold ? (
-                                <button
-                                  type="button"
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
-                                  onClick={() => {
-                                    onMarkUnsold(p);
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  <RotateCcw className="h-3.5 w-3.5" />
-                                  {t("sellerPanel.actions.markUnsold")}
-                                </button>
-                              ) : (
-                                <button
-                                  type="button"
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
-                                  onClick={() => {
-                                    onMarkSold(p);
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  <CircleCheck className="h-3.5 w-3.5" />
-                                  {t("sellerPanel.actions.markSold")}
-                                </button>
-                              )}
-                              {isDeactivated ? (
-                                <button
-                                  type="button"
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
-                                  onClick={() => {
-                                    onActivate(p);
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  <RotateCcw className="h-3.5 w-3.5" />
-                                  {t("sellerPanel.actions.activate")}
-                                </button>
-                              ) : (
-                                <button
-                                  type="button"
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
-                                  onClick={() => {
-                                    onDeactivate(p);
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  <Ban className="h-3.5 w-3.5" />
-                                  {t("sellerPanel.actions.deactivate")}
-                                </button>
-                              )}
-                              <button
-                                type="button"
-                                disabled={actionLoading}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--error)] hover:bg-[var(--error-bg)] disabled:opacity-50"
-                                onClick={() => {
-                                  onDelete(p._id);
-                                  setOpenMenu(null);
-                                }}
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                                {t("sellerDashboard.delete")}
-                              </button>
-                            </div>
-                          ) : null}
-                        </div>
+                        )}
                       </div>
                     </td>
                   </motion.tr>

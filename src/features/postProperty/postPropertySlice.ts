@@ -8,6 +8,7 @@ import {
 } from "../seller/sellerAPI";
 import { fetchPropertyByIdAPI } from "../properties/propertyAPI";
 import type { Property } from "../properties/propertyType";
+import { isSellerDirectRejectedListing } from "../../lib/sellerHelpers";
 import {
   clearPostPropertyDraft,
   loadPostPropertyDraft,
@@ -666,6 +667,11 @@ export const loadEditProperty = createAsyncThunk<
       return rejectWithValue("Invalid property id");
     }
     const property = await fetchPropertyByIdAPI(id);
+    if (isSellerDirectRejectedListing(property)) {
+      return rejectWithValue(
+        "This listing was rejected by admin and cannot be edited or resubmitted for approval."
+      );
+    }
     return mapPropertyToEditState(property);
   } catch (error: unknown) {
     const err = error as { message?: string };

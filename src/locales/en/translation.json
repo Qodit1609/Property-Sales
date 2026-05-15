@@ -806,6 +806,7 @@
     "actions": {
       "view": "View",
       "edit": "Edit",
+      "editBlockedDirectReject": "This listing was rejected by admin and cannot be edited or resubmitted.",
       "duplicate": "Duplicate",
       "more": "More",
       "markSold": "Mark sold",

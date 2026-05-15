@@ -209,4 +209,11 @@ export interface Property {
     postedAt?: string;
   };
   availabilityStatus?: string;
+  /** Set when admin rejects a listing */
+  rejectionType?: "DIRECT" | "WITH_REASON";
+  rejectionDescription?: string;
+  rejectionMessage?: string;
+  /** When false after DIRECT rejection, seller cannot edit or resubmit */
+  canResubmit?: boolean;
+  rejectedAt?: string;
 }

@@ -6,7 +6,6 @@ import {
   ChevronRight,
   Eye,
   EyeOff,
-  Pencil,
   Trash2,
   XCircle,
 } from "lucide-react";
@@ -112,6 +111,10 @@ const AdminPropertiesPage: React.FC = () => {
   }, []);
 
   const [rejectId, setRejectId] = useState<string | null>(null);
+  const [rejectDirectly, setRejectDirectly] = useState(false);
+  const [rejectionDescription, setRejectionDescription] = useState("");
+  const [rejectionMessage, setRejectionMessage] = useState("");
+  const [rejectModalError, setRejectModalError] = useState<string | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [viewGuardAlertOpen, setViewGuardAlertOpen] = useState(false);
   const [viewedIds, setViewedIds] = useState<Set<string>>(() =>
@@ -162,12 +165,19 @@ const AdminPropertiesPage: React.FC = () => {
     return () => window.clearTimeout(timer);
   }, [mutationError, dispatch, pushToast]);
 
-  const openEdit = useCallback(
-    (listing: Property) => {
-      navigate(`/post-property/basic?edit=${listing._id}`);
-    },
-    [navigate]
-  );
+  useEffect(() => {
+    if (!rejectId) {
+      setRejectDirectly(false);
+      setRejectionDescription("");
+      setRejectionMessage("");
+      setRejectModalError(null);
+      return;
+    }
+    setRejectDirectly(false);
+    setRejectionDescription("");
+    setRejectionMessage("");
+    setRejectModalError(null);
+  }, [rejectId]);
 
   const openDetails = useCallback(
     (listing: Property) => {
@@ -197,6 +207,11 @@ const AdminPropertiesPage: React.FC = () => {
     [viewedIds]
   );
 
+  const rejectTargetListing = useMemo(
+    () => (rejectId ? listings.find((l) => l._id === rejectId) : undefined),
+    [listings, rejectId]
+  );
+
   const handleApprove = (listing: Property) => {
     if (!isListingViewed(listing)) {
       setViewGuardAlertOpen(true);
@@ -213,7 +228,31 @@ const AdminPropertiesPage: React.FC = () => {
 
   const submitReject = () => {
     if (!rejectId) return;
-    dispatch(rejectListing(rejectId))
+    if (!rejectDirectly) {
+      const d = rejectionDescription.trim();
+      const m = rejectionMessage.trim();
+      if (!d || !m) {
+        setRejectModalError("Please enter both a short description and a suggestion/message.");
+        return;
+      }
+    }
+    setRejectModalError(null);
+    const payload = rejectDirectly
+      ? {
+          id: rejectId,
+          rejectionType: "DIRECT" as const,
+          rejectionDescription: "",
+          rejectionMessage: "",
+          canResubmit: false,
+        }
+      : {
+          id: rejectId,
+          rejectionType: "WITH_REASON" as const,
+          rejectionDescription: rejectionDescription.trim(),
+          rejectionMessage: rejectionMessage.trim(),
+          canResubmit: true,
+        };
+    dispatch(rejectListing(payload))
       .unwrap()
       .then(() => {
         pushToast({ kind: "success", title: "Property rejected" });
@@ -362,7 +401,6 @@ const AdminPropertiesPage: React.FC = () => {
                   onApprove={() => handleApprove(listing)}
                   onReject={() => setRejectId(listing._id)}
                   onOpenDetails={() => openDetails(listing)}
-                  onEdit={() => openEdit(listing)}
                   onDelete={() => setDeleteId(listing._id)}
                   actionBtn={actionBtn}
                 />
@@ -496,20 +534,6 @@ const AdminPropertiesPage: React.FC = () => {
                             disabled={actionLoading || !isListingViewed(listing)}
                             onClick={(e) => {
                               e.stopPropagation();
-                              openEdit(listing);
-                            }}
-                            className={`${actionBtn} border-[var(--b2)]`}
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                            Edit
-                          </Button>
-                          <Button
-                            type="button"
-                            size="sm"
-                            variant="outline"
-                            disabled={actionLoading || !isListingViewed(listing)}
-                            onClick={(e) => {
-                              e.stopPropagation();
                               setDeleteId(listing._id);
                             }}
                             className={`${actionBtn} border-rose-500/40 text-rose-700`}
@@ -575,11 +599,11 @@ const AdminPropertiesPage: React.FC = () => {
 
         {rejectId && (
           <Modal
-            title="Reject listing?"
+            title="Reject listing"
             onClose={() => setRejectId(null)}
             footer={
               <>
-                <Button variant="outline" onClick={() => setRejectId(null)}>
+                <Button variant="outline" onClick={() => setRejectId(null)} disabled={actionLoading}>
                   Cancel
                 </Button>
                 <Button onClick={submitReject} disabled={actionLoading}>
@@ -588,9 +612,72 @@ const AdminPropertiesPage: React.FC = () => {
               </>
             }
           >
-            <p className="text-sm text-[var(--muted)]">
-              The server will record a default reason. Confirm to reject.
-            </p>
+            <div className="space-y-4 text-sm text-[var(--b1)]">
+              <div>
+                <label
+                  htmlFor="admin-reject-property-name"
+                  className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--b1-mid)]"
+                >
+                  Property name
+                </label>
+                <Input
+                  id="admin-reject-property-name"
+                  readOnly
+                  value={rejectTargetListing?.title || "Untitled"}
+                  className="border-[var(--b2)] bg-[var(--b2-soft)]/40 text-sm"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="admin-reject-description"
+                  className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--b1-mid)]"
+                >
+                  Short description
+                </label>
+                <textarea
+                  id="admin-reject-description"
+                  rows={3}
+                  disabled={rejectDirectly || actionLoading}
+                  value={rejectionDescription}
+                  onChange={(e) => setRejectionDescription(e.target.value)}
+                  className={`${filterSelectClass} min-h-[88px] resize-y py-2.5`}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="admin-reject-message"
+                  className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--b1-mid)]"
+                >
+                  Suggestion / message
+                </label>
+                <textarea
+                  id="admin-reject-message"
+                  rows={3}
+                  disabled={rejectDirectly || actionLoading}
+                  value={rejectionMessage}
+                  onChange={(e) => setRejectionMessage(e.target.value)}
+                  className={`${filterSelectClass} min-h-[88px] resize-y py-2.5`}
+                />
+              </div>
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-[var(--b1)]">
+                <input
+                  type="checkbox"
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-[var(--b2)] text-[var(--b1-mid)] focus:ring-[var(--b1-mid)]"
+                  checked={rejectDirectly}
+                  disabled={actionLoading}
+                  onChange={(e) => {
+                    setRejectDirectly(e.target.checked);
+                    setRejectModalError(null);
+                  }}
+                />
+                <span>Reject directly without giving any reason</span>
+              </label>
+              {rejectModalError ? (
+                <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                  {rejectModalError}
+                </p>
+              ) : null}
+            </div>
           </Modal>
         )}
 
@@ -672,7 +759,6 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
   onApprove,
   onReject,
   onOpenDetails,
-  onEdit,
   onDelete,
   actionBtn,
 }: {
@@ -682,7 +768,6 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
   onApprove: () => void;
   onReject: () => void;
   onOpenDetails: () => void;
-  onEdit: () => void;
   onDelete: () => void;
   actionBtn: string;
 }) {
@@ -754,16 +839,6 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
           className={`${actionBtn} border-amber-500/40 text-amber-800`}
         >
           Reject
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          disabled={actionLoading || !isViewed}
-          onClick={onEdit}
-          className={`${actionBtn} border-[var(--b2)]`}
-        >
-          Edit
         </Button>
         <Button
           type="button"

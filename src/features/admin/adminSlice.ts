@@ -17,6 +17,7 @@ import {
   type AdminListingsPagination,
   type AdminCreatePropertyPayload,
   type AdminUpdatePropertyPayload,
+  type AdminRejectListingBody,
 } from "./adminAPI";
 import type {
   ActivityLogEntry,
@@ -234,13 +235,21 @@ export const approveListing = createAsyncThunk<
   }
 });
 
+export type RejectListingThunkArg =
+  | string
+  | ({ id: string } & AdminRejectListingBody);
+
 export const rejectListing = createAsyncThunk<
   Property,
-  string,
+  RejectListingThunkArg,
   { rejectValue: string }
->("admin/rejectListing", async (id, { rejectWithValue }) => {
+>("admin/rejectListing", async (arg, { rejectWithValue }) => {
   try {
-    return await rejectListingAPI(id);
+    if (typeof arg === "string") {
+      return await rejectListingAPI(arg);
+    }
+    const { id, ...body } = arg;
+    return await rejectListingAPI(id, body);
   } catch (error: unknown) {
     const err = error as { message?: string };
     const message = err.message ?? "Failed to reject listing";
