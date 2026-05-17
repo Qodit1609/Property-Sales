@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import Modal from "../../components/Modal/Modal";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { Input, Button } from "@/components/common";
@@ -14,6 +15,7 @@ type AgentPropertyRow = {
 };
 
 const AgentPropertiesPage: React.FC = () => {
+  const { t } = useTranslation();
   const { data } = useAppSelector((state) => state.properties);
 
   const initialRows = useMemo<AgentPropertyRow[]>(() => {
@@ -50,10 +52,10 @@ const AgentPropertiesPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold text-[var(--b1)]">
-            My Properties
+            {t("agentPanel.propertiesPage.title")}
           </h1>
           <p className="mt-1 text-xs text-[var(--muted)]">
-            Manage your assigned inventory.
+            {t("agentPanel.propertiesPage.subtitle")}
           </p>
         </div>
       </div>
@@ -62,10 +64,18 @@ const AgentPropertiesPage: React.FC = () => {
         <table className="min-w-[900px] w-full text-sm">
           <thead className="bg-[var(--b2-soft)] text-[var(--b1)]">
             <tr>
-              <th className="px-4 py-3 text-left font-semibold">Property</th>
-              <th className="px-4 py-3 text-left font-semibold">Price</th>
-              <th className="px-4 py-3 text-left font-semibold">Status</th>
-              <th className="px-4 py-3 text-right font-semibold">Actions</th>
+              <th className="px-4 py-3 text-left font-semibold">
+                {t("agentPanel.propertiesPage.property")}
+              </th>
+              <th className="px-4 py-3 text-left font-semibold">
+                {t("agentPanel.propertiesPage.price")}
+              </th>
+              <th className="px-4 py-3 text-left font-semibold">
+                {t("agentPanel.propertiesPage.status")}
+              </th>
+              <th className="px-4 py-3 text-right font-semibold">
+                {t("agentPanel.propertiesPage.actions")}
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--b2)]">
@@ -73,14 +83,14 @@ const AgentPropertiesPage: React.FC = () => {
               <tr key={r.id} className="hover:bg-[var(--b2-soft)]">
                 <td className="px-4 py-3">
                   <p className="font-medium text-[var(--b1)]">
-                    {r.title || "Untitled"}
+                    {r.title || t("agentPanel.propertiesPage.untitled")}
                   </p>
                   <p className="text-xs text-[var(--muted)] line-clamp-1">
                     {r.address}
                   </p>
                 </td>
                 <td className="px-4 py-3">
-                  ₹ {r.price?.toLocaleString("en-IN") ?? "N/A"}
+                  ₹ {r.price?.toLocaleString("en-IN") ?? t("common.na")}
                 </td>
                 <td className="px-4 py-3">
                   <select
@@ -96,9 +106,9 @@ const AgentPropertiesPage: React.FC = () => {
                     }
                     className="rounded-md border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
                   >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="sold">Sold</option>
+                    <option value="active">{t("agentPanel.propertiesPage.statusActive")}</option>
+                    <option value="inactive">{t("agentPanel.propertiesPage.statusInactive")}</option>
+                    <option value="sold">{t("agentPanel.propertiesPage.statusSold")}</option>
                   </select>
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -108,14 +118,14 @@ const AgentPropertiesPage: React.FC = () => {
                       onClick={() => onEdit(r)}
                       className="inline-flex items-center gap-1 rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-1 text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
                     >
-                      Edit
+                      {t("agentPanel.propertiesPage.edit")}
                     </Button>
                     <Button
                       type="button"
                       onClick={() => onDelete(r)}
                       className="inline-flex items-center gap-1 rounded-md border border-[var(--error)] bg-[var(--error-bg)] px-3 py-1 text-xs font-medium text-[var(--error)] hover:opacity-80 transition"
                     >
-                      Delete
+                      {t("agentPanel.propertiesPage.delete")}
                     </Button>
                   </div>
                 </td>
@@ -127,7 +137,7 @@ const AgentPropertiesPage: React.FC = () => {
                   colSpan={4}
                   className="px-4 py-6 text-center text-sm text-[var(--muted)]"
                 >
-                  No properties assigned.
+                  {t("agentPanel.propertiesPage.empty")}
                 </td>
               </tr>
             )}
@@ -138,7 +148,7 @@ const AgentPropertiesPage: React.FC = () => {
       <Modal
         open={Boolean(editing)}
         onClose={() => setEditing(null)}
-        title="Edit Property"
+        title={t("agentPanel.propertiesPage.editTitle")}
       >
         {editing && (
           <EditForm
@@ -152,13 +162,14 @@ const AgentPropertiesPage: React.FC = () => {
       <Modal
         open={Boolean(confirmDelete)}
         onClose={() => setConfirmDelete(null)}
-        title="Delete Property"
+        title={t("agentPanel.propertiesPage.deleteTitle")}
       >
         {confirmDelete && (
           <div className="space-y-4">
             <p className="text-sm text-[var(--b1)]">
-              Are you sure you want to delete{" "}
-              <span className="font-semibold">{confirmDelete.title}</span>?
+              {t("agentPanel.propertiesPage.deleteConfirm", {
+                name: confirmDelete.title,
+              })}
             </p>
             <div className="flex justify-end gap-2">
               <Button
@@ -166,14 +177,14 @@ const AgentPropertiesPage: React.FC = () => {
                 onClick={() => setConfirmDelete(null)}
                 className="rounded-md border border-[var(--b2)] bg-[var(--white)] px-4 py-2 text-sm"
               >
-                Cancel
+                {t("common.cancel")}
               </Button>
               <Button
                 type="button"
                 onClick={() => applyDelete(confirmDelete.id)}
                 className="rounded-md border border-[var(--error)] bg-[var(--error-bg)] px-4 py-2 text-sm font-semibold text-[var(--error)] hover:opacity-80 transition"
               >
-                Delete
+                {t("agentPanel.propertiesPage.delete")}
               </Button>
             </div>
           </div>
@@ -192,6 +203,7 @@ function EditForm({
   onCancel: () => void;
   onSave: (next: AgentPropertyRow) => void;
 }) {
+  const { t } = useTranslation();
   const [title, setTitle] = useState(value.title);
   const [address, setAddress] = useState(value.address);
   const [price, setPrice] = useState(String(value.price ?? ""));
@@ -213,14 +225,14 @@ function EditForm({
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Title"
+          placeholder={t("agentPanel.propertiesPage.titlePlaceholder")}
           className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
           required
         />
         <Input
           value={price}
           onChange={(e) => setPrice(e.target.value)}
-          placeholder="Price"
+          placeholder={t("agentPanel.propertiesPage.pricePlaceholder")}
           inputMode="numeric"
           className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
           required
@@ -229,7 +241,7 @@ function EditForm({
       <Input
         value={address}
         onChange={(e) => setAddress(e.target.value)}
-        placeholder="Address"
+        placeholder={t("agentPanel.propertiesPage.addressPlaceholder")}
         className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)]"
       />
 
@@ -239,13 +251,13 @@ function EditForm({
           onClick={onCancel}
           className="w-full sm:w-auto rounded-md border border-[var(--b2)] px-4 py-2 text-sm"
         >
-          Cancel
+          {t("common.cancel")}
         </Button>
         <Button
           type="submit"
           className="w-full sm:w-auto rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] hover:bg-[var(--b1)] transition"
         >
-          Save
+          {t("agentPanel.propertiesPage.save")}
         </Button>
       </div>
     </form>

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/common";
 import { ToastStack, type ToastMessage } from "@/components/propertyPost/Toast";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -27,6 +28,7 @@ const getRemainingDays = (expiry?: string | null) => {
 };
 
 const AdminPromotionsPage: React.FC = () => {
+  const { t } = useTranslation();
   const [promotionRequests, setPromotionRequests] = useState<Property[]>([]);
   const [promotionLoading, setPromotionLoading] = useState(false);
   const [promotionActionLoadingId, setPromotionActionLoadingId] = useState<string | null>(null);
@@ -73,7 +75,7 @@ const AdminPromotionsPage: React.FC = () => {
         setPromotionActionLoadingId(id);
         await approvePromotionRequestAPI(id);
         await refreshPromotions();
-        pushToast({ kind: "success", title: "Promotion approved" });
+        pushToast({ kind: "success", title: t("adminPanel.promotions.toast.approved") });
       } finally {
         setPromotionActionLoadingId(null);
       }
@@ -87,7 +89,7 @@ const AdminPromotionsPage: React.FC = () => {
         setPromotionActionLoadingId(id);
         await rejectPromotionRequestAPI(id);
         await refreshPromotions();
-        pushToast({ kind: "success", title: "Promotion rejected" });
+        pushToast({ kind: "success", title: t("adminPanel.promotions.toast.rejected") });
       } finally {
         setPromotionActionLoadingId(null);
       }
@@ -101,7 +103,7 @@ const AdminPromotionsPage: React.FC = () => {
         setPromotionActionLoadingId(id);
         await repromotePromotionRequestAPI(id);
         await refreshPromotions();
-        pushToast({ kind: "success", title: "Promotion extended for 30 days" });
+        pushToast({ kind: "success", title: t("adminPanel.promotions.toast.extended") });
       } finally {
         setPromotionActionLoadingId(null);
         setRepromoteConfirmId(null);
@@ -111,15 +113,14 @@ const AdminPromotionsPage: React.FC = () => {
   );
 
   return (
-    <AdminLayout title="Promotion Requests">
+    <AdminLayout title={t("adminPanel.promotions.title")}>
       <div className="mx-auto max-w-7xl space-y-5">
         <ToastStack toasts={toasts} onDismiss={dismissToast} />
         <AdminConfirmDialog
           open={repromoteConfirmId !== null}
-          title="RePromotion Request"
-          description="This will reset the promotion for 30 days starting from today. Do you want to continue?"
-          confirmLabel="OK"
-          cancelLabel="Cancel"
+          title={t("adminPanel.promotions.repromoteTitle")}
+          description={t("adminPanel.promotions.repromoteDescription")}
+          confirmLabel={t("common.ok")}
           loading={repromoteConfirmId !== null && promotionActionLoadingId === repromoteConfirmId}
           onClose={() => {
             if (promotionActionLoadingId === repromoteConfirmId) return;
@@ -131,32 +132,48 @@ const AdminPromotionsPage: React.FC = () => {
           }}
         />
         <section className="rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] p-4 shadow-sm sm:p-5">
-          <h3 className="text-base font-semibold text-[var(--b1)]">Promotion Requests</h3>
-          <p className="mt-1 text-sm text-[var(--muted)]">Dynamic list of seller promotion requests.</p>
-          {promotionLoading ? <p className="mt-3 text-sm text-[var(--muted)]">Loading requests...</p> : null}
+          <h3 className="text-base font-semibold text-[var(--b1)]">{t("adminPanel.promotions.heading")}</h3>
+          <p className="mt-1 text-sm text-[var(--muted)]">{t("adminPanel.promotions.subtitle")}</p>
+          {promotionLoading ? <p className="mt-3 text-sm text-[var(--muted)]">{t("adminPanel.promotions.loading")}</p> : null}
           {!promotionLoading && promotionRequests.length === 0 ? (
-            <p className="mt-3 text-sm text-[var(--muted)]">No promotion requests found.</p>
+            <p className="mt-3 text-sm text-[var(--muted)]">{t("adminPanel.promotions.empty")}</p>
           ) : null}
           <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
             {promotionRequests.map((request) => (
               <article key={request._id} className="rounded-xl border border-[var(--b2)] bg-[var(--white)] p-4">
-                <p className="text-sm text-[var(--muted)]">Seller: {request.seller?.name ?? "Unknown"}</p>
+                <p className="text-sm text-[var(--muted)]">
+                  {t("adminPanel.promotions.seller", {
+                    name: request.seller?.name ?? t("common.unknown"),
+                  })}
+                </p>
                 <p className="mt-1 text-base font-semibold text-[var(--b1)]">{request.title}</p>
                 <p className="mt-1 text-sm text-[var(--muted)]">
-                  Requested Duration: {request.requestedDuration ?? "-"} month(s)
+                  {t("adminPanel.promotions.requestedDuration", {
+                    months: request.requestedDuration ?? "-",
+                  })}
                 </p>
-                <p className="mt-1 text-sm text-[var(--muted)]">Status: {request.promotionStatus ?? "none"}</p>
+                <p className="mt-1 text-sm text-[var(--muted)]">
+                  {t("adminPanel.promotions.statusLine", {
+                    status: request.promotionStatus ?? "none",
+                  })}
+                </p>
                 {request.promotionStatus === "approved" ? (
                   <>
                     <p className="mt-1 text-sm text-[var(--muted)]">
-                      Approved At: {formatDateTime(request.approvedAt)}
+                      {t("adminPanel.promotions.approvedAt", {
+                        date: formatDateTime(request.approvedAt),
+                      })}
                     </p>
                     <p className="mt-1 text-sm text-[var(--muted)]">
-                      Live Duration: {formatDateTime(request.approvedAt)} to{" "}
-                      {formatDateTime(request.featuredExpiryDate)}
+                      {t("adminPanel.promotions.liveDuration", {
+                        from: formatDateTime(request.approvedAt),
+                        to: formatDateTime(request.featuredExpiryDate),
+                      })}
                     </p>
                     <p className="mt-1 text-sm text-[var(--muted)]">
-                      Remaining Days Left: {getRemainingDays(request.featuredExpiryDate) ?? "-"}
+                      {t("adminPanel.promotions.remainingDays", {
+                        days: getRemainingDays(request.featuredExpiryDate) ?? "-",
+                      })}
                     </p>
                   </>
                 ) : null}
@@ -168,7 +185,7 @@ const AdminPromotionsPage: React.FC = () => {
                       disabled={promotionActionLoadingId === request._id}
                       onClick={() => handleApprovePromotion(request._id)}
                     >
-                      Approve
+                      {t("common.approve")}
                     </Button>
                   ) : (
                     <Button
@@ -177,7 +194,7 @@ const AdminPromotionsPage: React.FC = () => {
                       disabled={promotionActionLoadingId === request._id}
                       onClick={() => setRepromoteConfirmId(request._id)}
                     >
-                      RePromotion Request
+                      {t("adminPanel.promotions.repromote")}
                     </Button>
                   )}
                   <Button
@@ -186,7 +203,7 @@ const AdminPromotionsPage: React.FC = () => {
                     disabled={promotionActionLoadingId === request._id}
                     onClick={() => handleRejectPromotion(request._id)}
                   >
-                    Reject
+                    {t("common.reject")}
                   </Button>
                   {request.promotionStatus === "rejected" ? (
                     <Button
@@ -199,13 +216,13 @@ const AdminPromotionsPage: React.FC = () => {
                           setPromotionActionLoadingId(request._id);
                           await deletePromotionRequestAPI(request._id);
                           await refreshPromotions();
-                          pushToast({ kind: "success", title: "Promotion request deleted" });
+                          pushToast({ kind: "success", title: t("adminPanel.promotions.toast.deleted") });
                         } finally {
                           setPromotionActionLoadingId(null);
                         }
                       }}
                     >
-                      Delete
+                      {t("common.delete")}
                     </Button>
                   ) : null}
                 </div>

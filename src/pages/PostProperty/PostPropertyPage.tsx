@@ -57,7 +57,7 @@ export default function PostPropertyPage() {
     return (
       <CustomAlert
         open={unauthorizedAlert.open}
-        title="Access Restricted"
+        title={t("adminPanel.toast.accessRestricted")}
         message={unauthorizedAlert.message}
         onConfirm={() => {
           setUnauthorizedAlert((prev) => ({ ...prev, open: false }));

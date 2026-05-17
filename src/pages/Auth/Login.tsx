@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { loginUser, resetError } from "../../features/auth/authSlice";
@@ -29,6 +30,7 @@ function pathAllowedForRole(pathname: string, role: AppRole | undefined): boolea
 }
 
 const Login: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -132,7 +134,7 @@ const Login: React.FC = () => {
           <Button
                       type="button"
                       onClick={() => navigate("/", { replace: true })}
-                      aria-label="Close"
+                      aria-label={t("common.close")}
                       className="absolute right-4 top-4 h-8 w-8 flex items-center justify-center rounded-full bg-[var(--b2-soft)] text-[var(--b1)] hover:bg-[var(--b2)] transition"
                     >
                       ✕
@@ -142,13 +144,13 @@ const Login: React.FC = () => {
           <div className="mb-5 flex justify-center">
             {/* replace with real logo if available */}
             <span className="text-2xl font-bold text-[var(--b1)]">
-              BhoomiWala
+              {t("auth.brand")}
             </span>
           </div>
 
-          <h1 className="mb-1 text-center text-2xl font-semibold">Sign in</h1>
+          <h1 className="mb-1 text-center text-2xl font-semibold">{t("auth.login.title")}</h1>
           <p className="mb-5 text-center text-xs text-[var(--muted)]">
-            Access your dashboard and saved activity.
+            {t("auth.login.subtitle")}
           </p>
 
           {error && (
@@ -163,7 +165,7 @@ const Login: React.FC = () => {
                 htmlFor="email"
                 className="mb-1 block text-sm font-medium"
               >
-                Email
+                {t("auth.fields.email")}
               </label>
               <Input
                 id="email"
@@ -171,7 +173,7 @@ const Login: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-[var(--b2)] focus:border-[var(--b2)] transition"
-                placeholder="Enter your email"
+                placeholder={t("auth.placeholders.email")}
                 required
               />
             </div>
@@ -181,7 +183,7 @@ const Login: React.FC = () => {
                 htmlFor="password"
                 className="mb-1 block text-sm font-medium"
               >
-                Password
+                {t("auth.fields.password")}
               </label>
               <div className="relative">
                 <Input
@@ -197,9 +199,9 @@ const Login: React.FC = () => {
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-transparent px-2 py-1 text-sm font-medium hover:border-[var(--b2)] hover:bg-[var(--b1-mid)] transition"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label={showPassword ? t("auth.actions.hidePassword") : t("auth.actions.showPassword")}
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  {showPassword ? t("auth.actions.hide") : t("auth.actions.show")}
                 </Button>
               </div>
             </div>
@@ -210,13 +212,13 @@ const Login: React.FC = () => {
                   type="checkbox"
                   className="h-4 w-4 rounded border border-[var(--b2)] text-[var(--b1)] accent-[var(--b1)] focus:ring-[var(--b2)]"
                 />
-                Remember me
+                {t("auth.login.rememberMe")}
               </label>
               <a
                 href="#"
                 className="text-xs text-[var(--b1-mid)] hover:text-[var(--b1)] whitespace-nowrap"
               >
-                Forgot password?
+                {t("auth.login.forgotPassword")}
               </a>
             </div>
 
@@ -225,16 +227,16 @@ const Login: React.FC = () => {
               disabled={loading}
               className="w-full inline-flex justify-center items-center rounded-md bg-[var(--b1-mid)] px-4 py-2.5 text-sm font-semibold text-[var(--fg)] shadow-md hover:bg-[var(--b1)] transition disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? t("auth.login.submitting") : t("auth.login.submit")}
             </Button>
 
             <p className="pt-1 text-center text-xs text-[var(--muted)]">
-              New here?{" "}
+              {t("auth.login.newHere")}{" "}
               <Link
                 to="/register"
                 className="text-[var(--b1-mid)] hover:text-[var(--b1)]"
               >
-                Register here
+                {t("auth.login.registerLink")}
               </Link>
             </p>
           </form>
@@ -242,8 +244,8 @@ const Login: React.FC = () => {
       </div>
       <CustomAlert
         open={blockedAlertOpen}
-        title="Alert"
-        message="You are blocked by Admin"
+        title={t("auth.blocked.title")}
+        message={t("auth.blocked.message")}
         onConfirm={() => setBlockedAlertOpen(false)}
       />
     </div>

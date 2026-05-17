@@ -34,7 +34,7 @@ const MediaGallery = ({ title, images = [], videos = [], droneView, mapScreensho
               <img
                 key={`${src}-${index}`}
                 src={src}
-                alt={`${title} ${index + 1}`}
+                alt={t("propertyPreview.aria.imageAlt", { title, index: index + 1 })}
                 className="h-36 w-56 shrink-0 rounded-lg border border-[var(--b2-soft)] object-cover"
               />
             ))}
@@ -75,7 +75,7 @@ const MediaGallery = ({ title, images = [], videos = [], droneView, mapScreensho
           >
             <img
               src={mapScreenshot}
-              alt={`${title} map screenshot`}
+              alt={t("propertyPreview.aria.mapScreenshotAlt", { title })}
               className="h-44 w-full object-cover"
             />
           </a>

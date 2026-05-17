@@ -1,7 +1,7 @@
 import type { Property } from "../../features/properties/propertyType";
 import PropertyFeatureList from "./PropertyFeatureList";
 import { useTranslation } from "react-i18next";
-import { translateSoilType } from "./previewUtils";
+import { translateDynamicList, translateSoilType } from "./previewUtils";
 
 type PropertyFarmingProps = {
   property: Property;
@@ -10,11 +10,9 @@ type PropertyFarmingProps = {
 const PropertyFarming = ({ property }: PropertyFarmingProps) => {
   const { t } = useTranslation();
   const farming = property.soilAndFarming;
-  const cropSuitability = Array.isArray(farming?.cropSuitability)
-    ? farming.cropSuitability.filter(Boolean).join(", ")
-    : typeof farming?.cropSuitability === "string"
-      ? farming.cropSuitability
-      : undefined;
+  const cropSuitability = translateDynamicList(
+    farming?.cropSuitability?.filter(Boolean),
+  )?.join(", ");
 
   const rainfallData =
     typeof farming?.rainfallData === "string"
@@ -22,7 +20,7 @@ const PropertyFarming = ({ property }: PropertyFarmingProps) => {
       : farming?.rainfallData
         ? [
             farming.rainfallData.annualRainfall
-              ? `${farming.rainfallData.annualRainfall} mm/year`
+              ? `${farming.rainfallData.annualRainfall} ${t("propertyPreview.units.mmPerYear")}`
               : undefined,
             farming.rainfallData.irrigationSupport === true
               ? t("propertyPreview.messages.irrigationSupportAvailable")
@@ -52,7 +50,10 @@ const PropertyFarming = ({ property }: PropertyFarmingProps) => {
     { label: t("propertyPreview.labels.rainfallData"), value: rainfallData },
     {
       label: t("propertyPreview.labels.farmingPercent"),
-      value: typeof farmingPercent === "number" ? `${farmingPercent}%` : undefined,
+      value:
+        typeof farmingPercent === "number"
+          ? `${farmingPercent}${t("propertyPreview.units.percent")}`
+          : undefined,
     },
   ].filter((item): item is { label: string; value: string } => Boolean(item.value));
 

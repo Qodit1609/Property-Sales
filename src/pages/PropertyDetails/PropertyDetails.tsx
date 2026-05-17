@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import { fetchPropertyById } from "../../features/properties/propertySlice";
@@ -12,6 +13,7 @@ import { Button } from "@/components/common";
 const ADMIN_VIEWED_STORAGE_KEY = "admin_viewed_property_ids";
 
 const PropertyDetails = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -69,14 +71,14 @@ const PropertyDetails = () => {
       <div className="pt-24 px-4">
         <div className="mx-auto max-w-2xl rounded-xl border border-red-200 bg-red-50 p-6 text-center">
           <p className="text-lg font-semibold text-red-700">
-            Unable to load property details
+            {t("propertyDetails.loadFailedTitle")}
           </p>
           <p className="mt-2 text-sm text-red-600">{selectedError}</p>
           <Button
             onClick={() => navigate(-1)}
             className="mt-4 bg-[var(--b1)] text-[var(--fg)]"
           >
-            Go Back
+            {t("propertyDetails.goBack")}
           </Button>
         </div>
       </div>
@@ -88,16 +90,16 @@ const PropertyDetails = () => {
       <div className="pt-24 px-4">
         <div className="mx-auto max-w-2xl rounded-xl border border-[var(--b2-soft)] bg-white p-6 text-center">
           <p className="text-lg font-semibold text-[var(--b1)]">
-            Property not found
+            {t("propertyDetails.notFoundTitle")}
           </p>
           <p className="mt-2 text-sm text-[var(--muted)]">
-            The property may have been removed or is unavailable.
+            {t("propertyDetails.notFoundBody")}
           </p>
           <Button
             onClick={() => navigate("/")}
             className="mt-4 bg-[var(--b1)] text-[var(--fg)]"
           >
-            Back to Home
+            {t("propertyDetails.backToHome")}
           </Button>
         </div>
       </div>

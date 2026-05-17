@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Briefcase,
   Camera,
@@ -105,6 +106,7 @@ function AccountSkeleton() {
 }
 
 const AdminAccountPage: React.FC = () => {
+  const { t } = useTranslation();
   const authUser = useAppSelector((s) => s.auth.user);
   const userId = String(authUser?.id ?? authUser?._id ?? "");
   const profileIdentity = userId || authUser?.email || undefined;
@@ -122,12 +124,12 @@ const AdminAccountPage: React.FC = () => {
   const [completionAlertOpen, setCompletionAlertOpen] = useState(false);
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  const pushToast = useCallback((t: Omit<ToastMessage, "id">) => {
+  const pushToast = useCallback((toast: Omit<ToastMessage, "id">) => {
     const id =
       typeof crypto !== "undefined" && crypto.randomUUID
         ? crypto.randomUUID()
         : String(Date.now());
-    setToasts((prev) => [...prev, { id, ...t }]);
+    setToasts((prev) => [...prev, { id, ...toast }]);
   }, []);
   const dismissToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((x) => x.id !== id));
@@ -178,8 +180,8 @@ const AdminAccountPage: React.FC = () => {
       setLoading(false);
       pushToast({
         kind: "error",
-        title: "Not signed in",
-        detail: "Sign in again to manage your account.",
+        title: t("adminPanel.account.toast.notSignedIn"),
+        detail: t("adminPanel.account.toast.notSignedInDetail"),
       });
       return;
     }
@@ -197,7 +199,7 @@ const AdminAccountPage: React.FC = () => {
     } catch (e) {
       pushToast({
         kind: "error",
-        title: "Could not load profile",
+        title: t("adminPanel.account.toast.loadFailed"),
         detail: e instanceof Error ? e.message : "Unknown error",
       });
     } finally {
@@ -260,18 +262,18 @@ const AdminAccountPage: React.FC = () => {
       if (!userId || !rawUser) return;
       const errBasic = validateBasicInfo(form);
       if (errBasic) {
-        pushToast({ kind: "error", title: "Validation", detail: errBasic });
+        pushToast({ kind: "error", title: t("adminPanel.account.toast.validation"), detail: errBasic });
         return;
       }
       const errAddr = validateAddress(form);
       if (errAddr) {
-        pushToast({ kind: "error", title: "Validation", detail: errAddr });
+        pushToast({ kind: "error", title: t("adminPanel.account.toast.validation"), detail: errAddr });
         return;
       }
       if (section === "security" || section === "all") {
         const pErr = validatePasswordChange(pwd.current, pwd.next, pwd.confirm);
         if (pErr) {
-          pushToast({ kind: "error", title: "Password", detail: pErr });
+          pushToast({ kind: "error", title: t("adminPanel.account.toast.password"), detail: pErr });
           return;
         }
       }
@@ -308,7 +310,11 @@ const AdminAccountPage: React.FC = () => {
         setPwd({ current: "", next: "", confirm: "" });
         if (section === "all") setEditing(new Set());
         else stopEdit(section);
-        pushToast({ kind: "success", title: "Saved", detail: "Your profile was updated." });
+        pushToast({
+          kind: "success",
+          title: t("adminPanel.account.toast.saved"),
+          detail: t("adminPanel.account.toast.savedDetail"),
+        });
         const updatedCompletionChecks = [
           updated.basicInfo.fullName.trim(),
           updated.basicInfo.email.trim(),
@@ -331,7 +337,7 @@ const AdminAccountPage: React.FC = () => {
       } catch (e) {
         pushToast({
           kind: "error",
-          title: "Save failed",
+          title: t("adminPanel.account.toast.saveFailed"),
           detail: e instanceof Error ? e.message : "Unknown error",
         });
       } finally {
@@ -355,37 +361,37 @@ const AdminAccountPage: React.FC = () => {
 
   if (!userId) {
     return (
-      <AdminLayout title="My Account">
-        <p className="text-sm text-[var(--muted)]">You need to be logged in as an admin.</p>
+      <AdminLayout title={t("adminPanel.account.title")}>
+        <p className="text-sm text-[var(--muted)]">{t("adminPanel.account.signInRequired")}</p>
       </AdminLayout>
     );
   }
 
   return (
-    <AdminLayout title="My Account">
+    <AdminLayout title={t("adminPanel.account.title")}>
       <div className="mx-auto max-w-4xl space-y-6">
         <ToastStack toasts={toasts} onDismiss={dismissToast} />
 
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-lg font-semibold text-[var(--b1)] sm:text-xl">
-              My account
+              {t("adminPanel.account.pageTitle")}
             </h1>
             <p className="mt-1 text-sm text-[var(--muted)]">
-              View and update your admin profile, security, and preferences.
+              {t("adminPanel.account.pageSubtitle")}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             {editing.size === 0 ? (
               <Button type="button" variant="primary" onClick={startEditAll}>
                 <Pencil className="mr-1.5 h-4 w-4" />
-                Edit profile
+                {t("adminPanel.account.editProfile")}
               </Button>
             ) : (
               <>
                 <Button type="button" variant="ghost" onClick={cancelAll}>
                   <X className="mr-1.5 h-4 w-4" />
-                  Cancel all
+                  {t("adminPanel.account.cancelAll")}
                 </Button>
                 <Button
                   type="button"
@@ -396,7 +402,7 @@ const AdminAccountPage: React.FC = () => {
                   {savingSection === "all" ? (
                     <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
                   ) : null}
-                  Save all
+                  {t("adminPanel.account.saveAll")}
                 </Button>
               </>
             )}
@@ -410,7 +416,7 @@ const AdminAccountPage: React.FC = () => {
             {/* Basic */}
             <div className="lg:col-span-2">
               <SectionShell
-                title="Basic info"
+                title={t("adminPanel.account.basicInfo")}
                 icon={User}
                 actions={
                   !isEditing("basicInfo") ? (

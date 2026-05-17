@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ChevronLeft,
   ChevronRight,
@@ -44,15 +45,26 @@ type TabDefinition = {
 };
 
 const TABS: TabDefinition[] = [
-  { id: "all", label: "All Leads", countKey: "total" },
-  { id: "buyer_inquiry", label: "Buyer Inquiries", countKey: "buyerInquiries" },
-  { id: "visit_request", label: "Visit Requests", countKey: "visitRequests" },
-  { id: "contact_request", label: "Contact Requests", countKey: "contactRequests" },
-  { id: "call_request", label: "Call Requests", countKey: "callRequests" },
-  { id: "seller_lead", label: "Seller Leads", countKey: "sellerLeads" },
-  { id: "agent_inquiry", label: "Agent Inquiries", countKey: "agentInquiries" },
-  { id: "agent_detailed_entry", label: "Agent Detailed Entries", countKey: "agentDetailedEntries" },
+  { id: "all", label: "", countKey: "total" },
+  { id: "buyer_inquiry", label: "", countKey: "buyerInquiries" },
+  { id: "visit_request", label: "", countKey: "visitRequests" },
+  { id: "contact_request", label: "", countKey: "contactRequests" },
+  { id: "call_request", label: "", countKey: "callRequests" },
+  { id: "seller_lead", label: "", countKey: "sellerLeads" },
+  { id: "agent_inquiry", label: "", countKey: "agentInquiries" },
+  { id: "agent_detailed_entry", label: "", countKey: "agentDetailedEntries" },
 ];
+
+const LEAD_TAB_LABEL_KEY: Record<TabId, string> = {
+  all: "adminPanel.leads.tabs.all",
+  buyer_inquiry: "adminPanel.leads.tabs.buyerInquiries",
+  visit_request: "adminPanel.leads.tabs.visitRequests",
+  contact_request: "adminPanel.leads.tabs.contactRequests",
+  call_request: "adminPanel.leads.tabs.callRequests",
+  seller_lead: "adminPanel.leads.tabs.sellerLeads",
+  agent_inquiry: "adminPanel.leads.tabs.agentInquiries",
+  agent_detailed_entry: "adminPanel.leads.tabs.agentDetailedEntries",
+};
 
 type SummaryCardTone = "emerald" | "sky" | "amber" | "rose" | "slate" | "violet";
 
@@ -185,6 +197,7 @@ function useDebouncedValue<T>(value: T, delayMs: number): T {
 }
 
 const AdminLeadsManagementPage: React.FC = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>("all");
   const [status, setStatus] = useState<string>("");
   const [search, setSearch] = useState<string>("");
@@ -250,13 +263,13 @@ const AdminLeadsManagementPage: React.FC = () => {
       setSummary(result.summary);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to load leads";
+        err instanceof Error ? err.message : t("adminPanel.leads.failedLoad");
       setError(message);
       setItems([]);
     } finally {
       setLoading(false);
     }
-  }, [page, activeTab, status, debouncedSearch, dateFrom, dateTo]);
+  }, [page, activeTab, status, debouncedSearch, dateFrom, dateTo, t]);
 
   useEffect(() => {
     loadLeads();
@@ -264,40 +277,40 @@ const AdminLeadsManagementPage: React.FC = () => {
 
   const summaryCards: SummaryCardConfig[] = useMemo(
     () => [
-      { label: "Total leads", value: summary.total, tone: "slate", icon: Inbox },
+      { label: t("adminPanel.leads.stats.total"), value: summary.total, tone: "slate", icon: Inbox },
       {
-        label: "Buyer inquiries",
+        label: t("adminPanel.leads.stats.buyerInquiries"),
         value: summary.buyerInquiries,
         tone: "emerald",
         icon: ClipboardList,
       },
       {
-        label: "Visit requests",
+        label: t("adminPanel.leads.stats.visitRequests"),
         value: summary.visitRequests,
         tone: "amber",
         icon: Calendar,
       },
       {
-        label: "Contact requests",
+        label: t("adminPanel.leads.stats.contactRequests"),
         value: summary.contactRequests,
         tone: "sky",
         icon: MessageCircle,
       },
       {
-        label: "Call requests",
+        label: t("adminPanel.leads.stats.callRequests"),
         value: summary.callRequests,
         tone: "violet",
         icon: Phone,
       },
-      { label: "Seller leads", value: summary.sellerLeads, tone: "rose", icon: Store },
+      { label: t("adminPanel.leads.stats.sellerLeads"), value: summary.sellerLeads, tone: "rose", icon: Store },
       {
-        label: "Agent inquiries",
+        label: t("adminPanel.leads.stats.agentInquiries"),
         value: summary.agentInquiries + summary.agentDetailedEntries,
         tone: "slate",
         icon: UserCog,
       },
     ],
-    [summary]
+    [summary, t]
   );
 
   const openLeadDetail = useCallback(async (lead: LeadItem) => {
@@ -309,7 +322,7 @@ const AdminLeadsManagementPage: React.FC = () => {
       setSelectedLead(detail);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : "Failed to load lead details";
+        err instanceof Error ? err.message : t("adminPanel.leads.failedLoadDetails");
       setDetailError(message);
     } finally {
       setDetailLoading(false);
@@ -336,8 +349,8 @@ const AdminLeadsManagementPage: React.FC = () => {
 
   return (
     <AdminLayout
-      title="Leads Management"
-      topBarSubtitle="Track inquiries, visits and agent-collected leads in one place."
+      title={t("adminPanel.leads.title")}
+      topBarSubtitle={t("adminPanel.leads.subtitle")}
     >
       <div className="space-y-6">
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -388,7 +401,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                       : "border-[var(--b2)] bg-[var(--white)] text-[var(--b1)] hover:bg-[var(--b2-soft)]"
                   }`}
                 >
-                  <span>{tab.label}</span>
+                  <span>{t(LEAD_TAB_LABEL_KEY[tab.id])}</span>
                   <span
                     className={`inline-flex min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-[10px] font-bold ${
                       isActive
@@ -409,12 +422,12 @@ const AdminLeadsManagementPage: React.FC = () => {
                 className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]"
                 htmlFor="leads-search"
               >
-                Search
+                {t("common.search")}
               </label>
               <Input
                 id="leads-search"
                 type="search"
-                placeholder="Name, email, phone, property, agent…"
+                placeholder={t("adminPanel.leads.searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full"
@@ -426,7 +439,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                 className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]"
                 htmlFor="leads-status"
               >
-                Status
+                {t("common.status")}
               </label>
               <select
                 id="leads-status"
@@ -436,7 +449,9 @@ const AdminLeadsManagementPage: React.FC = () => {
               >
                 {STATUS_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {option.value
+                      ? t(`adminPanel.leads.statusOptions.${option.value}`)
+                      : t("adminPanel.leads.allStatuses")}
                   </option>
                 ))}
               </select>
@@ -447,7 +462,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                 className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]"
                 htmlFor="leads-date-from"
               >
-                From
+                {t("adminPanel.leads.dateFrom")}
               </label>
               <input
                 id="leads-date-from"
@@ -463,7 +478,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                 className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]"
                 htmlFor="leads-date-to"
               >
-                To
+                {t("adminPanel.leads.dateTo")}
               </label>
               <input
                 id="leads-date-to"
@@ -477,7 +492,7 @@ const AdminLeadsManagementPage: React.FC = () => {
 
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs text-[var(--muted)]">
-              {pagination.total} matching lead{pagination.total === 1 ? "" : "s"}
+              {t("adminPanel.leads.matchingCount", { count: pagination.total })}
             </p>
             <Button
               type="button"
@@ -486,7 +501,7 @@ const AdminLeadsManagementPage: React.FC = () => {
               onClick={resetFilters}
               className="border-[var(--b2)]"
             >
-              Reset filters
+              {t("adminPanel.leads.resetFilters")}
             </Button>
           </div>
         </section>
@@ -496,13 +511,13 @@ const AdminLeadsManagementPage: React.FC = () => {
             <table className="w-full min-w-[960px] border-collapse text-left text-sm">
               <thead>
                 <tr className="border-b border-[var(--b2)] bg-[var(--b2-soft)]/80">
-                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">Lead</th>
-                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">Type</th>
-                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">Status</th>
-                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">Property / Subject</th>
-                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">Linked</th>
-                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">Created</th>
-                  <th className="px-4 py-3.5 text-right font-semibold text-[var(--b1)] sm:px-5">Actions</th>
+                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">{t("adminPanel.leads.table.lead")}</th>
+                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">{t("adminPanel.leads.table.type")}</th>
+                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">{t("adminPanel.leads.table.status")}</th>
+                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">{t("adminPanel.leads.tableSubject")}</th>
+                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">{t("adminPanel.leads.table.linked")}</th>
+                  <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">{t("adminPanel.leads.table.created")}</th>
+                  <th className="px-4 py-3.5 text-right font-semibold text-[var(--b1)] sm:px-5">{t("adminPanel.leads.table.actions")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -515,7 +530,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                     ].join(" ")}
                   >
                     <td className="px-4 py-3.5 align-top sm:px-5">
-                      <p className="text-sm font-semibold text-[var(--b1)]">{lead.name || "Unknown"}</p>
+                      <p className="text-sm font-semibold text-[var(--b1)]">{lead.name || t("adminPanel.leads.unknown")}</p>
                       <p className="text-xs text-[var(--muted)]">{lead.email || "—"}</p>
                       {lead.phone ? (
                         <p className="mt-0.5 text-xs text-[var(--muted)]">{lead.phone}</p>
@@ -528,7 +543,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                         {LEAD_TYPE_LABELS[lead.type] ?? lead.type}
                       </span>
                       {lead.source ? (
-                        <p className="mt-1 text-[11px] text-[var(--muted)]">Source: {lead.source}</p>
+                        <p className="mt-1 text-[11px] text-[var(--muted)]">{t("adminPanel.leads.source", { source: lead.source })}</p>
                       ) : null}
                     </td>
                     <td className="px-4 py-3.5 align-top sm:px-5">
@@ -553,12 +568,12 @@ const AdminLeadsManagementPage: React.FC = () => {
                     <td className="px-4 py-3.5 align-top text-[var(--b1-mid)] sm:px-5">
                       {lead.agentName ? (
                         <p className="text-xs">
-                          <span className="text-[var(--muted)]">Agent:</span> {lead.agentName}
+                          <span className="text-[var(--muted)]">{t("adminPanel.leads.fields.agent")}:</span> {lead.agentName}
                         </p>
                       ) : null}
                       {lead.sellerName ? (
                         <p className="text-xs">
-                          <span className="text-[var(--muted)]">Seller:</span> {lead.sellerName}
+                          <span className="text-[var(--muted)]">{t("adminPanel.leads.fields.seller")}:</span> {lead.sellerName}
                         </p>
                       ) : null}
                       {!lead.agentName && !lead.sellerName ? (
@@ -578,7 +593,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                           className="border-[var(--b2)]"
                         >
                           <Eye className="h-3.5 w-3.5" />
-                          View
+                          {t("common.view")}
                         </Button>
                       </div>
                     </td>
@@ -588,7 +603,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                 {loading ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-10 text-center text-sm text-[var(--muted)]">
-                      Loading leads…
+                      {t("adminPanel.leads.loading")}
                     </td>
                   </tr>
                 ) : null}
@@ -604,7 +619,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                 {!loading && !error && items.length === 0 ? (
                   <tr>
                     <td colSpan={7} className="px-4 py-10 text-center text-sm text-[var(--muted)]">
-                      No leads match the current filters.
+                      {t("adminPanel.leads.empty")}
                     </td>
                   </tr>
                 ) : null}
@@ -615,8 +630,10 @@ const AdminLeadsManagementPage: React.FC = () => {
           {(totalPages > 1 || pagination.total > 0) && (
             <div className="flex flex-col items-stretch justify-between gap-3 border-t border-[var(--b2)]/60 bg-[var(--b2-soft)]/20 px-4 py-3 sm:flex-row sm:items-center">
               <p className="text-center text-[11px] text-[var(--muted)] sm:text-left">
-                Page {pagination.page} of {totalPages}
-                {pagination.total > 0 ? <> · {pagination.total} total</> : null}
+                {t("adminPanel.leads.pagination.pageOf", { page: pagination.page, totalPages })}
+                {pagination.total > 0 ? (
+                  <> · {t("adminPanel.leads.pagination.total", { count: pagination.total })}</>
+                ) : null}
               </p>
               <div className="flex items-center gap-2">
                 <Button
@@ -627,7 +644,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                 >
                   <ChevronLeft className="h-4 w-4" />
-                  Prev
+                  {t("adminPanel.leads.pagination.prev")}
                 </Button>
                 <Button
                   type="button"
@@ -636,7 +653,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                   disabled={!canNext || loading}
                   onClick={() => setPage((p) => p + 1)}
                 >
-                  Next
+                  {t("adminPanel.leads.pagination.next")}
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -648,7 +665,7 @@ const AdminLeadsManagementPage: React.FC = () => {
       <Modal
         open={Boolean(selectedLead)}
         onClose={closeLeadDetail}
-        title="Lead details"
+        title={t("adminPanel.leads.detailTitle")}
       >
         {selectedLead ? (
           <LeadDetailContent
@@ -664,7 +681,7 @@ const AdminLeadsManagementPage: React.FC = () => {
             onClick={closeLeadDetail}
             className="border-[var(--b2)]"
           >
-            Close
+            {t("common.close")}
           </Button>
         </div>
       </Modal>
@@ -683,12 +700,13 @@ const LeadDetailContent: React.FC<LeadDetailContentProps> = ({
   loading,
   error,
 }) => {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <div className="rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]/30 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <p className="text-base font-semibold text-[var(--b1)]">{lead.name || "Unknown"}</p>
+            <p className="text-base font-semibold text-[var(--b1)]">{lead.name || t("adminPanel.leads.unknown")}</p>
             <p className="text-xs text-[var(--muted)]">
               {LEAD_TYPE_LABELS[lead.type] ?? lead.type} · {lead.source || "—"}
             </p>
@@ -700,29 +718,29 @@ const LeadDetailContent: React.FC<LeadDetailContentProps> = ({
           </span>
         </div>
         <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
-          <DetailField label="Email" value={lead.email || "—"} />
-          <DetailField label="Phone" value={lead.phone || "—"} />
-          <DetailField label="Created" value={formatDateTime(lead.createdAt)} />
-          <DetailField label="Last update" value={formatDateTime(lead.updatedAt)} />
+          <DetailField label={t("adminPanel.leads.fields.email")} value={lead.email || "—"} />
+          <DetailField label={t("adminPanel.leads.fields.phone")} value={lead.phone || "—"} />
+          <DetailField label={t("adminPanel.leads.fields.created")} value={formatDateTime(lead.createdAt)} />
+          <DetailField label={t("adminPanel.leads.fields.lastUpdate")} value={formatDateTime(lead.updatedAt)} />
           {lead.propertyTitle ? (
-            <DetailField label="Property / subject" value={lead.propertyTitle} />
+            <DetailField label={t("adminPanel.leads.fields.propertySubject")} value={lead.propertyTitle} />
           ) : null}
-          {lead.agentName ? <DetailField label="Agent" value={lead.agentName} /> : null}
-          {lead.sellerName ? <DetailField label="Seller" value={lead.sellerName} /> : null}
+          {lead.agentName ? <DetailField label={t("adminPanel.leads.fields.agent")} value={lead.agentName} /> : null}
+          {lead.sellerName ? <DetailField label={t("adminPanel.leads.fields.seller")} value={lead.sellerName} /> : null}
         </div>
       </div>
 
       {lead.message ? (
         <div className="rounded-xl border border-[var(--b2)] bg-[var(--white)] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-            Message
+            {t("adminPanel.leads.message")}
           </p>
           <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--b1)]">{lead.message}</p>
         </div>
       ) : null}
 
       {loading ? (
-        <p className="text-xs text-[var(--muted)]">Loading full lead details…</p>
+        <p className="text-xs text-[var(--muted)]">{t("adminPanel.leads.loadingDetails")}</p>
       ) : null}
       {!loading && error ? (
         <p className="text-xs text-[var(--error)]">{error}</p>

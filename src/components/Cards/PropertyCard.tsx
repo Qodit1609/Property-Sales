@@ -6,12 +6,13 @@ import { Button, PropertyImage } from "@/components/common";
 
 import type { Property as BackendProperty } from "../../features/properties/propertyType";
 import BuyerActions from "../buyer/BuyerActions";
-import { formatINRCurrency } from "../../lib/i18nHelpers";
+import { formatINRCurrency, translatePropertyType } from "../../lib/i18nHelpers";
+import { usePropertyPreviewText } from "../../hooks/usePropertyPreviewText";
+import { truncateText } from "../../utils/propertyFormatters";
 import {
-  FALLBACK_PROPERTY_IMAGE,
-  formatArea,
-  truncateText,
-} from "../../utils/propertyFormatters";
+  buildPropertyCardFallbackImage,
+  formatPropertyCardArea,
+} from "./propertyCardI18n";
 import { PROPERTY_TEXT_WRAP_CLASS } from "../../utils/wordText";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { selectMediaLoading } from "../../features/media/mediaSelectors";
@@ -31,6 +32,8 @@ const PropertyCard: React.FC<Props> = ({
 
   const language = i18n.resolvedLanguage ?? i18n.language;
 
+  const previewText = usePropertyPreviewText(property);
+
   const user = useAppSelector((s) => s.auth.user);
 
   const isBuyer = Boolean(user?.role === "buyer");
@@ -39,15 +42,28 @@ const PropertyCard: React.FC<Props> = ({
 
   const mediaLoading = mediaLoadingProp ?? loadingFromStore;
 
+  const fallbackImage = useMemo(
+    () => buildPropertyCardFallbackImage(t("propertyCard.imageNotAvailable")),
+    [t, language],
+  );
+
   const cardImages = useMemo(() => {
     if (property.media?.images?.length) return property.media.images;
     if (property.images?.length) return property.images;
     if (property.media?.gallery?.length) return property.media.gallery;
 
-    return [FALLBACK_PROPERTY_IMAGE];
-  }, [property.images, property.media]);
+    return [fallbackImage];
+  }, [property.images, property.media, fallbackImage]);
 
-  const primaryImage = cardImages[0] ?? FALLBACK_PROPERTY_IMAGE;
+  const primaryImage = cardImages[0] ?? fallbackImage;
+
+  const displayTitle = previewText.title?.trim() || t("propertyCard.untitledProperty");
+
+  const displayLocation =
+    previewText.address?.trim() || t("propertyCard.locationNotAvailable");
+
+  const displayPropertyType =
+    translatePropertyType(property.propertyType) || t("propertyCard.propertyFallbackType");
 
   const showImageSkeleton =
     mediaLoading &&
@@ -58,10 +74,19 @@ const PropertyCard: React.FC<Props> = ({
 
   const areaUnit = property.areaUnit ?? property.landUnit;
 
-  const shortDescription = truncateText(
-    property.shortDescription || property.description,
-    120,
+  const isRent = property.listingType === "rent";
+
+  const formattedArea = useMemo(
+    () => formatPropertyCardArea(t, areaValue, areaUnit),
+    [t, areaValue, areaUnit, language],
   );
+
+  const formattedPrice = useMemo(() => {
+    const amount = formatINRCurrency(property.price || 0, language);
+    return isRent ? `${amount} ${t("propertyCard.perMonth")}` : amount;
+  }, [property.price, language, isRent, t]);
+
+  const shortDescription = truncateText(previewText.shortDescription, 120);
 
   const cleanDescription = shortDescription
     .replace(
@@ -72,8 +97,6 @@ const PropertyCard: React.FC<Props> = ({
     .replace(/\s*[-|,]\s*$/g, "")
     .replace(/\s{2,}/g, " ")
     .trim();
-
-  const isRent = property.listingType === "rent";
 
   const tag = isRent ? t("propertyCard.rentTag") : t("propertyCard.saleTag");
 
@@ -95,7 +118,7 @@ const PropertyCard: React.FC<Props> = ({
   return (
     <div
       tabIndex={isBlocked ? -1 : 0}
-      aria-label={`${property.title}. ${t("propertyCard.viewDetails")}.`}
+      aria-label={`${displayTitle}. ${t("propertyCard.viewDetails")}.`}
       onClick={handleOpenProperty}
       onKeyDown={(e) => {
         if (isBlocked) return;
@@ -156,7 +179,8 @@ const PropertyCard: React.FC<Props> = ({
         ) : (
           <PropertyImage
             src={primaryImage}
-            alt={property.title}
+            alt={displayTitle}
+            fallback={fallbackImage}
             className={`h-full w-full object-cover transition-transform duration-500 ${
               isBlocked ? "blur-[2px]" : "group-hover:scale-105"
             }`}
@@ -227,9 +251,7 @@ const PropertyCard: React.FC<Props> = ({
         font-semibold
         "
         >
-          {t(`postProperty.options.propertyType.${property.propertyType}`, {
-            defaultValue: property.propertyType,
-          })}
+          {displayPropertyType}
         </p>
 
         <p
@@ -238,17 +260,17 @@ const PropertyCard: React.FC<Props> = ({
         text-[var(--b1)]
         "
         >
-          {formatINRCurrency(property.price || 0, language)}
+          {formattedPrice}
         </p>
 
         <h3 className="text-[15px] font-semibold text-[var(--b1)] line-clamp-2 min-h-[48px] leading-6">
-          {property.title}
+          {displayTitle}
         </h3>
 
         <div className="flex items-start gap-2 text-sm text-[var(--muted)] min-h-[40px]">
           <MapPin size={14} />
           <p className="line-clamp-2">
-            {property.locationText || property.address}
+            {displayLocation}
           </p>
         </div>
 
@@ -262,7 +284,7 @@ const PropertyCard: React.FC<Props> = ({
         "
         >
           <Ruler size={14} />
-          {formatArea(areaValue, areaUnit)}
+          {formattedArea}
         </div>
 
         <div className="min-h-[44px]" >

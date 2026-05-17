@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import {
   LayoutGrid,
@@ -39,17 +40,6 @@ const ICON_MAP = {
   enquiries: MessageCircleMore,
 } as const;
 
-const DEFAULT_ITEMS: SidebarItem[] = [
-  { to: "/buyer/overview", label: "Overview", icon: LayoutGrid },
-  { to: "/buyer/wishlist", label: "Wishlist", icon: Heart },
-  { to: "/buyer/compare", label: "Compare", icon: Scale },
-  { to: "/buyer/cart", label: "Cart", icon: ShoppingCart },
-  { to: "/buyer/enquiries", label: "Enquiries", icon: MessageCircleMore },
-  { to: "/buyer/activity", label: "Activity", icon: Clock3 },
-  { to: "/buyer/notifications", label: "Notifications", icon: Bell },
-  { to: "/buyer/account", label: "Account", icon: UserCircle2 },
-];
-
 interface BuyerSidebarProps {
   collapsed?: boolean;
   onNavigate?: () => void;
@@ -59,6 +49,20 @@ const BuyerSidebar: React.FC<BuyerSidebarProps> = ({
   collapsed,
   onNavigate,
 }) => {
+  const { t } = useTranslation();
+  const defaultItems = useMemo<SidebarItem[]>(
+    () => [
+      { to: "/buyer/overview", label: t("buyerPanel.nav.overview"), icon: LayoutGrid },
+      { to: "/buyer/wishlist", label: t("buyerPanel.nav.wishlist"), icon: Heart },
+      { to: "/buyer/compare", label: t("buyerPanel.nav.compare"), icon: Scale },
+      { to: "/buyer/cart", label: t("buyerPanel.nav.cart"), icon: ShoppingCart },
+      { to: "/buyer/enquiries", label: t("buyerPanel.nav.enquiries"), icon: MessageCircleMore },
+      { to: "/buyer/activity", label: t("buyerPanel.nav.activity"), icon: Clock3 },
+      { to: "/buyer/notifications", label: t("buyerPanel.nav.notifications"), icon: Bell },
+      { to: "/buyer/account", label: t("buyerPanel.nav.account"), icon: UserCircle2 },
+    ],
+    [t]
+  );
   const [dynamicItems, setDynamicItems] = useState<SidebarItem[]>([]);
   const [sectionTitle, setSectionTitle] = useState<string>("");
   const normalizeRoute = (route: string) => {
@@ -126,7 +130,7 @@ const BuyerSidebar: React.FC<BuyerSidebarProps> = ({
           .map(mapItem)
           .filter((item: { to: string; label: string }) => item.to && item.label);
 
-        setDynamicItems(mapped.length ? mapped : DEFAULT_ITEMS);
+        setDynamicItems(mapped.length ? mapped : defaultItems);
         const title =
           (Array.isArray(sections) ? sections[0]?.sectionTitle : undefined) ??
           payload?.sectionTitle ??
@@ -138,7 +142,7 @@ const BuyerSidebar: React.FC<BuyerSidebarProps> = ({
       } catch (error) {
         console.error("Failed to load buyer sidebar:", error);
         if (active) {
-          setDynamicItems(DEFAULT_ITEMS);
+          setDynamicItems(defaultItems);
         }
       }
     };
@@ -147,7 +151,7 @@ const BuyerSidebar: React.FC<BuyerSidebarProps> = ({
     return () => {
       active = false;
     };
-  }, []);
+  }, [defaultItems]);
 
   return (
     <nav className="space-y-1 text-sm" aria-label={sectionTitle || undefined}>

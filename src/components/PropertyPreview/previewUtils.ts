@@ -7,6 +7,65 @@ import i18n from "../../i18n";
 
 const normalizeToken = (value: string) => value.trim().replace(/\s+/g, " ").toLowerCase();
 
+type PreviewDynamicGroup = "facing" | "landUseType" | "roadType" | "waterAvailability" | "furnishing";
+
+const translatePreviewDynamic = (
+  group: PreviewDynamicGroup,
+  value?: string,
+): string | undefined => {
+  if (!value?.trim()) {
+    return value;
+  }
+  const trimmed = value.trim();
+  const namespace = `propertyPreview.dynamic.${group}`;
+  const directKey = `${namespace}.${trimmed}`;
+  if (i18n.exists(directKey)) {
+    return i18n.t(directKey);
+  }
+
+  const normalized = normalizeToken(trimmed);
+  const enOptions = i18n.getResource("en", "translation", namespace) ?? {};
+  const hiOptions = i18n.getResource("hi", "translation", namespace) ?? {};
+  const candidate = Object.keys(enOptions).find((item) => {
+    const enValue = typeof enOptions[item] === "string" ? enOptions[item] : item;
+    const hiValue = typeof hiOptions[item] === "string" ? hiOptions[item] : undefined;
+    return (
+      normalizeToken(item) === normalized ||
+      normalizeToken(String(enValue)) === normalized ||
+      (hiValue ? normalizeToken(String(hiValue)) === normalized : false)
+    );
+  });
+  if (candidate) {
+    return i18n.t(`${namespace}.${candidate}`);
+  }
+  return trimmed;
+};
+
+export const translateFacing = (value?: string): string | undefined =>
+  translatePreviewDynamic("facing", value);
+
+export const translateLandUseType = (value?: string): string | undefined =>
+  translatePreviewDynamic("landUseType", value);
+
+export const translateRoadType = (value?: string): string | undefined =>
+  translatePreviewDynamic("roadType", value);
+
+export const translateWaterAvailability = (value?: string): string | undefined => {
+  if (!value?.trim()) {
+    return value;
+  }
+  if (value.includes("+")) {
+    return value
+      .split("+")
+      .map((part) => translatePreviewDynamic("waterAvailability", part.trim()) ?? part.trim())
+      .join(" + ");
+  }
+  return translatePreviewDynamic("waterAvailability", value);
+};
+
+export const translateFurnishing = (value?: string): string | undefined =>
+  translatePreviewDynamic("furnishing", value);
+
 const translatePostPropertyOption = (
   group: "propertyType" | "category" | "ownership" | "soil" | "suitableFor",
   value?: string,
@@ -55,7 +114,8 @@ export const translateListingType = (value?: string): string | undefined => {
   if (!value?.trim()) {
     return value;
   }
-  const normalized = normalizeToken(value);
+  const trimmed = value.trim();
+  const normalized = normalizeToken(trimmed);
   if (
     normalized.includes("rent") ||
     normalized.includes("lease") ||
@@ -72,7 +132,19 @@ export const translateListingType = (value?: string): string | undefined => {
   ) {
     return i18n.t("postProperty.basic.sell");
   }
-  return value;
+
+  const listingKey = `listingType.${trimmed}`;
+  if (i18n.exists(listingKey)) {
+    return i18n.t(listingKey);
+  }
+  const listingOptions = i18n.getResource("en", "translation", "listingType") ?? {};
+  const listingCandidate = Object.keys(listingOptions).find(
+    (item) => normalizeToken(item) === normalized,
+  );
+  if (listingCandidate) {
+    return i18n.t(`listingType.${listingCandidate}`);
+  }
+  return trimmed;
 };
 
 export const translateStatusValue = (value?: string): string | undefined => {
@@ -85,6 +157,10 @@ export const translateStatusValue = (value?: string): string | undefined => {
   }
   if (normalized === normalizeToken(i18n.getResource("hi", "translation", "propertyPreview.labels.available") as string || "")) {
     return i18n.t("propertyPreview.labels.available");
+  }
+  const globalStatusKey = `status.${normalized}`;
+  if (i18n.exists(globalStatusKey)) {
+    return i18n.t(globalStatusKey);
   }
   const statusKey = `sellerPanel.status.${normalized}`;
   if (i18n.exists(statusKey)) {
@@ -143,9 +219,17 @@ export const translateDynamicList = (items?: string[]): string[] | undefined => 
   }
   return items.map((item) =>
     translateAmenityValue(
-      translateSuitableFor(
-        translateSoilType(
-          translatePropertyType(item),
+      translateWaterAvailability(
+        translateFacing(
+          translateFurnishing(
+            translateLandUseType(
+              translateRoadType(
+                translateSuitableFor(
+                  translateSoilType(translatePropertyType(item)),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     ) ?? item,
@@ -501,7 +585,10 @@ export const getOverviewSpecs = (property: Property): Array<{ label: string; val
           ? String(property.bathrooms ?? property.baths)
           : "",
     },
-    { label: i18n.t("propertyPreview.labels.facing"), value: property.features?.facing || property.facing || "" },
+    {
+      label: i18n.t("propertyPreview.labels.facing"),
+      value: translateFacing(property.features?.facing || property.facing) || "",
+    },
     {
       label: i18n.t("propertyPreview.detail.floor"),
       value: property.features?.floor || property.floor ? String(property.features?.floor || property.floor) : "",

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Bell, ChevronDown, LogOut, User2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../hooks/reduxHooks";
@@ -11,6 +12,7 @@ interface BuyerHeaderActionsProps {
 const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
   onLogout,
 }) => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const unreadCount = useAppSelector((state) => state.notifications.unreadCount);
   const [open, setOpen] = useState(false);
@@ -42,10 +44,10 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
 
           <div className="hidden text-left sm:block">
             <p className="text-[11px] leading-tight text-[var(--b1)]">
-              {user?.name ?? "Buyer"}
+              {user?.name ?? t("common.buyerFallback")}
             </p>
             <p className="text-[10px] font-medium uppercase tracking-wide text-[var(--b1-mid)]">
-              Buyer
+              {t("buyerPanel.headerActions.roleBadge")}
             </p>
           </div>
 
@@ -56,10 +58,10 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
           <div className="absolute right-0 z-30 mt-2 w-52 overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--white)] text-xs shadow-lg shadow-[var(--b2)]/40">
             <div className="border-b border-[var(--b2-soft)] px-3 py-2">
               <p className="text-[11px] font-semibold text-[var(--b1)]">
-                {user?.name ?? "Buyer"}
+                {user?.name ?? t("common.buyerFallback")}
               </p>
               <p className="truncate text-[10px] text-[var(--muted)]">
-                {user?.email ?? "Signed in"}
+                {user?.email ?? t("common.signedIn")}
               </p>
             </div>
 
@@ -70,7 +72,7 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
                 onClick={() => setOpen(false)}
               >
                 <User2 className="h-3.5 w-3.5" />
-                <span>Account settings</span>
+                <span>{t("common.accountSettings")}</span>
               </Link>
             </div>
 
@@ -84,7 +86,7 @@ const BuyerHeaderActions: React.FC<BuyerHeaderActionsProps> = ({
               className="flex w-full items-center gap-2 border-t border-[var(--b2-soft)] px-3 py-2 text-[11px] font-medium text-[var(--error)] hover:bg-[var(--error-bg)]"
             >
               <LogOut className="h-3.5 w-3.5" />
-              <span>Logout</span>
+              <span>{t("common.logout")}</span>
             </Button>
           </div>
         )}

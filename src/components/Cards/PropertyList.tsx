@@ -1,4 +1,5 @@
 import PropertyCard, { PropertyCardSkeleton } from "../Cards/PropertyCard";
+import { useTranslation } from "react-i18next";
 
 // Redux
 import { useAppSelector } from "../../hooks/reduxHooks";
@@ -10,6 +11,7 @@ import {
 import { useHomeFilterOptional } from "../Home/homeFilterContext";
 
 const PropertyList = () => {
+  const { t } = useTranslation();
   const { data, loading, error } = useAppSelector(
     (state) => state.properties
   );
@@ -38,24 +40,21 @@ const PropertyList = () => {
       <div className="flex items-center justify-center gap-3 sm:gap-6 mb-4">
         <div className="w-12 sm:w-28 h-[1px] bg-[var(--b1-mid)]/40" />
         <p className="text-[var(--b1-mid)] font-medium text-xs sm:text-base tracking-widest">
-          FEATURED LISTINGS
+          {t("propertyList.featuredListings")}
         </p>
         <div className="w-12 sm:w-28 h-[1px] bg-[var(--b1-mid)]/40" />
       </div>
 
       <p className="max-w-3xl mx-auto text-[var(--b1)]/70 text-sm sm:text-base md:text-lg leading-relaxed mb-8 sm:mb-12 text-center px-2">
-        Discover exclusive properties in prime demand areas.
-        Crafted for superior living and lifestyle excellence.
-        Ensuring high returns and dependable investment growth.
+        {t("propertyList.description")}
       </p>
 
       {mediaError && (
         <p className="mb-4 text-center text-xs text-[var(--muted)]" role="status">
-          Gallery images could not be refreshed; showing listing images when available.
+          {t("propertyList.galleryRefreshFailed")}
         </p>
       )}
 
-      {/* Width calcs must match gap: gap-4=1rem, sm:gap-6=1.5rem, lg+:gap-8=2rem (3 gaps for 4 cols = 6rem). */}
       <div className="relative">
         <div
           className="
@@ -72,7 +71,7 @@ const PropertyList = () => {
             [&::-webkit-scrollbar-thumb]:bg-[var(--b1-mid)]/50
             hover:[&::-webkit-scrollbar-thumb]:bg-[var(--b1-mid)]/80
           "
-          aria-label="Property listings horizontal scroller"
+          aria-label={t("propertyList.scrollerLabel")}
         >
           {loading
             ? Array.from({ length: 8 }).map((_, i) => (
@@ -112,8 +111,8 @@ const PropertyList = () => {
       {!loading && !error && properties.length === 0 && (
         <p className="mt-6 text-center text-sm text-[var(--muted)]">
           {isHomeFiltered
-            ? "No properties found"
-            : "No properties found right now. Please try again shortly."}
+            ? t("propertyList.emptyFiltered")
+            : t("propertyList.emptyDefault")}
         </p>
       )}
     </div>
@@ -121,3 +120,4 @@ const PropertyList = () => {
 };
 
 export default PropertyList;
+

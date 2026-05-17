@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -83,18 +84,25 @@ interface AdminSidebarProps {
 }
 
 const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, collapsed }) => {
+  const { t } = useTranslation();
   const [dynamicItems, setDynamicItems] = useState<SidebarItem[]>([]);
   const [sectionTitle, setSectionTitle] = useState<string>("");
-  const imagesFallbackItem: SidebarItem = {
-    to: "/admin/images",
-    label: "Images",
-    icon: Images,
-  };
-  const leadsManagementFallbackItem: SidebarItem = {
-    to: "/admin/leads-management",
-    label: "Leads Management",
-    icon: Inbox,
-  };
+  const imagesFallbackItem = useMemo<SidebarItem>(
+    () => ({
+      to: "/admin/images",
+      label: t("adminPanel.nav.images"),
+      icon: Images,
+    }),
+    [t]
+  );
+  const leadsManagementFallbackItem = useMemo<SidebarItem>(
+    () => ({
+      to: "/admin/leads-management",
+      label: t("adminPanel.nav.leadsManagement"),
+      icon: Inbox,
+    }),
+    [t]
+  );
   const normalizeAdminRoute = (rawTo: string, rawLabel: string) => {
     const labelKey = rawLabel.trim().toLowerCase();
     const byLabel = ADMIN_ROUTE_BY_LABEL[labelKey];

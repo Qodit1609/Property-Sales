@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { store } from "./app/store.ts";
 import { Provider } from "react-redux";
+import "./i18n";
 import "./index.css";
 
 const THEME_KEY = "theme";

@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { Testimonial } from "../models/homeTypes";
 import { SectionHeading, SectionWrapper } from "../ui";
@@ -9,6 +10,7 @@ type TestimonialsSectionProps = {
 };
 
 const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials }) => {
+  const { t } = useTranslation();
   const intervalRef = useRef<number | null>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [isFocusedWithin, setIsFocusedWithin] = useState(false);
@@ -61,7 +63,7 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
 
   const safeMessage =
     activeTestimonial.message?.trim() ||
-    "This customer shared a positive experience with BhoomiWala.";
+    t("homeSections.testimonials.emptyMessageFallback");
 
   const pageTransition = shouldReduceMotion
     ? { duration: 0.01 }
@@ -104,9 +106,9 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
   return (
     <SectionWrapper className="py-12 sm:py-14" id="testimonials">
       <SectionHeading
-        eyebrow="Testimonials"
-        title="Trusted by farmland buyers and sellers"
-        description="Real customer stories from successful farmland discovery and closure journeys."
+        eyebrow={t("homeSections.testimonials.eyebrow")}
+        title={t("homeSections.testimonials.title")}
+        description={t("homeSections.testimonials.description")}
       />
 
       <div
@@ -138,7 +140,7 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
             className="relative min-h-[240px] overflow-hidden rounded-[26px] border border-[var(--b2-soft)] bg-[var(--white)] px-5 py-6 shadow-[0_20px_42px_rgba(15,23,42,0.09)] sm:min-h-[260px] sm:px-8"
             role="region"
             aria-roledescription="carousel"
-            aria-label="Customer testimonials"
+            aria-label={t("homeSections.testimonials.carouselAriaLabel")}
             tabIndex={0}
             onKeyDown={(event) => {
               if (event.key === "ArrowRight") changeSlide(1);
@@ -167,7 +169,7 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
                     {activeTestimonial.name}
                   </p>
                   <p className="truncate text-xs text-[var(--muted)] sm:text-sm">
-                    {activeTestimonial.occupation || "Farmland User"}
+                    {activeTestimonial.occupation || t("homeSections.testimonials.defaultOccupation")}
                     {activeTestimonial.location
                       ? ` • ${activeTestimonial.location}`
                       : ""}
@@ -192,7 +194,7 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
             <button
               type="button"
               onClick={() => changeSlide(-1)}
-              aria-label="Previous testimonial"
+              aria-label={t("homeSections.testimonials.prevAriaLabel")}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--b2-soft)] bg-[var(--white)] text-[var(--b1)] transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b1)]"
             >
               &#8249;
@@ -203,7 +205,7 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
                 <motion.button
                   key={testimonial.id}
                   type="button"
-                  aria-label={`Go to testimonial ${index + 1}`}
+                  aria-label={t("homeSections.testimonials.goToAriaLabel", { index: index + 1 })}
                   onClick={() => jumpToSlide(index)}
                   className={`h-2 rounded-full transition-all ${
                     index === activeIndex
@@ -219,7 +221,7 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
             <button
               type="button"
               onClick={() => changeSlide(1)}
-              aria-label="Next testimonial"
+              aria-label={t("homeSections.testimonials.nextAriaLabel")}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--b2-soft)] bg-[var(--white)] text-[var(--b1)] transition-colors hover:bg-[var(--surface)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b1)]"
             >
               &#8250;

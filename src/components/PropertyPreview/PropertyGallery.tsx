@@ -2,6 +2,7 @@ import type { Property } from "../../features/properties/propertyType";
 import { ImageSlider } from "@/components/common";
 import { FALLBACK_PROPERTY_IMAGE } from "../../utils/propertyFormatters";
 import { resolvePropertyGalleryImages } from "./previewUtils";
+import { usePropertyPreviewTextContext } from "./PropertyPreviewTextContext";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { useTranslation } from "react-i18next";
 import {
@@ -15,6 +16,7 @@ type PropertyGalleryProps = {
 
 const PropertyGallery = ({ property }: PropertyGalleryProps) => {
   const { t } = useTranslation();
+  const previewText = usePropertyPreviewTextContext();
   const propertyImagesMap = useAppSelector(selectPropertyImagesMap);
   const cloudinaryPool = useAppSelector(selectCloudinaryUrlPool);
   const images =
@@ -35,7 +37,7 @@ const PropertyGallery = ({ property }: PropertyGalleryProps) => {
     <div className="space-y-4">
       <ImageSlider
         images={images}
-        alt={property.title}
+        alt={previewText.title}
         fallbackImage={FALLBACK_PROPERTY_IMAGE}
         autoPlayMs={5000}
         showThumbnails
@@ -80,7 +82,7 @@ const PropertyGallery = ({ property }: PropertyGalleryProps) => {
               </p>
               <img
                 src={mapPreview}
-                alt={`${property.title} map preview`}
+                alt={t("propertyPreview.aria.mapPreviewAlt", { title: previewText.title })}
                 loading="lazy"
                 className="h-56 w-full object-cover"
                 onError={(event) => {

@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { fetchAgentClientsAPI, type AgentClient } from "@/features/agent/agentAPI";
 
 const AgentClientsPage: React.FC = () => {
+  const { t } = useTranslation();
   const [clients, setClients] = useState<AgentClient[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -17,7 +19,7 @@ const AgentClientsPage: React.FC = () => {
         setClients(rows);
       } catch (err) {
         if (!mounted) return;
-        const message = err instanceof Error ? err.message : "Failed to load clients.";
+        const message = err instanceof Error ? err.message : t("agentPanel.clientsPage.failedLoad");
         setError(message);
       } finally {
         if (mounted) setLoading(false);
@@ -27,7 +29,7 @@ const AgentClientsPage: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [t]);
 
   const buyers = useMemo(() => clients.filter((c) => c.type === "buyer"), [clients]);
   const sellers = useMemo(() => clients.filter((c) => c.type === "seller"), [clients]);
@@ -36,16 +38,16 @@ const AgentClientsPage: React.FC = () => {
     <section className="space-y-6 px-4 sm:px-6 lg:px-8 py-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-semibold text-[var(--b1)]">
-          Clients
+          {t("agentPanel.clientsPage.title")}
         </h1>
         <p className="mt-1 text-xs text-[var(--muted)]">
-          Buyer and seller contacts managed by the agent.
+          {t("agentPanel.topBar.clients.subtitle")}
         </p>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <ClientList title="Buyer list" items={buyers} loading={loading} error={error} />
-        <ClientList title="Seller list" items={sellers} loading={loading} error={error} />
+        <ClientList title={t("agentPanel.clientsPage.buyerList")} items={buyers} loading={loading} error={error} />
+        <ClientList title={t("agentPanel.clientsPage.sellerList")} items={sellers} loading={loading} error={error} />
       </div>
     </section>
   );
@@ -62,6 +64,7 @@ function ClientList({
   loading: boolean;
   error: string;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-sm">
       <div className="border-b border-[var(--b2)] px-4 py-3">
@@ -69,11 +72,11 @@ function ClientList({
       </div>
       <div className="p-4">
         {loading ? (
-          <p className="text-sm text-[var(--muted)]">Loading clients...</p>
+          <p className="text-sm text-[var(--muted)]">{t("agentPanel.clientsPage.loading")}</p>
         ) : error ? (
           <p className="text-sm text-[var(--error)]">{error}</p>
         ) : items.length === 0 ? (
-          <p className="text-sm text-[var(--muted)]">No clients found.</p>
+          <p className="text-sm text-[var(--muted)]">{t("agentPanel.clientsPage.empty")}</p>
         ) : (
           <ul className="space-y-2">
             {items.map((c) => (

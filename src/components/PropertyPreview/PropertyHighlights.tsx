@@ -1,7 +1,7 @@
 import { LandPlot, Sprout, TrendingUp, Compass, BedDouble, Bath } from "lucide-react";
 import type { Property } from "../../features/properties/propertyType";
 import { useTranslation } from "react-i18next";
-import { formatAreaLocalized, translateSoilType } from "./previewUtils";
+import { formatAreaLocalized, translateFacing, translateSoilType } from "./previewUtils";
 
 type PropertyHighlightsProps = {
   property: Property;
@@ -28,8 +28,16 @@ const PropertyHighlights = ({ property }: PropertyHighlightsProps) => {
       value: beds || baths ? `${beds ?? 0} / ${baths ?? 0}` : "",
       icon: beds || baths ? BedDouble : Bath,
     },
-    { label: t("propertyPreview.labels.facing"), value: facing ? String(facing) : "", icon: Compass },
-    { label: t("propertyPreview.labels.roi"), value: Number.isFinite(roi) ? `${roi}%` : "", icon: TrendingUp },
+    {
+      label: t("propertyPreview.labels.facing"),
+      value: facing ? translateFacing(String(facing)) ?? String(facing) : "",
+      icon: Compass,
+    },
+    {
+      label: t("propertyPreview.labels.roi"),
+      value: Number.isFinite(roi) ? `${roi}${t("propertyPreview.units.percent")}` : "",
+      icon: TrendingUp,
+    },
     { label: t("propertyPreview.labels.soilType"), value: translateSoilType(soilType) ?? "", icon: Sprout },
   ].filter((card) => card.value.trim().length > 0);
 

@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
 import type { SellerLeadRecord } from "@/features/seller/sellerAPI";
@@ -6,13 +7,6 @@ import type { SellerLeadRecord } from "@/features/seller/sellerAPI";
 type SellerLeadsTableProps = {
   rows: SellerLeadRecord[];
   onDeleteRow?: (row: SellerLeadRecord) => void;
-};
-
-const activityLabelMap: Record<SellerLeadRecord["activityType"], string> = {
-  view: "View Property",
-  cart: "Add to Cart",
-  wishlist: "Wishlist",
-  compare: "Compare Property",
 };
 
 function formatDateTime(value?: string) {
@@ -23,23 +17,38 @@ function formatDateTime(value?: string) {
 }
 
 function SellerLeadsTableComponent({ rows, onDeleteRow }: SellerLeadsTableProps) {
+  const { t } = useTranslation();
+
+  const activityLabel = (type: SellerLeadRecord["activityType"]) =>
+    t(`sellerPanel.leadsTable.activityTypes.${type}`, { defaultValue: type });
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-[760px] w-full text-sm">
         <thead className="bg-[var(--b2-soft)]/90">
           <tr>
-            <th className="px-4 py-3 text-left font-semibold">Buyer Name</th>
-            <th className="px-4 py-3 text-left font-semibold">Activity Type</th>
-            <th className="px-4 py-3 text-left font-semibold">Property Name</th>
-            <th className="px-4 py-3 text-left font-semibold">Date & Time</th>
-            <th className="px-4 py-3 text-left font-semibold">Action</th>
+            <th className="px-4 py-3 text-left font-semibold">
+              {t("sellerPanel.leadsTable.buyerName")}
+            </th>
+            <th className="px-4 py-3 text-left font-semibold">
+              {t("sellerPanel.leadsTable.activityType")}
+            </th>
+            <th className="px-4 py-3 text-left font-semibold">
+              {t("sellerPanel.leadsTable.propertyName")}
+            </th>
+            <th className="px-4 py-3 text-left font-semibold">
+              {t("sellerPanel.leadsTable.dateTime")}
+            </th>
+            <th className="px-4 py-3 text-left font-semibold">
+              {t("sellerPanel.leadsTable.action")}
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-[var(--b2)]/70">
           {rows.length === 0 ? (
             <tr>
               <td colSpan={5} className="px-4 py-6 text-center text-[var(--muted)]">
-                No activities yet.
+                {t("sellerPanel.leadsTable.empty")}
               </td>
             </tr>
           ) : (
@@ -52,7 +61,7 @@ function SellerLeadsTableComponent({ rows, onDeleteRow }: SellerLeadsTableProps)
               >
                 <td className="px-4 py-3 font-medium text-[var(--b1)]">{row.buyerName || "-"}</td>
                 <td className="px-4 py-3 text-[var(--b1)]">
-                  {activityLabelMap[row.activityType] ?? row.activityType}
+                  {activityLabel(row.activityType)}
                 </td>
                 <td className="px-4 py-3 text-[var(--b1)]">{row.propertyName || "-"}</td>
                 <td className="px-4 py-3 text-[var(--muted)]">{formatDateTime(row.timestamp)}</td>
@@ -63,7 +72,7 @@ function SellerLeadsTableComponent({ rows, onDeleteRow }: SellerLeadsTableProps)
                     className="inline-flex items-center gap-1 rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2.5 py-1.5 text-xs font-medium text-[var(--error)] transition hover:bg-[var(--b2-soft)]"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                    Delete
+                    {t("sellerPanel.leadsTable.delete")}
                   </button>
                 </td>
               </motion.tr>

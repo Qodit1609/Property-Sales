@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import api from "@/lib/apiClient";
+import { translateApiValue } from "@/lib/i18nHelpers";
 
 type Stat = {
   value: string;
@@ -23,6 +25,7 @@ type StatApiItem = {
 };
 
 const StatsSection: React.FC = () => {
+  const { t } = useTranslation();
   const [content, setContent] = useState<StatsContent | null>(null);
 
   useEffect(() => {
@@ -94,7 +97,7 @@ const StatsSection: React.FC = () => {
                     {stat?.value}
                   </h3>
                   <p className="mt-2 text-sm font-medium uppercase tracking-wider text-gray-600">
-                    {stat?.label}
+                    {translateApiValue("statsSection.labels", stat?.label, stat?.label)}
                   </p>
                 </div>
               ))}

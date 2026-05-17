@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { HeartCrack, MoveRight, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
@@ -14,9 +15,10 @@ import { createNotificationAPI } from "../../features/notifications/notification
 import { trackPropertyActivityAPI } from "../../features/properties/propertyAPI";
 
 const Wishlist: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const wishlistIds = useAppSelector((s) => s.buyer.wishlistIds);
-  const buyerName = useAppSelector((s) => s.auth.user?.name ?? "Buyer");
+  const buyerName = useAppSelector((s) => s.auth.user?.name ?? t("common.buyerFallback"));
   const { properties: wishlist, loading } = useBuyerResolvedProperties(wishlistIds);
 
   if (wishlistIds.length === 0) {
@@ -26,17 +28,16 @@ const Wishlist: React.FC = () => {
           <HeartCrack className="h-7 w-7" />
         </div>
         <h2 className="text-lg font-semibold text-[var(--b1)]">
-          No saved properties yet
+          {t("buyerPanel.wishlistPage.emptyTitle")}
         </h2>
         <p className="mt-2 max-w-md text-sm text-[var(--muted)]">
-          Start exploring curated agriculture lands, farmhouses and resorts. Use
-          the heart on any property card to save it for later.
+          {t("buyerPanel.wishlistPage.emptyBody")}
         </p>
         <Link
           to="/buyer/dashboard"
           className="mt-6 inline-flex items-center justify-center rounded-full bg-[var(--b1)] px-5 py-2 text-sm font-semibold text-[var(--fg)] transition hover:opacity-95"
         >
-          Discover properties
+          {t("buyerPanel.wishlistPage.discoverCta")}
         </Link>
       </div>
     );
@@ -47,11 +48,11 @@ const Wishlist: React.FC = () => {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-[var(--b1)]">
-            Saved properties
+            {t("buyerPanel.wishlistPage.savedTitle")}
           </h2>
           <p className="text-xs text-[var(--muted)]">
-            You have {wishlistIds.length} properties in your wishlist.
-            {loading ? " Refreshing details…" : ""}
+            {t("buyerPanel.wishlistPage.countSummary", { count: wishlistIds.length })}
+            {loading ? t("buyerPanel.wishlistPage.refreshing") : ""}
           </p>
         </div>
       </div>
@@ -74,19 +75,14 @@ const Wishlist: React.FC = () => {
                 className="rounded-full px-3 py-1 text-[11px] font-medium text-[var(--muted)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2-soft)]"
               >
                 <HeartCrack className="h-3.5 w-3.5" />
-                Remove
+                {t("buyerPanel.dashboard.remove")}
               </Button>
 
               <Button
                 type="button"
                 onClick={() => {
                   dispatch(moveWishlistToCart(property._id));
-                  void trackPropertyActivityAPI(property._id, "cart").then((result) => {
-                    if (result?.alreadyPresent) {
-                      // Keep UX consistent with quick action feedback patterns used elsewhere.
-                      // This action still keeps cart selected locally.
-                    }
-                  });
+                  void trackPropertyActivityAPI(property._id, "cart");
                   const rawSellerId = (property as { sellerId?: unknown }).sellerId;
                   const sellerId =
                     typeof rawSellerId === "string"
@@ -98,8 +94,11 @@ const Wishlist: React.FC = () => {
                       : "";
                   if (sellerId) {
                     void createNotificationAPI({
-                      title: "Property added to cart",
-                      message: `${buyerName} added ${property.title ?? "your property"} to cart.`,
+                      title: t("buyerPanel.wishlistPage.addedToCartTitle"),
+                      message: t("buyerPanel.wishlistPage.addedToCartMessage", {
+                        buyer: buyerName,
+                        property: property.title ?? t("propertyCard.untitledProperty"),
+                      }),
                       type: "cart",
                       receiverId: sellerId,
                       propertyId: property._id,
@@ -110,7 +109,7 @@ const Wishlist: React.FC = () => {
                 className="rounded-full px-3 py-1 text-[11px] font-semibold"
               >
                 <ShoppingCart className="h-3.5 w-3.5" />
-                Move to cart
+                {t("buyerPanel.wishlistPage.moveToCart")}
                 <MoveRight className="h-3 w-3" />
               </Button>
             </div>

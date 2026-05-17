@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, useReducedMotion } from "framer-motion";
 import { Scale } from "lucide-react";
 import { useStore } from "react-redux";
@@ -15,6 +16,7 @@ interface Props {
 }
 
 const CompareButton: React.FC<Props> = ({ property, className = "" }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const store = useStore<RootState>();
   const reduceMotion = useReducedMotion();
@@ -30,12 +32,12 @@ const CompareButton: React.FC<Props> = ({ property, className = "" }) => {
       const after = store.getState().buyer.compareIds.includes(id);
       if (before !== after) {
         showBuyerActionFeedback(
-          after ? "Added to compare" : "Removed from compare"
+          after ? t("buyerPanel.actions.addedToCompare") : t("buyerPanel.actions.removedFromCompare")
         );
         if (after) {
           void trackPropertyActivityAPI(property._id, "compare").then((result) => {
             if (result?.alreadyPresent) {
-              showBuyerActionFeedback("Property is already in compare");
+              showBuyerActionFeedback(t("buyerPanel.actions.alreadyInCompare"));
             }
           });
         } else {
@@ -43,7 +45,7 @@ const CompareButton: React.FC<Props> = ({ property, className = "" }) => {
         }
       }
     },
-    [dispatch, property, store]
+    [dispatch, property, store, t]
   );
 
   return (
@@ -55,7 +57,7 @@ const CompareButton: React.FC<Props> = ({ property, className = "" }) => {
       className={`inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white shadow-sm backdrop-blur-md ring-1 ring-white/15 transition hover:bg-black/55 ${
         active ? "ring-emerald-400/80" : ""
       } ${className}`}
-      aria-label="Compare"
+      aria-label={t("buyerPanel.actions.compare")}
       aria-pressed={active}
     >
       <Scale size={16} className={active ? "text-emerald-300" : "text-white"} />

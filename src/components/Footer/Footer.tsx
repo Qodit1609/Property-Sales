@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import {
   Mail,
@@ -164,6 +165,7 @@ const SocialIcon: React.FC<SocialLink> = ({ label, href, icon }) => (
 );
 
 const BackToTop: React.FC = () => {
+  const { t } = useTranslation();
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -171,13 +173,13 @@ const BackToTop: React.FC = () => {
   return (
     <button
       onClick={scrollToTop}
-      aria-label="Back to top"
+      aria-label={t("footer.backToTopAria")}
       className="group flex items-center gap-2 mx-auto sm:mx-0 text-xs font-medium text-fg/60 hover:text-[var(--b2)] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] rounded-sm"
     >
       <span className="flex items-center justify-center w-8 h-8 rounded-full border border-fg/20 group-hover:border-[var(--b2)] group-hover:bg-[var(--b2)]/10 transition-all duration-300">
         <ArrowUp className="w-3.5 h-3.5" />
       </span>
-      Back to Top
+      {t("footer.backToTop")}
     </button>
   );
 };
@@ -187,6 +189,7 @@ const BackToTop: React.FC = () => {
 /* ------------------------------------------------------------------ */
 
 const Newsletter: React.FC = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
@@ -204,19 +207,18 @@ const Newsletter: React.FC = () => {
   return (
     <div className="text-center sm:text-left">
       <h3 className="text-sm font-semibold uppercase tracking-widest mb-3 text-[var(--b2)]">
-        Stay Updated
+        {t("footer.newsletter.title")}
       </h3>
       <p className="text-sm text-fg/60 mb-4 max-w-sm mx-auto sm:mx-0">
-        Get the latest property listings and investment tips delivered to your
-        inbox.
+        {t("footer.newsletter.description")}
       </p>
       <form
         onSubmit={handleSubmit}
         className="flex flex-col sm:flex-row gap-2 max-w-sm mx-auto sm:mx-0 w-full"
-        aria-label="Newsletter subscription"
+        aria-label={t("footer.newsletter.subscribeAria")}
       >
         <label htmlFor="footer-email" className="sr-only">
-          Email address
+          {t("footer.newsletter.emailLabel")}
         </label>
         <input
           id="footer-email"
@@ -224,21 +226,21 @@ const Newsletter: React.FC = () => {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter your email"
+          placeholder={t("footer.newsletter.emailPlaceholder")}
           className="w-full sm:flex-1 min-w-0 px-4 py-2.5 text-sm rounded-lg bg-white/10 border border-fg/20 text-fg placeholder:text-fg/40 focus:outline-none focus:border-[var(--b2)] focus:ring-1 focus:ring-[var(--b2)] transition-colors duration-200"
         />
         <button
           type="submit"
-          aria-label="Subscribe to newsletter"
+          aria-label={t("footer.newsletter.subscribeAria")}
           className="flex items-center justify-center w-full sm:w-auto px-4 py-2.5 rounded-lg bg-[var(--b2)] text-[var(--b1)] font-semibold text-sm hover:bg-[var(--b2-soft)] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--b1)] shrink-0"
         >
           <Send className="w-4 h-4 mr-2" />
-          <span>Subscribe</span>
+          <span>{t("footer.newsletter.subscribe")}</span>
         </button>
       </form>
       {submitted && (
         <p className="mt-2 text-xs text-[var(--b2)] animate-pulse">
-          Thank you for subscribing!
+          {t("footer.newsletter.thankYou")}
         </p>
       )}
     </div>
@@ -250,6 +252,7 @@ const Newsletter: React.FC = () => {
 /* ------------------------------------------------------------------ */
 
 const Footer: React.FC = () => {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
   const [footerData, setFooterData] = useState<FooterData | null>(null);
 
@@ -389,22 +392,28 @@ const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div className="lg:col-span-2">
-            {footerData?.quickLinks && <FooterColumn title="Quick Links" links={footerData.quickLinks} />}
+            {footerData?.quickLinks && (
+              <FooterColumn title={t("footer.sections.quickLinks")} links={footerData.quickLinks} />
+            )}
           </div>
 
           {/* Property Categories */}
           <div className="lg:col-span-2">
-            {footerData?.categories && <FooterColumn title="Categories" links={footerData.categories} />}
+            {footerData?.categories && (
+              <FooterColumn title={t("footer.sections.categories")} links={footerData.categories} />
+            )}
           </div>
 
           {/* Useful Links + Contact */}
           <div className="lg:col-span-4 space-y-8">
-            {footerData?.usefulLinks && <FooterColumn title="Useful Links" links={footerData.usefulLinks} />}
+            {footerData?.usefulLinks && (
+              <FooterColumn title={t("footer.sections.usefulLinks")} links={footerData.usefulLinks} />
+            )}
 
             {/* Contact Info */}
             <div>
               <h3 className="text-sm font-semibold uppercase tracking-widest mb-4 text-[var(--b2)]">
-                Contact Us
+                {t("footer.sections.contact")}
               </h3>
               <address className="not-italic space-y-3">
                 <a
@@ -442,13 +451,8 @@ const Footer: React.FC = () => {
       {/* Bottom Bar */}
       <div className="border-t border-white/15 bg-black/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-fg/50">
-          <p>
-            &copy; {currentYear} BhoomiWala.com &middot; All Rights Reserved
-          </p>
-          <p>
-            Developed with care by{" "}
-            <span className="text-[var(--b2)] font-semibold">TRH</span>
-          </p>
+          <p>{t("footer.copyright", { year: currentYear })}</p>
+          <p>{t("footer.credits")}</p>
         </div>
       </div>
     </footer>

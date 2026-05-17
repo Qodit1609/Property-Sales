@@ -47,7 +47,7 @@ const InfoItem = ({ label, value, suffix }: InfoItemProps) => {
             rel="noopener noreferrer"
             className="text-blue-600 underline"
           >
-            View on Map
+            {t("propertyPreview.actions.viewOnMap")}
           </a>
         ) : (
           displayValue

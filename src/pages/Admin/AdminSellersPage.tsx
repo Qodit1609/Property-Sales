@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/common";
 import AdminLayout from "../../components/admin/AdminLayout";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
@@ -8,6 +9,7 @@ import {
 } from "../../features/admin/adminSlice";
 
 const AdminSellersPage: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { users, usersLoading, usersError, listings, listingsLoading, listingsError, listingsPagination } =
     useAppSelector((s) => s.admin);
@@ -57,28 +59,27 @@ const AdminSellersPage: React.FC = () => {
   const countsMayBePartial = catalogTotal > totalLoaded;
 
   return (
-    <AdminLayout title="Sellers">
+    <AdminLayout title={t("adminPanel.sellersPage.title")}>
       <div className="mx-auto max-w-7xl space-y-5">
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
-            Sellers
+            {t("adminPanel.sellersPage.heading")}
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">
-            Accounts with the seller role and how many listings each has posted.
+            {t("adminPanel.sellersPage.subtitle")}
           </p>
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Input
-            placeholder="Search by name, email, or ID…"
+            placeholder={t("adminPanel.sellersPage.searchPlaceholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full border-[var(--b2)] text-sm shadow-sm sm:max-w-md"
           />
           {!loading && countsMayBePartial && (
             <p className="text-[11px] text-amber-700">
-              Loaded {totalLoaded} of {catalogTotal} properties; counts may be incomplete. Increase the
-              fetch limit if needed.
+              {t("adminPanel.sellersPage.countsIncomplete", { loaded: totalLoaded, total: catalogTotal })}
             </p>
           )}
         </div>
@@ -86,7 +87,7 @@ const AdminSellersPage: React.FC = () => {
         {loading && (
           <div className="flex items-center gap-2 rounded-xl border border-[var(--b2)] bg-[var(--white)] px-4 py-8 text-sm text-[var(--muted)]">
             <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--b1-mid)] border-t-transparent" />
-            Loading sellers…
+            {t("adminPanel.sellersPage.loading")}
           </div>
         )}
 
@@ -96,7 +97,7 @@ const AdminSellersPage: React.FC = () => {
 
         {listingsCountError && !loading && (
           <p className="text-sm text-amber-700">
-            Could not load property counts: {listingsCountError}
+            {t("adminPanel.sellersPage.countsError", { error: listingsCountError })}
           </p>
         )}
 
@@ -121,7 +122,7 @@ const AdminSellersPage: React.FC = () => {
                     </p>
                     <div className="mt-3 flex items-center justify-between border-t border-[var(--b2)]/80 pt-3">
                       <span className="text-xs font-medium text-[var(--muted)]">
-                        Properties posted
+                        {t("adminPanel.sellersPage.propertiesPosted")}
                       </span>
                       <span className="inline-flex min-w-[2rem] justify-center rounded-full bg-[var(--b2-soft)] px-2.5 py-1 text-sm font-semibold tabular-nums text-[var(--b1)] ring-1 ring-[var(--b2)]">
                         {n}
@@ -132,7 +133,7 @@ const AdminSellersPage: React.FC = () => {
               })}
               {sellers.length === 0 && (
                 <p className="rounded-xl border border-dashed border-[var(--b2)] py-12 text-center text-sm text-[var(--muted)]">
-                  No seller accounts found.
+                  {t("adminPanel.sellersPage.noSellers")}
                 </p>
               )}
             </div>
@@ -141,10 +142,10 @@ const AdminSellersPage: React.FC = () => {
               <table className="min-w-[640px] w-full text-sm text-[var(--b1)]">
                 <thead className="sticky top-0 z-10 bg-gradient-to-r from-[var(--b2-soft)] to-[var(--white)] text-xs font-semibold uppercase tracking-wider shadow-sm">
                   <tr>
-                    <th className="px-4 py-3.5 text-left">Name</th>
-                    <th className="px-4 py-3.5 text-left">Email</th>
-                    <th className="px-4 py-3.5 text-left">User ID</th>
-                    <th className="px-4 py-3.5 text-right">Properties posted</th>
+                    <th className="px-4 py-3.5 text-left">{t("adminPanel.sellersPage.table.name")}</th>
+                    <th className="px-4 py-3.5 text-left">{t("adminPanel.sellersPage.table.email")}</th>
+                    <th className="px-4 py-3.5 text-left">{t("adminPanel.sellersPage.table.userId")}</th>
+                    <th className="px-4 py-3.5 text-right">{t("adminPanel.sellersPage.propertiesPosted")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--b2)]/80">
@@ -182,7 +183,7 @@ const AdminSellersPage: React.FC = () => {
                         colSpan={4}
                         className="px-4 py-12 text-center text-[var(--muted)]"
                       >
-                        No seller accounts found.
+                        {t("adminPanel.sellersPage.noSellers")}
                       </td>
                     </tr>
                   )}

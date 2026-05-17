@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, Input } from "@/components/common";
 import type { CreateTestimonialRequest } from "@/features/testimonials/testimonialTypes";
 import StarRating from "@/components/testimonial/StarRating";
@@ -24,6 +25,7 @@ const TestimonialFormCard: React.FC<Props> = ({
   submitting = false,
   onSubmit,
 }) => {
+  const { t } = useTranslation();
   const [form, setForm] = useState<CreateTestimonialRequest>(initialState);
 
   return (
@@ -42,25 +44,27 @@ const TestimonialFormCard: React.FC<Props> = ({
       >
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Input
-            label="Full Name"
+            label={t("buyerPanel.testimonial.form.fullName")}
             value={form.fullName}
             onChange={(e) => setForm((prev) => ({ ...prev, fullName: e.target.value }))}
             required
           />
           <Input
-            label="Location"
+            label={t("buyerPanel.testimonial.form.location")}
             value={form.location}
             onChange={(e) => setForm((prev) => ({ ...prev, location: e.target.value }))}
             required
           />
           <Input
-            label="Occupation"
+            label={t("buyerPanel.testimonial.form.occupation")}
             value={form.occupation}
             onChange={(e) => setForm((prev) => ({ ...prev, occupation: e.target.value }))}
             required
           />
           <div>
-            <label className="mb-1 block text-sm text-[var(--b1)]">Rating (1-5)</label>
+            <label className="mb-1 block text-sm text-[var(--b1)]">
+              {t("buyerPanel.testimonial.form.rating")}
+            </label>
             <div className="rounded-lg border border-border px-3 py-2">
               <StarRating
                 value={form.rating}
@@ -72,7 +76,9 @@ const TestimonialFormCard: React.FC<Props> = ({
         </div>
 
         <div>
-          <label className="mb-1 block text-sm text-[var(--b1)]">Description</label>
+          <label className="mb-1 block text-sm text-[var(--b1)]">
+            {t("buyerPanel.testimonial.form.description")}
+          </label>
           <textarea
             value={form.description}
             onChange={(e) => setForm((prev) => ({ ...prev, description: e.target.value }))}
@@ -83,7 +89,7 @@ const TestimonialFormCard: React.FC<Props> = ({
         </div>
 
         <Button type="submit" loading={submitting} disabled={submitting}>
-          Submit Testimonial
+          {t("buyerPanel.testimonial.form.submit")}
         </Button>
       </form>
     </section>
@@ -91,3 +97,4 @@ const TestimonialFormCard: React.FC<Props> = ({
 };
 
 export default TestimonialFormCard;
+

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Bell } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import {
@@ -8,6 +9,7 @@ import {
 import { Button } from "@/components/common";
 
 const NotificationPanel: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const notifications = useAppSelector((state) => state.notifications.items);
   const user = useAppSelector((state) => state.auth.user);
@@ -23,10 +25,10 @@ const NotificationPanel: React.FC = () => {
           </div>
           <div>
             <h2 className="text-sm font-semibold text-[var(--b1)]">
-              Buyer notifications
+              {t("buyerPanel.notificationsPanel.title")}
             </h2>
             <p className="text-[11px] text-[var(--muted)]">
-              Price drops, new launches and seller responses.
+              {t("buyerPanel.notificationsPanel.subtitle")}
             </p>
           </div>
         </div>
@@ -38,7 +40,7 @@ const NotificationPanel: React.FC = () => {
             onClick={() => dispatch(clearReadNotifications(userId))}
             className="shrink-0 text-xs"
           >
-            Clear all
+            {t("common.clearAll")}
           </Button>
         ) : null}
       </div>
@@ -46,11 +48,10 @@ const NotificationPanel: React.FC = () => {
       {notifications.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[var(--b2)] bg-[var(--b2-soft)] px-6 py-10 text-center">
           <p className="text-sm font-medium text-[var(--b1)]">
-            You’re all caught up
+            {t("buyerPanel.notificationsPanel.emptyTitle")}
           </p>
           <p className="mt-1 text-[11px] text-[var(--muted)]">
-            Alerts for price drops, new matching listings and seller replies
-            will appear here.
+            {t("buyerPanel.notificationsPanel.emptySub")}
           </p>
         </div>
       ) : (

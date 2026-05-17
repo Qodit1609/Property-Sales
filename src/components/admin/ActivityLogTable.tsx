@@ -1,5 +1,11 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
+import {
+  translateActivityStatus,
+  translateActivityType,
+  translateRole,
+} from "../../lib/i18nHelpers";
 import {
   Building2,
   FileCheck,
@@ -38,12 +44,6 @@ function roleBadgeClass(role: ActivityLogRole): string {
   return "bg-emerald-500/15 text-emerald-800";
 }
 
-function roleLabel(role: ActivityLogRole): string {
-  if (role === "admin") return "Admin";
-  if (role === "seller") return "Seller";
-  return "Buyer";
-}
-
 function statusBadgeClass(tone: ActivityStatusTone): string {
   if (tone === "success") return "bg-emerald-500/15 text-emerald-700";
   if (tone === "warning") return "bg-amber-500/15 text-amber-800";
@@ -78,6 +78,7 @@ function activityIcon(type: ActivityTypeCode): React.ReactNode {
 }
 
 const ActivityLogTable: React.FC<ActivityLogTableProps> = ({ rows, activityCategory }) => {
+  const { t } = useTranslation();
   const isLoginView = activityCategory === "login";
   return (
     <div className="overflow-hidden rounded-xl border border-[var(--b2)]/90 bg-[var(--white)] shadow-md shadow-[var(--b1)]/5">
@@ -86,33 +87,33 @@ const ActivityLogTable: React.FC<ActivityLogTableProps> = ({ rows, activityCateg
           <thead>
             <tr className="border-b border-[var(--b2)] bg-[var(--b2-soft)]/80">
               <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
-                Role
+                {t("adminPanel.activityLogsPage.tableRole")}
               </th>
               <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
-                Activity
+                {t("adminPanel.activityLogsPage.tableActivity")}
               </th>
               <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
-                Name
+                {t("adminPanel.activityLogsPage.tableName")}
               </th>
               {isLoginView ? (
                 <>
                   <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
-                    Login at
+                    {t("adminPanel.activityLogsPage.tableLoginAt")}
                   </th>
                   <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
-                    Logout at
+                    {t("adminPanel.activityLogsPage.tableLogoutAt")}
                   </th>
                   <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
-                    Duration
+                    {t("adminPanel.activityLogsPage.tableDuration")}
                   </th>
                 </>
               ) : (
                 <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
-                  Date
+                  {t("adminPanel.activityLogsPage.tableDate")}
                 </th>
               )}
               <th className="px-4 py-3.5 font-semibold text-[var(--b1)] sm:px-5">
-                Status
+                {t("adminPanel.activityLogsPage.tableStatus")}
               </th>
             </tr>
           </thead>
@@ -132,13 +133,15 @@ const ActivityLogTable: React.FC<ActivityLogTableProps> = ({ rows, activityCateg
                   <span
                     className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${roleBadgeClass(row.role)}`}
                   >
-                    {roleLabel(row.role)}
+                    {translateRole(row.role)}
                   </span>
                 </td>
                 <td className="px-4 py-3.5 sm:px-5">
                   <span className="flex items-center gap-2">
                     {activityIcon(row.activityType)}
-                    <span className="text-[var(--b1)]">{row.activity}</span>
+                    <span className="text-[var(--b1)]">
+                      {translateActivityType(row.activityType) || row.activity}
+                    </span>
                   </span>
                 </td>
                 <td className="px-4 py-3.5 font-medium text-[var(--b1)] sm:px-5">
@@ -165,7 +168,7 @@ const ActivityLogTable: React.FC<ActivityLogTableProps> = ({ rows, activityCateg
                   <span
                     className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusBadgeClass(row.statusTone)}`}
                   >
-                    {row.status}
+                    {translateActivityStatus(row.status)}
                   </span>
                 </td>
               </motion.tr>
@@ -177,9 +180,9 @@ const ActivityLogTable: React.FC<ActivityLogTableProps> = ({ rows, activityCateg
       {rows.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-2 border-t border-[var(--b2)] bg-[var(--b2-soft)]/20 px-4 py-14 text-center">
           <Shield className="h-10 w-10 text-[var(--b1-mid)]" aria-hidden />
-          <p className="font-medium text-[var(--b1)]">No activities match</p>
+          <p className="font-medium text-[var(--b1)]">{t("adminPanel.activityLogsPage.emptyMatch")}</p>
           <p className="text-sm text-[var(--muted)]">
-            Adjust filters or search — connected APIs will stream live logs here.
+            {t("adminPanel.activityLogsPage.emptyHint")}
           </p>
         </div>
       ) : null}

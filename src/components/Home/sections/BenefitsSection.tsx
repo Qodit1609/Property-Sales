@@ -1,4 +1,5 @@
 import React, { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { CheckCircle2 } from "lucide-react";
 import { motion } from "framer-motion";
 import type { Benefit } from "../models/homeTypes";
@@ -9,12 +10,14 @@ type BenefitsSectionProps = {
 };
 
 const BenefitsSection: React.FC<BenefitsSectionProps> = ({ benefits }) => {
+  const { t } = useTranslation();
+
   return (
     <SectionWrapper className="py-12 sm:py-14" id="benefits">
       <SectionHeading
-        eyebrow="Why choose us"
-        title="Built for modern farmland transactions"
-        description="A focused product experience designed to reduce friction in discovery, due diligence, and closure."
+        eyebrow={t("homeSections.benefits.eyebrow")}
+        title={t("homeSections.benefits.title")}
+        description={t("homeSections.benefits.description")}
       />
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {benefits.map((benefit, index) => (

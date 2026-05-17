@@ -60,6 +60,7 @@ import { SellerStatsSkeleton } from "./components/seller/SellerSkeleton";
 import BuyerCompareToast from "./components/buyer/BuyerCompareToast";
 import BuyerFeedbackToast from "./components/buyer/BuyerFeedbackToast";
 import NotificationSync from "./features/notifications/NotificationSync";
+import I18nLanguageBoundary from "./components/I18nLanguageBoundary";
 
 const SellerLeadsPage = React.lazy(() => import("./pages/Seller/SellerLeadsPage"));
 const SellerAnalyticsPage = React.lazy(() => import("./pages/Seller/SellerAnalyticsPage"));
@@ -116,6 +117,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <I18nLanguageBoundary>
       <ScrollToTop />
       <NotificationSync />
       <BuyerCompareToast />
@@ -336,6 +338,7 @@ function App() {
         <Route path="/register" element={<Register />} />
 
       </Routes>
+      </I18nLanguageBoundary>
     </BrowserRouter>
   );
 }

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import Modal from "../../components/Modal/Modal";
 import { Button, Input } from "@/components/common";
@@ -1038,6 +1039,7 @@ function FieldLabel({
 }
 
 const AgentDashboardPage: React.FC = () => {
+  const { t } = useTranslation();
   const { properties, refreshProperties } = useAgentCollection();
   const [viewing, setViewing] = useState<AgentCollectedProperty | null>(null);
   const [editing, setEditing] = useState<AgentCollectedProperty | null>(null);
@@ -1106,10 +1108,10 @@ const AgentDashboardPage: React.FC = () => {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-xl sm:text-2xl font-semibold text-[var(--b1)]">
-            Agent Dashboard
+            {t("agentPanel.dashboard.title")}
           </h1>
           <p className="mt-1 text-xs text-[var(--muted)]">
-            Track listings, leads and visits at a glance.
+            {t("agentPanel.dashboard.subtitle")}
           </p>
         </div>
         <div className="flex flex-wrap gap-2 justify-end shrink-0">
@@ -1118,48 +1120,48 @@ const AgentDashboardPage: React.FC = () => {
             onClick={() => exportAgentCsv(properties)}
             className="inline-flex items-center gap-1 rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-1 text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
           >
-            Export CSV
+            {t("agentPanel.dashboard.exportCsv")}
           </Button>
           <Button
             type="button"
             onClick={() => openExportPdf(properties)}
             className="inline-flex items-center gap-1 rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-1 text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
           >
-            Download PDF
+            {t("agentPanel.dashboard.downloadPdf")}
           </Button>
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          label="Collected Properties"
+          label={t("agentPanel.dashboard.stats.collected")}
           value={String(properties.length)}
-          hint="Agent property collection entries."
+          hint={t("agentPanel.dashboard.stats.collectedHint")}
         />
         <StatCard
-          label="Draft"
+          label={t("agentPanel.dashboard.stats.draft")}
           value={String(statusTotals.draft)}
-          hint="Step 1 saved and editable."
+          hint={t("agentPanel.dashboard.stats.draftHint")}
         />
         <StatCard
-          label="Incomplete"
+          label={t("agentPanel.dashboard.stats.incomplete")}
           value={String(statusTotals.incomplete)}
-          hint="Step 2 pending final details."
+          hint={t("agentPanel.dashboard.stats.incompleteHint")}
         />
         <StatCard
-          label="Ready"
+          label={t("agentPanel.dashboard.stats.ready")}
           value={String(statusTotals.ready)}
-          hint="Ready for admin approval flow."
+          hint={t("agentPanel.dashboard.stats.readyHint")}
         />
       </div>
 
       <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-sm">
         <div className="border-b border-[var(--b2)] px-4 py-3">
           <h2 className="text-sm font-semibold text-[var(--b1)]">
-            Recent Activity
+            {t("agentPanel.dashboard.recentActivity")}
           </h2>
           <p className="text-[11px] text-[var(--muted)]">
-            Latest property status snapshots.
+            {t("agentPanel.dashboard.recentActivityHint")}
           </p>
         </div>
         <div className="p-4">
@@ -1170,7 +1172,7 @@ const AgentDashboardPage: React.FC = () => {
           ) : null}
           {recentActivity.length === 0 ? (
             <p className="text-sm text-[var(--muted)]">
-              No recent activity found.
+              {t("agentPanel.dashboard.noRecentActivity")}
             </p>
           ) : (
             <ul className="space-y-3">
@@ -1181,7 +1183,7 @@ const AgentDashboardPage: React.FC = () => {
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-[var(--b1)]">
-                      {a.step1.village || "Untitled"}
+                      {a.step1.village || t("agentPanel.dashboard.untitled")}
                     </p>
                     <p className="text-[11px] text-[var(--muted)]">
                       ID: {a.id}
@@ -1196,14 +1198,14 @@ const AgentDashboardPage: React.FC = () => {
                       onClick={() => setViewing(a)}
                       className="inline-flex items-center gap-1 rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-1 text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
                     >
-                      View
+                      {t("common.view")}
                     </Button>
                     <Button
                       type="button"
                       onClick={() => setEditing(a)}
                       className="inline-flex items-center gap-1 rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-1 text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
                     >
-                      Edit
+                      {t("common.edit")}
                     </Button>
                     <Button
                       type="button"
@@ -1213,7 +1215,7 @@ const AgentDashboardPage: React.FC = () => {
                       }}
                       className="inline-flex items-center gap-1 rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-1 text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
                     >
-                      Delete
+                      {t("common.delete")}
                     </Button>
                   </div>
                 </li>
@@ -1226,7 +1228,7 @@ const AgentDashboardPage: React.FC = () => {
       <Modal
         open={Boolean(viewing)}
         onClose={() => setViewing(null)}
-        title={viewing ? `Entry · ${viewing.step1.village || viewing.id}` : "Entry"}
+        title={viewing ? `${t("agentPanel.dashboard.entryTitle")} · ${viewing.step1.village || viewing.id}` : t("agentPanel.dashboard.entryTitle")}
       >
         {viewing ? <EntryViewBody property={viewing} /> : null}
       </Modal>
@@ -1234,7 +1236,7 @@ const AgentDashboardPage: React.FC = () => {
       <Modal
         open={Boolean(editing)}
         onClose={() => setEditing(null)}
-        title={editing ? `Edit · ${editing.step1.village || editing.id}` : "Edit"}
+        title={editing ? `${t("agentPanel.dashboard.editTitle")} · ${editing.step1.village || editing.id}` : t("agentPanel.dashboard.editTitle")}
       >
         {editing ? (
           <EntryEditForm
@@ -1248,14 +1250,16 @@ const AgentDashboardPage: React.FC = () => {
 
       <CustomAlert
         open={Boolean(pendingDelete)}
-        title="Delete property?"
+        title={t("agentPanel.dashboard.deleteTitle")}
         message={
           pendingDelete
-            ? `Are you sure you want to delete "${pendingDelete.step1.village || pendingDelete.id}"? This cannot be undone.`
+            ? t("agentPanel.dashboard.deleteMessage", {
+                name: pendingDelete.step1.village || pendingDelete.id,
+              })
             : ""
         }
-        confirmLabel={deleteInProgress ? "Deleting…" : "Delete"}
-        cancelLabel="Cancel"
+        confirmLabel={deleteInProgress ? t("common.deleting") : t("common.delete")}
+        cancelLabel={t("common.cancel")}
         showCancel
         onCancel={() => {
           if (deleteInProgress) return;

@@ -21,7 +21,6 @@ import {
   formatCompactNumber,
   formatPriceLocalized,
   formatSqftPrice,
-  getDisplayAddress,
   getLatLng,
   getOverviewSpecs,
   getPrimaryContact,
@@ -30,6 +29,10 @@ import {
   translatePropertyType,
   yesNoOptional,
 } from "./previewUtils";
+import {
+  PropertyPreviewTextProvider,
+  usePropertyPreviewTextContext,
+} from "./PropertyPreviewTextContext";
 import {
   MAX_PROPERTY_DESCRIPTION_WORDS,
   MAX_PROPERTY_SHORT_DESCRIPTION_WORDS,
@@ -41,8 +44,15 @@ type Props = {
   property: Property;
 };
 
-const PropertyPreview = ({ property }: Props) => {
+const PropertyPreview = ({ property }: Props) => (
+  <PropertyPreviewTextProvider property={property}>
+    <PropertyPreviewContent property={property} />
+  </PropertyPreviewTextProvider>
+);
+
+const PropertyPreviewContent = ({ property }: Props) => {
   const { t, i18n } = useTranslation();
+  const previewText = usePropertyPreviewTextContext();
   const navigate = useNavigate();
   const user = useAppSelector((s) => s.auth.user);
   const isBuyer = Boolean(user?.role === "buyer");
@@ -94,29 +104,25 @@ const PropertyPreview = ({ property }: Props) => {
     {
       label: t("propertyPreview.labels.roi"),
       value: Number.isFinite(property.analytics?.roiPercent ?? property.roiPercent)
-        ? `${property.analytics?.roiPercent ?? property.roiPercent}%`
+        ? `${property.analytics?.roiPercent ?? property.roiPercent}${t("propertyPreview.units.percent")}`
         : undefined,
     },
     {
       label: t("propertyPreview.labels.appreciationRate"),
       value: Number.isFinite(property.analytics?.appreciationRate)
-        ? `${property.analytics?.appreciationRate}%`
+        ? `${property.analytics?.appreciationRate}${t("propertyPreview.units.percent")}`
         : undefined,
     },
     { label: t("propertyPreview.labels.pricePerSqft"), value: formatSqftPrice(property) },
   ].filter((item): item is { label: string; value: string } => Boolean(item.value && item.value !== "\u2014"));
   const topOverviewSpecs = overviewSpecs.slice(0, 4);
   const previewDescription = useMemo(
-    () => truncateWords(property.description || "", MAX_PROPERTY_DESCRIPTION_WORDS),
-    [property.description]
+    () => truncateWords(previewText.description || "", MAX_PROPERTY_DESCRIPTION_WORDS),
+    [previewText.description]
   );
   const previewShortDescription = useMemo(
-    () =>
-      truncateWords(
-        property.shortDescription || property.description || "",
-        MAX_PROPERTY_SHORT_DESCRIPTION_WORDS
-      ),
-    [property.shortDescription, property.description]
+    () => truncateWords(previewText.shortDescription || "", MAX_PROPERTY_SHORT_DESCRIPTION_WORDS),
+    [previewText.shortDescription]
   );
 
   const tabs: PropertyTab[] = [
@@ -181,7 +187,7 @@ const PropertyPreview = ({ property }: Props) => {
         <div className="fixed left-0 right-0 top-[72px] z-40 border-b border-[var(--b2-soft)] bg-white/95 backdrop-blur">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-[var(--b1)]">{property.title}</p>
+              <p className="truncate text-sm font-semibold text-[var(--b1)]">{previewText.title}</p>
               <p className="text-xs text-[var(--muted)]">{formatPriceLocalized(property.price, property.listingType)}</p>
             </div>
             <Button
@@ -238,7 +244,7 @@ const PropertyPreview = ({ property }: Props) => {
                 </div>
 
                 <h1 className="text-xl font-bold leading-tight text-[var(--b1)] sm:text-3xl">
-                  {property.title}
+                  {previewText.title}
                 </h1>
 
                 <p
@@ -249,7 +255,7 @@ const PropertyPreview = ({ property }: Props) => {
 
                 <div className="mt-3 inline-flex max-w-full items-center gap-1.5 rounded-full bg-[var(--b2-soft)]/40 px-3 py-1.5 text-sm text-[var(--muted)]">
                   <MapPin size={14} className="shrink-0" />
-                  <span className="truncate">{getDisplayAddress(property)}</span>
+                  <span className="truncate">{previewText.address}</span>
                 </div>
               </div>
 
@@ -339,7 +345,7 @@ const PropertyPreview = ({ property }: Props) => {
               <div className="mt-4 overflow-hidden rounded-xl border border-[var(--b2-soft)] bg-[var(--b2-soft)]/20">
                 {mapEmbedUrl ? (
                   <iframe
-                    title={`${property.title} location map`}
+                    title={t("propertyPreview.aria.locationMapTitle", { title: previewText.title })}
                     src={mapEmbedUrl}
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"

@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, useReducedMotion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { useStore } from "react-redux";
@@ -18,9 +19,11 @@ interface Props {
 const WishlistButton: React.FC<Props> = ({
   property,
   className = "",
-  "aria-label": ariaLabel = "Wishlist",
+  "aria-label": ariaLabel,
 }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const resolvedAriaLabel = ariaLabel ?? t("buyerPanel.actions.wishlist");
   const store = useStore<RootState>();
   const reduceMotion = useReducedMotion();
   const active = useAppSelector((s) => s.buyer.wishlistIds.includes(property._id));
@@ -35,12 +38,12 @@ const WishlistButton: React.FC<Props> = ({
       const after = store.getState().buyer.wishlistIds.includes(id);
       if (before !== after) {
         showBuyerActionFeedback(
-          after ? "Added to wishlist" : "Removed from wishlist"
+          after ? t("buyerPanel.actions.addedToWishlist") : t("buyerPanel.actions.removedFromWishlist")
         );
         if (after) {
           void trackPropertyActivityAPI(property._id, "wishlist").then((result) => {
             if (result?.alreadyPresent) {
-              showBuyerActionFeedback("Property is already in wishlist");
+              showBuyerActionFeedback(t("buyerPanel.actions.alreadyInWishlist"));
             }
           });
         } else {
@@ -48,7 +51,7 @@ const WishlistButton: React.FC<Props> = ({
         }
       }
     },
-    [dispatch, property, store]
+    [dispatch, property, store, t]
   );
 
   return (
@@ -58,7 +61,7 @@ const WishlistButton: React.FC<Props> = ({
       whileTap={reduceMotion ? undefined : { scale: 0.96 }}
       onClick={onClick}
       className={`inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white shadow-sm backdrop-blur-md ring-1 ring-white/15 transition hover:bg-black/55 ${className}`}
-      aria-label={ariaLabel}
+      aria-label={resolvedAriaLabel}
       aria-pressed={active}
     >
       <Heart

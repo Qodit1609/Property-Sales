@@ -96,7 +96,9 @@ function SellerLeadsCardComponent({ recentLeads }: SellerLeadsCardProps) {
           </motion.li>
         ))}
         {items.length === 0 ? (
-          <li className="px-5 py-4 text-sm text-[var(--muted)]">No recent leads yet.</li>
+          <li className="px-5 py-4 text-sm text-[var(--muted)]">
+            {t("sellerPanel.leadsPreview.empty")}
+          </li>
         ) : null}
       </ul>
     </motion.div>

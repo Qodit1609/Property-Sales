@@ -1,6 +1,6 @@
 import type { Property } from "../../features/properties/propertyType";
 import PropertyFeatureList from "./PropertyFeatureList";
-import { yesNoOptional } from "./previewUtils";
+import { translateDynamicList, translateWaterAvailability, yesNoOptional } from "./previewUtils";
 import { useTranslation } from "react-i18next";
 
 type PropertyWaterProps = {
@@ -12,11 +12,14 @@ const PropertyWater = ({ property }: PropertyWaterProps) => {
   const water = property.waterResources;
   const items = [
     { label: t("propertyPreview.labels.borewell"), value: yesNoOptional(water?.borewell) },
-    { label: t("propertyPreview.labels.waterAvailability"), value: water?.waterAvailability },
+    {
+      label: t("propertyPreview.labels.waterAvailability"),
+      value: translateWaterAvailability(water?.waterAvailability),
+    },
     { label: t("propertyPreview.labels.irrigation"), value: yesNoOptional(water?.irrigation) },
     {
       label: t("propertyPreview.labels.nearbySources"),
-      value: water?.nearbySources?.join(", "),
+      value: translateDynamicList(water?.nearbySources)?.join(", "),
     },
   ].filter((item): item is { label: string; value: string } => Boolean(item.value));
 

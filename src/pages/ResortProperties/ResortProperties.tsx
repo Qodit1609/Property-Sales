@@ -1,9 +1,11 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import PropertyCard from "../../components/Cards/PropertyCard";
 import PropertyLayout from "../PropertyDetails/PropertyLayout";
 import { useAppSelector } from "../../hooks/reduxHooks";
 
 const ResortProperties: React.FC = () => {
+  const { t } = useTranslation();
   const { data } = useAppSelector((state) => state.properties);
 
   const allProperties = data.filter(
@@ -19,7 +21,7 @@ const ResortProperties: React.FC = () => {
           ))
         ) : (
           <div className="col-span-2 flex items-center justify-center text-gray-500 py-20 text-lg">
-            No properties match your filters.
+            {t("propertyList.emptyFiltered")}
           </div>
         )
       }

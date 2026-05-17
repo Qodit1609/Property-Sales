@@ -13,6 +13,7 @@ import { mapPropertyListPayload } from "../../features/properties/propertyAPI";
 import { Button } from "@/components/common";
 import CustomAlert from "@/components/common/CustomAlert";
 import { normalizeLanguage, preloadLanguage } from "../../i18n";
+import { translateHeaderLabel } from "../../lib/i18nHelpers";
 import { loadBuyerProfile } from "../../lib/buyerProfileStorage";
 import { loadSellerProfile } from "../../lib/sellerProfileStorage";
 import { loadAdminProfile } from "../../lib/adminProfileStorage";
@@ -56,12 +57,6 @@ interface HeaderApiResponse {
   data?: HeaderPayload;
   header?: HeaderPayload;
 }
-
-const NAV_LABEL_KEY_MAP: Record<string, string> = {};
-
-const SECTION_TITLE_KEY_MAP: Record<string, string> = {};
-
-const SECTION_ITEM_KEY_MAP: Record<string, string> = {};
 
 const normalizeValue = (value: string): string => value.trim().toLowerCase();
 const normalizePath = (value: string): string =>
@@ -780,11 +775,16 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
         : undefined,
   }));
 
-  const brandName = headerData?.brand?.name ?? "";
+  const brandNameRaw = headerData?.brand?.name ?? "";
+  const brandName = brandNameRaw
+    ? translateHeaderLabel(brandNameRaw)
+    : t("header.brand");
   const brandLogo = headerData?.brand?.logo ?? "";
   const primaryCta = headerData?.ctaButtons?.[0];
-  const ctaLabel = primaryCta?.label ?? "";
-  const ctaTag = primaryCta?.tag ?? "";
+  const ctaLabelRaw = primaryCta?.label ?? "";
+  const ctaTagRaw = primaryCta?.tag ?? "";
+  const ctaLabel = ctaLabelRaw ? translateHeaderLabel(ctaLabelRaw) : "";
+  const ctaTag = ctaTagRaw ? translateHeaderLabel(ctaTagRaw) : "";
   const ctaUrl = primaryCta?.url ?? "";
   const hasCta = Boolean(ctaLabel && ctaUrl);
   const contactPhone = headerData?.contact?.phone ?? "";
@@ -860,13 +860,10 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
     setContactOpen(false);
   };
 
-  const translateHeaderValue = (value: string) => {
-    const key =
-      NAV_LABEL_KEY_MAP[value] ??
-      SECTION_TITLE_KEY_MAP[value] ??
-      SECTION_ITEM_KEY_MAP[value];
-    return key ? t(key) : value;
-  };
+  const translateHeaderValue = (value: string) => translateHeaderLabel(value);
+
+  const languageSwitcherLabel = (code: "en" | "hi") =>
+    code === "hi" ? t("header.languageHindi") : t("header.languageEnglish");
 
   const changeLanguage = (language: "en" | "hi") => {
     if (activeLanguage === language) return;
@@ -1090,7 +1087,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         }`}
                         aria-pressed={activeLanguage === option.code}
                       >
-                        {option.label}
+                        {languageSwitcherLabel(option.code)}
                       </button>
                       {index < safeLanguageOptions.length - 1 && (
                         <span
@@ -1178,7 +1175,9 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                           <img
                             src={profilePhotoUrl}
                             alt={
-                              user?.name ? `${user.name} profile` : "Profile"
+                              user?.name
+                                ? t("header.profilePhotoAlt", { name: user.name })
+                                : t("header.profilePhotoAltGeneric")
                             }
                             className="h-full w-full rounded-full object-cover"
                           />
@@ -1478,8 +1477,8 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
       </Modal>
       <CustomAlert
         open={logoutAlertOpen}
-        title="Confirm Logout"
-        message="Are you sure you want to logout?"
+        title={t("header.logoutConfirmTitle")}
+        message={t("header.logoutConfirmMessage")}
         showCancel
         onCancel={() => setLogoutAlertOpen(false)}
         onConfirm={handleLogout}

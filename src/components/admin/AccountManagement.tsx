@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Trash2, Users } from "lucide-react";
 import { Button, Input } from "@/components/common";
 import AdminConfirmDialog from "./AdminConfirmDialog";
 
 import type { ManagedAccount } from "../../features/auth/roleTypes";
 
-const ROLE_FILTERS = ["All", "Buyer", "Seller", "Agent"] as const;
-type RoleFilterOption = (typeof ROLE_FILTERS)[number];
+type RoleFilterOption = "All" | "Buyer" | "Seller" | "Agent";
 
 function matchesRoleFilter(
   account: ManagedAccount,
@@ -68,6 +68,8 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
   onToggleBlock,
   initialRoleFilter = "all",
 }) => {
+  const { t } = useTranslation();
+  const roleFilters: RoleFilterOption[] = ["All", "Buyer", "Seller", "Agent"];
   const [query, setQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<RoleFilterOption>(() => {
     if (initialRoleFilter === "buyer" || initialRoleFilter === "user") return "Buyer";
@@ -127,16 +129,16 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="min-w-0 shrink">
           <h2 className="text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
-            Role
+            {t("adminPanel.users.roleTitle")}
           </h2>
           <p className="mt-1 max-w-xl text-sm leading-relaxed text-[var(--muted)]">
-            Filter by role, search, and manage accounts.
+            {t("adminPanel.users.roleSubtitle")}
           </p>
         </div>
 
         <div className="flex w-full min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-3 lg:max-w-xl lg:flex-nowrap lg:justify-end">
           <Input
-            placeholder="Search accounts…"
+            placeholder={t("adminPanel.users.searchPlaceholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full min-w-0 border-[var(--b2)] text-sm shadow-sm sm:flex-1 sm:min-w-[200px]"
@@ -163,7 +165,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
             variant="primary"
             className="w-full shrink-0 shadow-sm sm:w-auto sm:self-center"
           >
-            Export CSV
+            {t("adminPanel.users.exportCsv")}
           </Button>
         </div>
       </div>
@@ -171,10 +173,18 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
       <div
         className="-mx-1 flex min-w-0 flex-nowrap gap-2 overflow-x-auto px-1 pb-0.5 sm:flex-wrap sm:overflow-visible"
         role="tablist"
-        aria-label="Filter by role"
+        aria-label={t("adminPanel.users.filterByRole")}
       >
-        {ROLE_FILTERS.map((f) => {
+        {roleFilters.map((f) => {
           const active = roleFilter === f;
+          const roleKey =
+            f === "All"
+              ? "all"
+              : f === "Buyer"
+                ? "buyer"
+                : f === "Seller"
+                  ? "seller"
+                  : "agent";
           return (
             <button
               key={f}
@@ -189,7 +199,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
                   : "border-[var(--b2)] bg-[var(--white)] text-[var(--muted)] hover:border-[var(--b1-mid)]/40 hover:bg-[var(--b2-soft)]/80 hover:text-[var(--b1)]",
               ].join(" ")}
             >
-              {f}
+              {t(`adminPanel.users.roles.${roleKey}`)}
             </button>
           );
         })}
@@ -223,7 +233,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
                     </p>
                   </div>
                   <span className="shrink-0 rounded-full bg-[var(--b2-soft)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--b1)] ring-1 ring-[var(--b2)]">
-                    {row.role ?? "N/A"}
+                    {row.role ?? t("common.na")}
                   </span>
                 </div>
                 <div className="mt-4 flex justify-end gap-2">
@@ -235,7 +245,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
                     size="sm"
                     className="gap-1.5 border-rose-300 text-rose-700 hover:bg-rose-50"
                   >
-                    {row.isBlocked ? "Unblock" : "Block"}
+                    {row.isBlocked ? t("adminPanel.users.unblock") : t("adminPanel.users.block")}
                   </Button>
                   <Button
                     type="button"
@@ -246,7 +256,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
                     className="gap-1.5 border-rose-300 text-rose-700 hover:bg-rose-50"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                    Delete
+                    {t("common.delete")}
                   </Button>
                 </div>
               </article>
@@ -266,11 +276,11 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
               <table className="min-w-[640px] w-full text-left text-sm text-[var(--b1)]">
                 <thead className="sticky top-0 z-10 bg-gradient-to-r from-[var(--b2-soft)] to-[var(--white)] text-xs font-semibold uppercase tracking-wider text-[var(--b1)] shadow-sm">
                   <tr>
-                    <th className="px-4 py-3.5">Name</th>
-                    <th className="px-4 py-3.5">Email</th>
-                    <th className="px-4 py-3.5">Role</th>
+                    <th className="px-4 py-3.5">{t("adminPanel.users.table.name")}</th>
+                    <th className="px-4 py-3.5">{t("adminPanel.users.table.email")}</th>
+                    <th className="px-4 py-3.5">{t("adminPanel.users.table.role")}</th>
                     <th className="w-[1%] whitespace-nowrap px-4 py-3.5 text-center">
-                      Actions
+                      {t("common.actions")}
                     </th>
                   </tr>
                 </thead>
@@ -294,7 +304,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
 
                       <td className="px-4 py-3.5">
                         <span className="inline-flex items-center rounded-full bg-[var(--b2-soft)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--b1)] ring-1 ring-[var(--b2)]">
-                          {row.role ?? "N/A"}
+                          {row.role ?? t("common.na")}
                         </span>
                       </td>
 
@@ -307,7 +317,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
                           size="sm"
                           className="inline-flex gap-1.5 border-rose-300 text-rose-700 hover:bg-rose-50"
                         >
-                          {row.isBlocked ? "Unblock" : "Block"}
+                          {row.isBlocked ? t("adminPanel.users.unblock") : t("adminPanel.users.block")}
                         </Button>
                         {" "}
                         <Button
@@ -319,7 +329,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
                           className="inline-flex gap-1.5 border-rose-300 text-rose-700 hover:bg-rose-50"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
-                          Delete
+                          {t("common.delete")}
                         </Button>
                       </td>
                     </tr>
@@ -346,14 +356,16 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
 
       <AdminConfirmDialog
         open={deleteTarget !== null}
-        title="Are you sure you want to Delete?"
+        title={t("adminPanel.users.deleteConfirm.title")}
         description={
           deleteTarget
-            ? `This will permanently remove ${deleteTarget.name} (${deleteTarget.email}). This action cannot be undone.`
+            ? t("adminPanel.users.deleteConfirm.description", {
+                name: deleteTarget.name,
+                email: deleteTarget.email,
+              })
             : ""
         }
-        confirmLabel="Delete account"
-        cancelLabel="Cancel"
+        confirmLabel={t("adminPanel.users.deleteConfirm.confirm")}
         destructive
         loading={actionLoading}
         onClose={() => setDeleteTarget(null)}
@@ -364,16 +376,23 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
         open={blockTarget !== null}
         title={
           blockTarget?.isBlocked
-            ? "Are you sure you want to Unblock?"
-            : "Are you sure you want to Block?"
+            ? t("adminPanel.users.blockConfirm.unblockTitle")
+            : t("adminPanel.users.blockConfirm.blockTitle")
         }
         description={
           blockTarget
-            ? `${blockTarget.isBlocked ? "Unblock" : "Block"} ${blockTarget.name} (${blockTarget.email})?`
+            ? t("adminPanel.users.blockConfirm.description", {
+                action: blockTarget.isBlocked
+                  ? t("adminPanel.users.unblock")
+                  : t("adminPanel.users.block"),
+                name: blockTarget.name,
+                email: blockTarget.email,
+              })
             : ""
         }
-        confirmLabel={blockTarget?.isBlocked ? "Unblock" : "Block"}
-        cancelLabel="Cancel"
+        confirmLabel={
+          blockTarget?.isBlocked ? t("adminPanel.users.unblock") : t("adminPanel.users.block")
+        }
         loading={actionLoading}
         onClose={() => setBlockTarget(null)}
         onConfirm={confirmToggleBlock}
@@ -393,18 +412,32 @@ function EmptyState({
   roleFilter: RoleFilterOption;
   inTable?: boolean;
 }) {
+  const { t } = useTranslation();
+  const roleKey =
+    roleFilter === "All"
+      ? "all"
+      : roleFilter === "Buyer"
+        ? "buyer"
+        : roleFilter === "Seller"
+          ? "seller"
+          : "agent";
   const inner = (
     <div className="flex flex-col items-center justify-center gap-2 px-4 py-12 text-center">
       <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--b2-soft)] text-[var(--b1-mid)]">
         <Users className="h-6 w-6" />
       </div>
       <p className="font-medium text-[var(--b1)]">
-        {noAccounts ? "No accounts yet" : "No matching users"}
+        {noAccounts ? t("adminPanel.users.empty.noAccounts") : t("adminPanel.users.empty.noMatching")}
       </p>
       <p className="max-w-sm text-sm text-[var(--muted)]">
         {noAccounts
-          ? "When users register, they will appear here."
-          : `Try adjusting your search${query ? ` “${query}”` : ""} or switch from “${roleFilter}”.`}
+          ? t("adminPanel.users.empty.noAccountsHint")
+          : t("adminPanel.users.empty.noMatchingHint", {
+              searchPart: query
+                ? t("adminPanel.users.empty.searchPart", { query })
+                : "",
+              roleFilter: t(`adminPanel.users.roles.${roleKey}`),
+            })}
       </p>
     </div>
   );

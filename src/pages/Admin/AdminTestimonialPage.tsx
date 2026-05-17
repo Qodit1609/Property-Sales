@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Eye, CheckCircle2, XCircle, Trash2 } from "lucide-react";
+import { translateRole, translateStatus } from "@/lib/i18nHelpers";
 import { Button } from "@/components/common";
 import { ToastStack, type ToastMessage } from "@/components/propertyPost/Toast";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -12,8 +14,6 @@ import {
 import type { Testimonial } from "@/features/testimonials/testimonialTypes";
 import CustomAlert from "@/components/common/CustomAlert";
 
-const toLabel = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
-
 const badgeClass = (status: string) => {
   if (status === "approved") return "bg-emerald-500/15 text-emerald-700";
   if (status === "rejected") return "bg-rose-500/15 text-rose-700";
@@ -21,6 +21,7 @@ const badgeClass = (status: string) => {
 };
 
 const AdminTestimonialPage: React.FC = () => {
+  const { t } = useTranslation();
   const [items, setItems] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -48,8 +49,9 @@ const AdminTestimonialPage: React.FC = () => {
     } catch (error) {
       pushToast({
         kind: "error",
-        title: "Load failed",
-        detail: error instanceof Error ? error.message : "Unable to fetch testimonials",
+        title: t("adminPanel.testimonial.page.loadFailed"),
+        detail:
+          error instanceof Error ? error.message : t("adminPanel.testimonial.page.loadFailed"),
       });
     } finally {
       setLoading(false);
@@ -77,8 +79,9 @@ const AdminTestimonialPage: React.FC = () => {
     } catch (error) {
       pushToast({
         kind: "error",
-        title: "Action failed",
-        detail: error instanceof Error ? error.message : "Unable to process action",
+        title: t("adminPanel.testimonial.page.actionFailed"),
+        detail:
+          error instanceof Error ? error.message : t("adminPanel.testimonial.page.actionFailed"),
       });
     } finally {
       setActionLoading(false);
@@ -94,23 +97,35 @@ const AdminTestimonialPage: React.FC = () => {
   );
 
   return (
-    <AdminLayout title="Testimonial">
+    <AdminLayout title={t("adminPanel.nav.testimonial")}>
       <ToastStack toasts={toasts} onDismiss={dismissToast} />
       <div className="space-y-4 rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm sm:p-5">
         {loading ? (
-          <p className="text-sm text-[var(--muted)]">Loading testimonials...</p>
+          <p className="text-sm text-[var(--muted)]">{t("adminPanel.testimonial.page.loading")}</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[920px] text-sm text-[var(--b1)]">
               <thead className="bg-[var(--b2-soft)]/50 text-xs uppercase tracking-wide text-[var(--b1-mid)]">
                 <tr>
-                  <th className="px-3 py-2 text-left">Full Name</th>
-                  <th className="px-3 py-2 text-left">Role</th>
-                  <th className="px-3 py-2 text-left">Location</th>
-                  <th className="px-3 py-2 text-left">Rating</th>
-                  <th className="px-3 py-2 text-left">Status</th>
-                  <th className="px-3 py-2 text-left">Created Date</th>
-                  <th className="px-3 py-2 text-right">Actions</th>
+                  <th className="px-3 py-2 text-left">
+                    {t("adminPanel.testimonial.page.table.fullName")}
+                  </th>
+                  <th className="px-3 py-2 text-left">
+                    {t("adminPanel.testimonial.page.table.role")}
+                  </th>
+                  <th className="px-3 py-2 text-left">
+                    {t("adminPanel.testimonial.page.table.location")}
+                  </th>
+                  <th className="px-3 py-2 text-left">
+                    {t("adminPanel.testimonial.page.table.rating")}
+                  </th>
+                  <th className="px-3 py-2 text-left">
+                    {t("adminPanel.testimonial.page.table.status")}
+                  </th>
+                  <th className="px-3 py-2 text-left">
+                    {t("adminPanel.testimonial.page.table.createdDate")}
+                  </th>
+                  <th className="px-3 py-2 text-right">{t("common.actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--b2)]/60">
@@ -119,7 +134,7 @@ const AdminTestimonialPage: React.FC = () => {
                   return (
                     <tr key={item.id}>
                       <td className="px-3 py-2">{item.fullName}</td>
-                      <td className="px-3 py-2">{toLabel(item.role)}</td>
+                      <td className="px-3 py-2">{translateRole(item.role)}</td>
                       <td className="px-3 py-2">{item.location}</td>
                       <td className="px-3 py-2">{item.rating}/5</td>
                       <td className="px-3 py-2">
@@ -128,7 +143,7 @@ const AdminTestimonialPage: React.FC = () => {
                             item.status
                           )}`}
                         >
-                          {toLabel(item.status)}
+                          {translateStatus(item.status)}
                         </span>
                       </td>
                       <td className="px-3 py-2">
@@ -146,7 +161,7 @@ const AdminTestimonialPage: React.FC = () => {
                             }}
                           >
                             <Eye className="h-3.5 w-3.5" />
-                            View
+                            {t("common.view")}
                           </Button>
                           <Button
                             type="button"
@@ -157,13 +172,13 @@ const AdminTestimonialPage: React.FC = () => {
                               withViewedGuard(item, () =>
                                 runAction(
                                   () => approveTestimonial(item.id).then(() => undefined),
-                                  "Testimonial approved"
+                                  t("adminPanel.testimonial.page.approved")
                                 )
                               )
                             }
                           >
                             <CheckCircle2 className="h-3.5 w-3.5" />
-                            Approve
+                            {t("common.approve")}
                           </Button>
                           <Button
                             type="button"
@@ -174,13 +189,13 @@ const AdminTestimonialPage: React.FC = () => {
                               withViewedGuard(item, () =>
                                 runAction(
                                   () => rejectTestimonial(item.id).then(() => undefined),
-                                  "Testimonial rejected"
+                                  t("adminPanel.testimonial.page.rejected")
                                 )
                               )
                             }
                           >
                             <XCircle className="h-3.5 w-3.5" />
-                            Reject
+                            {t("common.reject")}
                           </Button>
                           <Button
                             type="button"
@@ -191,13 +206,13 @@ const AdminTestimonialPage: React.FC = () => {
                               withViewedGuard(item, () =>
                                 runAction(
                                   () => deleteTestimonial(item.id),
-                                  "Testimonial deleted"
+                                  t("adminPanel.testimonial.page.deleted")
                                 )
                               )
                             }
                           >
                             <Trash2 className="h-3.5 w-3.5" />
-                            Delete
+                            {t("common.delete")}
                           </Button>
                         </div>
                       </td>
@@ -207,7 +222,7 @@ const AdminTestimonialPage: React.FC = () => {
                 {sorted.length === 0 && (
                   <tr>
                     <td colSpan={7} className="px-3 py-8 text-center text-[var(--muted)]">
-                      No testimonials found.
+                      {t("adminPanel.testimonial.page.empty")}
                     </td>
                   </tr>
                 )}
@@ -222,7 +237,7 @@ const AdminTestimonialPage: React.FC = () => {
           <div className="w-full max-w-xl rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-5 shadow-xl">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-base font-semibold text-[var(--b1)]">
-                Testimonial Details
+                {t("adminPanel.testimonial.page.detailsTitle")}
               </h3>
               <button
                 type="button"
@@ -234,25 +249,30 @@ const AdminTestimonialPage: React.FC = () => {
             </div>
             <div className="space-y-2 text-sm text-[var(--b1)]">
               <p>
-                <strong>Name:</strong> {selected.fullName}
+                <strong>{t("adminPanel.testimonial.page.fields.name")}:</strong> {selected.fullName}
               </p>
               <p>
-                <strong>Role:</strong> {toLabel(selected.role)}
+                <strong>{t("adminPanel.testimonial.page.fields.role")}:</strong>{" "}
+                {translateRole(selected.role)}
               </p>
               <p>
-                <strong>Location:</strong> {selected.location}
+                <strong>{t("adminPanel.testimonial.page.fields.location")}:</strong>{" "}
+                {selected.location}
               </p>
               <p>
-                <strong>Occupation:</strong> {selected.occupation}
+                <strong>{t("adminPanel.testimonial.page.fields.occupation")}:</strong>{" "}
+                {selected.occupation}
               </p>
               <p>
-                <strong>Rating:</strong> {selected.rating}/5
+                <strong>{t("adminPanel.testimonial.page.fields.rating")}:</strong> {selected.rating}/5
               </p>
               <p>
-                <strong>Status:</strong> {toLabel(selected.status)}
+                <strong>{t("adminPanel.testimonial.page.fields.status")}:</strong>{" "}
+                {translateStatus(selected.status)}
               </p>
               <p className="whitespace-pre-wrap">
-                <strong>Description:</strong> {selected.description}
+                <strong>{t("adminPanel.testimonial.page.fields.description")}:</strong>{" "}
+                {selected.description}
               </p>
             </div>
           </div>
@@ -260,8 +280,8 @@ const AdminTestimonialPage: React.FC = () => {
       )}
       <CustomAlert
         open={guardAlertOpen}
-        title="Action blocked"
-        message="First click View to enable this action."
+        title={t("adminPanel.testimonial.actionBlocked.title")}
+        message={t("adminPanel.testimonial.page.viewGuardMessage")}
         onConfirm={() => setGuardAlertOpen(false)}
       />
     </AdminLayout>

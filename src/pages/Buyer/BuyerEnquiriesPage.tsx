@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import BuyerLayout from "../../components/buyer/BuyerLayout";
 import { MessageCircle } from "lucide-react";
 import { useAppSelector } from "../../hooks/reduxHooks";
@@ -11,6 +12,7 @@ type EnquiryRow = {
 };
 
 const BuyerEnquiriesPage: React.FC = () => {
+  const { t } = useTranslation();
   const activity = useAppSelector((state) => state.buyer.activity);
   const notifications = useAppSelector((state) => state.buyer.notifications);
 
@@ -19,27 +21,29 @@ const BuyerEnquiriesPage: React.FC = () => {
       .filter((item) => item.type === "enquiry" || item.type === "callback" || item.type === "visit")
       .map((item) => ({
         id: item.id,
-        title: item.title || "Property enquiry",
+        title: item.title || t("buyerPanel.enquiries.propertyEnquiry"),
         status:
           item.type === "visit"
-            ? "Visit scheduled"
+            ? t("buyerPanel.enquiries.visitScheduled")
             : item.type === "callback"
-              ? "Callback requested"
-              : "Enquiry sent",
-        lastUpdate: `Updated on ${new Date(item.timestamp).toLocaleString()}`,
+              ? t("buyerPanel.enquiries.callbackRequested")
+              : t("buyerPanel.enquiries.enquirySent"),
+        lastUpdate: t("buyerPanel.enquiries.updatedOn", {
+          date: new Date(item.timestamp).toLocaleString(),
+        }),
       }));
 
     const replyRows = notifications
       .filter((item) => item.type === "seller_reply")
       .map((item) => ({
         id: item.id,
-        title: item.title || "Seller response",
-        status: item.read ? "Reply read" : "Reply received",
+        title: item.title || t("buyerPanel.enquiries.sellerResponse"),
+        status: item.read ? t("buyerPanel.enquiries.replyRead") : t("buyerPanel.enquiries.replyReceived"),
         lastUpdate: item.message,
       }));
 
     return [...replyRows, ...activityRows];
-  }, [activity, notifications]);
+  }, [activity, notifications, t]);
 
   return (
     <BuyerLayout>
@@ -50,10 +54,10 @@ const BuyerEnquiriesPage: React.FC = () => {
           </div>
           <div>
             <h2 className="text-sm font-semibold text-[var(--b1)]">
-              Enquiries & contact requests
+              {t("buyerPanel.enquiries.pageHeading")}
             </h2>
             <p className="text-[11px] text-[var(--muted)]">
-              Structured view of your conversations with sellers and agents.
+              {t("buyerPanel.enquiries.pageSubtitle")}
             </p>
           </div>
         </div>
@@ -80,7 +84,7 @@ const BuyerEnquiriesPage: React.FC = () => {
             ))
           ) : (
             <div className="rounded-xl border border-dashed border-[var(--b2)] bg-[var(--b2-soft)]/40 px-3 py-4 text-[11px] text-[var(--muted)]">
-              No enquiries yet. Once you contact a seller or receive replies, they will appear here automatically.
+              {t("buyerPanel.enquiries.empty")}
             </div>
           )}
         </div>

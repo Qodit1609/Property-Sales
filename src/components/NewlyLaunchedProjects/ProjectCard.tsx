@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/common";
 import Card from "@/components/common/Card/Card";
 
@@ -18,6 +19,7 @@ type ProjectCardProps = {
 };
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
+  const { t } = useTranslation();
   const formattedPrice =
     typeof project.price === "number" ? `₹${project.price.toLocaleString("en-IN")}` : undefined;
   const formattedPostedDate = project.postedTime
@@ -68,7 +70,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
         <div className="mt-2 flex items-start sm:items-center justify-between gap-2">
           <div className="min-w-0">
             <p className="text-[10px] sm:text-[11px] uppercase tracking-wide text-[var(--muted)]/80 font-sans">
-              Starting from
+              {t("homeSection.projectCard.startingFrom")}
             </p>
             {formattedPrice && (
               <p className="text-xs sm:text-sm font-semibold text-[var(--b1)] truncate">
@@ -86,7 +88,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
 
         {formattedPostedDate && (
           <p className="text-[10px] sm:text-[11px] text-[var(--muted)] mt-2">
-            Posted: {formattedPostedDate}
+            {t("homeSection.projectCard.posted", { date: formattedPostedDate })}
           </p>
         )}
 
@@ -97,7 +99,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
             size="sm"
             className="w-full text-xs sm:text-sm bg-[var(--b1)] text-[var(--fg)] py-2 rounded-md font-medium hover:bg-[var(--b1-mid)] transition"
           >
-            View Details
+            {t("propertyCard.viewDetails")}
           </Button>
         </div>
 

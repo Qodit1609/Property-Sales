@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   CheckCircle2,
@@ -52,14 +53,6 @@ function getViewedIdsFromSession(): Set<string> {
   }
 }
 
-function approvalLabel(status: string | undefined): string {
-  const s = (status ?? "pending").toLowerCase();
-  if (s === "approved") return "Approved";
-  if (s === "rejected") return "Rejected";
-  if (s === "sold") return "Sold";
-  return "Pending";
-}
-
 function statusBadgeClass(status: string | undefined): string {
   const s = (status ?? "pending").toLowerCase();
   if (s === "approved") return "bg-emerald-500/15 text-emerald-700";
@@ -76,7 +69,19 @@ const filterSelectClass =
   "w-full min-h-[44px] rounded-xl border border-[var(--b2)] bg-[var(--white)] px-3 py-2.5 text-sm text-[var(--b1)] shadow-sm transition focus:outline-none focus:ring-2 focus:ring-[var(--b1-mid)]/35 focus:border-[var(--b1-mid)]";
 
 const AdminPropertiesPage: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
+
+  const getApprovalLabel = useCallback(
+    (status: string | undefined) => {
+      const s = (status ?? "pending").toLowerCase();
+      if (s === "approved") return t("adminPanel.properties.status.approved");
+      if (s === "rejected") return t("adminPanel.properties.status.rejected");
+      if (s === "sold") return t("adminPanel.properties.status.sold");
+      return t("adminPanel.properties.status.pending");
+    },
+    [t]
+  );
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const {
@@ -222,7 +227,7 @@ const AdminPropertiesPage: React.FC = () => {
     dispatch(approveListing(id))
       .unwrap()
       .then(() =>
-        pushToast({ kind: "success", title: "Property approved" })
+        pushToast({ kind: "success", title: t("adminPanel.properties.toast.approved") })
       );
   };
 
@@ -232,7 +237,7 @@ const AdminPropertiesPage: React.FC = () => {
       const d = rejectionDescription.trim();
       const m = rejectionMessage.trim();
       if (!d || !m) {
-        setRejectModalError("Please enter both a short description and a suggestion/message.");
+        setRejectModalError(t("adminPanel.properties.rejectModal.errorBothFields"));
         return;
       }
     }
@@ -255,7 +260,7 @@ const AdminPropertiesPage: React.FC = () => {
     dispatch(rejectListing(payload))
       .unwrap()
       .then(() => {
-        pushToast({ kind: "success", title: "Property rejected" });
+        pushToast({ kind: "success", title: t("adminPanel.properties.toast.rejected") });
         setRejectId(null);
       });
   };
@@ -265,7 +270,7 @@ const AdminPropertiesPage: React.FC = () => {
     dispatch(deleteListingById(deleteId))
       .unwrap()
       .then(() => {
-        pushToast({ kind: "success", title: "Property deleted" });
+        pushToast({ kind: "success", title: t("adminPanel.properties.toast.deleted") });
         setDeleteId(null);
         load();
       });
@@ -279,7 +284,7 @@ const AdminPropertiesPage: React.FC = () => {
     "inline-flex items-center gap-1 whitespace-nowrap text-[11px] font-medium disabled:opacity-50";
 
   return (
-    <AdminLayout title="Properties">
+    <AdminLayout title={t("adminPanel.properties.title")}>
       <div className="mx-auto max-w-7xl space-y-5">
         <ToastStack toasts={toasts} onDismiss={dismissToast} />
 
@@ -290,17 +295,17 @@ const AdminPropertiesPage: React.FC = () => {
           />
           <div className="relative">
             <h2 className="text-lg font-semibold tracking-tight text-[var(--b1)] sm:text-xl">
-              All properties
+              {t("adminPanel.properties.heading")}
             </h2>
             <p className="mt-1 max-w-2xl text-sm text-[var(--muted)]">
-              CRUD and moderation for every listing.
+              {t("adminPanel.properties.subtitle")}
             </p>
           </div>
         </header>
 
         <section
           className="rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] p-4 shadow-sm sm:p-5"
-          aria-label="Filters"
+          aria-label={t("adminPanel.properties.filtersAria")}
         >
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-12 xl:gap-4">
             <div className="sm:col-span-2 xl:col-span-5">
@@ -308,11 +313,11 @@ const AdminPropertiesPage: React.FC = () => {
                 htmlFor="admin-properties-search"
                 className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--b1-mid)]"
               >
-                Search
+                {t("common.search")}
               </label>
               <Input
                 id="admin-properties-search"
-                placeholder="Search on this page…"
+                placeholder={t("adminPanel.properties.searchPlaceholder")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 autoComplete="off"
@@ -324,7 +329,7 @@ const AdminPropertiesPage: React.FC = () => {
                 htmlFor="admin-properties-status"
                 className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--b1-mid)]"
               >
-                Status
+                {t("common.status")}
               </label>
               <select
                 id="admin-properties-status"
@@ -335,11 +340,11 @@ const AdminPropertiesPage: React.FC = () => {
                 }}
                 className={filterSelectClass}
               >
-                <option value="">All statuses</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="sold">Sold</option>
+                <option value="">{t("adminPanel.properties.allStatuses")}</option>
+                <option value="pending">{t("adminPanel.properties.status.pending")}</option>
+                <option value="approved">{t("adminPanel.properties.status.approved")}</option>
+                <option value="rejected">{t("adminPanel.properties.status.rejected")}</option>
+                <option value="sold">{t("adminPanel.properties.status.sold")}</option>
               </select>
             </div>
             <div className="sm:col-span-2 xl:col-span-4">
@@ -347,7 +352,7 @@ const AdminPropertiesPage: React.FC = () => {
                 htmlFor="admin-properties-type"
                 className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--b1-mid)]"
               >
-                Property type
+                {t("adminPanel.properties.propertyTypeLabel")}
               </label>
               <select
                 id="admin-properties-type"
@@ -358,7 +363,7 @@ const AdminPropertiesPage: React.FC = () => {
                 }}
                 className={filterSelectClass}
               >
-                <option value="">All types</option>
+                <option value="">{t("adminPanel.properties.allTypes")}</option>
                 {PROPERTY_TYPES.map((t) => (
                   <option key={t} value={t}>
                     {t}
@@ -376,7 +381,7 @@ const AdminPropertiesPage: React.FC = () => {
             aria-live="polite"
           >
             <span className="inline-block h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-[var(--b1-mid)] border-t-transparent" />
-            Loading properties…
+            {t("adminPanel.properties.loading")}
           </div>
         )}
 
@@ -403,11 +408,12 @@ const AdminPropertiesPage: React.FC = () => {
                   onOpenDetails={() => openDetails(listing)}
                   onDelete={() => setDeleteId(listing._id)}
                   actionBtn={actionBtn}
+                  getApprovalLabel={getApprovalLabel}
                 />
               ))}
               {filtered.length === 0 && (
                 <p className="rounded-xl border border-dashed border-[var(--b2)] py-10 text-center text-sm text-[var(--muted)]">
-                  No properties match your filters.
+                  {t("propertyList.emptyFiltered")}
                 </p>
               )}
             </div>
@@ -416,11 +422,11 @@ const AdminPropertiesPage: React.FC = () => {
               <table className="w-full min-w-[920px] text-xs text-[var(--b1)]">
                 <thead className="sticky top-0 z-10 bg-gradient-to-r from-[var(--b2-soft)] to-[var(--white)] text-[11px] font-semibold uppercase tracking-wide shadow-sm">
                   <tr>
-                    <th className="px-4 py-3 text-left font-medium">Property</th>
-                    <th className="px-4 py-3 text-left font-medium">Type</th>
-                    <th className="px-4 py-3 text-left font-medium">Price</th>
-                    <th className="px-4 py-3 text-left font-medium">Status</th>
-                    <th className="px-4 py-3 text-right font-medium">Actions</th>
+                    <th className="px-4 py-3 text-left font-medium">{t("adminPanel.properties.table.property")}</th>
+                    <th className="px-4 py-3 text-left font-medium">{t("adminPanel.properties.table.type")}</th>
+                    <th className="px-4 py-3 text-left font-medium">{t("adminPanel.properties.table.price")}</th>
+                    <th className="px-4 py-3 text-left font-medium">{t("adminPanel.properties.table.status")}</th>
+                    <th className="px-4 py-3 text-right font-medium">{t("adminPanel.properties.table.actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--b2)]/80">
@@ -434,7 +440,7 @@ const AdminPropertiesPage: React.FC = () => {
                     >
                       <td className="px-4 py-3 align-top">
                         <p className="text-xs font-semibold text-[var(--b1)]">
-                          {listing.title || "Untitled"}
+                          {listing.title || t("propertyCard.untitledProperty")}
                         </p>
                         <p className="mt-0.5 text-[11px] text-[var(--b1-mid)] line-clamp-2">
                           {listing.address}
@@ -452,7 +458,7 @@ const AdminPropertiesPage: React.FC = () => {
                             listing.status
                           )}`}
                         >
-                          {approvalLabel(listing.status)}
+                          {getApprovalLabel(listing.status)}
                         </span>
                       </td>
                       <td className="px-4 py-3 align-top text-right">
@@ -467,15 +473,23 @@ const AdminPropertiesPage: React.FC = () => {
                               openDetails(listing);
                             }}
                             className={`${actionBtn} border-[var(--b2)]`}
-                            aria-label={isListingViewed(listing) ? "Viewed" : "Unviewed"}
-                            title={isListingViewed(listing) ? "Viewed" : "Unviewed"}
+                            aria-label={
+                              isListingViewed(listing)
+                                ? t("adminPanel.properties.viewed")
+                                : t("adminPanel.properties.unviewed")
+                            }
+                            title={
+                              isListingViewed(listing)
+                                ? t("adminPanel.properties.viewed")
+                                : t("adminPanel.properties.unviewed")
+                            }
                           >
                             {isListingViewed(listing) ? (
                               <Eye className="h-3.5 w-3.5" />
                             ) : (
                               <EyeOff className="h-3.5 w-3.5" />
                             )}
-                            View
+                            {t("common.view")}
                           </Button>
                           <Button
                             type="button"
@@ -495,7 +509,7 @@ const AdminPropertiesPage: React.FC = () => {
                             className={`${actionBtn} border-emerald-500/40 text-emerald-700`}
                           >
                             <CheckCircle2 className="h-3.5 w-3.5" />
-                            Approve
+                            {t("common.approve")}
                           </Button>
                           <Button
                             type="button"
@@ -515,7 +529,7 @@ const AdminPropertiesPage: React.FC = () => {
                             className={`${actionBtn} border-amber-500/40 text-amber-800`}
                           >
                             <XCircle className="h-3.5 w-3.5" />
-                            Reject
+                            {t("common.reject")}
                           </Button>
                           <Button
                             type="button"
@@ -529,7 +543,7 @@ const AdminPropertiesPage: React.FC = () => {
                             className={`${actionBtn} border-rose-500/40 text-rose-700`}
                           >
                             <Trash2 className="h-3.5 w-3.5" />
-                            Delete
+                            {t("common.delete")}
                           </Button>
                         </div>
                       </td>
@@ -541,7 +555,7 @@ const AdminPropertiesPage: React.FC = () => {
                         colSpan={5}
                         className="px-4 py-10 text-center text-[var(--muted)]"
                       >
-                        No properties on this page.
+                        {t("adminPanel.properties.emptyPage")}
                       </td>
                     </tr>
                   )}
@@ -552,11 +566,11 @@ const AdminPropertiesPage: React.FC = () => {
             {(totalPages > 1 || listingsPagination.total > 0) && (
               <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-[var(--b2)]/60 bg-[var(--b2-soft)]/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-center text-[11px] text-[var(--muted)] sm:text-left">
-                  Page {page} of {totalPages}
+                  {t("adminPanel.properties.pagination.pageOf", { page, totalPages })}
                   {listingsPagination.total > 0 && (
                     <>
                       {" "}
-                      · {listingsPagination.total} total
+                      · {t("adminPanel.properties.pagination.total", { count: listingsPagination.total })}
                     </>
                   )}
                 </p>
@@ -569,7 +583,7 @@ const AdminPropertiesPage: React.FC = () => {
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
                   >
                     <ChevronLeft className="h-4 w-4" />
-                    Prev
+                    {t("adminPanel.properties.pagination.prev")}
                   </Button>
                   <Button
                     type="button"
@@ -578,7 +592,7 @@ const AdminPropertiesPage: React.FC = () => {
                     disabled={!canNext || listingsLoading}
                     onClick={() => setPage((p) => p + 1)}
                   >
-                    Next
+                    {t("adminPanel.properties.pagination.next")}
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </div>
@@ -589,15 +603,16 @@ const AdminPropertiesPage: React.FC = () => {
 
         {rejectId && (
           <Modal
-            title="Reject listing"
+            title={t("adminPanel.properties.rejectModal.title")}
             onClose={() => setRejectId(null)}
+            closeLabel={t("common.close")}
             footer={
               <>
                 <Button variant="outline" onClick={() => setRejectId(null)} disabled={actionLoading}>
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
                 <Button onClick={submitReject} disabled={actionLoading}>
-                  {actionLoading ? "Submitting…" : "Reject"}
+                  {actionLoading ? t("adminPanel.properties.submitting") : t("common.reject")}
                 </Button>
               </>
             }
@@ -608,12 +623,12 @@ const AdminPropertiesPage: React.FC = () => {
                   htmlFor="admin-reject-property-name"
                   className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--b1-mid)]"
                 >
-                  Property name
+                  {t("adminPanel.properties.rejectModal.propertyName")}
                 </label>
                 <Input
                   id="admin-reject-property-name"
                   readOnly
-                  value={rejectTargetListing?.title || "Untitled"}
+                  value={rejectTargetListing?.title || t("propertyCard.untitledProperty")}
                   className="border-[var(--b2)] bg-[var(--b2-soft)]/40 text-sm"
                 />
               </div>
@@ -622,7 +637,7 @@ const AdminPropertiesPage: React.FC = () => {
                   htmlFor="admin-reject-description"
                   className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--b1-mid)]"
                 >
-                  Short description
+                  {t("adminPanel.properties.rejectModal.shortDescription")}
                 </label>
                 <textarea
                   id="admin-reject-description"
@@ -638,7 +653,7 @@ const AdminPropertiesPage: React.FC = () => {
                   htmlFor="admin-reject-message"
                   className="mb-1.5 block text-xs font-medium uppercase tracking-wide text-[var(--b1-mid)]"
                 >
-                  Suggestion / message
+                  {t("adminPanel.properties.rejectModal.suggestionMessage")}
                 </label>
                 <textarea
                   id="admin-reject-message"
@@ -660,7 +675,7 @@ const AdminPropertiesPage: React.FC = () => {
                     setRejectModalError(null);
                   }}
                 />
-                <span>Reject directly without giving any reason</span>
+                <span>{t("adminPanel.properties.rejectModal.rejectWithoutReason")}</span>
               </label>
               {rejectModalError ? (
                 <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
@@ -673,32 +688,33 @@ const AdminPropertiesPage: React.FC = () => {
 
         {deleteId && (
           <Modal
-            title="Delete property?"
+            title={t("adminPanel.properties.deleteModal.title")}
             onClose={() => setDeleteId(null)}
+            closeLabel={t("common.close")}
             footer={
               <>
                 <Button variant="outline" onClick={() => setDeleteId(null)}>
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
                 <Button
                   onClick={confirmDelete}
                   disabled={actionLoading}
                   className="!bg-rose-600 hover:!opacity-90"
                 >
-                  {actionLoading ? "Deleting…" : "Delete"}
+                  {actionLoading ? t("adminPanel.properties.deleting") : t("common.delete")}
                 </Button>
               </>
             }
           >
             <p className="text-sm text-[var(--b1)]">
-              This permanently removes the listing.
+              {t("adminPanel.properties.deleteModal.body")}
             </p>
           </Modal>
         )}
         <CustomAlert
           open={viewGuardAlertOpen}
-          title="Action blocked"
-          message="First view the property"
+          title={t("adminPanel.properties.actionBlocked.title")}
+          message={t("adminPanel.properties.actionBlocked.message")}
           onConfirm={() => setViewGuardAlertOpen(false)}
         />
       </div>
@@ -711,11 +727,13 @@ function Modal({
   children,
   onClose,
   footer,
+  closeLabel,
 }: {
   title: string;
   children: React.ReactNode;
   onClose: () => void;
   footer: React.ReactNode;
+  closeLabel: string;
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center">
@@ -730,7 +748,7 @@ function Modal({
             type="button"
             className="rounded-lg p-1 text-[var(--muted)] hover:bg-[var(--b2-soft)]"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={closeLabel}
           >
             ×
           </button>
@@ -751,6 +769,7 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
   onOpenDetails,
   onDelete,
   actionBtn,
+  getApprovalLabel,
 }: {
   listing: Property;
   isViewed: boolean;
@@ -760,7 +779,9 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
   onOpenDetails: () => void;
   onDelete: () => void;
   actionBtn: string;
+  getApprovalLabel: (status: string | undefined) => string;
 }) {
+  const { t } = useTranslation();
   const st = normalizedStatus(listing.status);
   const cannotApprove = st === "approved" || st === "sold";
   const cannotReject = st === "rejected" || st === "sold";
@@ -773,7 +794,7 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
             onClick={onOpenDetails}
             className="text-left text-sm font-semibold text-[var(--b1)] hover:underline"
           >
-            {listing.title || "Untitled"}
+            {listing.title || t("propertyCard.untitledProperty")}
           </button>
           <p className="mt-1 text-[11px] text-[var(--b1-mid)] line-clamp-2">
             {listing.address}
@@ -784,7 +805,7 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
             listing.status
           )}`}
         >
-          {approvalLabel(listing.status)}
+          {getApprovalLabel(listing.status)}
         </span>
       </div>
       <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-[var(--b1-mid)]">
@@ -800,15 +821,15 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
           disabled={actionLoading}
           onClick={onOpenDetails}
           className={`${actionBtn} border-[var(--b2)]`}
-          aria-label={isViewed ? "Viewed" : "Unviewed"}
-          title={isViewed ? "Viewed" : "Unviewed"}
+          aria-label={isViewed ? t("adminPanel.properties.viewed") : t("adminPanel.properties.unviewed")}
+          title={isViewed ? t("adminPanel.properties.viewed") : t("adminPanel.properties.unviewed")}
         >
           {isViewed ? (
             <Eye className="h-3.5 w-3.5" />
           ) : (
             <EyeOff className="h-3.5 w-3.5" />
           )}
-          View
+          {t("common.view")}
         </Button>
         <Button
           type="button"
@@ -818,7 +839,7 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
           onClick={onApprove}
           className={`${actionBtn} border-emerald-500/40 text-emerald-700`}
         >
-          Approve
+          {t("common.approve")}
         </Button>
         <Button
           type="button"
@@ -828,7 +849,7 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
           onClick={onReject}
           className={`${actionBtn} border-amber-500/40 text-amber-800`}
         >
-          Reject
+          {t("common.reject")}
         </Button>
         <Button
           type="button"
@@ -838,7 +859,7 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
           onClick={onDelete}
           className={`${actionBtn} border-rose-500/40 text-rose-700`}
         >
-          Delete
+          {t("common.delete")}
         </Button>
       </div>
     </div>

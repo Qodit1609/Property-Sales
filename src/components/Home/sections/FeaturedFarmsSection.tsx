@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import type { FeaturedFarmProperty } from "../models/homeTypes";
 import { SectionHeading, SectionWrapper } from "../ui";
@@ -11,6 +12,7 @@ type FeaturedFarmsSectionProps = {
 };
 
 const FeaturedFarmsSection: React.FC<FeaturedFarmsSectionProps> = () => {
+  const { t } = useTranslation();
   const [apiProperties, setApiProperties] = useState<Property[]>([]);
   const [currentTime] = useState(() => Date.now());
 
@@ -59,9 +61,9 @@ const FeaturedFarmsSection: React.FC<FeaturedFarmsSectionProps> = () => {
   return (
     <SectionWrapper className="py-12 sm:py-14" id="featured-farms">
       <SectionHeading
-        eyebrow="Featured"
-        title="Featured properties BhoomiWala Assured Highly recommended"
-        description="Only active featured properties are shown here."
+        eyebrow={t("homeSections.featuredFarms.eyebrow")}
+        title={t("homeSections.featuredFarms.title")}
+        description={t("homeSections.featuredFarms.description")}
       />
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {topFarmingProperties.map(({ property, daysRemaining }, index) => (

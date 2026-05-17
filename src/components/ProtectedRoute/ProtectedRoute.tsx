@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../store/hooks";
 import type { AppRole } from "../../features/auth/roleTypes";
@@ -19,6 +20,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRoles,
   children,
 }) => {
+  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
@@ -56,8 +58,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return (
       <CustomAlert
         open={showProfileAlert}
-        title="Profile Incomplete"
-        message="Please complete your profile 100% to access this page."
+        title={t("common.profileIncompleteTitle")}
+        message={t("common.profileIncompleteMessage")}
         onConfirm={() => {
           setShowProfileAlert(false);
           navigate(mandatoryProfilePath, { replace: true });

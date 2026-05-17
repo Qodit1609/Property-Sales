@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/common";
 
 type CustomAlertProps = {
@@ -16,12 +17,16 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   open,
   title,
   message,
-  confirmLabel = "OK",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   showCancel = false,
   onConfirm,
   onCancel,
 }) => {
+  const { t } = useTranslation();
+  const resolvedConfirm = confirmLabel ?? t("common.ok");
+  const resolvedCancel = cancelLabel ?? t("common.cancel");
+
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (event: KeyboardEvent) => {
@@ -55,11 +60,11 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
         <div className="mt-6 flex flex-wrap justify-end gap-2">
           {showCancel ? (
             <Button type="button" variant="outline" onClick={onCancel}>
-              {cancelLabel}
+              {resolvedCancel}
             </Button>
           ) : null}
           <Button type="button" variant="primary" onClick={onConfirm}>
-            {confirmLabel}
+            {resolvedConfirm}
           </Button>
         </div>
       </div>

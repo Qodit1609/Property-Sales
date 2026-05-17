@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Bell, ChevronLeft, ChevronRight, LogOut, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,13 +18,14 @@ import { twMerge } from "tailwind-merge";
 import CustomAlert from "@/components/common/CustomAlert";
 
 function AdminNotificationsBell() {
+  const { t } = useTranslation();
   const unreadCount = useAppSelector((s) => s.notifications.unreadCount);
 
   return (
     <Link
       to="/admin/notifications"
       className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--b2)]/80 bg-[var(--white)] text-[var(--b1)] shadow-sm transition hover:bg-[var(--b2-soft)] hover:shadow-md"
-      aria-label="Notifications"
+      aria-label={t("common.notifications")}
     >
       <Bell className="h-5 w-5" strokeWidth={1.75} aria-hidden />
       {unreadCount > 0 ? (
@@ -54,6 +56,7 @@ function AdminShellSidebar({
   avatarUrl,
   onLogout,
 }: AdminShellSidebarProps) {
+  const { t } = useTranslation();
   const headerExpanded = !collapsed || mobile;
   const width =
     collapsed && !mobile ? ADMIN_SIDEBAR_WIDTH_COLLAPSED : ADMIN_SIDEBAR_WIDTH_EXPANDED;
@@ -86,7 +89,9 @@ function AdminShellSidebar({
               "absolute top-2 z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--b2)] bg-[var(--white)] text-[var(--b1)] shadow-sm transition hover:bg-[var(--b2-soft)]",
               collapsed && !mobile ? "left-1/2 top-3 -translate-x-1/2" : "right-2"
             )}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={
+              collapsed ? t("common.expandSidebar") : t("common.collapseSidebar")
+            }
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
@@ -129,7 +134,7 @@ function AdminShellSidebar({
           )}
         >
           <LogOut className="h-[18px] w-[18px] shrink-0" />
-          {(!collapsed || mobile) && <span>Logout</span>}
+          {(!collapsed || mobile) && <span>{t("common.logout")}</span>}
         </button>
       </div>
     </motion.aside>
@@ -150,6 +155,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   topBarSubtitle,
   children,
 }) => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -164,7 +170,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   const displayName =
     user?.name?.trim() ||
     user?.email?.trim() ||
-    "Admin";
+    t("adminPanel.fallbackName");
   const profileIdentity = String(user?.id ?? user?._id ?? user?.email ?? "").trim() || undefined;
   const localProfile = useAdminProfileLocal(profileIdentity);
   const rawUser = (user ?? {}) as Record<string, unknown>;
@@ -191,7 +197,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   const overviewTitle = topBarTitle ?? title;
   const overviewSubtitle =
-    topBarSubtitle ?? "Track your workspace and tasks at a glance.";
+    topBarSubtitle ?? t("adminPanel.defaultSubtitle");
 
   const handleLogout = () => {
     setLogoutAlertOpen(false);
@@ -221,7 +227,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
         type="button"
         className="fixed left-4 top-[76px] z-40 flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--b2)] bg-[var(--white)] text-[var(--b1)] shadow-sm transition hover:bg-[var(--b2-soft)] md:hidden"
         onClick={() => setMobileNavOpen(true)}
-        aria-label="Open admin navigation"
+        aria-label={t("adminPanel.a11y.openNavigation")}
       >
         <Menu className="h-5 w-5" aria-hidden />
       </button>
@@ -249,7 +255,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
             <>
               <motion.button
                 type="button"
-                aria-label="Close menu"
+                aria-label={t("adminPanel.a11y.closeMenu")}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -264,12 +270,14 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                 className="fixed left-0 top-0 z-[70] flex h-full w-[min(88vw,300px)] flex-col border-r border-[var(--b2)] bg-[var(--white)] shadow-2xl md:hidden"
               >
                 <div className="flex shrink-0 items-center justify-between border-b border-[var(--b2)] px-4 py-3">
-                  <span className="text-sm font-semibold text-[var(--b1)]">Admin menu</span>
+                  <span className="text-sm font-semibold text-[var(--b1)]">
+                    {t("adminPanel.mobileMenuTitle")}
+                  </span>
                   <button
                     type="button"
                     className="rounded-lg p-2 text-[var(--muted)] hover:bg-[var(--b2-soft)]"
                     onClick={closeMobile}
-                    aria-label="Close"
+                    aria-label={t("common.close")}
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -310,8 +318,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
       </div>
       <CustomAlert
         open={logoutAlertOpen}
-        title="Confirm Logout"
-        message="Are you sure you want to logout?"
+        title={t("adminPanel.logoutConfirm.title")}
+        message={t("adminPanel.logoutConfirm.message")}
+        confirmLabel={t("common.confirm")}
+        cancelLabel={t("common.cancel")}
         showCancel
         onCancel={() => setLogoutAlertOpen(false)}
         onConfirm={handleLogout}
