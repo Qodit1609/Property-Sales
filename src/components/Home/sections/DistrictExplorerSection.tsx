@@ -14,6 +14,7 @@ import {
 import { FALLBACK_PROPERTY_IMAGE } from "@/utils/propertyFormatters";
 import type { Property } from "@/features/properties/propertyType";
 import { isAgricultureLandType } from "@/features/properties/propertyTypeUtils";
+import { translateCity } from "@/lib/i18nHelpers";
 
 const DistrictExplorerSection: React.FC = () => {
   const { t } = useTranslation();
@@ -154,19 +155,23 @@ const DistrictExplorerSection: React.FC = () => {
             to={`/agriculture-land?district=${encodeURIComponent(district.name)}`}
             className="group overflow-hidden rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             aria-label={t("homeSections.districtExplorer.ariaExploreDistrict", {
-              district: district.name,
+              district: translateCity(district.name),
             })}
           >
             <div className="aspect-[16/10] overflow-hidden">
               <img
                 src={district.image}
-                alt={t("homeSections.districtExplorer.imageAlt", { district: district.name })}
+                alt={t("homeSections.districtExplorer.imageAlt", {
+                  district: translateCity(district.name),
+                })}
                 loading="lazy"
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
             <div className="p-4">
-              <h3 className="text-lg font-semibold text-[var(--b1)]">{district.name}</h3>
+              <h3 className="text-lg font-semibold text-[var(--b1)]">
+                {translateCity(district.name)}
+              </h3>
               <p className="mt-1 text-sm text-[var(--muted)]">{district.listingsText}</p>
               <span className="mt-4 inline-flex items-center text-sm font-semibold text-[var(--b1-mid)] group-hover:text-[var(--b1)]">
                 {t("homeSections.districtExplorer.viewListings")}

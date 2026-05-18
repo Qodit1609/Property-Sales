@@ -2470,7 +2470,21 @@
     }
   },
   "statsSection": {
-    "loadFailed": "आँकड़े लोड करने में विफल।"
+    "loadFailed": "आँकड़े लोड करने में विफल।",
+    "titles": {
+      "trustedByOurClients": "हमारे ग्राहकों का विश्वास"
+    },
+    "subtitles": {
+      "ratedByClients": "200+ ग्राहकों द्वारा 4.8 ★ रेटिंग"
+    },
+    "descriptions": {
+      "highlyRated": "हम पारदर्शिता, विशेषज्ञ मार्गदर्शन और फार्महाउस, विला, रिसॉर्ट संपत्तियों तथा कृषि भूमि निवेश में दीर्घकालिक मूल्य प्रदान करने की प्रतिबद्धता के लिए अत्यधिक रेटेड हैं।"
+    },
+    "labels": {
+      "averageRating": "औसत रेटिंग",
+      "yearsExperience": "वर्षों का अनुभव",
+      "happyClients": "संतुष्ट ग्राहक"
+    }
   },
   "homeSection": {
     "newlyLaunched": {

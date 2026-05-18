@@ -2,7 +2,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { store } from "./app/store.ts";
 import { Provider } from "react-redux";
-import "./i18n";
+import { i18nReady } from "./i18n";
 import "./index.css";
 
 const THEME_KEY = "theme";
@@ -17,8 +17,10 @@ const initialTheme: "light" | "dark" = storedTheme === "dark" ? "dark" : "light"
 applyTheme(initialTheme);
 localStorage.setItem(THEME_KEY, initialTheme);
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-   <Provider store={store}>
-    <App />
-  </Provider>
-);
+void i18nReady.then(() => {
+  ReactDOM.createRoot(document.getElementById("root")!).render(
+    <Provider store={store}>
+      <App />
+    </Provider>,
+  );
+});

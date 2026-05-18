@@ -2433,7 +2433,21 @@
     }
   },
   "statsSection": {
-    "loadFailed": "Failed to load statistics."
+    "loadFailed": "Failed to load statistics.",
+    "titles": {
+      "trustedByOurClients": "Trusted by Our Clients"
+    },
+    "subtitles": {
+      "ratedByClients": "Rated 4.8 ★ by 200+ Clients"
+    },
+    "descriptions": {
+      "highlyRated": "We are highly rated for our transparency, expert guidance, and commitment to delivering long-term value across farmhouses, villas, resort properties, and agricultural land investments."
+    },
+    "labels": {
+      "averageRating": "Average Rating",
+      "yearsExperience": "Years Experience",
+      "happyClients": "Happy Clients"
+    }
   },
   "homeSection": {
     "newlyLaunched": {

@@ -14,10 +14,22 @@ const LOCALE_LOADERS: Record<SupportedLanguage, () => Promise<TranslationModule>
   hi: () => import("./locales/hi/translation.json"),
 };
 
+const LANGUAGE_STORAGE_KEY = "bhoomiwala_lang";
+
 const loadedLanguages = new Set<SupportedLanguage>(["en"]);
 
 const normalizeLanguage = (language: string | undefined): SupportedLanguage =>
   language?.toLowerCase().startsWith("hi") ? "hi" : "en";
+
+const getPersistedLanguage = (): SupportedLanguage | undefined => {
+  try {
+    const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    if (!stored) return undefined;
+    return normalizeLanguage(stored);
+  } catch {
+    return undefined;
+  }
+};
 
 const ensureLanguageResources = async (language: string | undefined) => {
   const normalizedLanguage = normalizeLanguage(language);
@@ -45,14 +57,16 @@ const preloadLanguage = async (language: string | undefined) => {
   await ensureLanguageResources(language);
 };
 
-void i18n
+const persistedLanguage = getPersistedLanguage();
+
+const i18nReady = i18n
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
     resources: {
       en: { translation: enTranslation },
     },
-    lng: "en",
+    ...(persistedLanguage ? { lng: persistedLanguage } : {}),
     fallbackLng: "en",
     supportedLngs: ["en", "hi"],
     nonExplicitSupportedLngs: true,
@@ -66,13 +80,15 @@ void i18n
     detection: {
       order: ["localStorage", "navigator", "htmlTag"],
       caches: ["localStorage"],
-      lookupLocalStorage: "bhoomiwala_lang",
+      lookupLocalStorage: LANGUAGE_STORAGE_KEY,
     },
   })
-  .then(() => {
-    const initialLanguage = normalizeLanguage(i18n.resolvedLanguage ?? i18n.language);
-    document.documentElement.lang = initialLanguage;
-    return ensureLanguageResources(initialLanguage);
+  .then(async () => {
+    // Prefer i18n.language over resolvedLanguage here: resolved can be "en" until Hindi bundles exist.
+    const targetLanguage = normalizeLanguage(i18n.language);
+    document.documentElement.lang = targetLanguage;
+    await ensureLanguageResources(targetLanguage);
+    await i18n.changeLanguage(targetLanguage);
   });
 
 i18n.on("languageChanged", (language) => {
@@ -81,5 +97,5 @@ i18n.on("languageChanged", (language) => {
   void ensureLanguageResources(normalizedLanguage);
 });
 
-export { normalizeLanguage, preloadLanguage };
+export { normalizeLanguage, preloadLanguage, i18nReady };
 export default i18n;

@@ -75,15 +75,19 @@ const StatsSection: React.FC = () => {
           <>
             {/* 🔝 Trust Content */}
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
-              {content?.title}
+              {translateApiValue("statsSection.titles", content?.title, content?.title)}
             </h2>
 
             <p className="mt-3 text-lg font-semibold text-green-700">
-              {content?.subtitle}
+              {translateApiValue("statsSection.subtitles", content?.subtitle, content?.subtitle)}
             </p>
 
             <p className="mt-4 text-sm md:text-base text-gray-600 leading-relaxed max-w-3xl mx-auto">
-              {content?.description}
+              {translateApiValue(
+                "statsSection.descriptions",
+                content?.description,
+                content?.description,
+              )}
             </p>
 
             {/* Divider */}
