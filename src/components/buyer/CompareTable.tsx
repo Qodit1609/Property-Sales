@@ -1,5 +1,10 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import {
+  translateBuyerCompareRowLabel,
+  translateBuyerCompareSection,
+  translateBuyerCompareValue,
+} from "../../lib/buyerI18n";
 import { LayoutList } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
@@ -140,15 +145,18 @@ const CompareTable: React.FC = () => {
 
             <div className="divide-y divide-[var(--b2-soft)]">
               {COMPARE_DISPLAY_SECTIONS.map((section) => (
-                <div key={section.title}>
+                <div key={section.id}>
                   <div className="bg-[var(--b2-soft)]/35 px-3 py-2">
                     <p className="text-[11px] font-semibold tracking-tight text-[var(--b1)]">
-                      {section.title}
+                      {translateBuyerCompareSection(section.id, section.title)}
                     </p>
                   </div>
                   {section.rows.map((row) => {
                     const flat = flats[pi];
-                    const val = resolveCompareRowValue(row, property, flat);
+                    const val = translateBuyerCompareValue(
+                      row.key,
+                      resolveCompareRowValue(row, property, flat)
+                    );
                     const mask = highlightMasks[row.key];
                     const cellHighlight =
                       highlightDiff && mask ? mask[pi] : false;
@@ -162,7 +170,9 @@ const CompareTable: React.FC = () => {
                           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-[var(--b2-soft)] text-[var(--b1-mid)]">
                             <LayoutList className="h-3.5 w-3.5" />
                           </span>
-                          <span className="leading-tight">{row.label}</span>
+                          <span className="leading-tight">
+                            {translateBuyerCompareRowLabel(row.key, row.label)}
+                          </span>
                         </div>
                         <p
                           className={`text-right text-xs font-medium leading-relaxed text-[var(--b1)] ${
@@ -212,7 +222,7 @@ const CompareTable: React.FC = () => {
                       variant="ghost"
                       className="shrink-0 rounded-full px-2.5 py-1 text-[10px] text-[var(--muted)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2-soft)]"
                     >
-                      Remove
+                      {t("buyerPanel.dashboard.remove")}
                     </Button>
                   </div>
                 </th>
@@ -222,13 +232,13 @@ const CompareTable: React.FC = () => {
 
           <tbody>
             {COMPARE_DISPLAY_SECTIONS.map((section) => (
-              <React.Fragment key={section.title}>
+              <React.Fragment key={section.id}>
                 <tr className="border-t border-[var(--b2-soft)] bg-[var(--b2-soft)]/40">
                   <td
                     colSpan={compareList.length + 1}
                     className="px-4 py-2.5 text-[11px] font-semibold tracking-tight text-[var(--b1)]"
                   >
-                    {section.title}
+                    {translateBuyerCompareSection(section.id, section.title)}
                   </td>
                 </tr>
                 {section.rows.map((row) => {
@@ -244,16 +254,15 @@ const CompareTable: React.FC = () => {
                           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-white text-[var(--b1-mid)] ring-1 ring-[var(--b2-soft)]">
                             <LayoutList className="h-3.5 w-3.5" />
                           </span>
-                          <span>{row.label}</span>
+                          <span>{translateBuyerCompareRowLabel(row.key, row.label)}</span>
                         </div>
                       </td>
 
                       {compareList.map((property, colIdx) => {
                         const flat = flats[colIdx];
-                        const val = resolveCompareRowValue(
-                          row,
-                          property,
-                          flat
+                        const val = translateBuyerCompareValue(
+                          row.key,
+                          resolveCompareRowValue(row, property, flat)
                         );
                         const cellHighlight =
                           highlightDiff && mask ? mask[colIdx] : false;

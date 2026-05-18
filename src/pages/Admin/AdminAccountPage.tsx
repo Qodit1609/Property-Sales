@@ -200,7 +200,7 @@ const AdminAccountPage: React.FC = () => {
       pushToast({
         kind: "error",
         title: t("adminPanel.account.toast.loadFailed"),
-        detail: e instanceof Error ? e.message : "Unknown error",
+        detail: e instanceof Error ? e.message : t("adminPanel.account.unknownError"),
       });
     } finally {
       setLoading(false);
@@ -338,7 +338,7 @@ const AdminAccountPage: React.FC = () => {
         pushToast({
           kind: "error",
           title: t("adminPanel.account.toast.saveFailed"),
-          detail: e instanceof Error ? e.message : "Unknown error",
+          detail: e instanceof Error ? e.message : t("adminPanel.account.unknownError"),
         });
       } finally {
         setSavingSection(null);
@@ -421,8 +421,8 @@ const AdminAccountPage: React.FC = () => {
                 actions={
                   !isEditing("basicInfo") ? (
                     <Button type="button" variant="ghost" size="sm" onClick={() => startEdit("basicInfo")}>
-                      Edit
-                    </Button>
+                    {t("common.edit")}
+                  </Button>
                   ) : (
                     <>
                       <Button
@@ -434,7 +434,7 @@ const AdminAccountPage: React.FC = () => {
                           stopEdit("basicInfo");
                         }}
                       >
-                        Cancel
+                        {t("common.cancel")}
                       </Button>
                       <Button
                         type="button"
@@ -446,7 +446,7 @@ const AdminAccountPage: React.FC = () => {
                         {savingSection === "basicInfo" ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
-                          "Save"
+                          t("common.save")
                         )}
                       </Button>
                     </>
@@ -481,7 +481,7 @@ const AdminAccountPage: React.FC = () => {
                   </div>
                   <div className="grid flex-1 gap-3 sm:grid-cols-2">
                     <Input
-                      label="Full name"
+                      label={t("adminPanel.account.fields.fullName")}
                       value={form.basicInfo.fullName}
                       onChange={(e) =>
                         setForm((f) => ({
@@ -492,7 +492,7 @@ const AdminAccountPage: React.FC = () => {
                       disabled={!isEditing("basicInfo")}
                     />
                     <Input
-                      label="Email"
+                      label={t("adminPanel.account.fields.email")}
                       type="email"
                       value={form.basicInfo.email}
                       onChange={(e) =>
@@ -504,7 +504,7 @@ const AdminAccountPage: React.FC = () => {
                       disabled={!isEditing("basicInfo")}
                     />
                     <Input
-                      label="Phone number"
+                      label={t("adminPanel.account.fields.phone")}
                       value={form.basicInfo.phone}
                       onChange={(e) =>
                         setForm((f) => ({
@@ -513,10 +513,12 @@ const AdminAccountPage: React.FC = () => {
                         }))
                       }
                       disabled={!isEditing("basicInfo")}
-                      placeholder="+91 …"
+                      placeholder={t("adminPanel.account.phonePlaceholder")}
                     />
                     <div className="sm:col-span-2">
-                      <p className="mb-1.5 text-xs font-medium text-[var(--muted)]">Profile picture</p>
+                      <p className="mb-1.5 text-xs font-medium text-[var(--muted)]">
+                        {t("adminPanel.account.profilePicture")}
+                      </p>
                       <div className="flex items-center gap-3">
                         <div className="h-14 w-14 overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]">
                           {displayAvatar ? (
@@ -530,7 +532,7 @@ const AdminAccountPage: React.FC = () => {
                         {isEditing("basicInfo") ? (
                           <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]">
                             <Camera className="h-4 w-4" />
-                            Upload
+                            {t("adminPanel.account.upload")}
                             <input
                               type="file"
                               accept="image/*"
@@ -546,7 +548,9 @@ const AdminAccountPage: React.FC = () => {
                           </label>
                         ) : (
                           <span className="text-sm text-[var(--muted)]">
-                            {displayAvatar ? "Uploaded" : "No image uploaded"}
+                            {displayAvatar
+                              ? t("adminPanel.account.uploaded")
+                              : t("adminPanel.account.noImageUploaded")}
                           </span>
                         )}
                       </div>
@@ -558,12 +562,12 @@ const AdminAccountPage: React.FC = () => {
 
             {/* Security */}
             <SectionShell
-              title="Security"
+              title={t("adminPanel.account.security")}
               icon={Shield}
               actions={
                 !isEditing("security") ? (
                   <Button type="button" variant="ghost" size="sm" onClick={() => startEdit("security")}>
-                    Edit
+                    {t("common.edit")}
                   </Button>
                 ) : (
                   <>
@@ -576,7 +580,7 @@ const AdminAccountPage: React.FC = () => {
                         stopEdit("security");
                       }}
                     >
-                      Cancel
+                      {t("common.cancel")}
                     </Button>
                     <Button
                       type="button"
@@ -588,7 +592,7 @@ const AdminAccountPage: React.FC = () => {
                       {savingSection === "security" ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        "Save"
+                        t("common.save")
                       )}
                     </Button>
                   </>
@@ -596,7 +600,7 @@ const AdminAccountPage: React.FC = () => {
               }
             >
               <Input
-                label="Password"
+                label={t("adminPanel.account.fields.password")}
                 type="password"
                 value={profile.security.passwordMasked}
                 disabled
@@ -604,23 +608,25 @@ const AdminAccountPage: React.FC = () => {
               />
               {isEditing("security") ? (
                 <div className="space-y-3 rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]/40 p-3">
-                  <p className="text-xs font-medium text-[var(--b1)]">Change password</p>
+                  <p className="text-xs font-medium text-[var(--b1)]">
+                    {t("adminPanel.account.changePassword")}
+                  </p>
                   <Input
-                    label="Current password"
+                    label={t("adminPanel.account.fields.currentPassword")}
                     type="password"
                     autoComplete="current-password"
                     value={pwd.current}
                     onChange={(e) => setPwd((p) => ({ ...p, current: e.target.value }))}
                   />
                   <Input
-                    label="New password"
+                    label={t("adminPanel.account.fields.newPassword")}
                     type="password"
                     autoComplete="new-password"
                     value={pwd.next}
                     onChange={(e) => setPwd((p) => ({ ...p, next: e.target.value }))}
                   />
                   <Input
-                    label="Confirm new password"
+                    label={t("adminPanel.account.fields.confirmPassword")}
                     type="password"
                     autoComplete="new-password"
                     value={pwd.confirm}
@@ -632,7 +638,7 @@ const AdminAccountPage: React.FC = () => {
 
             {/* Professional */}
             <SectionShell
-              title="Professional"
+              title={t("adminPanel.account.professional")}
               icon={Briefcase}
               actions={
                 !isEditing("professional") ? (
@@ -642,7 +648,7 @@ const AdminAccountPage: React.FC = () => {
                     size="sm"
                     onClick={() => startEdit("professional")}
                   >
-                    Edit
+                    {t("common.edit")}
                   </Button>
                 ) : (
                   <>
@@ -667,7 +673,7 @@ const AdminAccountPage: React.FC = () => {
                       {savingSection === "professional" ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        "Save"
+                        t("common.save")
                       )}
                     </Button>
                   </>
@@ -675,13 +681,13 @@ const AdminAccountPage: React.FC = () => {
               }
             >
               <Input
-                label="Role"
+                label={t("adminPanel.account.fields.role")}
                 value={form.professional.role}
                 disabled
                 className="capitalize"
               />
               <Input
-                label="Experience (optional)"
+                label={t("adminPanel.account.fields.experience")}
                 value={form.professional.experience}
                 onChange={(e) =>
                   setForm((f) => ({
@@ -690,10 +696,10 @@ const AdminAccountPage: React.FC = () => {
                   }))
                 }
                 disabled={!isEditing("professional")}
-                placeholder="e.g. 5 years"
+                placeholder={t("adminPanel.account.experiencePlaceholder")}
               />
               <Input
-                label="Department (optional)"
+                label={t("adminPanel.account.fields.department")}
                 value={form.professional.department}
                 onChange={(e) =>
                   setForm((f) => ({
@@ -702,19 +708,19 @@ const AdminAccountPage: React.FC = () => {
                   }))
                 }
                 disabled={!isEditing("professional")}
-                placeholder="e.g. Operations"
+                placeholder={t("adminPanel.account.departmentPlaceholder")}
               />
             </SectionShell>
 
             {/* Address */}
             <div className="lg:col-span-2">
               <SectionShell
-                title="Address"
+                title={t("adminPanel.account.address")}
                 icon={MapPin}
                 actions={
                   !isEditing("address") ? (
                     <Button type="button" variant="ghost" size="sm" onClick={() => startEdit("address")}>
-                      Edit
+                      {t("common.edit")}
                     </Button>
                   ) : (
                     <>
@@ -727,7 +733,7 @@ const AdminAccountPage: React.FC = () => {
                           stopEdit("address");
                         }}
                       >
-                        Cancel
+                        {t("common.cancel")}
                       </Button>
                       <Button
                         type="button"
@@ -739,7 +745,7 @@ const AdminAccountPage: React.FC = () => {
                         {savingSection === "address" ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
-                          "Save"
+                          t("common.save")
                         )}
                       </Button>
                     </>
@@ -748,7 +754,7 @@ const AdminAccountPage: React.FC = () => {
               >
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Input
-                    label="Country"
+                    label={t("adminPanel.account.fields.country")}
                     value={form.address.country}
                     onChange={(e) =>
                       setForm((f) => ({
@@ -759,7 +765,7 @@ const AdminAccountPage: React.FC = () => {
                     disabled={!isEditing("address")}
                   />
                   <Input
-                    label="State"
+                    label={t("adminPanel.account.fields.state")}
                     value={form.address.state}
                     onChange={(e) =>
                       setForm((f) => ({
@@ -770,7 +776,7 @@ const AdminAccountPage: React.FC = () => {
                     disabled={!isEditing("address")}
                   />
                   <Input
-                    label="City"
+                    label={t("adminPanel.account.fields.city")}
                     value={form.address.city}
                     onChange={(e) =>
                       setForm((f) => ({
@@ -781,7 +787,7 @@ const AdminAccountPage: React.FC = () => {
                     disabled={!isEditing("address")}
                   />
                   <Input
-                    label="Zip code"
+                    label={t("adminPanel.account.fields.zipCode")}
                     value={form.address.zipCode}
                     onChange={(e) =>
                       setForm((f) => ({
@@ -797,7 +803,7 @@ const AdminAccountPage: React.FC = () => {
 
             {/* Preferences */}
             <SectionShell
-              title="Preferences"
+              title={t("adminPanel.account.preferences")}
               icon={Sliders}
               actions={
                 !isEditing("preferences") ? (
@@ -807,7 +813,7 @@ const AdminAccountPage: React.FC = () => {
                     size="sm"
                     onClick={() => startEdit("preferences")}
                   >
-                    Edit
+                    {t("common.edit")}
                   </Button>
                 ) : (
                   <>
@@ -832,7 +838,7 @@ const AdminAccountPage: React.FC = () => {
                       {savingSection === "preferences" ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        "Save"
+                        t("common.save")
                       )}
                     </Button>
                   </>
@@ -840,31 +846,33 @@ const AdminAccountPage: React.FC = () => {
               }
             >
               <div className="flex flex-col gap-2">
-                <span className="text-xs font-medium text-[var(--muted)]">Theme</span>
+                <span className="text-xs font-medium text-[var(--muted)]">
+                  {t("adminPanel.account.theme")}
+                </span>
                 <div className="flex flex-wrap gap-2">
-                  {(["light", "dark"] as const).map((t) => (
+                  {(["light", "dark"] as const).map((themeValue) => (
                     <button
-                      key={t}
+                      key={themeValue}
                       type="button"
                       disabled={!isEditing("preferences")}
                       onClick={() =>
                         setForm((f) => {
-                          applyGlobalTheme(t);
+                          applyGlobalTheme(themeValue);
                           return {
                             ...f,
-                            preferences: { ...f.preferences, theme: t },
+                            preferences: { ...f.preferences, theme: themeValue },
                           };
                         })
                       }
                       className={[
                         "rounded-lg px-3 py-1.5 text-sm font-medium capitalize transition-colors",
-                        form.preferences.theme === t
+                        form.preferences.theme === themeValue
                           ? "bg-[var(--b1)] text-white"
                           : "bg-[var(--b2-soft)] text-[var(--b1)] hover:bg-[var(--b2)]",
                         !isEditing("preferences") ? "opacity-70" : "",
                       ].join(" ")}
                     >
-                      {t}
+                      {t(`adminPanel.account.theme${themeValue === "light" ? "Light" : "Dark"}`)}
                     </button>
                   ))}
                 </div>
@@ -885,15 +893,17 @@ const AdminAccountPage: React.FC = () => {
                     }))
                   }
                 />
-                <span>Email & product notifications</span>
+                <span>{t("adminPanel.account.emailNotifications")}</span>
               </label>
             </SectionShell>
 
             {/* Activity */}
-            <SectionShell title="Activity" icon={Clock}>
+            <SectionShell title={t("adminPanel.account.activity")} icon={Clock}>
               <div className="grid gap-3">
                 <div>
-                  <p className="text-xs font-medium text-[var(--muted)]">Last login</p>
+                  <p className="text-xs font-medium text-[var(--muted)]">
+                    {t("adminPanel.account.lastLogin")}
+                  </p>
                   <p className="text-sm text-[var(--b1)]">
                     {formatDisplayDate(form.activity.lastLogin)}
                   </p>
@@ -906,8 +916,8 @@ const AdminAccountPage: React.FC = () => {
       </div>
       <CustomAlert
         open={completionAlertOpen}
-        title="Profile Completed"
-        message="Your profile is 100% completed"
+        title={t("adminPanel.account.profileCompleted")}
+        message={t("adminPanel.account.profileCompletedMessage")}
         onConfirm={() => setCompletionAlertOpen(false)}
       />
     </AdminLayout>

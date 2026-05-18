@@ -13,10 +13,11 @@ import { useTranslation } from "react-i18next";
 import type { Property } from "../../features/properties/propertyType";
 import { SELLER_CHART_WEEKS } from "./sellerNav";
 import type { SellerDashboardTrendPoint } from "@/features/seller/sellerAPI";
+import { translateSellerChartWeekLabel } from "@/lib/sellerI18n";
 
 type Point = { label: string; views: number; leads: number };
 
-function buildTrendData(listings: Property[], weeks: number): Point[] {
+function buildTrendData(listings: Property[], weeks: number, weekLabel: (index: number) => string): Point[] {
   const baseViews = listings.reduce((s, p) => s + (p.analytics?.views ?? 0), 0);
   const baseLeads = listings.reduce((s, p) => s + (p.analytics?.contactClicks ?? 0), 0);
   const v = Math.max(1, baseViews);
@@ -26,7 +27,7 @@ function buildTrendData(listings: Property[], weeks: number): Point[] {
     const t = i / Math.max(1, weeks - 1);
     const wave = 0.85 + 0.15 * Math.sin((i + 1) * 0.9);
     return {
-      label: `W${i + 1}`,
+      label: weekLabel(i),
       views: Math.max(0, Math.round((v / weeks) * wave * (0.7 + t * 0.35))),
       leads: Math.max(0, Math.round((l / weeks) * wave * (0.65 + t * 0.4))),
     };
@@ -44,7 +45,7 @@ function SellerChartsComponent({ listings, trendData }: SellerChartsProps) {
     if (Array.isArray(trendData) && trendData.length > 0) {
       return trendData;
     }
-    return buildTrendData(listings, SELLER_CHART_WEEKS);
+    return buildTrendData(listings, SELLER_CHART_WEEKS, translateSellerChartWeekLabel);
   }, [listings, trendData]);
 
   return (

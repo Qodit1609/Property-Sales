@@ -119,6 +119,28 @@ export const translateActivityType = (code?: string | null): string =>
 export const translateActivityStatus = (status?: string | null): string =>
   translateApiValue("adminPanel.activityLogsPage.statuses", status, status ?? "");
 
+const cityKeyFromName = (city: string): string =>
+  city
+    .trim()
+    .toLowerCase()
+    .replace(/\s+city$/i, "")
+    .replace(/\s+/g, "")
+    .replace(/[^a-z]/g, "");
+
+/** City name from API / mega menu → localized label (homePage.cities). */
+export const translateCity = (city?: string | null): string => {
+  if (!city?.trim()) return city ?? "";
+  const trimmed = city.trim();
+  const key = cityKeyFromName(trimmed);
+  const directKey = `homePage.cities.${key}`;
+  if (key && i18n.exists(directKey)) {
+    return i18n.t(directKey);
+  }
+  const fromNamespace = translateApiValue("homePage.cities", trimmed, trimmed);
+  if (fromNamespace !== trimmed) return fromNamespace;
+  return trimmed;
+};
+
 export const translateHeaderLabel = (value?: string | null): string => {
   if (!value?.trim()) return value ?? "";
   const trimmed = value.trim();
@@ -158,6 +180,9 @@ export const translateHeaderLabel = (value?: string | null): string => {
 
   const propertyType = translatePropertyType(trimmed);
   if (propertyType !== trimmed) return propertyType;
+
+  const city = translateCity(trimmed);
+  if (city !== trimmed) return city;
 
   const budget = translateBudgetLabel(trimmed);
   if (budget !== trimmed) return budget;

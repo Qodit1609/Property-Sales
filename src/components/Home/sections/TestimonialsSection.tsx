@@ -61,9 +61,22 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
     setActiveIndex(nextIndex);
   };
 
+  const testimonialKey = `homeSections.testimonials.items.${activeTestimonial.id}`;
   const safeMessage =
-    activeTestimonial.message?.trim() ||
-    t("homeSections.testimonials.emptyMessageFallback");
+    t(`${testimonialKey}.message`, {
+      defaultValue:
+        activeTestimonial.message?.trim() ||
+        t("homeSections.testimonials.emptyMessageFallback"),
+    }) || t("homeSections.testimonials.emptyMessageFallback");
+  const displayOccupation = t(`${testimonialKey}.occupation`, {
+    defaultValue:
+      activeTestimonial.occupation || t("homeSections.testimonials.defaultOccupation"),
+  });
+  const displayLocation = activeTestimonial.location
+    ? t(`${testimonialKey}.location`, {
+        defaultValue: activeTestimonial.location,
+      })
+    : "";
 
   const pageTransition = shouldReduceMotion
     ? { duration: 0.01 }
@@ -169,10 +182,8 @@ const TestimonialsSection: React.FC<TestimonialsSectionProps> = ({ testimonials 
                     {activeTestimonial.name}
                   </p>
                   <p className="truncate text-xs text-[var(--muted)] sm:text-sm">
-                    {activeTestimonial.occupation || t("homeSections.testimonials.defaultOccupation")}
-                    {activeTestimonial.location
-                      ? ` • ${activeTestimonial.location}`
-                      : ""}
+                    {displayOccupation}
+                    {displayLocation ? ` • ${displayLocation}` : ""}
                   </p>
                 </div>
 

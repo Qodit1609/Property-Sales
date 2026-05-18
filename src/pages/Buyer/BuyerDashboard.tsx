@@ -1,5 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import {
+  translateBuyerActivityTitle,
+  translateBuyerActivityType,
+} from "../../lib/buyerI18n";
 import { Search, TrendingUp, Sparkles, Heart, Scale, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
@@ -219,8 +223,10 @@ const BuyerDashboard: React.FC = () => {
             <ul className="mt-3 space-y-2 text-xs text-[var(--muted)]">
               {activity.slice(0, 6).map((a) => (
                 <li key={a.id} className="flex justify-between gap-2 border-b border-[var(--b2-soft)]/80 pb-2 last:border-0">
-                  <span className="text-[var(--b1)]">{a.title}</span>
-                  <span className="shrink-0 uppercase tracking-wide text-[10px]">{a.type}</span>
+                  <span className="text-[var(--b1)]">{translateBuyerActivityTitle(a.title)}</span>
+                  <span className="shrink-0 uppercase tracking-wide text-[10px]">
+                    {translateBuyerActivityType(a.type)}
+                  </span>
                 </li>
               ))}
             </ul>

@@ -3,24 +3,18 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
 import type { SellerLeadRecord } from "@/features/seller/sellerAPI";
+import { formatSellerDateTime, translateSellerLeadActivityType } from "@/lib/sellerI18n";
 
 type SellerLeadsTableProps = {
   rows: SellerLeadRecord[];
   onDeleteRow?: (row: SellerLeadRecord) => void;
 };
 
-function formatDateTime(value?: string) {
-  if (!value) return "-";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
-  return date.toLocaleString();
-}
-
 function SellerLeadsTableComponent({ rows, onDeleteRow }: SellerLeadsTableProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const activityLabel = (type: SellerLeadRecord["activityType"]) =>
-    t(`sellerPanel.leadsTable.activityTypes.${type}`, { defaultValue: type });
+    translateSellerLeadActivityType(type);
 
   return (
     <div className="overflow-x-auto">
@@ -64,7 +58,9 @@ function SellerLeadsTableComponent({ rows, onDeleteRow }: SellerLeadsTableProps)
                   {activityLabel(row.activityType)}
                 </td>
                 <td className="px-4 py-3 text-[var(--b1)]">{row.propertyName || "-"}</td>
-                <td className="px-4 py-3 text-[var(--muted)]">{formatDateTime(row.timestamp)}</td>
+                <td className="px-4 py-3 text-[var(--muted)]">
+                  {formatSellerDateTime(row.timestamp, i18n.language)}
+                </td>
                 <td className="px-4 py-3 text-[var(--muted)]">
                   <button
                     type="button"

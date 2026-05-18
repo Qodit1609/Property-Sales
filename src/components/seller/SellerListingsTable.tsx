@@ -7,6 +7,7 @@ import {
   normalizeListingStatus,
   sortPropertiesByRecency,
 } from "../../lib/sellerHelpers";
+import { formatSellerCurrency, translatePropertyType, translateSellerListingStatus } from "@/lib/sellerI18n";
 
 export interface SellerListingsTableProps {
   listings: Property[];
@@ -32,7 +33,7 @@ const SellerListingsTable: React.FC<SellerListingsTableProps> = ({
   onDelete,
   limit,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const sorted = sortPropertiesByRecency(listings);
   const rows =
     typeof limit === "number" ? sorted.slice(0, limit) : sorted;
@@ -81,11 +82,13 @@ const SellerListingsTable: React.FC<SellerListingsTableProps> = ({
                   ) : null}
                 </td>
                 <td className="px-4 py-3 align-top text-[var(--b1)]">
-                  {p.propertyType || t("sellerDashboard.na")}
+                  {p.propertyType
+                    ? translatePropertyType(p.propertyType) || p.propertyType
+                    : t("sellerDashboard.na")}
                 </td>
                 <td className="px-4 py-3 align-top tabular-nums text-[var(--b1)]">
                   {typeof p.price === "number" && Number.isFinite(p.price)
-                    ? `₹ ${p.price.toLocaleString("en-IN")}`
+                    ? formatSellerCurrency(p.price, i18n.language)
                     : t("sellerDashboard.na")}
                 </td>
                 <td className="px-4 py-3 align-top">
@@ -94,7 +97,7 @@ const SellerListingsTable: React.FC<SellerListingsTableProps> = ({
                       normalized
                     )}`}
                   >
-                    {normalized}
+                    {translateSellerListingStatus(normalized)}
                   </span>
                 </td>
                 <td className="px-4 py-3 align-top text-right">

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import api from "@/lib/apiClient";
+import { translateBuyerNavLabel, translateBuyerSectionTitle } from "../../lib/buyerI18n";
 
 type SidebarItem = {
   to: string;
@@ -88,11 +89,13 @@ const BuyerSidebar: React.FC<BuyerSidebarProps> = ({
   }) => {
     const iconKey = (item.icon ?? "").replace(/[\s_-]/g, "").toLowerCase();
     const icon = ICON_MAP[iconKey as keyof typeof ICON_MAP] ?? LayoutGrid;
+    const rawLabel = item.title ?? item.label ?? item.name ?? "";
+    const route = normalizeRoute(
+      item.route ?? item.path ?? item.to ?? item.href ?? item.url ?? ""
+    );
     return {
-      to: normalizeRoute(
-        item.route ?? item.path ?? item.to ?? item.href ?? item.url ?? ""
-      ),
-      label: item.title ?? item.label ?? item.name ?? "",
+      to: route,
+      label: rawLabel ? translateBuyerNavLabel(rawLabel, route) : "",
       icon,
     };
   };
@@ -153,8 +156,12 @@ const BuyerSidebar: React.FC<BuyerSidebarProps> = ({
     };
   }, [defaultItems]);
 
+  const resolvedSectionTitle = sectionTitle
+    ? translateBuyerSectionTitle(sectionTitle)
+    : undefined;
+
   return (
-    <nav className="space-y-1 text-sm" aria-label={sectionTitle || undefined}>
+    <nav className="space-y-1 text-sm" aria-label={resolvedSectionTitle || undefined}>
       {dynamicItems.map((item) => {
         const Icon = item.icon;
         return (

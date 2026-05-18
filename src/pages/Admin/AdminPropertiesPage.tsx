@@ -23,6 +23,7 @@ import {
   rejectListing,
 } from "../../features/admin/adminSlice";
 import CustomAlert from "@/components/common/CustomAlert";
+import { translatePropertyType } from "@/lib/adminI18n";
 
 const PROPERTY_TYPES = [
   "Farmhouse",
@@ -364,9 +365,9 @@ const AdminPropertiesPage: React.FC = () => {
                 className={filterSelectClass}
               >
                 <option value="">{t("adminPanel.properties.allTypes")}</option>
-                {PROPERTY_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
+                {PROPERTY_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {translatePropertyType(type)}
                   </option>
                 ))}
               </select>
@@ -447,7 +448,7 @@ const AdminPropertiesPage: React.FC = () => {
                         </p>
                       </td>
                       <td className="px-4 py-3 align-top text-[var(--b1-mid)]">
-                        {listing.propertyType}
+                        {translatePropertyType(listing.propertyType) || listing.propertyType}
                       </td>
                       <td className="px-4 py-3 align-top">
                         ₹ {listing.price?.toLocaleString("en-IN") ?? "—"}
@@ -809,7 +810,7 @@ const PropertyCardMobile = React.memo(function PropertyCardMobile({
         </span>
       </div>
       <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-[var(--b1-mid)]">
-        <span>{listing.propertyType}</span>
+        <span>{translatePropertyType(listing.propertyType) || listing.propertyType}</span>
         <span>·</span>
         <span>₹ {listing.price?.toLocaleString("en-IN") ?? "—"}</span>
       </div>

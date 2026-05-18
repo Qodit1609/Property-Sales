@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Trash2, Users } from "lucide-react";
 import { Button, Input } from "@/components/common";
 import AdminConfirmDialog from "./AdminConfirmDialog";
+import { translateRole } from "@/lib/adminI18n";
 
 import type { ManagedAccount } from "../../features/auth/roleTypes";
 
@@ -148,8 +149,16 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
             type="button"
             onClick={() => {
               const csv = [
-                ["Name", "Email", "Role"],
-                ...filtered.map((u) => [u.name, u.email, u.role || ""]),
+                [
+                  t("adminPanel.users.table.name"),
+                  t("adminPanel.users.table.email"),
+                  t("adminPanel.users.table.role"),
+                ],
+                ...filtered.map((u) => [
+                  u.name,
+                  u.email,
+                  translateRole(u.role) || u.role || "",
+                ]),
               ]
                 .map((row) => row.join(","))
                 .join("\n");
@@ -233,7 +242,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
                     </p>
                   </div>
                   <span className="shrink-0 rounded-full bg-[var(--b2-soft)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--b1)] ring-1 ring-[var(--b2)]">
-                    {row.role ?? t("common.na")}
+                    {row.role ? translateRole(row.role) : t("common.na")}
                   </span>
                 </div>
                 <div className="mt-4 flex justify-end gap-2">
@@ -304,7 +313,7 @@ const AccountManagement: React.FC<AccountManagementProps> = ({
 
                       <td className="px-4 py-3.5">
                         <span className="inline-flex items-center rounded-full bg-[var(--b2-soft)] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--b1)] ring-1 ring-[var(--b2)]">
-                          {row.role ?? t("common.na")}
+                          {row.role ? translateRole(row.role) : t("common.na")}
                         </span>
                       </td>
 

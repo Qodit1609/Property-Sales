@@ -17,7 +17,6 @@ import AdminLayout from "../../components/admin/AdminLayout";
 import Modal from "../../components/Modal/Modal";
 import { Button, Input } from "@/components/common";
 import {
-  LEAD_TYPE_LABELS,
   fetchLeadDetailAPI,
   fetchLeadsManagementAPI,
   type LeadItem,
@@ -25,6 +24,14 @@ import {
   type LeadsPagination,
   type LeadsSummary,
 } from "../../features/admin/leadsManagementAPI";
+import {
+  translateLeadStatus,
+  translateLeadType,
+  translatePropertyType,
+  translateRole,
+  translateVisitType,
+} from "@/lib/adminI18n";
+import { translateActivityType } from "@/lib/i18nHelpers";
 
 type TabId = "all" | LeadType;
 
@@ -113,24 +120,24 @@ const SUMMARY_TONES: Record<
 
 const PER_PAGE = 20;
 
-const STATUS_OPTIONS: Array<{ value: string; label: string }> = [
-  { value: "", label: "All statuses" },
-  { value: "received", label: "Received" },
-  { value: "sent", label: "Sent" },
-  { value: "failed", label: "Failed" },
-  { value: "scheduled", label: "Scheduled" },
-  { value: "rescheduled", label: "Rescheduled" },
-  { value: "cancelled", label: "Cancelled" },
-  { value: "viewed", label: "Viewed" },
-  { value: "interested", label: "Interested" },
-  { value: "contacted", label: "Contacted" },
-  { value: "uninterested", label: "Uninterested" },
-  { value: "draft", label: "Draft" },
-  { value: "incomplete", label: "Incomplete" },
-  { value: "ready", label: "Ready" },
-  { value: "approved", label: "Approved" },
-  { value: "rejected", label: "Rejected" },
-];
+const STATUS_OPTION_VALUES = [
+  "",
+  "received",
+  "sent",
+  "failed",
+  "scheduled",
+  "rescheduled",
+  "cancelled",
+  "viewed",
+  "interested",
+  "contacted",
+  "uninterested",
+  "draft",
+  "incomplete",
+  "ready",
+  "approved",
+  "rejected",
+] as const;
 
 const filterSelectClass =
   "w-full min-h-[44px] rounded-xl border border-[var(--b2)] bg-[var(--white)] px-3 py-2.5 text-sm text-[var(--b1)] shadow-sm transition focus:outline-none focus:ring-2 focus:ring-[var(--b1-mid)]/35 focus:border-[var(--b1-mid)]";
@@ -327,7 +334,7 @@ const AdminLeadsManagementPage: React.FC = () => {
     } finally {
       setDetailLoading(false);
     }
-  }, []);
+  }, [t]);
 
   const closeLeadDetail = useCallback(() => {
     setSelectedLead(null);
@@ -447,10 +454,10 @@ const AdminLeadsManagementPage: React.FC = () => {
                 onChange={(e) => setStatus(e.target.value)}
                 className={filterSelectClass}
               >
-                {STATUS_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.value
-                      ? t(`adminPanel.leads.statusOptions.${option.value}`)
+                {STATUS_OPTION_VALUES.map((value) => (
+                  <option key={value || "all"} value={value}>
+                    {value
+                      ? t(`adminPanel.leads.statusOptions.${value}`)
                       : t("adminPanel.leads.allStatuses")}
                   </option>
                 ))}
@@ -540,7 +547,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                       <span
                         className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ring-1 ring-inset ${leadTypeBadgeClass(lead.type)}`}
                       >
-                        {LEAD_TYPE_LABELS[lead.type] ?? lead.type}
+                        {translateLeadType(lead.type)}
                       </span>
                       {lead.source ? (
                         <p className="mt-1 text-[11px] text-[var(--muted)]">{t("adminPanel.leads.source", { source: lead.source })}</p>
@@ -550,7 +557,7 @@ const AdminLeadsManagementPage: React.FC = () => {
                       <span
                         className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${statusBadgeClass(lead.status)}`}
                       >
-                        {lead.status || "—"}
+                        {lead.status ? translateLeadStatus(lead.status) : "—"}
                       </span>
                     </td>
                     <td className="px-4 py-3.5 align-top text-[var(--b1-mid)] sm:px-5">
@@ -708,13 +715,13 @@ const LeadDetailContent: React.FC<LeadDetailContentProps> = ({
           <div>
             <p className="text-base font-semibold text-[var(--b1)]">{lead.name || t("adminPanel.leads.unknown")}</p>
             <p className="text-xs text-[var(--muted)]">
-              {LEAD_TYPE_LABELS[lead.type] ?? lead.type} · {lead.source || "—"}
+              {translateLeadType(lead.type)} · {lead.source || "—"}
             </p>
           </div>
           <span
             className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide ${statusBadgeClass(lead.status)}`}
           >
-            {lead.status || "—"}
+            {lead.status ? translateLeadStatus(lead.status) : "—"}
           </span>
         </div>
         <div className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
@@ -763,19 +770,29 @@ const DetailField: React.FC<{ label: string; value: string }> = ({ label, value 
 );
 
 const LeadExtendedDetails: React.FC<{ lead: LeadItem }> = ({ lead }) => {
+  const { t } = useTranslation();
   const details = lead.details ?? {};
   const blocks: React.ReactNode[] = [];
+  const dash = "—";
 
   if (lead.type === "visit_request") {
     blocks.push(
       <div key="visit-info" className="rounded-xl border border-[var(--b2)] bg-[var(--white)] p-4">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-          Visit details
+          {t("adminPanel.leads.visitDetails")}
         </p>
         <div className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
-          <DetailField label="Scheduled at" value={formatDateTime(details.visitDate)} />
-          <DetailField label="Visit type" value={details.visitType || "—"} />
-          {details.notes ? <DetailField label="Notes" value={details.notes} /> : null}
+          <DetailField
+            label={t("adminPanel.leads.fields.scheduledAt")}
+            value={formatDateTime(details.visitDate)}
+          />
+          <DetailField
+            label={t("adminPanel.leads.fields.visitType")}
+            value={details.visitType ? translateVisitType(details.visitType) : dash}
+          />
+          {details.notes ? (
+            <DetailField label={t("adminPanel.leads.fields.notes")} value={details.notes} />
+          ) : null}
         </div>
       </div>
     );
@@ -788,13 +805,19 @@ const LeadExtendedDetails: React.FC<{ lead: LeadItem }> = ({ lead }) => {
     blocks.push(
       <div key="contact-info" className="rounded-xl border border-[var(--b2)] bg-[var(--white)] p-4">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-          Inquiry meta
+          {t("adminPanel.leads.sections.inquiryMeta")}
         </p>
         <div className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
-          <DetailField label="Submitted at" value={formatDateTime(details.submittedAt)} />
-          <DetailField label="Sent at" value={formatDateTime(details.sentAt)} />
+          <DetailField
+            label={t("adminPanel.leads.fields.submittedAt")}
+            value={formatDateTime(details.submittedAt)}
+          />
+          <DetailField label={t("adminPanel.leads.fields.sentAt")} value={formatDateTime(details.sentAt)} />
           {details.failureReason ? (
-            <DetailField label="Failure reason" value={details.failureReason} />
+            <DetailField
+              label={t("adminPanel.leads.fields.failureReason")}
+              value={details.failureReason}
+            />
           ) : null}
         </div>
       </div>
@@ -813,41 +836,55 @@ const LeadExtendedDetails: React.FC<{ lead: LeadItem }> = ({ lead }) => {
     blocks.push(
       <div key="engagement-info" className="rounded-xl border border-[var(--b2)] bg-[var(--white)] p-4">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-          Engagement
+          {t("adminPanel.leads.sections.engagement")}
         </p>
         <div className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
-          <DetailField label="View count" value={String(details.viewCount ?? "—")} />
           <DetailField
-            label="Last viewed at"
+            label={t("adminPanel.leads.fields.viewCount")}
+            value={String(details.viewCount ?? dash)}
+          />
+          <DetailField
+            label={t("adminPanel.leads.fields.lastViewedAt")}
             value={formatDateTime(details.lastViewedAt)}
           />
           {details.propertyType ? (
-            <DetailField label="Property type" value={details.propertyType} />
+            <DetailField
+              label={t("adminPanel.leads.fields.propertyType")}
+              value={translatePropertyType(details.propertyType)}
+            />
           ) : null}
           {details.price !== undefined && details.price !== null ? (
             <DetailField
-              label="Price"
+              label={t("adminPanel.leads.fields.price")}
               value={`₹ ${Number(details.price).toLocaleString("en-IN")}`}
             />
           ) : null}
-          {details.address ? <DetailField label="Address" value={details.address} /> : null}
+          {details.address ? (
+            <DetailField label={t("adminPanel.leads.fields.address")} value={details.address} />
+          ) : null}
           {details.property?.title ? (
-            <DetailField label="Linked property" value={details.property.title} />
+            <DetailField
+              label={t("adminPanel.leads.fields.linkedProperty")}
+              value={details.property.title}
+            />
           ) : null}
           {details.property?.approvalStatus ? (
             <DetailField
-              label="Property status"
-              value={details.property.approvalStatus}
+              label={t("adminPanel.leads.fields.propertyStatus")}
+              value={translateLeadStatus(details.property.approvalStatus)}
             />
           ) : null}
           {details.buyer?.role ? (
-            <DetailField label="Buyer role" value={details.buyer.role} />
+            <DetailField
+              label={t("adminPanel.leads.fields.buyerRole")}
+              value={translateRole(details.buyer.role)}
+            />
           ) : null}
         </div>
         {Array.isArray(details.activityHistory) && details.activityHistory.length > 0 ? (
           <div className="mt-3">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-              Activity history
+              {t("adminPanel.leads.sections.activityHistory")}
             </p>
             <ul className="mt-2 space-y-1 text-xs text-[var(--b1)]">
               {details.activityHistory.slice(0, 8).map((entry, idx) => (
@@ -855,7 +892,9 @@ const LeadExtendedDetails: React.FC<{ lead: LeadItem }> = ({ lead }) => {
                   key={`${entry.activityType}-${entry.timestamp ?? idx}`}
                   className="flex items-center justify-between rounded-md border border-[var(--b2)]/70 bg-[var(--b2-soft)]/40 px-2 py-1"
                 >
-                  <span className="font-medium">{entry.activityType}</span>
+                  <span className="font-medium">
+                    {translateActivityType(entry.activityType)}
+                  </span>
                   <span className="text-[var(--muted)]">{formatDateTime(entry.timestamp)}</span>
                 </li>
               ))}
@@ -870,24 +909,30 @@ const LeadExtendedDetails: React.FC<{ lead: LeadItem }> = ({ lead }) => {
     blocks.push(
       <div key="agent-info" className="rounded-xl border border-[var(--b2)] bg-[var(--white)] p-4">
         <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-          Agent entry
+          {t("adminPanel.leads.sections.agentEntry")}
         </p>
         <div className="mt-2 grid gap-2 text-xs sm:grid-cols-2">
           {details.propertyId ? (
-            <DetailField label="Property ID" value={details.propertyId} />
+            <DetailField
+              label={t("adminPanel.leads.fields.propertyId")}
+              value={details.propertyId}
+            />
           ) : null}
           {details.adminRemark ? (
-            <DetailField label="Admin remark" value={details.adminRemark} />
+            <DetailField
+              label={t("adminPanel.leads.fields.adminRemark")}
+              value={details.adminRemark}
+            />
           ) : null}
           <DetailField
-            label="Has detailed entry"
-            value={details.hasDetailedEntry ? "Yes" : "No"}
+            label={t("adminPanel.leads.fields.hasDetailedEntry")}
+            value={details.hasDetailedEntry ? t("common.yes") : t("common.no")}
           />
         </div>
         {details.step1 && Object.keys(details.step1).length > 0 ? (
           <div className="mt-3">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-              Step 1 – Field entry
+              {t("adminPanel.leads.sections.step1")}
             </p>
             <KeyValueBlock data={details.step1} />
           </div>
@@ -895,7 +940,7 @@ const LeadExtendedDetails: React.FC<{ lead: LeadItem }> = ({ lead }) => {
         {details.step2 && Object.keys(details.step2).length > 0 ? (
           <div className="mt-3">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-              Step 2 – Detailed entry
+              {t("adminPanel.leads.sections.step2")}
             </p>
             <KeyValueBlock data={details.step2} />
           </div>
@@ -910,6 +955,7 @@ const LeadExtendedDetails: React.FC<{ lead: LeadItem }> = ({ lead }) => {
 };
 
 const KeyValueBlock: React.FC<{ data: Record<string, unknown> }> = ({ data }) => {
+  const { t } = useTranslation();
   const entries = Object.entries(data).filter(([, value]) => {
     if (value === null || value === undefined || value === "") return false;
     if (Array.isArray(value) && value.length === 0) return false;
@@ -917,7 +963,7 @@ const KeyValueBlock: React.FC<{ data: Record<string, unknown> }> = ({ data }) =>
   });
 
   if (entries.length === 0) {
-    return <p className="text-xs text-[var(--muted)]">No additional data.</p>;
+    return <p className="text-xs text-[var(--muted)]">{t("adminPanel.leads.noAdditionalData")}</p>;
   }
 
   return (

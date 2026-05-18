@@ -1,5 +1,10 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import {
+  formatBuyerDateTime,
+  translateBuyerActivityTitle,
+  translateBuyerNotificationMessage,
+} from "../../lib/buyerI18n";
 import BuyerLayout from "../../components/buyer/BuyerLayout";
 import { MessageCircle } from "lucide-react";
 import { useAppSelector } from "../../hooks/reduxHooks";
@@ -12,7 +17,7 @@ type EnquiryRow = {
 };
 
 const BuyerEnquiriesPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const activity = useAppSelector((state) => state.buyer.activity);
   const notifications = useAppSelector((state) => state.buyer.notifications);
 
@@ -21,7 +26,9 @@ const BuyerEnquiriesPage: React.FC = () => {
       .filter((item) => item.type === "enquiry" || item.type === "callback" || item.type === "visit")
       .map((item) => ({
         id: item.id,
-        title: item.title || t("buyerPanel.enquiries.propertyEnquiry"),
+        title: item.title?.trim()
+          ? translateBuyerActivityTitle(item.title)
+          : t("buyerPanel.enquiries.propertyEnquiry"),
         status:
           item.type === "visit"
             ? t("buyerPanel.enquiries.visitScheduled")
@@ -29,7 +36,7 @@ const BuyerEnquiriesPage: React.FC = () => {
               ? t("buyerPanel.enquiries.callbackRequested")
               : t("buyerPanel.enquiries.enquirySent"),
         lastUpdate: t("buyerPanel.enquiries.updatedOn", {
-          date: new Date(item.timestamp).toLocaleString(),
+          date: formatBuyerDateTime(item.timestamp, i18n.language),
         }),
       }));
 
@@ -37,13 +44,15 @@ const BuyerEnquiriesPage: React.FC = () => {
       .filter((item) => item.type === "seller_reply")
       .map((item) => ({
         id: item.id,
-        title: item.title || t("buyerPanel.enquiries.sellerResponse"),
+        title: item.title?.trim()
+          ? translateBuyerActivityTitle(item.title)
+          : t("buyerPanel.enquiries.sellerResponse"),
         status: item.read ? t("buyerPanel.enquiries.replyRead") : t("buyerPanel.enquiries.replyReceived"),
-        lastUpdate: item.message,
+        lastUpdate: translateBuyerNotificationMessage(item.message),
       }));
 
     return [...replyRows, ...activityRows];
-  }, [activity, notifications, t]);
+  }, [activity, notifications, t, i18n.language]);
 
   return (
     <BuyerLayout>

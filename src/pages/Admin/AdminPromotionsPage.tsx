@@ -12,6 +12,7 @@ import {
   repromotePromotionRequestAPI,
   deletePromotionRequestAPI,
 } from "@/features/admin/adminAPI";
+import { translatePromotionStatus } from "@/lib/adminI18n";
 
 const formatDateTime = (value?: string | null) => {
   if (!value) return "-";
@@ -154,7 +155,7 @@ const AdminPromotionsPage: React.FC = () => {
                 </p>
                 <p className="mt-1 text-sm text-[var(--muted)]">
                   {t("adminPanel.promotions.statusLine", {
-                    status: request.promotionStatus ?? "none",
+                    status: translatePromotionStatus(request.promotionStatus ?? "none"),
                   })}
                 </p>
                 {request.promotionStatus === "approved" ? (

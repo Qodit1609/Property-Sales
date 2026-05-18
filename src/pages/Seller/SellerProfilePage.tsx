@@ -8,7 +8,7 @@ import { useAppSelector } from "../../hooks/reduxHooks";
 import type { RootState } from "../../app/store";
 import { Button } from "@/components/common";
 import CustomAlert from "@/components/common/CustomAlert";
-import { sellerProfileFormSchema, type SellerProfileFormValues } from "./sellerProfileSchema";
+import { getSellerProfileFormSchema, type SellerProfileFormValues } from "./sellerProfileSchema";
 import {
   loadSellerProfile,
   saveSellerProfile,
@@ -81,6 +81,8 @@ const SellerProfilePage = () => {
     [defaults, email]
   );
 
+  const profileSchema = useMemo(() => getSellerProfileFormSchema(), [i18n.language]);
+
   const {
     register,
     handleSubmit,
@@ -88,7 +90,7 @@ const SellerProfilePage = () => {
     watch,
     formState: { errors },
   } = useForm<SellerProfileFormValues>({
-    resolver: zodResolver(sellerProfileFormSchema),
+    resolver: zodResolver(profileSchema),
     defaultValues: defaults,
     values: defaults,
   });
@@ -333,7 +335,7 @@ const SellerProfilePage = () => {
               ) : null}
             </label>
             <label className="block text-sm">
-              <span className="font-medium text-[var(--b1)]">PAN</span>
+              <span className="font-medium text-[var(--b1)]">{t("sellerPanel.profile.panLabel")}</span>
               <input
                 {...register("pan")}
                 className="mt-1 w-full rounded-xl border border-[var(--b2)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--b2)]"
@@ -343,7 +345,7 @@ const SellerProfilePage = () => {
               ) : null}
             </label>
             <label className="block text-sm">
-              <span className="font-medium text-[var(--b1)]">Aadhaar</span>
+              <span className="font-medium text-[var(--b1)]">{t("sellerPanel.profile.aadhaarLabel")}</span>
               <input
                 {...register("aadhaar")}
                 className="mt-1 w-full rounded-xl border border-[var(--b2)] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--b2)]"
@@ -405,17 +407,17 @@ const SellerProfilePage = () => {
             <li className="flex items-center justify-between rounded-xl border border-[var(--b2)]/80 bg-[var(--white)] px-3 py-2">
               <span className="inline-flex items-center gap-2">
                 <FileText className="h-4 w-4 text-[var(--b1-mid)]" />
-                Aadhaar Card Upload
+                {t("sellerPanel.profile.aadhaarUpload")}
               </span>
               {verificationUploads.aadhaar ? (
                 <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--success)]">
                   <span aria-hidden>✔</span>
-                  <span>Successfully</span>
+                  <span>{t("sellerPanel.profile.uploadSuccess")}</span>
                 </span>
               ) : (
                 <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-medium text-[var(--warning)]">
                   <span>{t("sellerPanel.profile.pending")}</span>
-                  <span className="text-[var(--b1)]">Upload</span>
+                  <span className="text-[var(--b1)]">{t("sellerPanel.profile.uploadAction")}</span>
                   <input type="file" className="sr-only" onChange={onVerificationUpload("aadhaar")} />
                 </label>
               )}
@@ -423,17 +425,17 @@ const SellerProfilePage = () => {
             <li className="flex items-center justify-between rounded-xl border border-[var(--b2)]/80 bg-[var(--white)] px-3 py-2">
               <span className="inline-flex items-center gap-2">
                 <FileText className="h-4 w-4 text-[var(--b1-mid)]" />
-                PAN Card Upload
+                {t("sellerPanel.profile.panUpload")}
               </span>
               {verificationUploads.pan ? (
                 <span className="inline-flex items-center gap-1 text-xs font-medium text-[var(--success)]">
                   <span aria-hidden>✔</span>
-                  <span>Successfully</span>
+                  <span>{t("sellerPanel.profile.uploadSuccess")}</span>
                 </span>
               ) : (
                 <label className="inline-flex cursor-pointer items-center gap-2 text-xs font-medium text-[var(--warning)]">
                   <span>{t("sellerPanel.profile.pending")}</span>
-                  <span className="text-[var(--b1)]">Upload</span>
+                  <span className="text-[var(--b1)]">{t("sellerPanel.profile.uploadAction")}</span>
                   <input type="file" className="sr-only" onChange={onVerificationUpload("pan")} />
                 </label>
               )}
@@ -443,8 +445,8 @@ const SellerProfilePage = () => {
       </div>
       <CustomAlert
         open={completionAlertOpen}
-        title="Profile Completed"
-        message="Your profile is 100% completed"
+        title={t("sellerPanel.profile.profileCompletedTitle")}
+        message={t("sellerPanel.profile.profileCompletedMessage")}
         onConfirm={() => setCompletionAlertOpen(false)}
       />
     </section>

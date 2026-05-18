@@ -6,23 +6,31 @@ import { cn } from "@/components/seller/sellerUtils";
 
 type Thread = {
   id: string;
-  name: string;
-  preview: string;
-  time: string;
   unread: boolean;
 };
 
-const THREADS: Thread[] = [
-  { id: "t1", name: "Priya · Farmland", preview: "Is the borewell certificate available?", time: "10:42", unread: true },
-  { id: "t2", name: "Vikram · Farmhouse", preview: "We can visit this weekend.", time: "Yesterday", unread: false },
-  { id: "t3", name: "Neha · Plot", preview: "Please share the exact pin location.", time: "Mon", unread: false },
+const THREAD_IDS: Thread[] = [
+  { id: "t1", unread: true },
+  { id: "t2", unread: false },
+  { id: "t3", unread: false },
 ];
 
 const SellerMessagesPage = () => {
   const { t } = useTranslation();
-  const [active, setActive] = useState(THREADS[0]?.id ?? "");
+  const [active, setActive] = useState(THREAD_IDS[0]?.id ?? "");
 
-  const current = useMemo(() => THREADS.find((x) => x.id === active) ?? THREADS[0], [active]);
+  const threads = useMemo(
+    () =>
+      THREAD_IDS.map((th) => ({
+        ...th,
+        name: t(`sellerPanel.messages.threads.${th.id}.name`),
+        preview: t(`sellerPanel.messages.threads.${th.id}.preview`),
+        time: t(`sellerPanel.messages.threads.${th.id}.time`),
+      })),
+    [t]
+  );
+
+  const current = useMemo(() => threads.find((x) => x.id === active) ?? threads[0], [active, threads]);
 
   return (
     <section className="space-y-6">
@@ -38,7 +46,7 @@ const SellerMessagesPage = () => {
             <span className="text-sm font-semibold text-[var(--b1)]">{t("sellerPanel.messages.inbox")}</span>
           </div>
           <ul className="max-h-[420px] overflow-y-auto">
-            {THREADS.map((th) => (
+            {threads.map((th) => (
               <li key={th.id}>
                 <button
                   type="button"

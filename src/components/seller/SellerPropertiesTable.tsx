@@ -24,6 +24,11 @@ import {
 } from "../../lib/sellerHelpers";
 import { Button } from "@/components/common";
 import { cn } from "./sellerUtils";
+import {
+  formatSellerCurrency,
+  formatSellerDate,
+  translatePropertyType,
+} from "@/lib/sellerI18n";
 
 const PAGE_SIZE = 8;
 
@@ -50,15 +55,9 @@ function statusBadgeClass(s: SellerListingDisplayStatus) {
   return "bg-[var(--warning-bg)] text-[var(--warning)] border-[var(--warning)]/30";
 }
 
-function rowDate(p: Property) {
+function rowDate(p: Property, language: string) {
   const raw = p.statusDetails?.postedAt ?? p.postedAt ?? p.createdAt ?? "";
-  const t = Date.parse(raw);
-  if (!Number.isFinite(t)) return "—";
-  return new Date(t).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  return formatSellerDate(raw, language);
 }
 
 function thumb(p: Property) {
@@ -82,7 +81,7 @@ function SellerPropertiesTableComponent({
   limit,
   compact,
 }: SellerPropertiesTableProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | SellerListingDisplayStatus>("all");
   const [sort, setSort] = useState<SortKey>("recent");
@@ -140,10 +139,13 @@ function SellerPropertiesTableComponent({
     return processed.slice(start, start + PAGE_SIZE);
   }, [processed, currentPage, limit]);
 
-  const fmtPrice = useCallback((n: number) => {
-    if (!Number.isFinite(n)) return t("sellerDashboard.na");
-    return `₹ ${n.toLocaleString("en-IN")}`;
-  }, [t]);
+  const fmtPrice = useCallback(
+    (n: number) => {
+      if (!Number.isFinite(n)) return t("sellerDashboard.na");
+      return formatSellerCurrency(n, i18n.language);
+    },
+    [i18n.language, t]
+  );
 
   const loc = useCallback((p: Property) => {
     const parts = [p.location?.locality, p.location?.city, p.location?.state].filter(Boolean);
@@ -247,7 +249,11 @@ function SellerPropertiesTableComponent({
                     </td>
                     <td className="max-w-[220px] px-4 py-3 align-top">
                       <p className="line-clamp-2 font-medium text-[var(--b1)]">{p.title?.trim() || t("sellerDashboard.untitled")}</p>
-                      <p className="mt-0.5 text-xs text-[var(--muted)]">{p.propertyType}</p>
+                      <p className="mt-0.5 text-xs text-[var(--muted)]">
+                        {p.propertyType
+                          ? translatePropertyType(p.propertyType) || p.propertyType
+                          : t("sellerDashboard.na")}
+                      </p>
                     </td>
                     <td className="px-4 py-3 align-top tabular-nums text-[var(--b1)]">{fmtPrice(p.price)}</td>
                     <td className="hidden max-w-[200px] px-4 py-3 align-top text-[var(--b1)] md:table-cell">
@@ -269,7 +275,9 @@ function SellerPropertiesTableComponent({
                     <td className="hidden px-4 py-3 align-top tabular-nums text-[var(--b1)] lg:table-cell">
                       {p.analytics?.contactClicks ?? 0}
                     </td>
-                    <td className="hidden px-4 py-3 align-top text-[var(--b1)] xl:table-cell">{rowDate(p)}</td>
+                    <td className="hidden px-4 py-3 align-top text-[var(--b1)] xl:table-cell">
+                      {rowDate(p, i18n.language)}
+                    </td>
                     <td className="px-3 py-3 align-top text-right sm:px-4">
                       <div className="flex flex-nowrap justify-end gap-1.5">
                         <Link

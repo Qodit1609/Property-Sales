@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import api from "@/lib/apiClient";
+import { translateAdminNavLabel } from "@/lib/adminI18n";
 
 type SidebarItem = {
   to: string;
@@ -211,8 +212,12 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, collapsed }) =>
         return next;
       })();
 
+  const translatedSectionTitle = sectionTitle
+    ? translateAdminNavLabel(sectionTitle)
+    : undefined;
+
   return (
-    <nav className="space-y-1" aria-label={sectionTitle || undefined}>
+    <nav className="space-y-1" aria-label={translatedSectionTitle}>
       {sidebarItems.map((item) => {
         const Icon = item.icon;
         return (
@@ -221,7 +226,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, collapsed }) =>
             to={item.to}
             end={item.to === "/admin"}
             onClick={() => onNavigate?.()}
-            title={collapsed ? item.label : undefined}
+            title={
+              collapsed ? translateAdminNavLabel(item.label, item.to) : undefined
+            }
             className={({ isActive }) =>
               twMerge(
                 "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition-all duration-200",
@@ -237,7 +244,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({ onNavigate, collapsed }) =>
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[var(--b2-soft)] text-[var(--b1-mid)] group-hover:bg-[var(--b2)] group-hover:text-[var(--b1)]">
               <Icon className="h-4 w-4" />
             </span>
-            <span className={twMerge("font-medium", collapsed && "sr-only")}>{item.label}</span>
+            <span className={twMerge("font-medium", collapsed && "sr-only")}>
+              {translateAdminNavLabel(item.label, item.to)}
+            </span>
           </NavLink>
         );
       })}

@@ -8,6 +8,10 @@ import {
   markNotificationRead,
 } from "../../features/notifications/notificationSlice";
 import { Button } from "@/components/common";
+import {
+  translateAdminNotificationMessage,
+  translateAdminNotificationTitle,
+} from "@/lib/adminI18n";
 
 const AdminNotificationPanel: React.FC = () => {
   const { t } = useTranslation();
@@ -133,10 +137,10 @@ const AdminNotificationPanel: React.FC = () => {
               />
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-semibold text-[var(--b1)]">
-                  {n.title}
+                  {translateAdminNotificationTitle(n.title)}
                 </p>
                 <p className="mt-0.5 text-[11px] text-[var(--muted)]">
-                  {n.message}
+                  {translateAdminNotificationMessage(n.message)}
                 </p>
                 <p className="mt-0.5 text-[10px] text-[var(--muted)]/80">
                   {new Date(n.createdAt).toLocaleString()}

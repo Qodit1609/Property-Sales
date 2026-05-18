@@ -17,6 +17,14 @@ import {
   TreePine,
 } from "lucide-react";
 import api from "@/lib/apiClient";
+import {
+  translateFooterBadge,
+  translateFooterAddress,
+  translateFooterBrandDescription,
+  translateFooterBrandName,
+  translateFooterLink,
+  translateFooterSocial,
+} from "./footerI18n";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -119,38 +127,45 @@ const normalizeLinks = (input: unknown): FooterLink[] =>
 /*  Subcomponents                                                      */
 /* ------------------------------------------------------------------ */
 
-const FooterColumn: React.FC<FooterColumnProps> = ({ title, links }) => (
-  <div>
-    <h3 className="text-sm font-semibold uppercase tracking-widest mb-5 text-[var(--b2)]">
-      {title}
-    </h3>
-    <nav aria-label={title}>
-      <ul className="space-y-2.5">
-        {links.map((link) => (
-          <li key={link.label}>
-            {link.external ? (
-              <a
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-fg/70 hover:text-[var(--b2)] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--b1)] rounded-sm"
-              >
-                {link.label}
-              </a>
-            ) : (
-              <Link
-                to={link.href}
-                className="text-sm text-fg/70 hover:text-[var(--b2)] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--b1)] rounded-sm"
-              >
-                {link.label}
-              </Link>
-            )}
-          </li>
-        ))}
-      </ul>
-    </nav>
-  </div>
-);
+const FooterColumn: React.FC<FooterColumnProps> = ({ title, links }) => {
+  useTranslation();
+
+  return (
+    <div>
+      <h3 className="text-sm font-semibold uppercase tracking-widest mb-5 text-[var(--b2)]">
+        {title}
+      </h3>
+      <nav aria-label={title}>
+        <ul className="space-y-2.5">
+          {links.map((link) => {
+            const translatedLabel = translateFooterLink(link.label);
+            return (
+              <li key={`${link.href}-${link.label}`}>
+                {link.external ? (
+                  <a
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-fg/70 hover:text-[var(--b2)] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--b1)] rounded-sm"
+                  >
+                    {translatedLabel}
+                  </a>
+                ) : (
+                  <Link
+                    to={link.href}
+                    className="text-sm text-fg/70 hover:text-[var(--b2)] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--b1)] rounded-sm"
+                  >
+                    {translatedLabel}
+                  </Link>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </div>
+  );
+};
 
 const SocialIcon: React.FC<SocialLink> = ({ label, href, icon }) => (
   <a
@@ -357,7 +372,7 @@ const Footer: React.FC = () => {
               >
                 <span className="text-[var(--b2)]">{mapBadgeIcon(badge?.icon ?? "")}</span>
                 <span className="text-xs sm:text-sm font-medium">
-                  {badge?.text}
+                  {translateFooterBadge(badge?.text)}
                 </span>
               </div>
             ))}
@@ -375,17 +390,22 @@ const Footer: React.FC = () => {
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               className="inline-block text-2xl font-bold text-fg font-serif focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--b2)] rounded-sm"
             >
-              {footerData?.brand?.name && renderBrandName(footerData.brand.name)}
+              {footerData?.brand?.name &&
+                renderBrandName(translateFooterBrandName(footerData.brand.name))}
             </Link>
 
             <p className="text-sm leading-relaxed text-fg/70 max-w-xs">
-              {footerData?.brand?.description}
+              {translateFooterBrandDescription(footerData?.brand?.description)}
             </p>
 
             {/* Social Icons */}
             <div className="flex gap-3">
               {footerData?.socials?.map((social) => (
-                <SocialIcon key={social.label} {...social} />
+                <SocialIcon
+                  key={social.label}
+                  {...social}
+                  label={translateFooterSocial(social.label)}
+                />
               ))}
             </div>
           </div>
@@ -432,7 +452,7 @@ const Footer: React.FC = () => {
                 </a>
                 <p className="flex items-start gap-2.5 text-sm text-fg/70 justify-center sm:justify-start">
                   <MapPin className="w-4 h-4 shrink-0 mt-0.5 text-[var(--b2)]" />
-                  <span>{footerData?.contact?.address}</span>
+                  <span>{translateFooterAddress(footerData?.contact?.address)}</span>
                 </p>
               </address>
             </div>

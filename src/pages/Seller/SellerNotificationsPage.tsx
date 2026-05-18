@@ -7,9 +7,14 @@ import {
   markNotificationRead,
 } from "../../features/notifications/notificationSlice";
 import { Button } from "@/components/common";
+import {
+  translateSellerNotificationMessage,
+  translateSellerNotificationTitle,
+} from "@/lib/sellerI18n";
+import { normalizeLanguage } from "@/i18n";
 
 const SellerNotificationsPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const notifications = useAppSelector((state) => state.notifications.items);
@@ -68,7 +73,7 @@ const SellerNotificationsPage = () => {
               onClick={() => dispatch(clearReadNotifications(userId))}
               className="shrink-0 text-xs"
             >
-              Clear all
+              {t("sellerPanel.notifications.clearAll")}
             </Button>
           ) : null}
         </div>
@@ -108,13 +113,15 @@ const SellerNotificationsPage = () => {
                 />
                 <div className="min-w-0 flex-1">
                   <p className="text-[11px] font-semibold text-[var(--b1)]">
-                    {n.title}
+                    {translateSellerNotificationTitle(n.title)}
                   </p>
                   <p className="mt-0.5 text-[11px] text-[var(--muted)]">
-                    {n.message}
+                    {translateSellerNotificationMessage(n.message)}
                   </p>
                   <p className="mt-0.5 text-[10px] text-[var(--muted)]/80">
-                    {new Date(n.createdAt).toLocaleString()}
+                    {new Date(n.createdAt).toLocaleString(
+                      normalizeLanguage(i18n.language) === "hi" ? "hi-IN" : "en-IN"
+                    )}
                   </p>
                 </div>
               </Button>

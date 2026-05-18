@@ -12,6 +12,7 @@ import CustomAlert from "@/components/common/CustomAlert";
 import { buildDuplicateListingPayload, getSellerListingDisplayStatus } from "../../lib/sellerHelpers";
 import { SellerPropertiesTable } from "@/components/seller/SellerPropertiesTable";
 import { SellerEmptyState } from "@/components/seller/SellerEmptyState";
+import { translateSellerError } from "@/lib/sellerI18n";
 
 type DashboardFilter = "all" | "active" | "pending" | "rejected" | "leads" | "views";
 
@@ -166,7 +167,7 @@ const SellerPropertiesPage = () => {
 
       {error ? (
         <p className="rounded-xl border border-[var(--error)] bg-[var(--error-bg)] px-4 py-3 text-sm text-[var(--error)]">
-          {error}
+          {translateSellerError(error)}
         </p>
       ) : null}
 

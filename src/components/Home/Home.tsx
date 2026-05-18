@@ -8,6 +8,7 @@ import {
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "@/hooks/reduxHooks";
+import { translateCity } from "@/lib/i18nHelpers";
 import {
   extractCityFromProperty,
   normalizeListingKey,
@@ -21,7 +22,7 @@ export { HomeFilterProvider } from "./homeFilterContext";
 const FILTER_ANY = "";
 
 const Home: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { data } = useAppSelector((state) => state.properties);
   const properties = useMemo(
     () => (Array.isArray(data) ? data : []),
@@ -76,15 +77,6 @@ const Home: React.FC = () => {
     );
   }, [properties]);
 
-  const translateCity = useCallback((city: string) => {
-    const cityKey = city
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, "")
-      .replace(/[^a-z]/g, "");
-    return t(`homePage.cities.${cityKey}`, { defaultValue: city });
-  }, [t]);
-
   const translateListingTypeLabel = useCallback((key: string, fallback: string) => {
     if (key === "sale") return t("homePage.buy");
     if (key === "rent") return t("homePage.rent");
@@ -99,7 +91,7 @@ const Home: React.FC = () => {
         label: translateCity(city),
       })),
     ],
-    [cities, t, translateCity]
+    [cities, t, i18n.language]
   );
 
   const categorySelectOptions = useMemo(

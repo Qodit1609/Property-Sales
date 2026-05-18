@@ -32,6 +32,7 @@ import type { SellerStatItem } from "@/components/seller/SellerStats";
 import { cn } from "@/components/seller/sellerUtils";
 import { SellerNotificationsBell } from "@/components/seller/SellerNotificationsBell";
 import { fetchSellerDashboardInsightsAPI, type SellerDashboardInsights } from "@/features/seller/sellerAPI";
+import { translateSellerError } from "@/lib/sellerI18n";
 
 const SellerDashboard = () => {
   const { t } = useTranslation();
@@ -267,7 +268,7 @@ const SellerDashboard = () => {
       {error ? (
         <p className="flex items-start gap-3 rounded-xl border border-[var(--error)]/30 bg-[var(--error-bg)] px-4 py-3.5 font-sans text-sm text-[var(--error)]">
           <XCircle className="mt-0.5 h-5 w-5 shrink-0 opacity-90" aria-hidden />
-          <span className="min-w-0 leading-relaxed">{error}</span>
+          <span className="min-w-0 leading-relaxed">{translateSellerError(error)}</span>
         </p>
       ) : null}
 

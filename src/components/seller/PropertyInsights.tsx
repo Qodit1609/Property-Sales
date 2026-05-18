@@ -5,6 +5,7 @@ import { ArrowUpRight, Eye, Heart, MessageCircle, TrendingUp } from "lucide-reac
 import { useTranslation } from "react-i18next";
 import { PropertyInsightItem } from "./PropertyInsightItem";
 import type { PropertyInsightBadgeTone } from "./PropertyInsightItem";
+import { formatSellerNumber } from "@/lib/sellerI18n";
 
 /** Shape prepared for future listing-level or portfolio analytics API responses. */
 export type PropertyInsightsAnalytics = {
@@ -30,7 +31,7 @@ type PropertyInsightsProps = {
 };
 
 function PropertyInsightsComponent({ analytics }: PropertyInsightsProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const level = useMemo(() => popularityLevel(analytics.views), [analytics.views]);
   const tone = useMemo(() => popularityTone(level), [level]);
@@ -65,17 +66,17 @@ function PropertyInsightsComponent({ analytics }: PropertyInsightsProps) {
         <PropertyInsightItem
           label={t("sellerPanel.propertyInsights.views")}
           icon={Eye}
-          value={analytics.views.toLocaleString("en-IN")}
+          value={formatSellerNumber(analytics.views, i18n.language)}
         />
         <PropertyInsightItem
           label={t("sellerPanel.propertyInsights.inquiries")}
           icon={MessageCircle}
-          value={analytics.inquiries.toLocaleString("en-IN")}
+          value={formatSellerNumber(analytics.inquiries, i18n.language)}
         />
         <PropertyInsightItem
           label={t("sellerPanel.propertyInsights.saved")}
           icon={Heart}
-          value={analytics.saved.toLocaleString("en-IN")}
+          value={formatSellerNumber(analytics.saved, i18n.language)}
         />
         <PropertyInsightItem
           label={t("sellerPanel.propertyInsights.popularity")}

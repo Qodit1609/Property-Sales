@@ -5,7 +5,7 @@ import { MapPin, Ruler } from "lucide-react";
 import Modal from "../Modal/Modal";
 import { Button, PropertyImage } from "@/components/common";
 import type { Property } from "../../features/properties/propertyType";
-import { formatINRCurrency } from "../../lib/i18nHelpers";
+import { formatINRCurrency, translatePropertyType } from "../../lib/i18nHelpers";
 import { formatArea, FALLBACK_PROPERTY_IMAGE } from "../../utils/propertyFormatters";
 
 interface Props {
@@ -41,7 +41,7 @@ const PropertyQuickViewModal: React.FC<Props> = ({
             {formatINRCurrency(property.price || 0, language)}
           </p>
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--b1-mid)]">
-            {property.propertyType}
+            {translatePropertyType(property.propertyType)}
           </p>
           <div className="flex items-start gap-2 text-sm text-[var(--muted)]">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[var(--b1-mid)]" />

@@ -34,8 +34,13 @@ const PromotionModal: React.FC<PromotionModalProps> = ({
       <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-5 shadow-xl">
         <div className="mb-4 flex items-center justify-between gap-2">
           <h3 className="text-base font-semibold text-[var(--b1)]">{t("sellerPanel.promotionModal.title")}</h3>
-          <button type="button" className="rounded-lg p-1 text-[var(--muted)] hover:bg-[var(--b2-soft)]" onClick={onClose}>
-            x
+          <button
+            type="button"
+            className="rounded-lg p-1 text-[var(--muted)] hover:bg-[var(--b2-soft)]"
+            onClick={onClose}
+            aria-label={t("common.close")}
+          >
+            ×
           </button>
         </div>
         <div className="space-y-4">

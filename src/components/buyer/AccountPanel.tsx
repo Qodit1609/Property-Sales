@@ -395,7 +395,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
 
               <Input
                 defaultValue={preferences.locations.join(", ")}
-                placeholder="E.g. Indore bypass, Mhow, Rau, Ujjain road"
+                placeholder={t("buyerPanel.account.placeholders.locations")}
                 className="mt-1 text-sm"
               />
             </div>

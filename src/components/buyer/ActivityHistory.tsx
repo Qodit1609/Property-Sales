@@ -2,11 +2,14 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Clock3 } from "lucide-react";
 import { useAppSelector } from "../../hooks/reduxHooks";
-
-const activityTypeKey = (type: string) => `buyerPanel.activity.types.${type}`;
+import {
+  formatBuyerDateTime,
+  translateBuyerActivityTitle,
+  translateBuyerActivityType,
+} from "../../lib/buyerI18n";
 
 const ActivityHistory: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { activity } = useAppSelector((state) => state.buyer);
 
   if (activity.length === 0) {
@@ -49,13 +52,13 @@ const ActivityHistory: React.FC = () => {
             <div className="mt-0.5 h-8 w-0.5 rounded-full bg-gradient-to-b from-emerald-400 to-sky-500" />
             <div className="flex-1">
               <p className="text-[11px] font-medium text-[var(--b1)]">
-                {t(activityTypeKey(item.type), { defaultValue: item.type })}
+                {translateBuyerActivityType(item.type)}
               </p>
               <p className="mt-0.5 text-[11px] text-[var(--muted)] line-clamp-1">
-                {item.title}
+                {translateBuyerActivityTitle(item.title)}
               </p>
               <p className="mt-0.5 text-[10px] text-[var(--muted)]/80">
-                {new Date(item.timestamp).toLocaleString()}
+                {formatBuyerDateTime(item.timestamp, i18n.language)}
               </p>
             </div>
           </div>

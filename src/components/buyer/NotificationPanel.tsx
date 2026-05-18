@@ -1,5 +1,10 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import {
+  formatBuyerDateTime,
+  translateBuyerNotificationMessage,
+  translateBuyerNotificationTitle,
+} from "../../lib/buyerI18n";
 import { Bell } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import {
@@ -9,7 +14,7 @@ import {
 import { Button } from "@/components/common";
 
 const NotificationPanel: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const notifications = useAppSelector((state) => state.notifications.items);
   const user = useAppSelector((state) => state.auth.user);
@@ -72,13 +77,13 @@ const NotificationPanel: React.FC = () => {
               <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-amber-400" />
               <div className="flex-1">
                 <p className="text-[11px] font-semibold text-[var(--b1)]">
-                  {n.title}
+                  {translateBuyerNotificationTitle(n.title)}
                 </p>
                 <p className="mt-0.5 text-[11px] text-[var(--muted)]">
-                  {n.message}
+                  {translateBuyerNotificationMessage(n.message)}
                 </p>
                 <p className="mt-0.5 text-[10px] text-[var(--muted)]/80">
-                  {new Date(n.createdAt).toLocaleString()}
+                  {formatBuyerDateTime(n.createdAt, i18n.language)}
                 </p>
               </div>
             </Button>

@@ -80,6 +80,15 @@ const ServiceSection: React.FC<ServiceSectionProps> = ({ services: servicesProp 
             const isActive = activeIndex === index;
             const isHovered = hoveredIndex === index;
             const cardKey = service.id ?? `service-${index}`;
+            const itemBase = service.id
+              ? `homeSection.serviceSection.items.${service.id}`
+              : null;
+            const cardTitle = itemBase
+              ? t(`${itemBase}.title`, { defaultValue: service.title })
+              : service.title;
+            const cardDescription = itemBase
+              ? t(`${itemBase}.description`, { defaultValue: service.description })
+              : service.description;
 
             return (
               <motion.div key={cardKey} variants={gridItem} className="h-full min-w-0">
@@ -158,7 +167,7 @@ const ServiceSection: React.FC<ServiceSectionProps> = ({ services: servicesProp 
                           : "text-[#1B4332] group-hover:text-white",
                       ].join(" ")}
                     >
-                      {service.title}
+                      {cardTitle}
                     </h3>
 
                     <p
@@ -169,7 +178,7 @@ const ServiceSection: React.FC<ServiceSectionProps> = ({ services: servicesProp 
                           : "text-[#6D4C41] group-hover:text-[#E8F5E9]",
                       ].join(" ")}
                     >
-                      {service.description}
+                      {cardDescription}
                     </p>
 
                     <span

@@ -31,10 +31,16 @@ const BenefitsSection: React.FC<BenefitsSectionProps> = ({ benefits }) => {
           >
             <h3 className="flex items-start text-lg font-semibold text-[var(--b1)]">
               <CheckCircle2 className="mr-2 mt-0.5 h-5 w-5 text-[var(--b1-mid)]" />
-              <span>{benefit.title}</span>
+              <span>
+                {t(`homeSections.benefits.items.${benefit.id}.title`, {
+                  defaultValue: benefit.title,
+                })}
+              </span>
             </h3>
             <p className="mt-2 text-sm sm:text-base text-[var(--muted)] leading-relaxed">
-              {benefit.description}
+              {t(`homeSections.benefits.items.${benefit.id}.description`, {
+                defaultValue: benefit.description,
+              })}
             </p>
           </motion.article>
         ))}

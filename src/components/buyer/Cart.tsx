@@ -21,9 +21,10 @@ import { useBuyerResolvedProperties } from "../../hooks/useBuyerResolvedProperti
 import PropertyCard from "../Cards/PropertyCard";
 import CartGrid from "./CartGrid";
 import { Button } from "@/components/common";
+import { formatBuyerCurrency } from "../../lib/buyerI18n";
 
 const Cart: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const cartIds = useAppSelector((s) => s.buyer.cartIds);
   const { properties: cart, loading } = useBuyerResolvedProperties(cartIds);
@@ -70,7 +71,7 @@ const Cart: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-[var(--b2-soft)] px-3 py-1 text-[11px] font-medium text-[var(--b1)] ring-1 ring-[var(--b2)]">
             {t("buyerPanel.cartPage.portfolioValue", {
-              value: totalValue.toLocaleString("en-IN"),
+              value: formatBuyerCurrency(totalValue, i18n.language).replace(/^\u20B9\s?/, ""),
             })}
           </span>
           <Button
