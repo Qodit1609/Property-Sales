@@ -75,7 +75,17 @@
     "toggleMenu": "Toggle Menu",
     "closeMenu": "Close menu",
     "contactUs": "Contact Us",
-    "toggleOptions": "Toggle {{item}} options"
+    "toggleOptions": "Toggle {{item}} options",
+    "tags": "Tags",
+    "budgetUnderCr": "Under {{amount}}Cr",
+    "budgetUnderL": "Under {{amount}}L",
+    "budgetUnderK": "Under {{amount}}k",
+    "languageEnglish": "English",
+    "languageHindi": "हिंदी",
+    "profilePhotoAlt": "{{name}} profile",
+    "profilePhotoAltGeneric": "Profile",
+    "logoutConfirmTitle": "Confirm Logout",
+    "logoutConfirmMessage": "Are you sure you want to logout?"
   },
   "homePage": {
     "heroTitlePrefix": "Your Piece of",
@@ -97,8 +107,10 @@
       "ahmedabad": "Ahmedabad",
       "ajmer": "Ajmer",
       "barwani": "Barwani",
+      "bhopal": "Bhopal",
       "dewas": "Dewas",
       "indore": "Indore",
+      "indorecity": "Indore City",
       "jaipur": "Jaipur",
       "lyari": "Lyari",
       "mumbai": "Mumbai",
@@ -115,6 +127,8 @@
     "locationNotAvailable": "Location not available",
     "propertyFallbackType": "Property",
     "imageNotAvailable": "Image Not Available",
+    "areaNotSpecified": "Area not specified",
+    "perMonth": "/ month",
     "rentTag": "Rent",
     "saleTag": "Sale",
     "viewDetails": "View Details",
@@ -123,7 +137,13 @@
     "featured": "Featured",
     "verified": "Verified",
     "sizeUnitAc": "ac",
-    "sizeUnitSqft": "sqft"
+    "sizeUnitSqft": "sqft",
+    "units": {
+      "sqft": "sqft",
+      "ac": "ac",
+      "acre": "acre",
+      "bigha": "bigha"
+    }
   },
   "propertySection": {
     "featuredProperty": "Featured Property",
@@ -142,7 +162,8 @@
       "yes": "Yes",
       "no": "No",
       "required": "Required",
-      "optional": "Optional"
+      "optional": "Optional",
+      "wordCount": "{{current}} / {{max}} words"
     },
     "layout": {
       "loadingStep": "Loading step..."
@@ -339,14 +360,38 @@
       "stepTitle": "Step 5: Amenities / Features",
       "stepSubtitle": "Select what applies. This helps users filter and compare.",
       "options": {
-        "borewell": { "label": "Borewell", "desc": "Reliable groundwater source" },
-        "dripIrrigation": { "label": "Drip irrigation", "desc": "Water-efficient setup" },
-        "fencing": { "label": "Fencing", "desc": "Boundary fencing available" },
-        "electricityConnection": { "label": "Electricity connection", "desc": "Active power connection" },
-        "farmRoad": { "label": "Farm road", "desc": "Internal/approach farm road" },
-        "nearbyHighway": { "label": "Nearby highway", "desc": "Good connectivity" },
-        "storageFacility": { "label": "Storage facility", "desc": "Godown/storage space" },
-        "security": { "label": "Security", "desc": "On-site security" }
+        "borewell": {
+          "label": "Borewell",
+          "desc": "Reliable groundwater source"
+        },
+        "dripIrrigation": {
+          "label": "Drip irrigation",
+          "desc": "Water-efficient setup"
+        },
+        "fencing": {
+          "label": "Fencing",
+          "desc": "Boundary fencing available"
+        },
+        "electricityConnection": {
+          "label": "Electricity connection",
+          "desc": "Active power connection"
+        },
+        "farmRoad": {
+          "label": "Farm road",
+          "desc": "Internal/approach farm road"
+        },
+        "nearbyHighway": {
+          "label": "Nearby highway",
+          "desc": "Good connectivity"
+        },
+        "storageFacility": {
+          "label": "Storage facility",
+          "desc": "Godown/storage space"
+        },
+        "security": {
+          "label": "Security",
+          "desc": "On-site security"
+        }
       }
     },
     "documents": {
@@ -474,6 +519,8 @@
       "enterFloor": "Enter floor",
       "enterFurnishing": "Enter furnishing",
       "addDescription": "Add description",
+      "descriptionWordLimit": "Description cannot exceed 150 words",
+      "shortDescriptionWordLimit": "Short description cannot exceed 40 words",
       "addAtLeastOneImage": "Add at least one image (upload files or paste an image URL)."
     }
   },
@@ -555,8 +602,7 @@
       "noRisk": "No Risk",
       "owner": "Owner",
       "dealer": "Dealer",
-      "seller": "Seller"
-      ,
+      "seller": "Seller",
       "sqft": "sqft",
       "month": "month",
       "acre": "acre",
@@ -570,7 +616,57 @@
       "openGoogleMap": "Open Google Map",
       "call": "Call",
       "contact": "Contact",
-      "viewDronePreview": "View Drone Preview"
+      "viewDronePreview": "View Drone Preview",
+      "viewOnMap": "View on Map"
+    },
+    "units": {
+      "km": "km",
+      "ft": "ft",
+      "m": "m",
+      "mm": "mm",
+      "mmPerYear": "mm/year",
+      "percent": "%"
+    },
+    "aria": {
+      "locationMapTitle": "{{title}} location map",
+      "mapPreviewAlt": "{{title}} map preview",
+      "mapScreenshotAlt": "{{title}} map screenshot",
+      "imageAlt": "{{title}} image {{index}}"
+    },
+    "dynamic": {
+      "facing": {
+        "North": "North",
+        "South": "South",
+        "East": "East",
+        "West": "West",
+        "North-East": "North-East",
+        "North-West": "North-West",
+        "South-East": "South-East",
+        "South-West": "South-West"
+      },
+      "landUseType": {
+        "Agricultural": "Agricultural",
+        "Residential": "Residential",
+        "Commercial": "Commercial"
+      },
+      "roadType": {
+        "kachha": "Kachha (Unpaved)",
+        "pakka": "Pakka (Paved)",
+        "highway": "Highway"
+      },
+      "waterAvailability": {
+        "High": "High",
+        "Medium": "Medium",
+        "Low": "Low",
+        "Canal + Borewell": "Canal + Borewell"
+      },
+      "furnishing": {
+        "Unfurnished": "Unfurnished",
+        "Semi-furnished": "Semi-furnished",
+        "Semi Furnished": "Semi Furnished",
+        "Fully-furnished": "Fully-furnished",
+        "Fully Furnished": "Fully Furnished"
+      }
     },
     "detail": {
       "basicDetails": "Basic Details",
@@ -668,8 +764,7 @@
       "noDataAvailable": "No Data Available",
       "statusMetadataLimited": "Status metadata is limited for this listing.",
       "floodRiskDescription": "Flood-prone area assessment based on backend climate analytics.",
-      "droughtRiskDescription": "Drought exposure based on historical weather and water support indicators."
-      ,
+      "droughtRiskDescription": "Drought exposure based on historical weather and water support indicators.",
       "priceOnRequest": "Price on request",
       "areaNotSpecified": "Area not specified"
     }
@@ -736,12 +831,32 @@
       "aria": "Notifications",
       "heading": "Notifications",
       "sub": "Listing and lead updates",
+      "clearAll": "Clear all",
       "approvedTitle": "Listing approved",
       "approvedDesc": "Your property passed review and is live.",
       "leadTitle": "New lead",
       "leadDesc": "A buyer requested contact on your farmland listing.",
       "rejectedTitle": "Update required",
-      "rejectedDesc": "A listing needs changes before approval."
+      "rejectedDesc": "A listing needs changes before approval.",
+      "titles": {
+        "Property approved": "Property approved",
+        "Property rejected": "Property rejected",
+        "Promotion approved": "Promotion approved",
+        "Property added to cart": "Property added to cart",
+        "New lead": "New lead",
+        "Update required": "Update required"
+      },
+      "messages": {
+        "approvedByAdmin": "{{target}} was approved by admin.",
+        "rejectedByAdmin": "{{target}} was rejected by admin.",
+        "propertyApproved": "Your property {{target}} has been approved.",
+        "propertyRejected": "Your property {{target}} was rejected."
+      }
+    },
+    "time": {
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago"
     },
     "stats": {
       "totalProperties": "Total properties",
@@ -755,12 +870,14 @@
       "viewsTitle": "Property views trend",
       "viewsSub": "Rolling weekly signal derived from your portfolio analytics.",
       "leadsTitle": "Leads trend",
-      "leadsSub": "Engagement proxy from contact actions across listings."
+      "leadsSub": "Engagement proxy from contact actions across listings.",
+      "weekLabel": "W{{week}}"
     },
     "leadsPreview": {
       "title": "Recent leads",
       "sub": "Preview only — connect workflows as APIs go live.",
-      "cta": "Open leads"
+      "cta": "Open leads",
+      "empty": "No recent leads yet."
     },
     "propertyInsights": {
       "title": "Property insights",
@@ -797,15 +914,16 @@
       "next": "Next"
     },
     "status": {
-      "pending": "pending",
-      "approved": "approved",
-      "rejected": "rejected",
-      "sold": "sold",
-      "deactivated": "deactivated"
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "sold": "Sold",
+      "deactivated": "Deactivated"
     },
     "actions": {
       "view": "View",
       "edit": "Edit",
+      "editBlockedDirectReject": "This listing was rejected by admin and cannot be edited or resubmitted.",
       "duplicate": "Duplicate",
       "more": "More",
       "markSold": "Mark sold",
@@ -823,6 +941,9 @@
       "success": "Listing status updated.",
       "error": "Could not update listing status. Please try again."
     },
+    "errors": {
+      "Failed to fetch your listings": "Failed to fetch your listings"
+    },
     "duplicateSuccess": "Duplicate listing created.",
     "duplicateError": "Could not duplicate listing. Ensure images and required fields are present.",
     "analytics": {
@@ -837,12 +958,22 @@
       "locationsTitle": "Top locations",
       "locationsSub": "Where your inventory is concentrated.",
       "noData": "Not enough listings to rank locations yet.",
-      "footer": "Figures reflect analytics captured on listings. Admin dashboards may include additional telemetry."
+      "footer": "Figures reflect analytics captured on listings. Admin dashboards may include additional telemetry.",
+      "fallback": {
+        "listing": "Listing",
+        "other": "Other"
+      }
     },
     "leadsPage": {
       "title": "Lead management",
       "sub": "Track buyer interest and follow-ups. Sample data until CRM APIs are connected.",
       "searchPlaceholder": "Search buyer or property",
+      "loading": "Loading leads...",
+      "loadError": "Failed to load leads.",
+      "deleteError": "Failed to delete row.",
+      "clearError": "Failed to clear rows.",
+      "noApprovedProperties": "No approved properties found.",
+      "noLeads": "No leads found.",
       "interest": "Interest",
       "colBuyer": "Buyer",
       "colContact": "Contact",
@@ -852,6 +983,26 @@
       "colStatus": "Status",
       "colActions": "Actions"
     },
+    "leadsCard": {
+      "untitledProperty": "Untitled Property",
+      "clearAll": "Clear All"
+    },
+    "leadsTable": {
+      "buyerName": "Buyer Name",
+      "activityType": "Activity Type",
+      "propertyName": "Property Name",
+      "dateTime": "Date & Time",
+      "action": "Action",
+      "empty": "No activities yet.",
+      "delete": "Delete",
+      "activityTypes": {
+        "view": "View Property",
+        "cart": "Add to Cart",
+        "wishlist": "Wishlist",
+        "compare": "Compare Property"
+      }
+    },
+    "statsAria": "Seller statistics",
     "leads": {
       "interest": {
         "hot": "Hot",
@@ -877,7 +1028,45 @@
       "encrypted": "End-to-end encryption may apply when chat is enabled.",
       "placeholderYou": "Thanks for your interest — happy to share more details.",
       "composerPlaceholder": "Type a message…",
-      "send": "Send message"
+      "send": "Send message",
+      "threads": {
+        "t1": {
+          "name": "Priya · Farmland",
+          "preview": "Is the borewell certificate available?",
+          "time": "10:42"
+        },
+        "t2": {
+          "name": "Vikram · Farmhouse",
+          "preview": "We can visit this weekend.",
+          "time": "Yesterday"
+        },
+        "t3": {
+          "name": "Neha · Plot",
+          "preview": "Please share the exact pin location.",
+          "time": "Mon"
+        }
+      }
+    },
+    "promotionsPage": {
+      "loading": "Loading promotions..."
+    },
+    "imageUploader": {
+      "title": "Quick Image Upload",
+      "subtitle": "Upload from dashboard. These images are used in post-property media step.",
+      "openMediaStep": "Open full media step",
+      "hint": "JPG/PNG/WEBP/GIF, max 10MB, up to 5 images.",
+      "selectImages": "Select images ({{current}}/{{max}})",
+      "uploading": "Uploading",
+      "empty": "No images uploaded yet.",
+      "propertyAlt": "Property",
+      "propertyImageAlt": "Property image",
+      "removeImage": "Remove image {{name}}",
+      "maxImages": "Only {{max}} images are allowed.",
+      "invalidType": "{{file}}: invalid file type",
+      "fileTooLarge": "{{file}}: file size exceeds 10MB",
+      "duplicateSkipped": "{{file}}: duplicate skipped",
+      "uploadFailed": "upload failed",
+      "skippedLimit": "{{count}} file(s) skipped due to {{max}}-image limit"
     },
     "promo": {
       "title": "Promotions",
@@ -892,6 +1081,36 @@
       "clicks": "Clicks",
       "performance": "Δ",
       "ctaSoon": "Coming soon"
+    },
+    "promotionSection": {
+      "title": "Paid Property Promotion",
+      "subtitle": "Boost visibility for your best listings. Choose a duration, submit a request, and track the status here.",
+      "legendActive": "Active",
+      "legendPending": "Pending",
+      "legendExpired": "Expired / Rejected",
+      "emptyTitle": "No properties to promote yet",
+      "emptyBody": "Once you add properties, you will be able to promote them here and see their performance at a glance.",
+      "noImage": "No image added",
+      "daysLeft": "{{count}} days left",
+      "extendPromotion": "Extend Promotion",
+      "promoteNow": "Promote Now",
+      "blockedTitle": "Promotion unavailable",
+      "blockedMessage": "Only approved property can be promoted.",
+      "statusPendingApproval": "Pending Approval",
+      "statusActive": "Active",
+      "statusExpired": "Expired",
+      "statusRejected": "Rejected",
+      "statusNotPromoted": "Not Promoted"
+    },
+    "promotionModal": {
+      "title": "Paid Property Promotion",
+      "selectDuration": "Select Duration",
+      "month": "{{count}} Month",
+      "months": "{{count}} Months",
+      "pricingFree": "FREE (first promotion)",
+      "pricingRs": "Rs {{amount}}",
+      "pricingLabel": "Pricing",
+      "sendRequest": "Send Promotion Request"
     },
     "profile": {
       "title": "Seller profile",
@@ -919,8 +1138,22 @@
       "verifySub": "Upload documents to unlock badges and faster approvals.",
       "docPan": "PAN / ID proof",
       "docAddress": "Address proof",
+      "panLabel": "PAN",
+      "aadhaarLabel": "Aadhaar",
+      "aadhaarUpload": "Aadhaar Card Upload",
+      "panUpload": "PAN Card Upload",
+      "uploadSuccess": "Successfully",
+      "uploadAction": "Upload",
+      "profileCompletedTitle": "Profile Completed",
+      "profileCompletedMessage": "Your profile is 100% completed",
       "pending": "Pending",
-      "optional": "Optional"
+      "optional": "Optional",
+      "validation": {
+        "nameRequired": "Name is required",
+        "phoneRequired": "Mobile number is required",
+        "panRequired": "PAN is required",
+        "aadhaarRequired": "Aadhaar is required"
+      }
     },
     "settings": {
       "title": "Settings",
@@ -931,6 +1164,1616 @@
       "listings": "Listing status changes",
       "marketing": "Product tips & marketplace updates",
       "save": "Save preferences"
+    }
+  },
+  "status": {
+    "available": "Available",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "sold": "Sold",
+    "deactivated": "Deactivated",
+    "active": "Active",
+    "inactive": "Inactive",
+    "success": "Success",
+    "new": "New",
+    "contacted": "Contacted",
+    "qualified": "Qualified",
+    "closed": "Closed",
+    "converted": "Converted",
+    "lost": "Lost"
+  },
+  "listingType": {
+    "sell": "Sell",
+    "sale": "Sale",
+    "rent": "Rent",
+    "lease": "Lease",
+    "rent/lease": "Rent/Lease"
+  },
+  "roles": {
+    "admin": "Admin",
+    "seller": "Seller",
+    "buyer": "Buyer",
+    "agent": "Agent"
+  },
+  "propertyList": {
+    "featuredListings": "FEATURED LISTINGS",
+    "description": "Discover exclusive properties in prime demand areas. Crafted for superior living and lifestyle excellence. Ensuring high returns and dependable investment growth.",
+    "galleryRefreshFailed": "Gallery images could not be refreshed; showing listing images when available.",
+    "scrollerLabel": "Property listings horizontal scroller",
+    "emptyFiltered": "No properties match your filters.",
+    "emptyDefault": "No properties found right now. Please try again shortly."
+  },
+  "propertyDetails": {
+    "loadFailedTitle": "Unable to load property details",
+    "goBack": "Go Back",
+    "notFoundTitle": "Property not found",
+    "notFoundBody": "The property may have been removed or is unavailable.",
+    "backToHome": "Back to Home"
+  },
+  "common": {
+    "close": "Close",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "ok": "OK",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "loading": "Loading...",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "yes": "Yes",
+    "no": "No",
+    "all": "All",
+    "actions": "Actions",
+    "status": "Status",
+    "filters": "Filters",
+    "view": "View",
+    "approve": "Approve",
+    "reject": "Reject",
+    "optional": "Optional",
+    "required": "Required",
+    "na": "N/A",
+    "unknown": "Unknown",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar",
+    "notifications": "Notifications",
+    "logout": "Logout",
+    "welcome": "Welcome",
+    "closeMenu": "Close menu",
+    "openNavigation": "Open navigation",
+    "confirmLogout": "Confirm Logout",
+    "confirmLogoutMessage": "Are you sure you want to log out?",
+    "clearAll": "Clear all",
+    "signedIn": "Signed in",
+    "accountSettings": "Account settings",
+    "viewFullDetails": "View full details",
+    "profileIncompleteTitle": "Profile Incomplete",
+    "profileIncompleteMessage": "Please complete your profile 100% to access this page.",
+    "specification": "Specification",
+    "highlightDifferences": "Highlight differences",
+    "showAllEqual": "Show all equal",
+    "submitting": "Submitting...",
+    "deleting": "Deleting…",
+    "property": "property",
+    "properties": "properties",
+    "buyerFallback": "Buyer"
+  },
+  "auth": {
+    "brand": "BhoomiWala",
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "mobile": "Mobile",
+      "confirmPassword": "Confirm Password",
+      "investmentInterest": "Investment Interest",
+      "propertyFocusType": "Property focus type",
+      "experienceYears": "Experience (years)"
+    },
+    "placeholders": {
+      "email": "Enter your email",
+      "fullName": "Enter your full name",
+      "mobile": "10-digit mobile",
+      "investmentInterest": "e.g. Weekend home, farmland, resort",
+      "propertyFocus": "e.g. Farmhouse, agriculture land",
+      "experienceYears": "3"
+    },
+    "actions": {
+      "hide": "Hide",
+      "show": "Show",
+      "hidePassword": "Hide password",
+      "showPassword": "Show password",
+      "hideConfirmPassword": "Hide confirm password",
+      "showConfirmPassword": "Show confirm password"
+    },
+    "login": {
+      "title": "Sign in",
+      "subtitle": "Access your dashboard and saved activity.",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "submitting": "Signing in...",
+      "submit": "Sign in",
+      "newHere": "New here?",
+      "registerLink": "Register here"
+    },
+    "register": {
+      "title": "Create your account",
+      "subtitle": "Choose your role and we'll take you to the right dashboard.",
+      "role": "Role",
+      "roles": {
+        "buyer": "BUYER",
+        "seller": "SELLER",
+        "agent": "AGENT"
+      },
+      "hints": {
+        "seller": "Seller: tell us your property focus.",
+        "agent": "Agent: share your experience level.",
+        "buyer": "Buyer: choose your investment interest."
+      },
+      "submitting": "Creating account...",
+      "submit": "Register",
+      "signInCta": "Already have an account? Sign in",
+      "terms": "By registering, you agree to our terms."
+    },
+    "blocked": {
+      "title": "Alert",
+      "message": "You are blocked by Admin"
+    },
+    "toast": {
+      "passwordMismatch": {
+        "title": "Passwords do not match",
+        "detail": "Please confirm your password again."
+      },
+      "success": {
+        "title": "Registration successful",
+        "detail": "Signing you in..."
+      }
+    }
+  },
+  "footer": {
+    "sections": {
+      "quickLinks": "Quick Links",
+      "categories": "Categories",
+      "usefulLinks": "Useful Links",
+      "contact": "Contact Us"
+    },
+    "newsletter": {
+      "title": "Stay Updated",
+      "description": "Get the latest property listings and investment tips delivered to your inbox.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "Enter your email",
+      "subscribeAria": "Subscribe to newsletter",
+      "subscribe": "Subscribe",
+      "thankYou": "Thank you for subscribing!"
+    },
+    "backToTop": "Back to Top",
+    "backToTopAria": "Back to top",
+    "copyright": "© {{year}} BhoomiWala.com · All Rights Reserved",
+    "credits": "Developed with care by TRH",
+    "links": {
+      "Home": "Home",
+      "About Us": "About Us",
+      "About": "About",
+      "Contact Us": "Contact Us",
+      "Contact": "Contact",
+      "Privacy Policy": "Privacy Policy",
+      "Terms of Service": "Terms of Service",
+      "Terms & Conditions": "Terms & Conditions",
+      "Terms and Conditions": "Terms and Conditions",
+      "FAQ": "FAQ",
+      "FAQs": "FAQs",
+      "Help & Support": "Help & Support",
+      "Help and Support": "Help and Support",
+      "Blog": "Blog",
+      "Careers": "Careers",
+      "Sitemap": "Sitemap",
+      "Login": "Login",
+      "Register": "Register",
+      "Sign In": "Sign In",
+      "Sign Up": "Sign Up",
+      "Post Property": "Post Property",
+      "List Property": "List Property",
+      "Buy Property": "Buy Property",
+      "Rent Property": "Rent Property",
+      "Explore Properties": "Explore Properties",
+      "Farmland": "Farmland",
+      "Agri Resort": "Agri Resort",
+      "Residential": "Residential",
+      "Commercial": "Commercial",
+      "Testimonials": "Testimonials",
+      "How It Works": "How It Works",
+      "Seller Dashboard": "Seller Dashboard",
+      "Buyer Dashboard": "Buyer Dashboard",
+      "Buy Land": "Buy Land",
+      "Blogs": "Blogs",
+      "Farm Land": "Farm Land",
+      "Agricultural Land": "Agricultural Land",
+      "Investment Land": "Investment Land",
+      "Rent Properties": "Rent Properties"
+    },
+    "badges": {
+      "Verified Listings": "Verified Listings",
+      "Verified Documentation": "Verified Documentation",
+      "Secure Transactions": "Secure Transactions",
+      "Legal Support": "Legal Support",
+      "100% Transparency": "100% Transparency",
+      "RERA Registered": "RERA Registered",
+      "Trusted Platform": "Trusted Platform",
+      "Expert Support": "Expert Support",
+      "Verified Properties": "Verified Properties",
+      "Safe & Secure": "Safe & Secure",
+      "Transparent Deals": "Transparent Deals",
+      "End-to-End Support": "End-to-End Support"
+    },
+    "brand": {
+      "names": {},
+      "descriptions": {
+        "The easiest way to find, buy, and invest in your dream land.": "The easiest way to find, buy, and invest in your dream land.",
+        "Discover premium land investments in Indore. More valuable than gold, more lasting than time.": "Discover premium land investments in Indore. More valuable than gold, more lasting than time.",
+        "Your trusted partner in finding the perfect land investment. Explore verified farm lands, farmhouses, and agricultural properties across India.": "Your trusted partner in finding the perfect land investment. Explore verified farm lands, farmhouses, and agricultural properties across India."
+      }
+    },
+    "social": {
+      "Instagram": "Instagram",
+      "Facebook": "Facebook",
+      "YouTube": "YouTube",
+      "WhatsApp": "WhatsApp",
+      "Twitter": "Twitter",
+      "LinkedIn": "LinkedIn",
+      "X": "X"
+    },
+    "addresses": {}
+  },
+  "homeSections": {
+    "farmingPromo": {
+      "eyebrow": "Farmland investment",
+      "title": "High-potential agricultural opportunities for long-term value",
+      "description": "Discover verified farmland listings with practical data around soil profile, irrigation access, and district-level growth demand.",
+      "badges": {
+        "verifiedDocs": "Verified documentation",
+        "farmingFilters": "Farming-specific filters",
+        "advisorSupport": "Advisor support"
+      },
+      "ctaExplore": "Explore farmland",
+      "ctaPostLand": "Post your land",
+      "imageAlt": "Aerial view of cultivated farmland"
+    },
+    "featuredFarms": {
+      "eyebrow": "Featured",
+      "title": "Featured properties BhoomiWala Assured Highly recommended",
+      "description": "Only active featured properties are shown here."
+    },
+    "districtExplorer": {
+      "eyebrow": "Location explorer",
+      "title": "Explore Top Agriculture Lands",
+      "description": "Discover opportunities and quickly jump into available inventory.",
+      "listingsCount": "{{count}}+ farming lands",
+      "viewListings": "View listings",
+      "ariaExploreDistrict": "Explore farmland listings in {{district}}",
+      "imageAlt": "Farmland in {{district}}"
+    },
+    "benefits": {
+      "eyebrow": "Why choose us",
+      "title": "Built for modern farmland transactions",
+      "description": "A focused product experience designed to reduce friction in discovery, due diligence, and closure.",
+      "items": {
+        "benefit-1": {
+          "title": "Verified land documentation",
+          "description": "Every listing is validated for ownership clarity and documentation reliability."
+        },
+        "benefit-2": {
+          "title": "Farming-first filters",
+          "description": "Search by soil quality, irrigation source, acreage, and district instantly."
+        },
+        "benefit-3": {
+          "title": "Local support network",
+          "description": "Get guidance for site visits, negotiation, and closure from local experts."
+        },
+        "benefit-4": {
+          "title": "Fast listing visibility",
+          "description": "Sellers get strong listing visibility with rich farmland-specific details."
+        }
+      }
+    },
+    "testimonials": {
+      "eyebrow": "Testimonials",
+      "title": "Trusted by farmland buyers and sellers",
+      "description": "Real customer stories from successful farmland discovery and closure journeys.",
+      "emptyMessageFallback": "This customer shared a positive experience with BhoomiWala.",
+      "defaultOccupation": "Farmland User",
+      "carouselAriaLabel": "Customer testimonials",
+      "prevAriaLabel": "Previous testimonial",
+      "nextAriaLabel": "Next testimonial",
+      "goToAriaLabel": "Go to testimonial {{index}}"
+    },
+    "footerCta": {
+      "title": "Ready to find your next farmland investment?",
+      "description": "Explore verified listings, compare farming-specific metrics, and connect directly with land owners and advisors for confident closure.",
+      "ctaExplore": "Start exploring",
+      "ctaPostFree": "Post land for free"
+    }
+  },
+  "contactPopup": {
+    "badge": "PREMIUM ASSISTANCE",
+    "title": "Let us find your perfect property",
+    "subtitle": "Share your requirements and our expert team will connect with curated options.",
+    "closeAriaLabel": "Close contact form",
+    "fields": {
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "message": "Message",
+      "messagePlaceholder": "Tell us your location preference, budget, and purpose..."
+    },
+    "validation": {
+      "nameRequired": "Name is required.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Enter a valid email address.",
+      "phoneRequired": "Phone number is required.",
+      "messageRequired": "Please enter your message."
+    },
+    "whatsapp": {
+      "message": "Hi, I'm interested in your property listing.{{nameSuffix}}",
+      "nameSuffix": " My name is {{name}}."
+    },
+    "footer": {
+      "responseTime": "We will get back to you within 24 hours."
+    },
+    "actions": {
+      "whatsapp": "Quick WhatsApp",
+      "sending": "Sending...",
+      "submit": "Send Inquiry"
+    },
+    "success": "Success! Your inquiry has been submitted. Our team will contact you shortly.",
+    "errors": {
+      "generic": "Something went wrong. Please try again in a moment."
+    }
+  },
+  "adminPanel": {
+    "fallbackName": "Admin",
+    "defaultSubtitle": "Track your workspace and tasks at a glance.",
+    "mobileMenuTitle": "Admin menu",
+    "a11y": {
+      "openNavigation": "Open admin navigation",
+      "closeMenu": "Close menu"
+    },
+    "logoutConfirm": {
+      "title": "Confirm Logout",
+      "message": "Are you sure you want to log out?"
+    },
+    "nav": {
+      "dashboard": "Dashboard",
+      "properties": "Properties",
+      "users": "Users",
+      "sellers": "Sellers",
+      "activityLogs": "Activity Logs",
+      "leadsManagement": "Leads Management",
+      "testimonial": "Testimonial",
+      "promotions": "Promotion Requests",
+      "images": "Images",
+      "notifications": "Notifications",
+      "account": "My Account"
+    },
+    "dashboard": {
+      "title": "Admin Panel",
+      "overview": "Overview",
+      "subtitle": "Portfolio health across listings, users, and leads.",
+      "overviewSubtitle": "Portfolio health across listings and user accounts at a glance.",
+      "stats": {
+        "listingsTitle": "Property listings",
+        "listingsDescription": "Moderation pipeline and inventory counts",
+        "usersTitle": "User accounts",
+        "usersDescription": "Roles across your platform",
+        "totalProperties": "Total properties",
+        "approved": "Approved",
+        "pendingReview": "Pending review",
+        "rejected": "Rejected",
+        "totalAccounts": "Total accounts",
+        "buyers": "Buyers",
+        "sellers": "Sellers",
+        "agents": "Agents"
+      }
+    },
+    "properties": {
+      "title": "Properties",
+      "heading": "All properties",
+      "subtitle": "CRUD and moderation for every listing.",
+      "loading": "Loading properties…",
+      "emptyPage": "No properties on this page.",
+      "propertyTypeLabel": "Property type",
+      "filtersAria": "Filters",
+      "searchPlaceholder": "Search on this page…",
+      "allStatuses": "All statuses",
+      "allTypes": "All types",
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "sold": "Sold"
+      },
+      "table": {
+        "property": "Property",
+        "type": "Type",
+        "price": "Price",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "rejectModal": {
+        "title": "Reject listing",
+        "propertyName": "Property name",
+        "shortDescription": "Short description",
+        "suggestionMessage": "Suggestion / message",
+        "errorBothFields": "Please enter both a short description and a suggestion/message.",
+        "rejectWithoutReason": "Reject directly without giving any reason"
+      },
+      "deleteModal": {
+        "title": "Delete property?",
+        "body": "This permanently removes the listing."
+      },
+      "pagination": {
+        "pageOf": "Page {{page}} of {{totalPages}}",
+        "total": "{{count}} total",
+        "prev": "Prev",
+        "next": "Next"
+      },
+      "submitting": "Submitting…",
+      "deleting": "Deleting…",
+      "actionBlocked": {
+        "title": "Action blocked",
+        "message": "First view the property"
+      },
+      "toast": {
+        "approved": "Property approved",
+        "rejected": "Property rejected",
+        "deleted": "Property deleted"
+      },
+      "viewed": "Viewed",
+      "unviewed": "Unviewed"
+    },
+    "propertyModeration": {
+      "title": "Property moderation",
+      "subtitle": "Approve, reject, or remove listings. Use filters to focus on a status.",
+      "searchPlaceholder": "Search listings…",
+      "allStatuses": "All statuses",
+      "loading": "Loading listings…",
+      "emptyFilter": "No listings match your filters.",
+      "empty": "No listings available.",
+      "deleteTitle": "Delete this listing?",
+      "deleteDescription": "“{{title}}” will be permanently removed.",
+      "deleteConfirm": "Delete listing",
+      "rejectTitle": "Reject this listing?",
+      "rejectDescription": "The listing will be marked as rejected. You can change this later by approving it again if needed.",
+      "rejectConfirm": "Reject"
+    },
+    "promotions": {
+      "title": "Promotion Requests",
+      "repromoteTitle": "RePromotion Request",
+      "repromoteDescription": "This will reset the promotion for 30 days starting from today. Do you want to continue?",
+      "heading": "Promotion Requests",
+      "subtitle": "Dynamic list of seller promotion requests.",
+      "loading": "Loading requests...",
+      "empty": "No promotion requests found.",
+      "seller": "Seller: {{name}}",
+      "requestedDuration": "Requested Duration: {{months}} month(s)",
+      "statusLine": "Status: {{status}}",
+      "approvedAt": "Approved At: {{date}}",
+      "liveDuration": "Live Duration: {{from}} to {{to}}",
+      "remainingDays": "Remaining Days Left: {{days}}",
+      "repromote": "RePromotion Request",
+      "toast": {
+        "approved": "Promotion approved",
+        "rejected": "Promotion rejected",
+        "extended": "Promotion extended for 30 days",
+        "deleted": "Promotion request deleted"
+      },
+      "unknownSeller": "Seller: Unknown",
+      "statuses": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "none": "None"
+      }
+    },
+    "users": {
+      "roleTitle": "Role",
+      "roleSubtitle": "Filter by role, search, and manage accounts.",
+      "searchPlaceholder": "Search accounts…",
+      "exportCsv": "Export CSV",
+      "filterByRole": "Filter by role",
+      "roles": {
+        "all": "All",
+        "buyer": "Buyer",
+        "seller": "Seller",
+        "agent": "Agent"
+      },
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role"
+      },
+      "block": "Block",
+      "unblock": "Unblock",
+      "deleteConfirm": {
+        "title": "Are you sure you want to Delete?",
+        "description": "This will permanently remove {{name}} ({{email}}). This action cannot be undone.",
+        "confirm": "Delete account"
+      },
+      "blockConfirm": {
+        "blockTitle": "Are you sure you want to Block?",
+        "unblockTitle": "Are you sure you want to Unblock?",
+        "description": "{{action}} {{name}} ({{email}})?"
+      },
+      "empty": {
+        "noAccounts": "No accounts yet",
+        "noMatching": "No matching users",
+        "noAccountsHint": "When users register, they will appear here.",
+        "noMatchingHint": "Try adjusting your search{{searchPart}} or switch from “{{roleFilter}}”.",
+        "searchPart": " “{{query}}”"
+      }
+    },
+    "leads": {
+      "title": "Leads Management",
+      "subtitle": "Track inquiries, visits and agent-collected leads in one place.",
+      "allStatuses": "All statuses",
+      "searchPlaceholder": "Name, email, phone, property, agent…",
+      "failedLoad": "Failed to load leads",
+      "failedLoadDetails": "Failed to load lead details",
+      "tabs": {
+        "all": "All Leads",
+        "buyerInquiries": "Buyer Inquiries",
+        "visitRequests": "Visit Requests",
+        "contactRequests": "Contact Requests",
+        "callRequests": "Call Requests",
+        "sellerLeads": "Seller Leads",
+        "agentInquiries": "Agent Inquiries",
+        "agentDetailedEntries": "Agent Detailed Entries"
+      },
+      "statusOptions": {
+        "received": "Received",
+        "sent": "Sent",
+        "failed": "Failed",
+        "scheduled": "Scheduled",
+        "rescheduled": "Rescheduled",
+        "cancelled": "Cancelled",
+        "viewed": "Viewed",
+        "interested": "Interested",
+        "contacted": "Contacted",
+        "uninterested": "Uninterested",
+        "draft": "Draft",
+        "incomplete": "Incomplete",
+        "ready": "Ready",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "dateFrom": "From",
+      "dateTo": "To",
+      "matchingCount": "{{count}} matching lead",
+      "matchingCount_plural": "{{count}} matching leads",
+      "resetFilters": "Reset filters",
+      "loading": "Loading leads…",
+      "empty": "No leads match the current filters.",
+      "loadingDetails": "Loading full lead details…",
+      "message": "Message",
+      "visitDetails": "Visit details",
+      "unknown": "Unknown",
+      "source": "Source: {{source}}",
+      "tableSubject": "Property / Subject",
+      "pagination": {
+        "pageOf": "Page {{page}} of {{totalPages}}",
+        "total": "{{count}} total",
+        "prev": "Prev",
+        "next": "Next"
+      },
+      "stats": {
+        "total": "Total leads",
+        "buyerInquiries": "Buyer inquiries",
+        "visitRequests": "Visit requests",
+        "contactRequests": "Contact requests",
+        "callRequests": "Call requests",
+        "sellerLeads": "Seller leads",
+        "agentInquiries": "Agent inquiries"
+      },
+      "table": {
+        "lead": "Lead",
+        "type": "Type",
+        "status": "Status",
+        "linked": "Linked",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "detailTitle": "Lead details",
+      "fields": {
+        "email": "Email",
+        "phone": "Phone",
+        "created": "Created",
+        "lastUpdate": "Last update",
+        "propertySubject": "Property / subject",
+        "agent": "Agent",
+        "seller": "Seller",
+        "scheduledAt": "Scheduled at",
+        "visitType": "Visit type",
+        "notes": "Notes",
+        "submittedAt": "Submitted at",
+        "sentAt": "Sent at",
+        "failureReason": "Failure reason",
+        "viewCount": "View count",
+        "lastViewedAt": "Last viewed at",
+        "propertyType": "Property type",
+        "price": "Price",
+        "address": "Address",
+        "linkedProperty": "Linked property",
+        "propertyStatus": "Property status",
+        "buyerRole": "Buyer role",
+        "propertyId": "Property ID",
+        "adminRemark": "Admin remark",
+        "hasDetailedEntry": "Has detailed entry"
+      },
+      "sections": {
+        "inquiryMeta": "Inquiry meta",
+        "engagement": "Engagement",
+        "activityHistory": "Activity history",
+        "agentEntry": "Agent entry",
+        "step1": "Step 1 – Field entry",
+        "step2": "Step 2 – Detailed entry"
+      },
+      "leadTypes": {
+        "buyer_inquiry": "Buyer Inquiry",
+        "contact_request": "Contact Request",
+        "call_request": "Call Request",
+        "visit_request": "Visit Request",
+        "seller_lead": "Seller Lead",
+        "agent_inquiry": "Agent Inquiry",
+        "agent_detailed_entry": "Agent Detailed Entry"
+      },
+      "visitTypes": {
+        "in_person": "In person",
+        "virtual": "Virtual",
+        "phone": "Phone"
+      },
+      "activityTypes": {},
+      "noAdditionalData": "No additional data."
+    },
+    "accessManagement": "Access Management",
+    "sellersPage": {
+      "title": "Sellers",
+      "heading": "Sellers",
+      "subtitle": "Accounts with the seller role and how many listings each has posted.",
+      "searchPlaceholder": "Search by name, email, or ID…",
+      "loading": "Loading sellers…",
+      "noSellers": "No seller accounts found.",
+      "propertiesPosted": "Properties posted",
+      "countsIncomplete": "Loaded {{loaded}} of {{total}} properties; counts may be incomplete. Increase the fetch limit if needed.",
+      "countsError": "Could not load property counts: {{error}}",
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "userId": "User ID"
+      }
+    },
+    "activityLogsPage": {
+      "title": "Activity logs",
+      "heading": "Activity logs",
+      "subtitle": "Track admin actions across properties and users.",
+      "filters": "Filters",
+      "filtersHint": "Narrow by role and category.",
+      "sellerActivities": "Seller activities",
+      "buyerActivities": "Buyer activities",
+      "totalSellers": "Total sellers: {{count}}",
+      "totalBuyers": "Total buyers: {{count}}",
+      "activityTable": "Activity table",
+      "loading": "Loading logs...",
+      "propertiesAdded": "Properties Added",
+      "addedAt": "Added At",
+      "filterUserType": "User type",
+      "filterActivityType": "Activity type",
+      "searchLabel": "Search",
+      "searchPlaceholder": "Search by name or activity",
+      "filterAll": "All",
+      "filterSeller": "Seller",
+      "filterBuyer": "Buyer",
+      "filterAllTypes": "All types",
+      "filterLogin": "Login",
+      "filterProperty": "Property",
+      "tableRole": "Role",
+      "tableActivity": "Activity",
+      "tableName": "Name",
+      "tableLoginAt": "Login at",
+      "tableLogoutAt": "Logout at",
+      "tableDuration": "Duration",
+      "tableTarget": "Target",
+      "tableDate": "Date",
+      "tableStatus": "Status",
+      "empty": "No activity logs found.",
+      "activityTypes": {
+        "PROPERTY_CREATED": "Property created",
+        "PROPERTY_EDITED": "Property edited",
+        "PROPERTY_DELETED": "Property deleted",
+        "DOCUMENT_UPLOADED": "Document uploaded",
+        "SELLER_LOGIN": "Seller login",
+        "SELLER_LOGOUT": "Seller logout",
+        "PROFILE_UPDATED": "Profile updated",
+        "BUYER_LOGIN": "Buyer login",
+        "BUYER_LOGOUT": "Buyer logout",
+        "PROPERTY_VIEWED": "Property viewed",
+        "CONTACT_REQUEST": "Contact request",
+        "PROPERTY_SAVED": "Property saved",
+        "SEARCH_ACTIVITY": "Search activity",
+        "PROPERTY_APPROVED": "Property approved",
+        "PROPERTY_REJECTED": "Property rejected",
+        "DOCUMENT_VERIFIED": "Document verified",
+        "USER_BLOCKED": "User blocked",
+        "USER_VERIFIED": "User verified"
+      },
+      "statuses": {
+        "Success": "Success",
+        "Pending": "Pending",
+        "Failed": "Failed",
+        "Approved": "Approved",
+        "Rejected": "Rejected"
+      },
+      "emptyMatch": "No activities match",
+      "emptyHint": "Adjust filters or search — connected APIs will stream live logs here.",
+      "statsTotal": "Total activities",
+      "statsSeller": "Seller activities",
+      "statsBuyer": "Buyer activities",
+      "statsAdmin": "Admin activities",
+      "searchByUserPlaceholder": "Search by user name"
+    },
+    "testimonial": {
+      "actionBlocked": {
+        "title": "Action blocked",
+        "message": "First view the property"
+      },
+      "page": {
+        "loading": "Loading testimonials...",
+        "empty": "No testimonials found.",
+        "detailsTitle": "Testimonial Details",
+        "viewGuardMessage": "First click View to enable this action.",
+        "loadFailed": "Load failed",
+        "actionFailed": "Action failed",
+        "approved": "Testimonial approved",
+        "rejected": "Testimonial rejected",
+        "deleted": "Testimonial deleted",
+        "table": {
+          "fullName": "Full Name",
+          "role": "Role",
+          "location": "Location",
+          "rating": "Rating",
+          "status": "Status",
+          "createdDate": "Created Date"
+        },
+        "fields": {
+          "name": "Name",
+          "role": "Role",
+          "location": "Location",
+          "occupation": "Occupation",
+          "rating": "Rating",
+          "status": "Status",
+          "description": "Description"
+        }
+      }
+    },
+    "images": {
+      "deleteTitle": "Delete image?",
+      "deleteMessage": "Delete this image permanently?",
+      "page": {
+        "heading": "Images",
+        "subtitle": "Manage uploaded media images.",
+        "loading": "Loading images...",
+        "empty": "No images found.",
+        "uploading": "Uploading...",
+        "addImage": "Add Image",
+        "mediaAlt": "Media",
+        "tag": "Tag",
+        "format": "Format",
+        "size": "Size",
+        "created": "Created",
+        "loadFailed": "Load failed",
+        "uploadSuccess": "Image uploaded",
+        "uploadFailed": "Upload failed",
+        "deleteSuccess": "Image deleted",
+        "deleteFailed": "Delete failed",
+        "deleting": "Deleting..."
+      }
+    },
+    "notificationsPanel": {
+      "heading": "Notifications",
+      "subtitle": "New listings and admin activity alerts.",
+      "emptyTitle": "No notifications yet",
+      "emptySub": "When a new property is added or other events occur, they will appear here."
+    },
+    "notifications": {
+      "fallbackListing": "A listing",
+      "titles": {
+        "Property approved": "Property approved",
+        "Property rejected": "Property rejected",
+        "New property pending approval": "New property pending approval",
+        "New property added": "New property added",
+        "New user registered": "New user registered"
+      },
+      "messages": {
+        "approvedByAdmin": "{{target}} was approved by admin.",
+        "rejectedByAdmin": "{{target}} was rejected by admin.",
+        "userJoined": "{{name}} joined the platform.",
+        "waitingForReview": "{{target}} is waiting for review.",
+        "hasBeenAdded": "{{target}} has been added."
+      }
+    },
+    "account": {
+      "title": "My Account",
+      "pageTitle": "My account",
+      "pageSubtitle": "View and update your admin profile, security, and preferences.",
+      "signInRequired": "You need to be logged in as an admin.",
+      "editProfile": "Edit profile",
+      "cancelAll": "Cancel all",
+      "saveAll": "Save all",
+      "basicInfo": "Basic info",
+      "security": "Security",
+      "professional": "Professional",
+      "address": "Address",
+      "preferences": "Preferences",
+      "activity": "Activity",
+      "profileCompleted": "Profile Completed",
+      "profileCompletedMessage": "Your profile is 100% completed",
+      "profilePicture": "Profile picture",
+      "upload": "Upload",
+      "uploaded": "Uploaded",
+      "noImageUploaded": "No image uploaded",
+      "changePassword": "Change password",
+      "theme": "Theme",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "emailNotifications": "Email & product notifications",
+      "lastLogin": "Last login",
+      "phonePlaceholder": "+91 …",
+      "experiencePlaceholder": "e.g. 5 years",
+      "departmentPlaceholder": "e.g. Operations",
+      "unknownError": "Unknown error",
+      "fields": {
+        "fullName": "Full name",
+        "email": "Email",
+        "phone": "Phone number",
+        "password": "Password",
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password",
+        "role": "Role",
+        "experience": "Experience (optional)",
+        "department": "Department (optional)",
+        "country": "Country",
+        "state": "State",
+        "city": "City",
+        "zipCode": "Zip code"
+      },
+      "toast": {
+        "notSignedIn": "Not signed in",
+        "notSignedInDetail": "Sign in again to manage your account.",
+        "loadFailed": "Could not load profile",
+        "validation": "Validation",
+        "password": "Password",
+        "saved": "Saved",
+        "savedDetail": "Your profile was updated.",
+        "saveFailed": "Save failed"
+      }
+    },
+    "toast": {
+      "accessRestricted": "Access Restricted"
+    }
+  },
+  "buyerPanel": {
+    "shell": {
+      "menuTitle": "Buyer menu",
+      "openNavigation": "Open buyer navigation"
+    },
+    "nav": {
+      "overview": "Overview",
+      "wishlist": "Wishlist",
+      "compare": "Compare",
+      "cart": "Cart",
+      "enquiries": "Enquiries",
+      "activity": "Activity",
+      "notifications": "Notifications",
+      "account": "Account",
+      "testimonial": "Testimonial"
+    },
+    "topBar": {
+      "overview": {
+        "title": "Overview",
+        "subtitle": "Track saved properties and activity at a glance."
+      },
+      "wishlist": {
+        "title": "Wishlist",
+        "subtitle": "Properties you saved for later."
+      },
+      "compare": {
+        "title": "Compare",
+        "subtitle": "Side-by-side listing comparison."
+      },
+      "cart": {
+        "title": "Cart",
+        "subtitle": "Listings you plan to enquire about."
+      },
+      "account": {
+        "title": "Account",
+        "subtitle": "Your profile and preferences."
+      },
+      "activity": {
+        "title": "Activity",
+        "subtitle": "Recent views and interactions."
+      },
+      "enquiries": {
+        "title": "Enquiries",
+        "subtitle": "Status of your seller and agent conversations."
+      },
+      "testimonial": {
+        "title": "Testimonial",
+        "subtitle": "Share your experience with buyers and sellers."
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Alerts and updates for your account."
+      },
+      "fallback": {
+        "title": "Buyer overview",
+        "subtitle": "Track saved properties and activity at a glance."
+      }
+    },
+    "dashboard": {
+      "wishlist": "Wishlist",
+      "compare": "Compare",
+      "cart": "Cart",
+      "viewList": "View list →",
+      "openCompare": "Open table →",
+      "goToCart": "Go to cart →",
+      "curatedInventory": "Curated inventory",
+      "heroTitle": "Discover verified land, farmhouse & agri resort deals",
+      "heroSubtitle": "Search, shortlist, compare and track visits — built for serious buyers.",
+      "searchPlaceholder": "Search by village, highway, landmark or project name",
+      "saveSearchLabel": "Label for saved search (optional)",
+      "saveSearch": "Save search",
+      "savedSearchDefault": "Saved search",
+      "savedSearches": "Saved searches",
+      "reapply": "Reapply",
+      "remove": "Remove",
+      "trendingCorridors": "Trending corridors:",
+      "recentActivity": "Recent activity",
+      "fullHistory": "Full history →",
+      "matchingProperties": "Matching properties",
+      "listingsShown": "{{shown}} of {{total}} listings shown",
+      "recommendations": "Recommendations",
+      "compareLimitNotice": "You can compare up to {{count}} properties. Remove one to add another."
+    },
+    "enquiries": {
+      "title": "Your enquiries",
+      "pageHeading": "Enquiries & contact requests",
+      "pageSubtitle": "Structured view of your conversations with sellers and agents.",
+      "empty": "No enquiries yet. Once you contact a seller or receive replies, they will appear here automatically.",
+      "propertyEnquiry": "Property enquiry",
+      "visitScheduled": "Visit scheduled",
+      "callbackRequested": "Callback requested",
+      "enquirySent": "Enquiry sent",
+      "sellerResponse": "Seller response",
+      "updatedOn": "Updated on {{date}}",
+      "replyRead": "Reply read",
+      "replyReceived": "Reply received"
+    },
+    "testimonial": {
+      "title": "Share Your Testimonial",
+      "subtitle": "Tell us about your experience with BhoomiWala.",
+      "form": {
+        "fullName": "Full Name",
+        "location": "Location",
+        "occupation": "Occupation",
+        "rating": "Rating (1-5)",
+        "description": "Description",
+        "submit": "Submit Testimonial"
+      },
+      "toast": {
+        "submitted": "Testimonial submitted",
+        "submittedDetail": "Your testimonial has been sent for admin review.",
+        "failed": "Submit failed",
+        "failedDetail": "Unable to submit testimonial"
+      }
+    },
+    "account": {
+      "photoHint": "Shown in your buyer sidebar. JPG or PNG, max about 1.5 MB.",
+      "profileDetails": "Profile details",
+      "profileCompletedMessage": "Your profile is 100% completed",
+      "savePreferenceBlueprint": "Save preference blueprint",
+      "propertyTypes": {
+        "agricultureLand": "Agriculture land",
+        "farmhouse": "Farmhouse",
+        "resort": "Resort",
+        "agriResort": "Agri resort"
+      },
+      "fields": {
+        "fullName": "Full name",
+        "email": "Email",
+        "mobile": "Mobile number",
+        "occupation": "Occupation",
+        "gender": "Gender",
+        "role": "Role"
+      },
+      "placeholders": {
+        "mobile": "Enter mobile number",
+        "occupation": "Enter occupation",
+        "gender": "Select gender",
+        "locations": "E.g. Indore bypass, Mhow, Rau, Ujjain road"
+      },
+      "gender": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other"
+      },
+      "roleBadge": "Buyer",
+      "preferences": {
+        "title": "Buyer preferences",
+        "subtitle": "Used to personalize recommendations and alerts.",
+        "locations": "Preferred locations",
+        "budgetFrom": "Budget from",
+        "budgetTo": "Budget to",
+        "propertyTypes": "Property types",
+        "propertyFocus": "Property focus",
+        "save": "Save preferences"
+      }
+    },
+    "wishlistPage": {
+      "emptyTitle": "No saved properties yet",
+      "emptyBody": "Start exploring curated agriculture lands, farmhouses and resorts. Use the heart on any property card to save it for later.",
+      "discoverCta": "Discover properties",
+      "savedTitle": "Saved properties",
+      "countSummary": "You have {{count}} properties in your wishlist.",
+      "refreshing": " Refreshing details…",
+      "moveToCart": "Move to cart",
+      "addedToCartTitle": "Property added to cart",
+      "addedToCartMessage": "{{buyer}} added {{property}} to cart."
+    },
+    "cartPage": {
+      "emptyTitle": "Your property cart is empty",
+      "emptyBody": "Shortlist farmland, farmhouse or resort listings to manage visits and enquiries in one place.",
+      "exploreCta": "Explore listings",
+      "shortlistedTitle": "Shortlisted properties",
+      "countSummary": "{{count}} {{unit}} in your cart",
+      "loadingData": " · Loading latest data…",
+      "portfolioValue": "Portfolio value: ₹ {{value}}",
+      "clearCart": "Clear cart",
+      "negotiationWorkspace": "Negotiation workspace",
+      "negotiationHint": "Coordinate with the seller or agent directly from here. Keep your communication, visits and documents organized.",
+      "requestCallback": "Request callback",
+      "scheduleVisit": "Schedule visit",
+      "sendEnquiry": "Send enquiry",
+      "downloadBrochure": "Download brochure",
+      "shareProperty": "Share property",
+      "addToCompare": "Add to compare",
+      "saveForLater": "Save for later"
+    },
+    "comparePage": {
+      "emptyTitle": "No properties selected for comparison",
+      "emptyBody": "From any property card, use the compare action to build a side-by-side view of price, location, type, size, and more.",
+      "browseCta": "Browse properties",
+      "loading": "Loading comparison…",
+      "title": "Property comparison",
+      "subtitle": "Selected fields are compared side by side. Toggle highlighting to emphasize values that differ.",
+      "countBadge": "{{count}} / 3"
+    },
+    "notificationsPanel": {
+      "title": "Buyer notifications",
+      "subtitle": "Price drops, new launches and seller responses.",
+      "emptyTitle": "You're all caught up",
+      "emptySub": "Alerts for price drops, new matching listings and seller replies will appear here."
+    },
+    "headerActions": {
+      "roleBadge": "Buyer"
+    },
+    "actions": {
+      "addedToCart": "Added to cart",
+      "removedFromCart": "Removed from cart",
+      "alreadyInCart": "Property is already in cart",
+      "addedToCompare": "Added to compare",
+      "removedFromCompare": "Removed from compare",
+      "alreadyInCompare": "Property is already in compare",
+      "addedToWishlist": "Added to wishlist",
+      "removedFromWishlist": "Removed from wishlist",
+      "alreadyInWishlist": "Property is already in wishlist",
+      "shortlistInCart": "Shortlist in cart",
+      "compare": "Compare",
+      "wishlist": "Wishlist",
+      "shareProperty": "Share property",
+      "linkCopied": "Link copied to clipboard",
+      "shareMenu": "Share…",
+      "copyLink": "Copy link",
+      "whatsApp": "WhatsApp",
+      "email": "Email",
+      "propertyAddedToCartTitle": "Property added to cart",
+      "propertyAddedToCartMessage": "{{buyer}} added {{property}} to cart.",
+      "yourProperty": "your property",
+      "feedbackAria": "Buyer action feedback"
+    },
+    "activity": {
+      "emptyTitle": "No recent activity",
+      "emptyBody": "As you view, shortlist, compare and enquire on properties, your activity trail will show up here.",
+      "title": "Buyer activity",
+      "touchpoints": "Last {{count}} touchpoints",
+      "types": {
+        "saved": "Saved to wishlist",
+        "viewed": "Viewed property",
+        "enquiry": "Sent an enquiry",
+        "callback": "Requested a callback",
+        "visit": "Scheduled a visit",
+        "cart": "Added to cart",
+        "compare": "Added to comparison"
+      }
+    },
+    "recommendations": {
+      "similarTitle": "Similar properties",
+      "similarSubtitle": "Same property type & profile as your selection when available.",
+      "similarEmpty": "Browse listings to populate similar recommendations from live inventory.",
+      "nearbyTitle": "Nearby properties",
+      "nearbySubtitle": "Heuristic match by city / locality from API data.",
+      "nearbyEmpty": "Location metadata will refine this section as listings include coordinates.",
+      "trendingTitle": "Trending & featured",
+      "trendingSubtitle": "Highlighted inventory from your current catalog.",
+      "trendingEmpty": "No featured tags yet — showing top listings instead."
+    },
+    "recentlyViewed": {
+      "title": "Recently viewed",
+      "emptyTitle": "No recent views yet",
+      "emptyBody": "Properties you open will appear here automatically.",
+      "updating": "Updating…"
+    },
+    "security": {
+      "title": "Security & password",
+      "subtitle": "Enterprise-grade guardrails for your account. Password & OTP flows are wired for backend integration.",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm password",
+      "strongPassword": "Strong password",
+      "repeatPassword": "Repeat new password",
+      "updatePassword": "Update password",
+      "forgotPassword": "Forgot password? Start OTP flow"
+    },
+    "fallbacks": {
+      "property": "Property"
+    },
+    "sidebarSections": {
+      "buyer menu": "Buyer menu",
+      "navigation": "Navigation"
+    },
+    "notifications": {
+      "titles": {
+        "Property added to cart": "Property added to cart",
+        "Price drop alert": "Price drop alert",
+        "New listing match": "New listing match",
+        "Seller reply": "Seller reply"
+      },
+      "messages": {
+        "addedToCart": "{{buyer}} added {{property}} to cart.",
+        "priceDrop": "Price drop on {{target}}",
+        "newListingMatch": "New listing match: {{target}}",
+        "sellerReply": "Seller replied to your enquiry on {{target}}"
+      }
+    },
+    "compare": {
+      "sections": {
+        "core": "Core Property Data",
+        "location": "Location",
+        "infrastructure": "Infrastructure",
+        "farming": "Farming & Land",
+        "water": "Water Resources",
+        "legal": "Legal",
+        "features": "Features"
+      },
+      "fields": {
+        "core-title": "Title",
+        "core-propertyType": "Property type",
+        "core-listingType": "Listing type",
+        "core-status": "Status",
+        "core-price": "Price",
+        "core-pricePerSqft": "Price per sq.ft",
+        "core-area": "Area",
+        "core-bedrooms": "Bedrooms",
+        "core-bathrooms": "Bathrooms",
+        "core-floor": "Floor",
+        "core-facing": "Facing",
+        "loc-address": "Address",
+        "loc-city": "City",
+        "loc-state": "State",
+        "loc-mapLink": "Map link",
+        "infra-roadAccess": "Road access",
+        "infra-roadType": "Road type",
+        "infra-electricity": "Electricity",
+        "infra-fencing": "Fencing",
+        "infra-gated": "Gated",
+        "farm-soilType": "Soil type",
+        "farm-soilQualityIndex": "Soil quality index",
+        "farm-cropSuitability": "Crop suitability",
+        "farm-farmingPercentage": "Farming percentage",
+        "farm-irrigationSupport": "Irrigation support",
+        "farm-waterAvailability": "Water availability",
+        "water-borewell": "Borewell",
+        "water-borewellDepth": "Borewell depth",
+        "water-irrigationSystem": "Irrigation system",
+        "water-nearbySources": "Nearby water sources",
+        "legal-ownershipDocs": "Ownership documents",
+        "legal-landRegistry": "Land registry",
+        "legal-encumbranceFree": "Encumbrance free",
+        "legal-landUseType": "Land use type",
+        "feat-powerBackup": "Power backup",
+        "feat-security": "Security",
+        "feat-constructionAllowed": "Construction allowed",
+        "feat-farmhouseBuilt": "Farmhouse built"
+      },
+      "values": {
+        "facing": {
+          "North": "North",
+          "South": "South",
+          "East": "East",
+          "West": "West",
+          "North-East": "North-East",
+          "North-West": "North-West",
+          "South-East": "South-East",
+          "South-West": "South-West"
+        },
+        "landUseType": {
+          "Agricultural": "Agricultural",
+          "Residential": "Residential",
+          "Commercial": "Commercial"
+        },
+        "infrastructure": {
+          "Paved": "Paved",
+          "Unpaved": "Unpaved",
+          "Available": "Available",
+          "Not Available": "Not Available"
+        },
+        "amenities": {}
+      }
+    }
+  },
+  "statsSection": {
+    "loadFailed": "Failed to load statistics.",
+    "titles": {
+      "trustedByOurClients": "Trusted by Our Clients"
+    },
+    "subtitles": {
+      "ratedByClients": "Rated 4.8 ★ by 200+ Clients"
+    },
+    "descriptions": {
+      "highlyRated": "We are highly rated for our transparency, expert guidance, and commitment to delivering long-term value across farmhouses, villas, resort properties, and agricultural land investments."
+    },
+    "labels": {
+      "averageRating": "Average Rating",
+      "yearsExperience": "Years Experience",
+      "happyClients": "Happy Clients"
+    }
+  },
+  "homeSection": {
+    "newlyLaunched": {
+      "eyebrow": "Newly Launched Projects",
+      "title": "Explore the latest real estate developments",
+      "empty": "No projects available right now. Please check back soon.",
+      "errorPrefix": "Error"
+    },
+    "projectCard": {
+      "startingFrom": "Starting from",
+      "posted": "Posted: {{date}}"
+    },
+    "serviceSection": {
+      "eyebrow": "OUR SERVICES",
+      "description": "We provide end-to-end real estate solutions focused on farmhouses, villas, resort properties, and agricultural land, ensuring transparency, expert guidance, and long-term value for every client.",
+      "checkIt": "Check it",
+      "items": {
+        "farmhouse-development": {
+          "title": "Farmhouse Development",
+          "description": "We help you buy, sell, and develop premium farmhouses with complete legal and planning support."
+        },
+        "agricultural-land": {
+          "title": "Agricultural Land",
+          "description": "Expert guidance for purchasing and selling agricultural land with verified documents."
+        },
+        "resort-properties": {
+          "title": "Resort Properties",
+          "description": "Discover high-return resort properties ideal for investment and hospitality businesses."
+        },
+        "farmhouse-rental": {
+          "title": "Farmhouse Rental",
+          "description": "Short-term and long-term farmhouse rental solutions for events and vacations."
+        }
+      }
+    }
+  },
+  "agentPanel": {
+    "shell": {
+      "menuTitle": "Agent menu",
+      "openNavigation": "Open agent navigation",
+      "profileCompletion": "{{percent}}% complete"
+    },
+    "nav": {
+      "dashboard": "Agent Dashboard",
+      "fieldEntry": "Field Entry",
+      "detailedEntry": "Detailed Entry",
+      "properties": "Properties",
+      "addProperty": "Add Property",
+      "leads": "Leads Management",
+      "visits": "Visit Scheduling",
+      "calendar": "Calendar",
+      "clients": "Clients",
+      "notifications": "Notifications",
+      "profile": "Agent Profile"
+    },
+    "topBar": {
+      "dashboard": {
+        "title": "Overview",
+        "subtitle": "Portfolio health across listings and client activity."
+      },
+      "fieldEntry": {
+        "title": "Field Entry",
+        "subtitle": "Capture on-ground lead and listing updates."
+      },
+      "detailedEntry": {
+        "title": "Detailed Entry",
+        "subtitle": "Submit complete listing details for review."
+      },
+      "properties": {
+        "title": "Properties",
+        "subtitle": "Manage assigned and published properties."
+      },
+      "addProperty": {
+        "title": "Add Property",
+        "subtitle": "Create a new property draft with required details."
+      },
+      "leads": {
+        "title": "Leads",
+        "subtitle": "Track and convert active buyer leads."
+      },
+      "visits": {
+        "title": "Visits",
+        "subtitle": "Coordinate and monitor scheduled site visits."
+      },
+      "calendar": {
+        "title": "Calendar",
+        "subtitle": "Review scheduled visits date-wise."
+      },
+      "clients": {
+        "title": "Clients",
+        "subtitle": "Manage client information and follow-ups."
+      },
+      "profile": {
+        "title": "Agent Profile",
+        "subtitle": "Update your professional profile details."
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Track latest alerts and updates."
+      }
+    },
+    "calendar": {
+      "unknownDate": "Unknown date",
+      "failedLoad": "Failed to load calendar",
+      "title": "Calendar",
+      "subtitle": "All scheduled visits by date.",
+      "loading": "Loading calendar...",
+      "empty": "No visits scheduled."
+    },
+    "dashboard": {
+      "title": "Agent Dashboard",
+      "subtitle": "Track listings, leads and visits at a glance.",
+      "exportCsv": "Export CSV",
+      "downloadPdf": "Download PDF",
+      "stats": {
+        "collected": "Collected Properties",
+        "collectedHint": "Agent property collection entries.",
+        "draft": "Draft",
+        "draftHint": "Step 1 saved and editable.",
+        "incomplete": "Incomplete",
+        "incompleteHint": "Step 2 pending final details.",
+        "ready": "Ready",
+        "readyHint": "Ready for admin approval flow."
+      },
+      "recentActivity": "Recent Activity",
+      "recentActivityHint": "Latest property status snapshots.",
+      "noRecentActivity": "No recent activity found.",
+      "untitled": "Untitled",
+      "entryTitle": "Entry",
+      "editTitle": "Edit",
+      "deleteTitle": "Delete property?",
+      "deleteMessage": "Are you sure you want to delete \"{{name}}\"? This cannot be undone.",
+      "deleteBlocked": "This entry cannot be deleted because it is not saved on the server yet.",
+      "deleteFailed": "Failed to delete property.",
+      "saveChanges": "Save changes",
+      "saving": "Saving…",
+      "step1": "Step 1",
+      "step2": "Step 2",
+      "removeDocument": "Remove document",
+      "missingServerRef": "Missing server reference for this entry.",
+      "documentUploadFailed": "Document upload failed",
+      "step2Incomplete": "Complete Expected Price, Ownership Type, and Owner Contact (step 2), or clear step 2 fields.",
+      "saveFailed": "Save failed"
+    },
+    "leadsPage": {
+      "title": "Leads Management",
+      "activeCount": "{{count}} active leads",
+      "failedLoad": "Failed to load leads.",
+      "loading": "Loading leads...",
+      "empty": "No leads found.",
+      "scheduleVisit": "Schedule visit",
+      "scheduledVisits": "Scheduled visits",
+      "table": {
+        "lead": "Lead",
+        "property": "Property",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "status": {
+        "new": "New",
+        "contacted": "Contacted",
+        "qualified": "Qualified",
+        "closed": "Closed"
+      },
+      "modal": {
+        "scheduleTitle": "Schedule Visit",
+        "notesPlaceholder": "Optional notes"
+      }
+    },
+    "clientsPage": {
+      "title": "Clients",
+      "buyerList": "Buyer list",
+      "sellerList": "Seller list",
+      "failedLoad": "Failed to load clients.",
+      "loading": "Loading clients...",
+      "empty": "No clients found."
+    },
+    "visitsPage": {
+      "title": "Visit Scheduling",
+      "activeCount": "{{count}} active visits",
+      "failedLoad": "Failed to load visits.",
+      "createVisit": "Create visit",
+      "loading": "Loading visits...",
+      "empty": "No visits created.",
+      "reschedule": "Reschedule",
+      "cancel": "Cancel",
+      "createModalTitle": "Create Visit",
+      "rescheduleModalTitle": "Reschedule Visit",
+      "cancelModalTitle": "Cancel Visit",
+      "cancelConfirm": "Cancel visit for {{name}}?",
+      "keep": "Keep",
+      "cancelling": "Cancelling...",
+      "cancelVisit": "Cancel visit",
+      "clientName": "Client name",
+      "clientNamePlaceholder": "Enter client name",
+      "dateTime": "Date & time",
+      "propertyPlaceholder": "Farmhouse - Goa",
+      "failedCreate": "Failed to create visit.",
+      "failedReschedule": "Failed to reschedule visit.",
+      "failedCancel": "Failed to cancel visit.",
+      "status": {
+        "scheduled": "Scheduled",
+        "rescheduled": "Rescheduled",
+        "cancelled": "Cancelled"
+      },
+      "table": {
+        "client": "Client",
+        "property": "Property",
+        "when": "When",
+        "status": "Status",
+        "actions": "Actions"
+      }
+    },
+    "propertiesPage": {
+      "title": "My Properties",
+      "subtitle": "Manage your assigned inventory.",
+      "property": "Property",
+      "price": "Price",
+      "status": "Status",
+      "actions": "Actions",
+      "untitled": "Untitled",
+      "statusActive": "Active",
+      "statusInactive": "Inactive",
+      "statusSold": "Sold",
+      "edit": "Edit",
+      "delete": "Delete",
+      "empty": "No properties assigned.",
+      "editTitle": "Edit Property",
+      "deleteTitle": "Delete Property",
+      "deleteConfirm": "Are you sure you want to delete {{name}}?",
+      "titlePlaceholder": "Title",
+      "pricePlaceholder": "Price",
+      "addressPlaceholder": "Address",
+      "save": "Save"
+    },
+    "notificationsPage": {
+      "title": "Notifications",
+      "subtitle": "Alerts related to leads, visits, and assigned activity."
+    },
+    "fieldEntryPage": {
+      "step1Title": "Property Collection - Step 1",
+      "step1Subtitle": "Quick field entry details for agent property collection.",
+      "step2Title": "Property Collection - Step 2",
+      "step2Subtitle": "Complete detailed property information for review readiness.",
+      "totalLandArea": "Total land area",
+      "saveContinue": "Save & Continue",
+      "acre": "Acre",
+      "hectare": "Hectare",
+      "yes": "yes",
+      "no": "no",
+      "linkedPropertyId": "Linked Property ID",
+      "statusPreview": "Current status preview: {{status}}",
+      "sections": {
+        "basicInfo": "Basic Info",
+        "fieldEntryDetails": "Field Entry Details",
+        "locationDetails": "Location Details",
+        "propertyDetails": "Property Details",
+        "mediaDocuments": "Media & Documents",
+        "uploadDocs": "Upload khasra khatauni naksha"
+      },
+      "exactLocationDescription": "Exact Location Description",
+      "anyLandDispute": "Any Land Dispute",
+      "notes": "Notes",
+      "uploadFiles": "Upload Files (images, videos, documents, audio)",
+      "uploadKhasra": "Upload khasra",
+      "uploadKhatauni": "Upload khatauni",
+      "uploadNaksha": "Upload naksha",
+      "highlightsPlaceholder": "Key strengths and unique points...",
+      "issuesPlaceholder": "Any known issues or limitations...",
+      "notesPlaceholder": "Additional notes...",
+      "backToStep1": "Back to Step 1",
+      "saveIncomplete": "Save as Incomplete",
+      "markReady": "Mark Ready",
+      "removeFile": "Remove {{name}}"
+    },
+    "profilePage": {
+      "title": "Agent Profile",
+      "subtitle": "Update your profile details and assigned area.",
+      "profileAlt": "Agent profile",
+      "profilePreview": "Profile preview",
+      "agentFallback": "Agent",
+      "profileImage": "Profile Image",
+      "agentName": "Agent Name",
+      "mobileNumber": "Mobile Number",
+      "required": "Required",
+      "email": "Email",
+      "assignedArea": "Assigned Area",
+      "areaPlaceholder": "Village/Tehsil/District",
+      "basicSettings": "Basic Settings",
+      "basicSettingsPlaceholder": "Basic settings placeholder",
+      "saving": "Saving...",
+      "savedSuccess": "Profile saved successfully.",
+      "savedLimited": "Profile saved with limited data.",
+      "imageError": "Unable to process image. Try another file."
+    },
+    "fieldEntry": {
+      "propertyId": "Property ID",
+      "selectOption": "Select option"
+    },
+    "form": {
+      "agentName": "Agent Name",
+      "village": "Village",
+      "tehsil": "Tehsil",
+      "district": "District",
+      "soilType": "Soil Type",
+      "roadAccess": "Road Access",
+      "waterAvailability": "Water Availability",
+      "ownerName": "Owner Name",
+      "ownerContact": "Owner Contact",
+      "expectedPrice": "Expected Price",
+      "ownershipType": "Ownership Type",
+      "negotiable": "Negotiable",
+      "registryAvailable": "Registry Available",
+      "khasraAvailable": "Khasra Available",
+      "landDispute": "Land Dispute",
+      "electricity": "Electricity",
+      "cropHistory": "Crop History",
+      "ownerContactStep2": "Owner Contact (step 2)",
+      "exactLocation": "Exact Location",
+      "nearbyLandmarks": "Nearby Landmarks",
+      "roadType": "Road Type",
+      "waterSourceDetails": "Water Source Details",
+      "connectivityInfo": "Connectivity Info",
+      "propertyHighlights": "Property Highlights",
+      "issuesDrawbacks": "Issues / Drawbacks",
+      "select": "Select"
     }
   }
 }

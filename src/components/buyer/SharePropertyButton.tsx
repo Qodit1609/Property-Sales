@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, useReducedMotion } from "framer-motion";
 import { Copy, Mail, MessageCircle, Share2 } from "lucide-react";
 import { createPortal } from "react-dom";
@@ -11,6 +12,7 @@ interface Props {
 }
 
 const SharePropertyButton: React.FC<Props> = ({ property, className = "" }) => {
+  const { t } = useTranslation();
   const reduceMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -25,9 +27,9 @@ const SharePropertyButton: React.FC<Props> = ({ property, className = "" }) => {
     return {
       url: u,
       shareBody: body,
-      mailSubject: property.title || "Property",
+      mailSubject: property.title || t("propertyCard.propertyFallbackType"),
     };
-  }, [property]);
+  }, [property, t]);
 
   useEffect(() => {
     if (!open) return;
@@ -67,10 +69,10 @@ const SharePropertyButton: React.FC<Props> = ({ property, className = "" }) => {
 
   const copyLink = useCallback(() => {
     void navigator.clipboard.writeText(url).then(() => {
-      showBuyerActionFeedback("Link copied to clipboard");
+      showBuyerActionFeedback(t("buyerPanel.actions.linkCopied"));
       setOpen(false);
     });
-  }, [url]);
+  }, [url, t]);
 
   const shareWhatsApp = useCallback(() => {
     const href = `https://wa.me/?text=${encodeURIComponent(shareBody)}`;
@@ -115,7 +117,7 @@ const SharePropertyButton: React.FC<Props> = ({ property, className = "" }) => {
           setOpen((v) => !v);
         }}
         className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white shadow-sm backdrop-blur-md ring-1 ring-white/15 transition hover:bg-black/55"
-        aria-label="Share property"
+        aria-label={t("buyerPanel.actions.shareProperty")}
         aria-expanded={open}
       >
         <Share2 size={16} className={open ? "text-emerald-300" : "text-white"} />
@@ -141,7 +143,7 @@ const SharePropertyButton: React.FC<Props> = ({ property, className = "" }) => {
                 }}
               >
                 <Share2 size={14} className="text-[var(--b1-mid)]" />
-                Share…
+                {t("buyerPanel.actions.shareMenu")}
               </button>
             )}
             <button
@@ -154,7 +156,7 @@ const SharePropertyButton: React.FC<Props> = ({ property, className = "" }) => {
               }}
             >
               <Copy size={14} className="text-[var(--b1-mid)]" />
-              Copy link
+              {t("buyerPanel.actions.copyLink")}
             </button>
             <button
               type="button"
@@ -166,7 +168,7 @@ const SharePropertyButton: React.FC<Props> = ({ property, className = "" }) => {
               }}
             >
               <MessageCircle size={14} className="text-[var(--b1-mid)]" />
-              WhatsApp
+              {t("buyerPanel.actions.whatsApp")}
             </button>
             <button
               type="button"
@@ -178,7 +180,7 @@ const SharePropertyButton: React.FC<Props> = ({ property, className = "" }) => {
               }}
             >
               <Mail size={14} className="text-[var(--b1-mid)]" />
-              Email
+              {t("buyerPanel.actions.email")}
             </button>
           </div>,
           document.body,

@@ -1,19 +1,52 @@
 import { Bell } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import {
   clearReadNotifications,
   markNotificationRead,
 } from "../../features/notifications/notificationSlice";
 import { Button } from "@/components/common";
+import {
+  translateSellerNotificationMessage,
+  translateSellerNotificationTitle,
+} from "@/lib/sellerI18n";
+import { normalizeLanguage } from "@/i18n";
 
 const SellerNotificationsPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const notifications = useAppSelector((state) => state.notifications.items);
   const user = useAppSelector((state) => state.auth.user);
   const userId = String(user?.id ?? user?._id ?? "");
   const hasReadNotifications = notifications.some((n) => n.isRead);
+
+  const navigatesToMyProperties = (notificationTitle: string) => {
+    const normalizedTitle = notificationTitle.trim().toLowerCase();
+    return (
+      normalizedTitle === "property approved" || normalizedTitle === "property rejected"
+    );
+  };
+
+  const handleNotificationClick = (notificationId: string, notificationTitle: string) => {
+    dispatch(markNotificationRead(notificationId));
+
+    const normalizedTitle = notificationTitle.trim().toLowerCase();
+    if (normalizedTitle === "property approved" || normalizedTitle === "property rejected") {
+      navigate("/seller/properties");
+      return;
+    }
+
+    if (normalizedTitle === "promotion approved") {
+      navigate("/seller/promotions");
+      return;
+    }
+
+    if (normalizedTitle === "property added to cart") {
+      navigate("/seller/leads");
+    }
+  };
 
   return (
     <section className="space-y-6">
@@ -40,7 +73,7 @@ const SellerNotificationsPage = () => {
               onClick={() => dispatch(clearReadNotifications(userId))}
               className="shrink-0 text-xs"
             >
-              Clear all
+              {t("sellerPanel.notifications.clearAll")}
             </Button>
           ) : null}
         </div>
@@ -62,10 +95,11 @@ const SellerNotificationsPage = () => {
               <Button
                 key={n.id}
                 type="button"
-                onClick={() => dispatch(markNotificationRead(n.id))}
+                onClick={() => handleNotificationClick(n.id, n.title)}
                 variant="ghost"
                 className={[
                   "w-full items-start gap-3 rounded-xl border px-3 py-2 text-left",
+                  navigatesToMyProperties(n.title) ? "cursor-pointer" : "cursor-default",
                   n.isRead
                     ? "border-[var(--b2-soft)] bg-[var(--b2-soft)]"
                     : "border-[var(--b2)] bg-[var(--white)] shadow-sm",
@@ -79,13 +113,15 @@ const SellerNotificationsPage = () => {
                 />
                 <div className="min-w-0 flex-1">
                   <p className="text-[11px] font-semibold text-[var(--b1)]">
-                    {n.title}
+                    {translateSellerNotificationTitle(n.title)}
                   </p>
                   <p className="mt-0.5 text-[11px] text-[var(--muted)]">
-                    {n.message}
+                    {translateSellerNotificationMessage(n.message)}
                   </p>
                   <p className="mt-0.5 text-[10px] text-[var(--muted)]/80">
-                    {new Date(n.createdAt).toLocaleString()}
+                    {new Date(n.createdAt).toLocaleString(
+                      normalizeLanguage(i18n.language) === "hi" ? "hi-IN" : "en-IN"
+                    )}
                   </p>
                 </div>
               </Button>

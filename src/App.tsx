@@ -22,8 +22,8 @@ import SellerLayout from "./components/seller/SellerLayout";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminPropertiesPage from "./pages/Admin/AdminPropertiesPage";
 import AdminUsersPage from "./pages/Admin/AdminUsersPage";
-import AdminLogsPage from "./pages/Admin/AdminLogsPage";
 import ActivityLogs from "./pages/Admin/ActivityLogs";
+import AdminLeadsManagementPage from "./pages/Admin/AdminLeadsManagementPage";
 import AdminNotificationsPage from "./pages/Admin/AdminNotificationsPage";
 import AdminTestimonialPage from "./pages/Admin/AdminTestimonialPage";
 import AdminPromotionsPage from "./pages/Admin/AdminPromotionsPage";
@@ -45,8 +45,10 @@ import AgentPropertiesPage from "./pages/Agent/AgentPropertiesPage";
 import AgentAddPropertyPage from "./pages/Agent/AgentAddPropertyPage";
 import AgentLeadsPage from "./pages/Agent/AgentLeadsPage";
 import AgentVisitsPage from "./pages/Agent/AgentVisitsPage";
+import AgentCalendarPage from "./pages/Agent/AgentCalendarPage";
 import AgentClientsPage from "./pages/Agent/AgentClientsPage";
 import AgentProfilePage from "./pages/Agent/AgentProfilePage";
+import AgentNotificationsPage from "./pages/Agent/AgentNotificationsPage";
 import AgentFieldEntryPage from "./pages/Agent/AgentFieldEntryPage";
 import AgentDetailedEntryPage from "./pages/Agent/AgentDetailedEntryPage";
 import { useAppDispatch } from "./store/hooks";
@@ -58,6 +60,7 @@ import { SellerStatsSkeleton } from "./components/seller/SellerSkeleton";
 import BuyerCompareToast from "./components/buyer/BuyerCompareToast";
 import BuyerFeedbackToast from "./components/buyer/BuyerFeedbackToast";
 import NotificationSync from "./features/notifications/NotificationSync";
+import I18nLanguageBoundary from "./components/I18nLanguageBoundary";
 
 const SellerLeadsPage = React.lazy(() => import("./pages/Seller/SellerLeadsPage"));
 const SellerAnalyticsPage = React.lazy(() => import("./pages/Seller/SellerAnalyticsPage"));
@@ -114,6 +117,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <I18nLanguageBoundary>
       <ScrollToTop />
       <NotificationSync />
       <BuyerCompareToast />
@@ -299,7 +303,9 @@ function App() {
             <Route path="/agent/add-property" element={<AgentAddPropertyPage />} />
             <Route path="/agent/leads" element={<AgentLeadsPage />} />
             <Route path="/agent/visits" element={<AgentVisitsPage />} />
+            <Route path="/agent/calendar" element={<AgentCalendarPage />} />
             <Route path="/agent/clients" element={<AgentClientsPage />} />
+            <Route path="/agent/notifications" element={<AgentNotificationsPage />} />
             <Route path="/agent/profile" element={<AgentProfilePage />} />
           </Route>
         </Route>
@@ -311,8 +317,11 @@ function App() {
           <Route path="/admin/properties" element={<AdminPropertiesPage />} />
           <Route path="/admin/sellers" element={<AdminSellersPage />} />
           <Route path="/admin/users" element={<AdminUsersPage />} />
-          <Route path="/admin/logs" element={<AdminLogsPage />} />
           <Route path="/admin/activity-logs" element={<ActivityLogs />} />
+          <Route
+            path="/admin/leads-management"
+            element={<AdminLeadsManagementPage />}
+          />
           <Route
             path="/admin/notifications"
             element={<AdminNotificationsPage />}
@@ -329,6 +338,7 @@ function App() {
         <Route path="/register" element={<Register />} />
 
       </Routes>
+      </I18nLanguageBoundary>
     </BrowserRouter>
   );
 }

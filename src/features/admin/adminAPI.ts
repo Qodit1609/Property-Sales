@@ -16,6 +16,7 @@ function normalizeAdminUser(raw: unknown): ManagedAccount {
     id: id as string | number,
     name: String(r.name ?? ""),
     email: String(r.email ?? ""),
+    isBlocked: Boolean(r.isBlocked),
     ...(role ? { role } : {}),
   };
 }
@@ -29,6 +30,14 @@ export const fetchAdminUsersAPI = async (): Promise<ManagedAccount[]> => {
 
 export const deleteAdminUserAPI = async (userId: string): Promise<void> => {
   await api.delete(`/admin/users/${userId}`);
+};
+
+export const toggleUserBlockStatusAPI = async (
+  userId: string
+): Promise<ManagedAccount> => {
+  const res = await api.patch(`/admin/users/${userId}/block-toggle`);
+  const raw = res.data?.data ?? res.data;
+  return normalizeAdminUser(raw);
 };
 
 /* =========================
@@ -112,6 +121,17 @@ function quickNormalize(raw: unknown): Property {
         : Number(r.requestedDuration) || null,
     requestedAt: r.requestedAt != null ? String(r.requestedAt) : null,
     approvedAt: r.approvedAt != null ? String(r.approvedAt) : undefined,
+    rejectionType:
+      String(r.rejectionType ?? "").toUpperCase() === "DIRECT"
+        ? "DIRECT"
+        : String(r.rejectionType ?? "").toUpperCase() === "WITH_REASON"
+          ? "WITH_REASON"
+          : undefined,
+    rejectionDescription:
+      typeof r.rejectionDescription === "string" ? r.rejectionDescription : undefined,
+    rejectionMessage: typeof r.rejectionMessage === "string" ? r.rejectionMessage : undefined,
+    canResubmit: typeof r.canResubmit === "boolean" ? r.canResubmit : undefined,
+    rejectedAt: r.rejectedAt != null ? String(r.rejectedAt) : undefined,
     seller: {
       name: typeof sellerObj.name === "string" ? sellerObj.name : undefined,
       email: typeof sellerObj.email === "string" ? sellerObj.email : undefined,
@@ -200,10 +220,25 @@ export const approveListingAPI = async (id: string): Promise<Property> => {
   return quickNormalize(res.data.data ?? res.data);
 };
 
-export const rejectListingAPI = async (id: string): Promise<Property> => {
-  const res = await api.put(`/properties/${id}/reject`, {
-    reason: "Rejected by admin",
-  });
+export type AdminRejectListingBody = {
+  rejectionType: "DIRECT" | "WITH_REASON";
+  rejectionDescription?: string;
+  rejectionMessage?: string;
+  canResubmit: boolean;
+};
+
+const defaultModerationRejectBody: AdminRejectListingBody = {
+  rejectionType: "WITH_REASON",
+  rejectionDescription: "Rejected by admin",
+  rejectionMessage: "Please review your listing and resubmit for approval when ready.",
+  canResubmit: true,
+};
+
+export const rejectListingAPI = async (
+  id: string,
+  body: AdminRejectListingBody = defaultModerationRejectBody
+): Promise<Property> => {
+  const res = await api.put(`/properties/${id}/reject`, body);
   return quickNormalize(res.data.data ?? res.data);
 };
 
@@ -281,6 +316,11 @@ export const rejectPromotionRequestAPI = async (id: string): Promise<Property> =
   const res = await api.put(`/properties/${id}/promotion/reject`, {
     reason: "Promotion rejected by admin",
   });
+  return quickNormalize(res.data?.data ?? res.data);
+};
+
+export const repromotePromotionRequestAPI = async (id: string): Promise<Property> => {
+  const res = await api.put(`/properties/${id}/promotion/repromote`);
   return quickNormalize(res.data?.data ?? res.data);
 };
 

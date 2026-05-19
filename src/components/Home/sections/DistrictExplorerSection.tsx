@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { District } from "../models/homeTypes";
@@ -13,8 +14,10 @@ import {
 import { FALLBACK_PROPERTY_IMAGE } from "@/utils/propertyFormatters";
 import type { Property } from "@/features/properties/propertyType";
 import { isAgricultureLandType } from "@/features/properties/propertyTypeUtils";
+import { translateCity } from "@/lib/i18nHelpers";
 
 const DistrictExplorerSection: React.FC = () => {
+  const { t } = useTranslation();
   const [dynamicDistricts, setDynamicDistricts] = useState<District[]>([]);
 
   useEffect(() => {
@@ -113,7 +116,9 @@ const DistrictExplorerSection: React.FC = () => {
             return {
               id: `district-${index + 1}`,
               name: districtData.name,
-              listingsText: `${districtData.count}+ farming lands`,
+              listingsText: t("homeSections.districtExplorer.listingsCount", {
+                count: districtData.count,
+              }),
               image,
               slug: slugify(districtData.name),
             };
@@ -134,14 +139,14 @@ const DistrictExplorerSection: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [t]);
 
   return (
     <SectionWrapper className="py-12 sm:py-14" id="district-explorer">
       <SectionHeading
-        eyebrow="Location explorer"
-        title="Explore Top Agriculture Lands"
-        description="Discover opportunities and quickly jump into available inventory."
+        eyebrow={t("homeSections.districtExplorer.eyebrow")}
+        title={t("homeSections.districtExplorer.title")}
+        description={t("homeSections.districtExplorer.description")}
       />
       <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {dynamicDistricts.map((district) => (
@@ -149,21 +154,27 @@ const DistrictExplorerSection: React.FC = () => {
             key={district.id}
             to={`/agriculture-land?district=${encodeURIComponent(district.name)}`}
             className="group overflow-hidden rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-            aria-label={`Explore farmland listings in ${district.name}`}
+            aria-label={t("homeSections.districtExplorer.ariaExploreDistrict", {
+              district: translateCity(district.name),
+            })}
           >
             <div className="aspect-[16/10] overflow-hidden">
               <img
                 src={district.image}
-                alt={`Farmland in ${district.name}`}
+                alt={t("homeSections.districtExplorer.imageAlt", {
+                  district: translateCity(district.name),
+                })}
                 loading="lazy"
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             </div>
             <div className="p-4">
-              <h3 className="text-lg font-semibold text-[var(--b1)]">{district.name}</h3>
+              <h3 className="text-lg font-semibold text-[var(--b1)]">
+                {translateCity(district.name)}
+              </h3>
               <p className="mt-1 text-sm text-[var(--muted)]">{district.listingsText}</p>
               <span className="mt-4 inline-flex items-center text-sm font-semibold text-[var(--b1-mid)] group-hover:text-[var(--b1)]">
-                View listings
+                {t("homeSections.districtExplorer.viewListings")}
                 <ChevronRight className="ml-1 h-4 w-4" aria-hidden="true" />
               </span>
             </div>

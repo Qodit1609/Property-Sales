@@ -1,9 +1,14 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import PostPropertyLayout from "../../components/propertyPost/PostPropertyLayout";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { loadEditProperty, setEditPropertyId } from "../../features/postProperty/postPropertySlice";
+import {
+  loadEditProperty,
+  resetPostProperty,
+} from "../../features/postProperty/postPropertySlice";
+import { clearPostPropertyDraft } from "../../features/postProperty/postPropertyStorage";
 import { useTranslation } from "react-i18next";
+import CustomAlert from "@/components/common/CustomAlert";
 
 export default function PostPropertyPage() {
   const { t } = useTranslation();
@@ -13,7 +18,12 @@ export default function PostPropertyPage() {
   const rawUserRole = useAppSelector((state) => state.auth.user?.role);
   const userRole = String(rawUserRole ?? "").trim().toLowerCase();
   const canAccess = userRole === "seller" || userRole === "admin";
-  const editPropertyId = useAppSelector((state) => state.postProperty.editPropertyId);
+  const editIdFromUrl = searchParams.get("edit");
+  const [unauthorizedAlert, setUnauthorizedAlert] = useState<{
+    open: boolean;
+    message: string;
+    redirectTo: string;
+  }>({ open: false, message: "", redirectTo: "/" });
 
   useEffect(() => {
     if (canAccess) return;
@@ -22,25 +32,39 @@ export default function PostPropertyPage() {
       userRole === "buyer"
         ? t("postProperty.page.buyerUnauthorized")
         : t("postProperty.page.roleUnauthorized");
-    window.alert(message);
+    setUnauthorizedAlert({
+      open: true,
+      message,
+      redirectTo: userRole === "buyer" ? "/buyer/dashboard" : "/",
+    });
+  }, [canAccess, userRole, t]);
 
-    if (userRole === "buyer") {
-      navigate("/buyer/dashboard", { replace: true });
-      return;
-    }
-    navigate("/", { replace: true });
-  }, [canAccess, navigate, userRole]);
+  useEffect(() => {
+    if (!canAccess || !editIdFromUrl) return;
+    clearPostPropertyDraft();
+    void dispatch(loadEditProperty(editIdFromUrl));
+  }, [canAccess, dispatch, editIdFromUrl]);
 
   useEffect(() => {
     if (!canAccess) return;
     const editId = searchParams.get("edit");
-    if (!editId) return;
-    if (editPropertyId === editId) return;
-    void dispatch(loadEditProperty(editId));
-  }, [canAccess, dispatch, editPropertyId, searchParams]);
+    if (editId) return;
+    if (userRole !== "admin") return;
+    dispatch(resetPostProperty());
+  }, [canAccess, dispatch, searchParams, userRole]);
 
   if (!canAccess) {
-    return null;
+    return (
+      <CustomAlert
+        open={unauthorizedAlert.open}
+        title={t("adminPanel.toast.accessRestricted")}
+        message={unauthorizedAlert.message}
+        onConfirm={() => {
+          setUnauthorizedAlert((prev) => ({ ...prev, open: false }));
+          navigate(unauthorizedAlert.redirectTo, { replace: true });
+        }}
+      />
+    );
   }
 
   return <PostPropertyLayout />;

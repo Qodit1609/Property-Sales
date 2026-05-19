@@ -1,8 +1,10 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import AdminDashboard from "./AdminDashboard";
 
 const AdminUsersPage: React.FC = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const role = (searchParams.get("role") ?? "").toLowerCase();
   const roleFilter =
@@ -15,7 +17,7 @@ const AdminUsersPage: React.FC = () => {
   return (
     <AdminDashboard
       initialTab="users"
-      layoutTitle="Access Management"
+      layoutTitle={t("adminPanel.accessManagement")}
       initialUserRoleFilter={roleFilter}
     />
   );

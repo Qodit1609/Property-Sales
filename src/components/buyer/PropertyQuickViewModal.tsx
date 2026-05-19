@@ -1,10 +1,11 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { MapPin, Ruler } from "lucide-react";
 import Modal from "../Modal/Modal";
 import { Button, PropertyImage } from "@/components/common";
 import type { Property } from "../../features/properties/propertyType";
-import { formatINRCurrency } from "../../lib/i18nHelpers";
+import { formatINRCurrency, translatePropertyType } from "../../lib/i18nHelpers";
 import { formatArea, FALLBACK_PROPERTY_IMAGE } from "../../utils/propertyFormatters";
 
 interface Props {
@@ -20,6 +21,7 @@ const PropertyQuickViewModal: React.FC<Props> = ({
   property,
   language,
 }) => {
+  const { t } = useTranslation();
   const img = property.images?.[0] ?? FALLBACK_PROPERTY_IMAGE;
   const areaValue = property.area ?? property.size ?? property.landSize;
   const areaUnit = property.areaUnit ?? property.landUnit;
@@ -39,7 +41,7 @@ const PropertyQuickViewModal: React.FC<Props> = ({
             {formatINRCurrency(property.price || 0, language)}
           </p>
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--b1-mid)]">
-            {property.propertyType}
+            {translatePropertyType(property.propertyType)}
           </p>
           <div className="flex items-start gap-2 text-sm text-[var(--muted)]">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[var(--b1-mid)]" />
@@ -55,7 +57,7 @@ const PropertyQuickViewModal: React.FC<Props> = ({
               onClick={onClose}
               className="inline-flex items-center justify-center rounded-lg bg-[var(--b1)] px-4 py-2 text-sm font-medium text-[var(--fg)] transition hover:opacity-95"
             >
-              View full details
+              {t("common.viewFullDetails")}
             </Link>
             <Button
               type="button"
@@ -63,7 +65,7 @@ const PropertyQuickViewModal: React.FC<Props> = ({
               onClick={onClose}
               className="rounded-lg px-4 py-2"
             >
-              Close
+              {t("common.close")}
             </Button>
           </div>
         </div>

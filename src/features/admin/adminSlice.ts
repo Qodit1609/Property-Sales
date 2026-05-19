@@ -5,6 +5,7 @@ import type { Property } from "../properties/propertyType";
 import {
   fetchAdminUsersAPI,
   deleteAdminUserAPI,
+  toggleUserBlockStatusAPI,
   fetchAdminListingsAPI,
   fetchAllAdminListingsAPI,
   approveListingAPI,
@@ -16,6 +17,7 @@ import {
   type AdminListingsPagination,
   type AdminCreatePropertyPayload,
   type AdminUpdatePropertyPayload,
+  type AdminRejectListingBody,
 } from "./adminAPI";
 import type {
   ActivityLogEntry,
@@ -233,13 +235,21 @@ export const approveListing = createAsyncThunk<
   }
 });
 
+export type RejectListingThunkArg =
+  | string
+  | ({ id: string } & AdminRejectListingBody);
+
 export const rejectListing = createAsyncThunk<
   Property,
-  string,
+  RejectListingThunkArg,
   { rejectValue: string }
->("admin/rejectListing", async (id, { rejectWithValue }) => {
+>("admin/rejectListing", async (arg, { rejectWithValue }) => {
   try {
-    return await rejectListingAPI(id);
+    if (typeof arg === "string") {
+      return await rejectListingAPI(arg);
+    }
+    const { id, ...body } = arg;
+    return await rejectListingAPI(id, body);
   } catch (error: unknown) {
     const err = error as { message?: string };
     const message = err.message ?? "Failed to reject listing";
@@ -301,6 +311,21 @@ export const deleteUserById = createAsyncThunk<
   } catch (error: unknown) {
     const err = error as { response?: { data?: { message?: string } } };
     const message = err.response?.data?.message ?? "Failed to delete user";
+    return rejectWithValue(message);
+  }
+});
+
+export const toggleUserBlockStatusById = createAsyncThunk<
+  ManagedAccount,
+  string,
+  { rejectValue: string }
+>("admin/toggleUserBlockStatus", async (userId, { rejectWithValue }) => {
+  try {
+    return await toggleUserBlockStatusAPI(userId);
+  } catch (error: unknown) {
+    const err = error as { response?: { data?: { message?: string } }; message?: string };
+    const message =
+      err.response?.data?.message ?? err.message ?? "Failed to update user block status";
     return rejectWithValue(message);
   }
 });
@@ -583,6 +608,19 @@ const adminSlice = createSlice({
         );
       })
       .addCase(deleteUserById.rejected, (state) => {
+        state.actionLoading = false;
+      })
+
+      .addCase(toggleUserBlockStatusById.pending, (state) => {
+        state.actionLoading = true;
+      })
+      .addCase(toggleUserBlockStatusById.fulfilled, (state, action) => {
+        state.actionLoading = false;
+        state.users = state.users.map((user) =>
+          String(user.id) === String(action.payload.id) ? action.payload : user
+        );
+      })
+      .addCase(toggleUserBlockStatusById.rejected, (state) => {
         state.actionLoading = false;
       });
   },

@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/common";
 
@@ -18,13 +19,15 @@ const AdminConfirmDialog: React.FC<AdminConfirmDialogProps> = ({
   open,
   title,
   description,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   destructive,
   loading,
   onConfirm,
   onClose,
 }) => {
+  const { t } = useTranslation();
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -35,6 +38,9 @@ const AdminConfirmDialog: React.FC<AdminConfirmDialogProps> = ({
   }, [open, onClose]);
 
   if (!open) return null;
+
+  const resolvedConfirm = confirmLabel ?? t("common.confirm");
+  const resolvedCancel = cancelLabel ?? t("common.cancel");
 
   return (
     <div
@@ -65,7 +71,7 @@ const AdminConfirmDialog: React.FC<AdminConfirmDialogProps> = ({
             onClick={onClose}
             disabled={loading}
           >
-            {cancelLabel}
+            {resolvedCancel}
           </Button>
           <Button
             type="button"
@@ -82,7 +88,7 @@ const AdminConfirmDialog: React.FC<AdminConfirmDialogProps> = ({
               {loading ? (
                 <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
               ) : null}
-              {confirmLabel}
+              {resolvedConfirm}
             </span>
           </Button>
         </div>

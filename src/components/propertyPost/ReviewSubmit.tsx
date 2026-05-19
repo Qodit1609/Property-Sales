@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import {
@@ -16,6 +16,7 @@ import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
 import { Button } from "@/components/common";
 import { FileText } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import CustomAlert from "@/components/common/CustomAlert";
 
 function SummaryRow({
   label,
@@ -59,6 +60,11 @@ export default function ReviewSubmit() {
   const dispatch = useAppDispatch();
   const post = useAppSelector((s) => s.postProperty);
   const isEditMode = Boolean(post.editPropertyId);
+  const [submitAlert, setSubmitAlert] = useState<{
+    open: boolean;
+    message: string;
+    redirectTo: string;
+  }>({ open: false, message: "", redirectTo: "/" });
 
   const allErrors = useMemo(() => {
     const basic = validateBasicDetails(post.basicDetails);
@@ -99,17 +105,14 @@ export default function ReviewSubmit() {
           ? t("postProperty.toast.propertyUpdated")
           : t("postProperty.toast.propertySubmitted"),
       });
-      if (isEditMode) {
-        window.alert(t("postProperty.alert.updateSuccess"));
-      } else {
-        window.alert(t("postProperty.alert.submitSuccess"));
-      }
       const created = result.payload as unknown as { _id?: string };
-      if (created?._id) {
-        navigate(`/admin/properties`, { replace: true });
-      } else {
-        navigate(isEditMode ? "/admin/properties" : "/", { replace: true });
-      }
+      setSubmitAlert({
+        open: true,
+        message: isEditMode
+          ? t("postProperty.alert.updateSuccess")
+          : t("postProperty.alert.submitSuccess"),
+        redirectTo: created?._id ? "/admin/properties" : isEditMode ? "/admin/properties" : "/",
+      });
     } else {
       pushToast({
         kind: "error",
@@ -335,6 +338,15 @@ export default function ReviewSubmit() {
             {t("postProperty.review.editDetails")}
           </Button>
         }
+      />
+      <CustomAlert
+        open={submitAlert.open}
+        title="Success"
+        message={submitAlert.message}
+        onConfirm={() => {
+          setSubmitAlert((prev) => ({ ...prev, open: false }));
+          navigate(submitAlert.redirectTo, { replace: true });
+        }}
       />
     </div>
   );

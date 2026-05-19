@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { registerUser, resetError } from "../../features/auth/authSlice";
 import type { RegisterRequest } from "../../features/auth/authTypes";
@@ -23,6 +24,7 @@ const backendRoleToUiRole = (role: string | undefined, fallback: Role): Role => 
 };
 
 const Register: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { loading, error } = useAppSelector((state) => state.auth);
@@ -67,10 +69,10 @@ const Register: React.FC = () => {
   );
 
   const roleHint = useMemo(() => {
-    if (role === "seller") return "Seller: tell us your property focus.";
-    if (role === "agent") return "Agent: share your experience level.";
-    return "Buyer: choose your investment interest.";
-  }, [role]);
+    if (role === "seller") return t("auth.register.hints.seller");
+    if (role === "agent") return t("auth.register.hints.agent");
+    return t("auth.register.hints.buyer");
+  }, [role, t]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -78,8 +80,8 @@ const Register: React.FC = () => {
     if (password !== confirmPassword) {
       pushToast({
         kind: "error",
-        title: "Passwords do not match",
-        detail: "Please confirm your password again.",
+        title: t("auth.toast.passwordMismatch.title"),
+        detail: t("auth.toast.passwordMismatch.detail"),
       });
       return;
     }
@@ -105,8 +107,8 @@ const Register: React.FC = () => {
     if (registerUser.fulfilled.match(result)) {
       pushToast({
         kind: "success",
-        title: "Registration successful",
-        detail: "Signing you in and redirecting…",
+        title: t("auth.toast.success.title"),
+        detail: t("auth.toast.success.detail"),
       });
 
       const resolvedRole = backendRoleToUiRole(result.payload.user?.role, role);
@@ -132,7 +134,7 @@ const Register: React.FC = () => {
           <Button
             type="button"
             onClick={() => navigate("/", { replace: true })}
-            aria-label="Close"
+            aria-label={t("common.close")}
             className="absolute right-4 top-6 h-8 w-8 flex items-center justify-center rounded-full bg-[var(--b2-soft)] text-[var(--b1)] hover:bg-[var(--b2)] transition"
           >
             ✕
@@ -140,16 +142,16 @@ const Register: React.FC = () => {
 
           <div className="mb-6 flex justify-center mt-2">
             <span className="text-2xl font-bold text-[var(--b1)]">
-              BhoomiWala
+              {t("auth.brand")}
             </span>
           </div>
 
           <h1 className="mb-2 text-center text-2xl font-semibold">
-            Create your account
+            {t("auth.register.title")}
           </h1>
 
           <p className="mb-6 text-center text-xs text-[var(--muted)]">
-            Choose your role and we’ll take you to the right dashboard.
+            {t("auth.register.subtitle")}
           </p>
 
           {error && (
@@ -162,7 +164,7 @@ const Register: React.FC = () => {
 
             {/* Role */}
             <div>
-              <p className="mb-2 block text-sm font-medium">Role</p>
+              <p className="mb-2 block text-sm font-medium">{t("auth.register.role")}</p>
 
               <div className="grid grid-cols-3 gap-2">
                 {(["buyer", "seller", "agent"] as const).map((r) => (
@@ -183,7 +185,7 @@ const Register: React.FC = () => {
                       className="sr-only"
                     />
                     <span className="block w-full text-center">
-                      {r === "buyer" ? "BUYER" : r.toUpperCase()}
+                      {t(`auth.register.roles.${r}`)}
                     </span>
                   </label>
                 ))}
@@ -196,45 +198,45 @@ const Register: React.FC = () => {
             <div className="grid sm:grid-cols-2 gap-4">
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium">Name</label>
+                <label className="text-sm font-medium">{t("auth.fields.name")}</label>
                 <Input
                   autoComplete="off"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
-                  placeholder="Rahul"
+                  placeholder={t("auth.placeholders.fullName")}
                   required
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium">Email</label>
+                <label className="text-sm font-medium">{t("auth.fields.email")}</label>
                 <Input
                   type="email"
                   autoComplete="off"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
-                  placeholder="rahul@gmail.com"
+                  placeholder={t("auth.placeholders.email")}
                   required
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium">Mobile</label>
+                <label className="text-sm font-medium">{t("auth.fields.mobile")}</label>
                 <Input
                   autoComplete="off"
                   value={mobile}
                   onChange={(e) => setMobile(e.target.value)}
                   className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
-                  placeholder="Optional"
+                  placeholder={t("common.optional")}
                 />
               </div>
 
               {role === "buyer" && (
                 <div className="flex flex-col gap-1 sm:col-span-2">
                   <label className="text-sm font-medium">
-                    Investment Interest
+                    {t("auth.fields.investmentInterest")}
                   </label>
                   <Input
                     autoComplete="off"
@@ -249,7 +251,7 @@ const Register: React.FC = () => {
               {role === "seller" && (
                 <div className="flex flex-col gap-1 sm:col-span-2">
                   <label className="text-sm font-medium">
-                    Property focus type
+                    {t("auth.fields.propertyFocusType")}
                   </label>
                   <Input
                     autoComplete="off"
@@ -264,20 +266,20 @@ const Register: React.FC = () => {
               {role === "agent" && (
                 <div className="flex flex-col gap-1 sm:col-span-2">
                   <label className="text-sm font-medium">
-                    Experience (years)
+                    {t("auth.fields.experienceYears")}
                   </label>
                   <Input
                     autoComplete="off"
                     value={experienceYears}
                     onChange={(e) => setExperienceYears(e.target.value)}
                     className="border border-[var(--b2)] rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[var(--b2)] focus:outline-none"
-                    placeholder="3"
+                    placeholder={t("auth.placeholders.experienceYears")}
                   />
                 </div>
               )}
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium">Password</label>
+                <label className="text-sm font-medium">{t("auth.fields.password")}</label>
                 <div className="relative">
                   <Input
                     type={showPassword ? "text" : "password"}
@@ -291,15 +293,17 @@ const Register: React.FC = () => {
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
                     className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-transparent px-2 py-1 text-sm font-medium hover:border-[var(--b2)] hover:bg-[var(--b1-mid)] transition"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? t("auth.actions.hidePassword") : t("auth.actions.showPassword")
+                    }
                   >
-                    {showPassword ? "Hide" : "Show"}
+                    {showPassword ? t("auth.actions.hide") : t("auth.actions.show")}
                   </Button>
                 </div>
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-medium">Confirm Password</label>
+                <label className="text-sm font-medium">{t("auth.fields.confirmPassword")}</label>
                 <div className="relative">
                   <Input
                     type={showConfirmPassword ? "text" : "password"}
@@ -313,9 +317,13 @@ const Register: React.FC = () => {
                     type="button"
                     onClick={() => setShowConfirmPassword((v) => !v)}
                     className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-transparent px-2 py-1 text-sm font-medium hover:border-[var(--b2)] hover:bg-[var(--b1-mid)] transition"
-                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                    aria-label={
+                      showConfirmPassword
+                        ? t("auth.actions.hideConfirmPassword")
+                        : t("auth.actions.showConfirmPassword")
+                    }
                   >
-                    {showConfirmPassword ? "Hide" : "Show"}
+                    {showConfirmPassword ? t("auth.actions.hide") : t("auth.actions.show")}
                   </Button>
                 </div>
               </div>
@@ -327,7 +335,7 @@ const Register: React.FC = () => {
               disabled={loading}
               className="w-full inline-flex justify-center items-center rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] shadow-md hover:bg-[var(--b1)] transition disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              {loading ? "Creating account..." : "Register"}
+              {loading ? t("auth.register.submitting") : t("auth.register.submit")}
             </Button>
 
             <Button
@@ -335,18 +343,11 @@ const Register: React.FC = () => {
               onClick={() => navigate("/login")}
               className="w-full inline-flex justify-center items-center rounded-md border border-[var(--b2)] bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] shadow-md hover:bg-[var(--b1)]  transition"
             >
-              Already have an account? Sign in
+              {t("auth.register.signInCta")}
             </Button>
 
             <div className="pt-1 text-center text-xs text-[var(--muted)]">
-              By registering, you agree to our{" "}
-              <Link
-                to="/"
-                className="text-[var(--b1-mid)] hover:text-[var(--b1)]"
-              >
-                terms
-              </Link>
-              .
+              {t("auth.register.terms")}
             </div>
 
           </form>

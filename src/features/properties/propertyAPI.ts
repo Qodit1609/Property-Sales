@@ -19,6 +19,16 @@ const toString = (value: unknown): string | undefined => {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
 };
 
+const toPhoneString = (value: unknown): string | undefined => {
+  if (typeof value === "string" && value.trim()) {
+    return value.trim();
+  }
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(value);
+  }
+  return undefined;
+};
+
 const toStringArray = (value: unknown): string[] => {
   if (typeof value === "string" && value.trim()) {
     return value
@@ -143,6 +153,8 @@ const normalizeProperty = (payload: unknown): Property => {
   const dealer = toRecord(raw.dealer);
   const seller = toRecord(raw.seller);
   const sellerIdRaw = raw.sellerId;
+  const populatedSeller = sellerIdRaw && typeof sellerIdRaw === "object" ? (sellerIdRaw as Record<string, unknown>) : {};
+  const ownerDetails = toRecord(raw.ownerDetails);
   const status = toRecord(raw.status);
   const distances = toRecord(location.distances);
   const features = toRecord(raw.features);
@@ -226,9 +238,51 @@ const normalizeProperty = (payload: unknown): Property => {
     description: toString(raw.description) ?? toString(raw.aboutProperty) ?? "",
     shortDescription:
       toString(raw.shortDescription) ?? toString(raw.description)?.slice(0, 150),
+    contactName:
+      toString(raw.contactName) ??
+      toString(ownerDetails.name) ??
+      toString(dealer.name) ??
+      toString(seller.name) ??
+      toString(populatedSeller.name) ??
+      toString(agent.name),
+    contactEmail:
+      toString(raw.contactEmail) ??
+      toString(raw.email) ??
+      toString(ownerDetails.email) ??
+      toString(dealer.email) ??
+      toString(seller.email) ??
+      toString(populatedSeller.email) ??
+      toString(agent.email),
+    contactMobile:
+      toPhoneString(raw.contactMobile) ??
+      toPhoneString(raw.mobileNumber) ??
+      toPhoneString(raw.phoneNumber) ??
+      toPhoneString(raw.phone) ??
+      toPhoneString(ownerDetails.mobile) ??
+      toPhoneString(ownerDetails.mobileNumber) ??
+      toPhoneString(ownerDetails.phoneNumber) ??
+      toPhoneString(ownerDetails.phone) ??
+      toPhoneString(dealer.mobile) ??
+      toPhoneString(dealer.mobileNumber) ??
+      toPhoneString(dealer.phoneNumber) ??
+      toPhoneString(dealer.phone) ??
+      toPhoneString(seller.mobile) ??
+      toPhoneString(seller.mobileNumber) ??
+      toPhoneString(seller.phoneNumber) ??
+      toPhoneString(seller.phone) ??
+      toPhoneString(populatedSeller.mobile) ??
+      toPhoneString(populatedSeller.mobileNumber) ??
+      toPhoneString(populatedSeller.phoneNumber) ??
+      toPhoneString(populatedSeller.phone) ??
+      toPhoneString(populatedSeller.contact) ??
+      toPhoneString(agent.mobile) ??
+      toPhoneString(agent.mobileNumber) ??
+      toPhoneString(agent.phoneNumber) ??
+      toPhoneString(agent.phone),
     address: getLocationText(raw),
     locationText: getLocationText(raw),
     price: toNumber(raw.price) ?? 0,
+    negotiable: toBoolean(raw.negotiable),
     images,
     videos: toStringArray(media.videos),
     propertyType: toString(raw.propertyType) ?? toString(raw.category) ?? "Property",
@@ -263,23 +317,41 @@ const normalizeProperty = (payload: unknown): Property => {
       (toString(raw.promotionStatus) as Property["promotionStatus"]) ?? "none",
     requestedDuration: toNumber(raw.requestedDuration),
     requestedAt: toString(raw.requestedAt),
-    verified: Boolean(status.verified) || Boolean(dealer.verified),
+    verified:
+      Boolean(status.verified) ||
+      Boolean(ownerDetails.verified) ||
+      Boolean(dealer.verified) ||
+      Boolean(seller.verified),
     ownerDetails: {
-      name: toString(dealer.name) ?? toString(seller.name) ?? toString(agent.name) ?? "",
-      phone: toString(dealer.phone) ?? toString(seller.phone) ?? toString(agent.phone) ?? "",
-      type: toString(dealer.type) ?? toString(agent.type),
-      verified: Boolean(dealer.verified) || Boolean(agent.verified),
+      name:
+        toString(ownerDetails.name) ??
+        toString(dealer.name) ??
+        toString(seller.name) ??
+        toString(agent.name) ??
+        "",
+      phone:
+        toPhoneString(ownerDetails.phone) ??
+        toPhoneString(dealer.phone) ??
+        toPhoneString(seller.phone) ??
+        toPhoneString(agent.phone) ??
+        "",
+      type: toString(ownerDetails.type) ?? toString(dealer.type) ?? toString(agent.type),
+      verified:
+        Boolean(ownerDetails.verified) ||
+        Boolean(dealer.verified) ||
+        Boolean(seller.verified) ||
+        Boolean(agent.verified),
     },
     dealer: {
       name: toString(dealer.name) ?? toString(agent.name),
-      phone: toString(dealer.phone) ?? toString(agent.phone),
+      phone: toPhoneString(dealer.phone) ?? toPhoneString(agent.phone),
       type: toString(dealer.type) ?? toString(agent.type),
       verified: Boolean(dealer.verified) || Boolean(agent.verified),
     },
     seller: {
-      name: toString(seller.name),
-      phone: toString(seller.phone),
-      email: toString(seller.email),
+      name: toString(seller.name) ?? toString(populatedSeller.name),
+      phone: toPhoneString(seller.phone) ?? toPhoneString(populatedSeller.phone) ?? toPhoneString(populatedSeller.contact),
+      email: toString(seller.email) ?? toString(populatedSeller.email),
       verified: Boolean(seller.verified),
     },
     media: {
@@ -506,6 +578,16 @@ const normalizeProperty = (payload: unknown): Property => {
       approvalStatus: toString(status.approvalStatus),
       postedAt: toString(status.postedAt),
     },
+    rejectionType:
+      String(raw.rejectionType ?? "").toUpperCase() === "DIRECT"
+        ? "DIRECT"
+        : String(raw.rejectionType ?? "").toUpperCase() === "WITH_REASON"
+          ? "WITH_REASON"
+          : undefined,
+    rejectionDescription: toString(raw.rejectionDescription),
+    rejectionMessage: toString(raw.rejectionMessage),
+    canResubmit: typeof raw.canResubmit === "boolean" ? raw.canResubmit : undefined,
+    rejectedAt: toString(raw.rejectedAt),
     soilType: toString(raw.soilType) ?? toString(soilAndFarming.soilType),
     location: {
       address: toString(location.address) ?? toString(raw.address),

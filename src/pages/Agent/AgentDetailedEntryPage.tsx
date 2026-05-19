@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Button, Input } from "@/components/common";
 import { X } from "lucide-react";
+import { translateOwnershipType, translateSoilType, translateStatus } from "@/lib/i18nHelpers";
 import { useAgentCollection } from "./AgentCollectionContext";
 
 const PROPERTY_SIZE_UNITS = ["Acre", "Hectare"] as const;
@@ -38,8 +40,17 @@ const parsePropertySize = (value: string): { size: string; unit: string } => {
 };
 
 const AgentDetailedEntryPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { activeDraft, saveFieldEntry, saveDetailedEntry, setPropertyStatus } = useAgentCollection();
+
+  const formatYesNo = (value: string) =>
+    value === "yes" ? t("postProperty.common.yes") : value === "no" ? t("postProperty.common.no") : value;
+
+  const statusLabel = (status: string) => {
+    const key = `agentPanel.dashboard.stats.${status}` as const;
+    return t(key, { defaultValue: translateStatus(status) });
+  };
 
   const [expectedPrice, setExpectedPrice] = useState("");
   const [negotiable, setNegotiable] = useState("yes");
@@ -88,99 +99,109 @@ const AgentDetailedEntryPage: React.FC = () => {
     <section className="space-y-6 px-4 sm:px-6 lg:px-8 py-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-semibold text-[var(--b1)]">
-          Property Collection - Step 2
+          {t("agentPanel.fieldEntryPage.step2Title")}
         </h1>
         <p className="mt-1 text-xs text-[var(--muted)]">
-          Complete detailed property information for review readiness.
+          {t("agentPanel.fieldEntryPage.step2Subtitle")}
         </p>
       </div>
 
       <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm">
         <form
           className="space-y-4"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            saveFieldEntry({
-              ...activeDraft,
-              landType,
-              propertySize: `${propertySizeValue.trim()} ${propertySizeUnit}`.trim(),
-              roadAccess,
-              waterAvailability,
-            });
-            saveDetailedEntry({
-              propertyId,
-              expectedPrice,
-              negotiable,
-              ownershipType,
-              registryAvailable,
-              khasraAvailable,
-              landDispute,
-              electricity,
-              cropHistory,
-              ownerContact,
-              exactLocation,
-              nearbyLandmarks,
-              roadType,
-              waterSourceDetails,
-              connectivityInfo,
-              propertyHighlights,
-              issuesDrawbacks,
-              attachments,
-              khasraFiles,
-              khatauniFiles,
-              nakshaFiles,
-              notes,
-            });
-            navigate("/agent/dashboard", { replace: true });
+            try {
+              await saveFieldEntry({
+                ...activeDraft,
+                landType,
+                propertySize: `${propertySizeValue.trim()} ${propertySizeUnit}`.trim(),
+                roadAccess,
+                waterAvailability,
+              });
+              await saveDetailedEntry({
+                propertyId,
+                expectedPrice,
+                negotiable,
+                ownershipType,
+                registryAvailable,
+                khasraAvailable,
+                landDispute,
+                electricity,
+                cropHistory,
+                ownerContact,
+                exactLocation,
+                nearbyLandmarks,
+                roadType,
+                waterSourceDetails,
+                connectivityInfo,
+                propertyHighlights,
+                issuesDrawbacks,
+                attachments,
+                khasraFiles,
+                khatauniFiles,
+                nakshaFiles,
+                notes,
+              });
+              navigate("/agent/dashboard", { replace: true });
+            } catch (error) {
+              console.error("Unable to save agent step 2", error);
+            }
           }}
         >
           <div className="rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]/40 px-3 py-2">
             <p className="text-xs font-semibold text-[var(--b1)]">
-              Linked Property ID
+              {t("agentPanel.fieldEntryPage.linkedPropertyId")}
             </p>
             <p className="text-sm text-[var(--b1)]">{propertyId}</p>
             <p className="mt-1 text-[11px] text-[var(--muted)]">
-              Current status preview: {statusPreview}
+              {t("agentPanel.fieldEntryPage.statusPreview", {
+                status: statusLabel(statusPreview),
+              })}
             </p>
           </div>
 
-          <SectionBlock title="Basic Info">
+          <SectionBlock title={t("agentPanel.fieldEntryPage.sections.basicInfo")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <LabeledInput
-                label="Expected Price"
+                label={t("agentPanel.form.expectedPrice")}
                 value={expectedPrice}
                 onChange={setExpectedPrice}
                 required
               />
               <SelectInput
-                label="Ownership Type"
+                label={t("agentPanel.form.ownershipType")}
                 value={ownershipType}
                 onChange={setOwnershipType}
                 options={[...OWNERSHIP_TYPE_OPTIONS]}
-                placeholderText="Select"
+                placeholderText={t("agentPanel.form.select")}
+                formatOption={translateOwnershipType}
                 uppercaseOptions={false}
                 required
               />
               <SelectInput
-                label="Negotiable"
+                label={t("agentPanel.form.negotiable")}
                 value={negotiable}
                 onChange={setNegotiable}
                 options={["yes", "no"]}
+                formatOption={formatYesNo}
               />
               <SelectInput
-                label="Registry Available"
+                label={t("agentPanel.form.registryAvailable")}
                 value={registryAvailable}
                 onChange={setRegistryAvailable}
                 options={["yes", "no"]}
+                formatOption={formatYesNo}
               />
               <SelectInput
-                label="Khasra Available"
+                label={t("agentPanel.form.khasraAvailable")}
                 value={khasraAvailable}
                 onChange={setKhasraAvailable}
                 options={["yes", "no"]}
+                formatOption={formatYesNo}
               />
               <LabeledInput
-                label="Owner Contact"
+                label={t("agentPanel.form.ownerContact")}
                 value={ownerContact}
                 onChange={(value) => setOwnerContact(value.replace(/\D/g, "").slice(0, 10))}
                 required
@@ -188,19 +209,22 @@ const AgentDetailedEntryPage: React.FC = () => {
             </div>
           </SectionBlock>
 
-          <SectionBlock title="Field Entry Details">
+          <SectionBlock title={t("agentPanel.fieldEntryPage.sections.fieldEntryDetails")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <SelectInput
-                label="Soil Type"
+                label={t("agentPanel.form.soilType")}
                 value={landType}
                 onChange={setLandType}
                 options={[...SOIL_TYPE_OPTIONS]}
+                formatOption={translateSoilType}
                 required
               />
               <div>
                 <div className="mb-1 flex items-center justify-between text-sm font-medium">
-                  <label htmlFor="property-size-value">Total land area</label>
-                  <span>Required</span>
+                  <label htmlFor="property-size-value">
+                    {t("agentPanel.fieldEntryPage.totalLandArea")}
+                  </label>
+                  <span>{t("common.required")}</span>
                 </div>
                 <div className="grid grid-cols-[2fr_1fr] gap-2">
                   <Input
@@ -221,75 +245,81 @@ const AgentDetailedEntryPage: React.FC = () => {
                   >
                     {PROPERTY_SIZE_UNITS.map((unit) => (
                       <option key={unit} value={unit}>
-                        {unit}
+                        {unit === "Acre"
+                          ? t("agentPanel.fieldEntryPage.acre")
+                          : t("agentPanel.fieldEntryPage.hectare")}
                       </option>
                     ))}
                   </select>
                 </div>
               </div>
               <SelectInput
-                label="Road Access"
+                label={t("agentPanel.form.roadAccess")}
                 value={roadAccess}
                 onChange={setRoadAccess}
                 options={["", "yes", "no"]}
+                formatOption={formatYesNo}
                 required
               />
               <SelectInput
-                label="Water Availability"
+                label={t("agentPanel.form.waterAvailability")}
                 value={waterAvailability}
                 onChange={setWaterAvailability}
                 options={["", "yes", "no"]}
+                formatOption={formatYesNo}
                 required
               />
             </div>
           </SectionBlock>
 
-          <SectionBlock title="Location Details">
+          <SectionBlock title={t("agentPanel.fieldEntryPage.sections.locationDetails")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <LabeledInput
-                label="Exact Location Description"
+                label={t("agentPanel.fieldEntryPage.exactLocationDescription")}
                 value={exactLocation}
                 onChange={setExactLocation}
               />
               <LabeledInput
-                label="Nearby Landmarks"
+                label={t("agentPanel.form.nearbyLandmarks")}
                 value={nearbyLandmarks}
                 onChange={setNearbyLandmarks}
               />
               <LabeledInput
-                label="Road Type"
+                label={t("agentPanel.form.roadType")}
                 value={roadType}
                 onChange={setRoadType}
               />
               <LabeledInput
-                label="Connectivity Info"
+                label={t("agentPanel.form.connectivityInfo")}
                 value={connectivityInfo}
                 onChange={setConnectivityInfo}
               />
             </div>
           </SectionBlock>
 
-          <SectionBlock title="Property Details">
+          <SectionBlock title={t("agentPanel.fieldEntryPage.sections.propertyDetails")}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <LabeledInput
-                label="Water Source Details"
+                label={t("agentPanel.form.waterSourceDetails")}
                 value={waterSourceDetails}
                 onChange={setWaterSourceDetails}
               />
               <SelectInput
-                label="Any Land Dispute"
+                label={t("agentPanel.fieldEntryPage.anyLandDispute")}
                 value={landDispute}
                 onChange={setLandDispute}
                 options={["yes", "no"]}
+                formatOption={formatYesNo}
               />
               <SelectInput
-                label="Electricity"
+                label={t("agentPanel.form.electricity")}
                 value={electricity}
                 onChange={setElectricity}
                 options={["yes", "no"]}
+                formatOption={formatYesNo}
               />
               <LabeledInput
-                label="Crop History"
+                label={t("agentPanel.form.cropHistory")}
                 value={cropHistory}
                 onChange={setCropHistory}
                 required
@@ -298,25 +328,25 @@ const AgentDetailedEntryPage: React.FC = () => {
             <div className="mt-4 grid grid-cols-1 gap-4">
               <TextAreaInput
                 id="propertyHighlights"
-                label="Property Highlights"
+                label={t("agentPanel.form.propertyHighlights")}
                 value={propertyHighlights}
                 onChange={setPropertyHighlights}
-                placeholder="Key strengths and unique points..."
+                placeholder={t("agentPanel.fieldEntryPage.highlightsPlaceholder")}
               />
               <TextAreaInput
                 id="issuesDrawbacks"
-                label="Issues / Drawbacks"
+                label={t("agentPanel.form.issuesDrawbacks")}
                 value={issuesDrawbacks}
                 onChange={setIssuesDrawbacks}
-                placeholder="Any known issues or limitations..."
+                placeholder={t("agentPanel.fieldEntryPage.issuesPlaceholder")}
               />
             </div>
           </SectionBlock>
 
-          <SectionBlock title="Media & Documents">
+          <SectionBlock title={t("agentPanel.fieldEntryPage.sections.mediaDocuments")}>
             <div>
               <label className="mb-1 block text-sm font-medium" htmlFor="attachments">
-                Upload Files (images, videos, documents, audio)
+                {t("agentPanel.fieldEntryPage.uploadFiles")}
               </label>
               <input
                 id="attachments"
@@ -341,10 +371,10 @@ const AgentDetailedEntryPage: React.FC = () => {
             />
           </SectionBlock>
 
-          <SectionBlock title="Upload khasra khatauni naksha">
+          <SectionBlock title={t("agentPanel.fieldEntryPage.sections.uploadDocs")}>
             <div>
               <label className="mb-1 block text-sm font-medium" htmlFor="khasra-files">
-                Upload khasra
+                {t("agentPanel.fieldEntryPage.uploadKhasra")}
               </label>
               <input
                 id="khasra-files"
@@ -370,7 +400,7 @@ const AgentDetailedEntryPage: React.FC = () => {
 
             <div className="mt-4">
               <label className="mb-1 block text-sm font-medium" htmlFor="khatauni-files">
-                Upload khatauni
+                {t("agentPanel.fieldEntryPage.uploadKhatauni")}
               </label>
               <input
                 id="khatauni-files"
@@ -396,7 +426,7 @@ const AgentDetailedEntryPage: React.FC = () => {
 
             <div className="mt-4">
               <label className="mb-1 block text-sm font-medium" htmlFor="naksha-files">
-                Upload naksha
+                {t("agentPanel.fieldEntryPage.uploadNaksha")}
               </label>
               <input
                 id="naksha-files"
@@ -424,10 +454,10 @@ const AgentDetailedEntryPage: React.FC = () => {
           <div>
             <TextAreaInput
               id="notes"
-              label="Notes"
+              label={t("agentPanel.fieldEntryPage.notes")}
               value={notes}
               onChange={setNotes}
-              placeholder="Additional notes..."
+              placeholder={t("agentPanel.fieldEntryPage.notesPlaceholder")}
             />
           </div>
 
@@ -440,20 +470,20 @@ const AgentDetailedEntryPage: React.FC = () => {
               }}
               className="w-full sm:w-auto rounded-md border border-[var(--b2)] px-4 py-2 text-sm"
             >
-              Back to Step 1
+              {t("agentPanel.fieldEntryPage.backToStep1")}
             </Button>
             <Button
               type="button"
               onClick={() => setPropertyStatus(propertyId, "incomplete")}
               className="w-full sm:w-auto rounded-md border border-[var(--b2)] bg-[var(--b2-soft)] px-4 py-2 text-sm font-semibold text-[var(--b1)]"
             >
-              Save as Incomplete
+              {t("agentPanel.fieldEntryPage.saveIncomplete")}
             </Button>
             <Button
               type="submit"
               className="w-full sm:w-auto rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] hover:bg-[var(--b1)] transition"
             >
-              Mark Ready
+              {t("agentPanel.fieldEntryPage.markReady")}
             </Button>
           </div>
         </form>
@@ -504,6 +534,7 @@ const SelectInput = ({
   value,
   onChange,
   options,
+  formatOption,
   required,
   placeholderText,
   uppercaseOptions = true,
@@ -512,26 +543,40 @@ const SelectInput = ({
   value: string;
   onChange: (value: string) => void;
   options: string[];
+  formatOption?: (value: string) => string;
   required?: boolean;
   placeholderText?: string;
   uppercaseOptions?: boolean;
-}) => (
-  <div>
-    <label className="mb-1 block text-sm font-medium">{label}</label>
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
-      required={required}
-    >
-      {options.map((option, index) => (
-        <option key={`${label}-${option || "select"}`} value={option} disabled={required && index === 0}>
-          {option ? (uppercaseOptions ? option.toUpperCase() : option) : placeholderText ?? "Select option"}
-        </option>
-      ))}
-    </select>
-  </div>
-);
+}) => {
+  const { t } = useTranslation();
+
+  return (
+    <div>
+      <label className="mb-1 block text-sm font-medium">{label}</label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
+        required={required}
+      >
+        {options.map((option, index) => {
+          const display = option
+            ? formatOption?.(option) ?? (uppercaseOptions ? option.toUpperCase() : option)
+            : placeholderText ?? t("agentPanel.fieldEntry.selectOption");
+          return (
+            <option
+              key={`${label}-${option || "select"}`}
+              value={option}
+              disabled={required && index === 0}
+            >
+              {display}
+            </option>
+          );
+        })}
+      </select>
+    </div>
+  );
+};
 
 const TextAreaInput = ({
   id,
@@ -568,6 +613,7 @@ const PreviewList = ({
   files: File[];
   onRemove: (index: number) => void;
 }) => {
+  const { t } = useTranslation();
   const previewItems = useMemo(
     () =>
       files.map((file, index) => {
@@ -620,7 +666,7 @@ const PreviewList = ({
               <span className="truncate text-sm text-[var(--b1)]">{item.file.name}</span>
               <button
                 type="button"
-                aria-label={`Remove ${item.file.name}`}
+                aria-label={t("agentPanel.fieldEntryPage.removeFile", { name: item.file.name })}
                 onClick={() => onRemove(index)}
                 className="rounded-md p-1 text-[var(--muted)] transition hover:bg-[var(--white)] hover:text-[var(--error)]"
               >

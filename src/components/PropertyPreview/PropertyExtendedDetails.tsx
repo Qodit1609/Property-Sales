@@ -10,13 +10,23 @@ import RiskCard from "./RiskCard";
 import {
   translateAmenityValue,
   translateDynamicList,
+  formatAreaLocalized,
   formatPriceLocalized,
+  translateLandUseType,
   translateListingType,
   translatePersonType,
   translatePropertyType,
+  translateRoadType,
   translateSoilType,
   translateStatusValue,
+  translateWaterAvailability,
 } from "./previewUtils";
+import {
+  MAX_PROPERTY_DESCRIPTION_WORDS,
+  MAX_PROPERTY_SHORT_DESCRIPTION_WORDS,
+  truncateWords,
+} from "../../utils/wordText";
+import { usePropertyPreviewTextContext } from "./PropertyPreviewTextContext";
 
 type PropertyExtendedDetailsProps = {
   property: Property;
@@ -107,6 +117,7 @@ const getStatusVariant = (status: string) => {
 
 const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => {
   const { t } = useTranslation();
+  const previewText = usePropertyPreviewTextContext();
   const locationDistances = property.location?.distances;
   const infra = property.infrastructure;
   const facilities = infra?.nearbyFacilities ?? property.location?.nearbyFacilities;
@@ -146,21 +157,27 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
     <div className="space-y-4">
       <PropertySection title={t("propertyPreview.detail.basicDetails")}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <InfoItem label={t("propertyPreview.detail.title")} value={property.title} />
+          <InfoItem label={t("propertyPreview.detail.title")} value={previewText.title} />
           <InfoItem label={t("propertyPreview.detail.propertyType")} value={translatePropertyType(property.propertyType)} />
           <InfoItem label={t("propertyPreview.detail.listingType")} value={translateListingType(property.listingType)} />
-          <InfoItem label={t("propertyPreview.sections.description")} value={property.description} />
-          <InfoItem label={t("propertyPreview.detail.shortDescription")} value={property.shortDescription} />
+          <InfoItem
+            label={t("propertyPreview.sections.description")}
+            value={truncateWords(previewText.description ?? "", MAX_PROPERTY_DESCRIPTION_WORDS)}
+          />
+          <InfoItem
+            label={t("propertyPreview.detail.shortDescription")}
+            value={truncateWords(previewText.shortDescription ?? "", MAX_PROPERTY_SHORT_DESCRIPTION_WORDS)}
+          />
           <InfoItem label={t("propertyPreview.detail.tags")} value={translatedTags?.length ? translatedTags.join(", ") : undefined} />
         </div>
       </PropertySection>
 
       <PropertySection title={t("propertyPreview.detail.locationDetails")}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <InfoItem label={t("propertyPreview.labels.address")} value={property.location?.address ?? property.address} />
-          <InfoItem label={t("propertyPreview.detail.locality")} value={property.location?.locality} />
-          <InfoItem label={t("propertyPreview.labels.city")} value={property.location?.city} />
-          <InfoItem label={t("propertyPreview.labels.state")} value={property.location?.state} />
+          <InfoItem label={t("propertyPreview.labels.address")} value={previewText.address} />
+          <InfoItem label={t("propertyPreview.detail.locality")} value={previewText.locality} />
+          <InfoItem label={t("propertyPreview.labels.city")} value={previewText.city} />
+          <InfoItem label={t("propertyPreview.labels.state")} value={previewText.state} />
           <InfoItem label={t("propertyPreview.labels.pincode")} value={property.location?.pincode} />
           <InfoItem label={t("propertyPreview.detail.mapLink")} value={mapLink} />
           <InfoItem label={t("propertyPreview.detail.latitude")} value={latitude} />
@@ -172,14 +189,14 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
               ? property.location.geoJSON.coordinates.join(", ")
               : undefined}
           />
-          <InfoItem label={t("propertyPreview.detail.cityCenterDistance")} value={locationDistances?.cityCenter} suffix=" km" />
+          <InfoItem label={t("propertyPreview.detail.cityCenterDistance")} value={locationDistances?.cityCenter} suffix={` ${t("propertyPreview.units.km")}`} />
           <InfoItem
             label={t("propertyPreview.detail.railwayStationDistance")}
             value={locationDistances?.railwayStation ?? locationDistances?.railway}
-            suffix=" km"
+            suffix={` ${t("propertyPreview.units.km")}`}
           />
-          <InfoItem label={t("propertyPreview.detail.highwayDistance")} value={locationDistances?.highway} suffix=" km" />
-          <InfoItem label={t("propertyPreview.detail.airportDistance")} value={locationDistances?.airport} suffix=" km" />
+          <InfoItem label={t("propertyPreview.detail.highwayDistance")} value={locationDistances?.highway} suffix={` ${t("propertyPreview.units.km")}`} />
+          <InfoItem label={t("propertyPreview.detail.airportDistance")} value={locationDistances?.airport} suffix={` ${t("propertyPreview.units.km")}`} />
         </div>
       </PropertySection>
 
@@ -187,8 +204,14 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <InfoItem label={t("propertyPreview.detail.price")} value={formatPriceLocalized(property.price, property.listingType)} />
           <InfoItem label={t("propertyPreview.labels.pricePerSqft")} value={analytics?.pricePerSqft ?? property.pricePerSqft} />
-          <InfoItem label={t("propertyPreview.labels.area")} value={areaValue} suffix={areaUnit ? ` ${areaUnit}` : undefined} />
-          <InfoItem label={t("propertyPreview.labels.landSize")} value={property.landSize} suffix={property.landUnit ? ` ${property.landUnit}` : undefined} />
+          <InfoItem
+            label={t("propertyPreview.labels.area")}
+            value={areaValue ? formatAreaLocalized(areaValue, areaUnit) : undefined}
+          />
+          <InfoItem
+            label={t("propertyPreview.labels.landSize")}
+            value={property.landSize ? formatAreaLocalized(property.landSize, property.landUnit ?? areaUnit) : undefined}
+          />
           <InfoItem label={t("propertyPreview.detail.bedrooms")} value={property.bedrooms ?? property.beds} />
           <InfoItem label={t("propertyPreview.detail.bathrooms")} value={property.bathrooms ?? property.baths} />
         </div>
@@ -196,7 +219,7 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
 
       <PropertySection title={t("propertyPreview.detail.soilFarming")}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <InfoItem label={t("propertyPreview.detail.annualRainfall")} value={rainfall?.annualRainfall} suffix=" mm" />
+          <InfoItem label={t("propertyPreview.detail.annualRainfall")} value={rainfall?.annualRainfall} suffix={` ${t("propertyPreview.units.mm")}`} />
           <InfoItem label={t("propertyPreview.detail.irrigationSupport")} value={parseBoolean(rainfall?.irrigationSupport)} />
           <InfoItem label={t("propertyPreview.labels.soilType")} value={translateSoilType(farming?.soilType)} />
           <InfoItem label={t("propertyPreview.labels.soilQualityIndex")} value={farming?.soilQualityIndex} />
@@ -204,7 +227,7 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
           <InfoItem
             label={t("propertyPreview.detail.farmingPercentage")}
             value={farming?.farmingPercentage ?? farming?.farmingPercent}
-            suffix="%"
+            suffix={` ${t("propertyPreview.units.percent")}`}
           />
         </div>
         <div className="mt-4">
@@ -216,8 +239,8 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
       <PropertySection title={t("propertyPreview.detail.waterResources")}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <InfoItem label={t("propertyPreview.detail.borewellAvailable")} value={parseBoolean(water?.borewellAvailable ?? water?.borewell)} />
-          <InfoItem label={t("propertyPreview.detail.borewellDepth")} value={water?.borewellDepth} suffix=" ft" />
-          <InfoItem label={t("propertyPreview.labels.waterAvailability")} value={water?.waterAvailability} />
+          <InfoItem label={t("propertyPreview.detail.borewellDepth")} value={water?.borewellDepth} suffix={` ${t("propertyPreview.units.ft")}`} />
+          <InfoItem label={t("propertyPreview.labels.waterAvailability")} value={translateWaterAvailability(water?.waterAvailability)} />
           <InfoItem label={t("propertyPreview.detail.irrigationSystem")} value={parseBoolean(water?.irrigationSystem ?? water?.irrigation)} />
           <InfoItem label={t("propertyPreview.detail.waterCertificate")} value={parseBoolean(water?.waterCertificateAvailable)} />
         </div>
@@ -231,7 +254,7 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <InfoItem label={t("propertyPreview.detail.electricityAvailable")} value={parseBoolean(infra?.electricityAvailable)} />
           <InfoItem label={t("propertyPreview.detail.roadAccess")} value={parseBoolean(infra?.roadAccess)} />
-          <InfoItem label={t("propertyPreview.detail.roadType")} value={infra?.roadType} />
+          <InfoItem label={t("propertyPreview.detail.roadType")} value={translateRoadType(infra?.roadType)} />
           <InfoItem label={t("propertyPreview.detail.fencing")} value={parseBoolean(infra?.fencing)} />
           <InfoItem label={t("propertyPreview.detail.gated")} value={parseBoolean(infra?.gated)} />
         </div>
@@ -248,7 +271,7 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
           <InfoItem label={t("propertyPreview.detail.landRegistryAvailable")} value={parseBoolean(legal?.landRegistryAvailable ?? legal?.landRegistry)} />
           <InfoItem label={t("propertyPreview.detail.ownershipDocuments")} value={parseBoolean(legal?.ownershipDocuments ?? legal?.ownershipDocs)} />
           <InfoItem label={t("propertyPreview.detail.encumbranceFree")} value={parseBoolean(legal?.encumbranceFree ?? legal?.encumbrance)} />
-          <InfoItem label={t("propertyPreview.labels.landUseType")} value={legal?.landUseType} />
+          <InfoItem label={t("propertyPreview.labels.landUseType")} value={translateLandUseType(legal?.landUseType)} />
         </div>
       </PropertySection>
 
@@ -270,7 +293,7 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
 
       <PropertySection title={t("propertyPreview.detail.media")}>
         <MediaGallery
-          title={property.title}
+          title={previewText.title}
           images={media?.images ?? property.images}
           videos={media?.videos ?? property.videos}
           droneView={media?.droneView}
@@ -298,7 +321,7 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
       <PropertySection title={t("propertyPreview.detail.topography")}>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <InfoItem label={t("propertyPreview.detail.slope")} value={topography?.slope} />
-          <InfoItem label={t("propertyPreview.detail.elevation")} value={topography?.elevation} suffix=" m" />
+          <InfoItem label={t("propertyPreview.detail.elevation")} value={topography?.elevation} suffix={` ${t("propertyPreview.units.m")}`} />
         </div>
       </PropertySection>
 
@@ -324,12 +347,12 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
           <InfoItem
             label={t("propertyPreview.detail.expectedRoi")}
             value={parseNumber(investment?.expectedROI ?? property.analytics?.roiPercent)}
-            suffix="%"
+            suffix={` ${t("propertyPreview.units.percent")}`}
           />
           <InfoItem
             label={t("propertyPreview.labels.appreciationRate")}
             value={parseNumber(investment?.appreciationRate ?? property.analytics?.appreciationRate)}
-            suffix="%"
+            suffix={` ${t("propertyPreview.units.percent")}`}
           />
         </div>
       </PropertySection>
@@ -339,8 +362,8 @@ const PropertyExtendedDetails = ({ property }: PropertyExtendedDetailsProps) => 
           <InfoItem label={t("propertyPreview.labels.views")} value={analytics?.views} />
           <InfoItem label={t("propertyPreview.labels.saves")} value={analytics?.saves} />
           <InfoItem label={t("propertyPreview.labels.contactClicks")} value={analytics?.contactClicks} />
-          <InfoItem label={t("propertyPreview.detail.roiPercent")} value={analytics?.roiPercent ?? property.roiPercent} suffix="%" />
-          <InfoItem label={t("propertyPreview.labels.appreciationRate")} value={analytics?.appreciationRate} suffix="%" />
+          <InfoItem label={t("propertyPreview.detail.roiPercent")} value={analytics?.roiPercent ?? property.roiPercent} suffix={` ${t("propertyPreview.units.percent")}`} />
+          <InfoItem label={t("propertyPreview.labels.appreciationRate")} value={analytics?.appreciationRate} suffix={` ${t("propertyPreview.units.percent")}`} />
           <InfoItem label={t("propertyPreview.labels.pricePerSqft")} value={analytics?.pricePerSqft ?? property.pricePerSqft} />
         </div>
       </PropertySection>

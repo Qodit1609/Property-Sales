@@ -19,6 +19,7 @@ import { createListing, deleteListing, fetchMyListings, updateListing } from "..
 import { buildDuplicateListingPayload } from "../../lib/sellerHelpers";
 import type { Property } from "../../features/properties/propertyType";
 import { Button } from "@/components/common";
+import CustomAlert from "@/components/common/CustomAlert";
 import { useSellerAggregates } from "../../hooks/useSellerAggregates";
 import { SellerCharts } from "@/components/seller/SellerCharts";
 import { SellerLeadsCard } from "@/components/seller/SellerLeadsCard";
@@ -31,12 +32,14 @@ import type { SellerStatItem } from "@/components/seller/SellerStats";
 import { cn } from "@/components/seller/sellerUtils";
 import { SellerNotificationsBell } from "@/components/seller/SellerNotificationsBell";
 import { fetchSellerDashboardInsightsAPI, type SellerDashboardInsights } from "@/features/seller/sellerAPI";
+import { translateSellerError } from "@/lib/sellerI18n";
 
 const SellerDashboard = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { listings, loading, error, actionLoading } = useAppSelector((state: RootState) => state.seller);
   const [banner, setBanner] = useState<{ text: string; variant: "success" | "error" } | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [dashboardInsights, setDashboardInsights] = useState<SellerDashboardInsights>({ trend: [], recentLeads: [] });
 
   useEffect(() => {
@@ -127,8 +130,13 @@ const SellerDashboard = () => {
   );
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm(t("sellerDashboard.confirmDelete"))) return;
-    await dispatch(deleteListing(id));
+    setPendingDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDeleteId) return;
+    await dispatch(deleteListing(pendingDeleteId));
+    setPendingDeleteId(null);
   };
 
   const handleDuplicate = useCallback(
@@ -260,7 +268,7 @@ const SellerDashboard = () => {
       {error ? (
         <p className="flex items-start gap-3 rounded-xl border border-[var(--error)]/30 bg-[var(--error-bg)] px-4 py-3.5 font-sans text-sm text-[var(--error)]">
           <XCircle className="mt-0.5 h-5 w-5 shrink-0 opacity-90" aria-hidden />
-          <span className="min-w-0 leading-relaxed">{error}</span>
+          <span className="min-w-0 leading-relaxed">{translateSellerError(error)}</span>
         </p>
       ) : null}
 
@@ -316,6 +324,14 @@ const SellerDashboard = () => {
           }
         />
       ) : null}
+      <CustomAlert
+        open={Boolean(pendingDeleteId)}
+        title={t("sellerDashboard.confirmDelete")}
+        message={t("sellerDashboard.confirmDelete")}
+        showCancel
+        onCancel={() => setPendingDeleteId(null)}
+        onConfirm={() => void confirmDelete()}
+      />
     </section>
   );
 };

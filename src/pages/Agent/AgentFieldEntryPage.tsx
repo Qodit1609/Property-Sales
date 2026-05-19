@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { translateSoilType } from "@/lib/i18nHelpers";
 import { Button, Input } from "@/components/common";
 import {
   createAgentPropertyId,
@@ -35,6 +37,7 @@ const parsePropertySize = (value: string): { size: string; unit: string } => {
 };
 
 const AgentFieldEntryPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { activeDraft, saveFieldEntry } = useAgentCollection();
   const { user } = useAppSelector((state) => state.auth);
@@ -80,71 +83,85 @@ const AgentFieldEntryPage: React.FC = () => {
     <section className="space-y-6 px-4 sm:px-6 lg:px-8 py-6">
       <div>
         <h1 className="text-xl sm:text-2xl font-semibold text-[var(--b1)]">
-          Property Collection - Step 1
+          {t("agentPanel.fieldEntryPage.step1Title")}
         </h1>
         <p className="mt-1 text-xs text-[var(--muted)]">
-          Quick field entry details for agent property collection.
+          {t("agentPanel.fieldEntryPage.step1Subtitle")}
         </p>
       </div>
 
       <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm">
         <form
           className="space-y-4"
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            saveFieldEntry({
-              propertyId,
-              agentName,
-              village,
-              tehsil,
-              district,
-              landType,
-              propertySize: `${propertySizeValue.trim()} ${propertySizeUnit}`.trim(),
-              roadAccess,
-              waterAvailability,
-              ownerName: ownerName.trim() || undefined,
-              ownerContact: ownerContact.trim() || undefined,
-              images,
-            });
-            navigate("/agent/detailed-entry", { replace: false });
+            try {
+              await saveFieldEntry({
+                propertyId,
+                agentName,
+                village,
+                tehsil,
+                district,
+                landType,
+                propertySize: `${propertySizeValue.trim()} ${propertySizeUnit}`.trim(),
+                roadAccess,
+                waterAvailability,
+                ownerName: ownerName.trim() || undefined,
+                ownerContact: ownerContact.trim() || undefined,
+                images,
+              });
+              navigate("/agent/detailed-entry", { replace: false });
+            } catch (error) {
+              console.error("Unable to save agent step 1", error);
+            }
           }}
         >
           <div className="rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]/40 px-3 py-2">
-            <p className="text-xs font-semibold text-[var(--b1)]">Property ID</p>
+            <p className="text-xs font-semibold text-[var(--b1)]">
+              {t("agentPanel.fieldEntry.propertyId")}
+            </p>
             <p className="text-sm text-[var(--b1)]">{propertyId}</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <LabeledInput
-              label="Agent Name"
+              label={t("agentPanel.form.agentName")}
               value={agentName}
               onChange={setAgentName}
               required
             />
             <LabeledInput
-              label="Village"
+              label={t("agentPanel.form.village")}
               value={village}
               onChange={setVillage}
               required
             />
-            <LabeledInput label="Tehsil" value={tehsil} onChange={setTehsil} required />
             <LabeledInput
-              label="District"
+              label={t("agentPanel.form.tehsil")}
+              value={tehsil}
+              onChange={setTehsil}
+              required
+            />
+            <LabeledInput
+              label={t("agentPanel.form.district")}
               value={district}
               onChange={setDistrict}
               required
             />
             <SelectInput
-              label="Soil Type"
+              label={t("agentPanel.form.soilType")}
               value={landType}
               onChange={setLandType}
               options={[...SOIL_TYPE_OPTIONS]}
+              formatOption={translateSoilType}
               required
             />
             <div>
               <div className="mb-1 flex items-center justify-between text-sm font-medium">
-                <label htmlFor="property-size-value">Total land area</label>
-                <span>Required</span>
+                <label htmlFor="property-size-value">
+                  {t("agentPanel.fieldEntryPage.totalLandArea")}
+                </label>
+                <span>{t("common.required")}</span>
               </div>
               <div className="grid grid-cols-[2fr_1fr] gap-2">
                 <Input
@@ -165,34 +182,42 @@ const AgentFieldEntryPage: React.FC = () => {
                 >
                   {PROPERTY_SIZE_UNITS.map((unit) => (
                     <option key={unit} value={unit}>
-                      {unit}
+                      {unit === "Acre"
+                        ? t("agentPanel.fieldEntryPage.acre")
+                        : t("agentPanel.fieldEntryPage.hectare")}
                     </option>
                   ))}
                 </select>
               </div>
             </div>
             <SelectInput
-              label="Road Access"
+              label={t("agentPanel.form.roadAccess")}
               value={roadAccess}
               onChange={setRoadAccess}
               options={["", "yes", "no"]}
+              formatOption={(v) =>
+                v === "yes" ? t("postProperty.common.yes") : v === "no" ? t("postProperty.common.no") : v
+              }
               required
             />
             <SelectInput
-              label="Water Availability"
+              label={t("agentPanel.form.waterAvailability")}
               value={waterAvailability}
               onChange={setWaterAvailability}
               options={["", "yes", "no"]}
+              formatOption={(v) =>
+                v === "yes" ? t("postProperty.common.yes") : v === "no" ? t("postProperty.common.no") : v
+              }
               required
             />
             <LabeledInput
-              label="Owner Name"
+              label={t("agentPanel.form.ownerName")}
               value={ownerName}
               onChange={setOwnerName}
               required
             />
             <LabeledInput
-              label="Owner Contact"
+              label={t("agentPanel.form.ownerContact")}
               value={ownerContact}
               onChange={(value) => setOwnerContact(value.replace(/\D/g, "").slice(0, 10))}
               required
@@ -204,7 +229,7 @@ const AgentFieldEntryPage: React.FC = () => {
               type="submit"
               className="w-full sm:w-auto rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] hover:bg-[var(--b1)] transition"
             >
-              Save & Continue
+              {t("agentPanel.fieldEntryPage.saveContinue")}
             </Button>
           </div>
         </form>
@@ -240,14 +265,19 @@ const SelectInput = ({
   value,
   onChange,
   options,
+  formatOption,
   required,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   options: string[];
+  formatOption?: (value: string) => string;
   required?: boolean;
-}) => (
+}) => {
+  const { t } = useTranslation();
+
+  return (
   <div>
     <label className="mb-1 block text-sm font-medium">{label}</label>
     <select
@@ -258,11 +288,12 @@ const SelectInput = ({
     >
       {options.map((option, index) => (
         <option key={`${label}-${option || "select"}`} value={option} disabled={required && index === 0}>
-          {option ? option : "Select option"}
+          {option ? (formatOption?.(option) ?? option) : t("agentPanel.fieldEntry.selectOption")}
         </option>
       ))}
     </select>
   </div>
-);
+  );
+};
 
 export default AgentFieldEntryPage;

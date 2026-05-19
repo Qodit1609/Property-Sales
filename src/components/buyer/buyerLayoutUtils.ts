@@ -1,56 +1,34 @@
+import type { TFunction } from "i18next";
+
 /** Desktop buyer sidebar widths (px). Must match BuyerLayout spacer + sidebar. */
 export const BUYER_SIDEBAR_WIDTH_EXPANDED = 280;
 export const BUYER_SIDEBAR_WIDTH_COLLAPSED = 72;
 
-const DEFAULT_SUB =
-  "Track saved properties and activity at a glance.";
+const ROUTE_TOP_BAR_KEY: Record<string, string> = {
+  "/buyer": "overview",
+  "/buyer/dashboard": "overview",
+  "/buyer/overview": "overview",
+  "/buyer/wishlist": "wishlist",
+  "/buyer/compare": "compare",
+  "/buyer/cart": "cart",
+  "/buyer/account": "account",
+  "/buyer/activity": "activity",
+  "/buyer/enquiries": "enquiries",
+  "/buyer/testimonial": "testimonial",
+  "/buyer/notifications": "notifications",
+};
 
 /**
  * Top overview strip title/subtitle from the current buyer route (pathname from react-router).
  */
-export function buyerTopBarFromPath(pathname: string): {
-  title: string;
-  subtitle: string;
-} {
+export function buyerTopBarFromPath(
+  pathname: string,
+  t: TFunction
+): { title: string; subtitle: string } {
   const p = pathname.replace(/\/$/, "") || "/";
-
-  const map: Record<string, { title: string; subtitle: string }> = {
-    "/buyer": { title: "Overview", subtitle: DEFAULT_SUB },
-    "/buyer/dashboard": { title: "Overview", subtitle: DEFAULT_SUB },
-    "/buyer/overview": { title: "Overview", subtitle: DEFAULT_SUB },
-    "/buyer/wishlist": {
-      title: "Wishlist",
-      subtitle: "Properties you saved for later.",
-    },
-    "/buyer/compare": {
-      title: "Compare",
-      subtitle: "Side-by-side listing comparison.",
-    },
-    "/buyer/cart": {
-      title: "Cart",
-      subtitle: "Listings you plan to enquire about.",
-    },
-    "/buyer/account": {
-      title: "Account",
-      subtitle: "Your profile and preferences.",
-    },
-    "/buyer/activity": {
-      title: "Activity",
-      subtitle: "Recent views and interactions.",
-    },
-    "/buyer/enquiries": {
-      title: "Enquiries",
-      subtitle: "Status of your seller and agent conversations.",
-    },
-    "/buyer/testimonial": {
-      title: "Testimonial",
-      subtitle: "Share your experience with buyers and sellers.",
-    },
-    "/buyer/notifications": {
-      title: "Notifications",
-      subtitle: "Alerts and updates for your account.",
-    },
+  const key = ROUTE_TOP_BAR_KEY[p] ?? "fallback";
+  return {
+    title: t(`buyerPanel.topBar.${key}.title`),
+    subtitle: t(`buyerPanel.topBar.${key}.subtitle`),
   };
-
-  return map[p] ?? { title: "Buyer overview", subtitle: DEFAULT_SUB };
 }

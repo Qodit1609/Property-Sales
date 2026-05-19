@@ -1,4 +1,9 @@
 import React, { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  translateBuyerActivityTitle,
+  translateBuyerActivityType,
+} from "../../lib/buyerI18n";
 import { Search, TrendingUp, Sparkles, Heart, Scale, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
@@ -10,6 +15,7 @@ import { Input, Button } from "@/components/common";
 import { addSavedSearch, removeSavedSearch } from "../../features/buyer/buyerSlice";
 
 const BuyerDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { data, loading } = useAppSelector((state) => state.properties);
   const wishlistIds = useAppSelector((s) => s.buyer.wishlistIds);
@@ -53,7 +59,7 @@ const BuyerDashboard: React.FC = () => {
         <section className="grid gap-3 sm:grid-cols-3">
           <div className="rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] p-4 shadow-sm">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-              Wishlist
+              {t("buyerPanel.dashboard.wishlist")}
             </p>
             <div className="mt-1 flex items-center gap-2">
               <Heart className="h-5 w-5 text-[var(--b1-mid)]" />
@@ -63,12 +69,12 @@ const BuyerDashboard: React.FC = () => {
               to="/buyer/wishlist"
               className="mt-2 inline-block text-[11px] font-medium text-[var(--b1-mid)] hover:text-[var(--b1)]"
             >
-              View list →
+              {t("buyerPanel.dashboard.viewList")}
             </Link>
           </div>
           <div className="rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] p-4 shadow-sm">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-              Compare
+              {t("buyerPanel.dashboard.compare")}
             </p>
             <div className="mt-1 flex items-center gap-2">
               <Scale className="h-5 w-5 text-[var(--b1-mid)]" />
@@ -78,12 +84,12 @@ const BuyerDashboard: React.FC = () => {
               to="/buyer/compare"
               className="mt-2 inline-block text-[11px] font-medium text-[var(--b1-mid)] hover:text-[var(--b1)]"
             >
-              Open table →
+              {t("buyerPanel.dashboard.openCompare")}
             </Link>
           </div>
           <div className="rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] p-4 shadow-sm">
             <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-              Cart
+              {t("buyerPanel.dashboard.cart")}
             </p>
             <div className="mt-1 flex items-center gap-2">
               <ShoppingCart className="h-5 w-5 text-[var(--b1-mid)]" />
@@ -93,7 +99,7 @@ const BuyerDashboard: React.FC = () => {
               to="/buyer/cart"
               className="mt-2 inline-block text-[11px] font-medium text-[var(--b1-mid)] hover:text-[var(--b1)]"
             >
-              Go to cart →
+              {t("buyerPanel.dashboard.goToCart")}
             </Link>
           </div>
         </section>
@@ -103,13 +109,13 @@ const BuyerDashboard: React.FC = () => {
             <div>
               <p className="inline-flex items-center gap-1 rounded-full bg-[var(--white)] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--b1-mid)] ring-1 ring-[var(--b2)]">
                 <Sparkles className="h-3 w-3" />
-                Curated inventory
+                {t("buyerPanel.dashboard.curatedInventory")}
               </p>
               <h1 className="mt-3 text-xl font-semibold text-[var(--b1)] md:text-2xl">
-                Discover verified land, farmhouse & agri resort deals
+                {t("buyerPanel.dashboard.heroTitle")}
               </h1>
               <p className="mt-1 text-[11px] text-[var(--muted)] md:text-xs">
-                Search, shortlist, compare and track visits — built for serious buyers.
+                {t("buyerPanel.dashboard.heroSubtitle")}
               </p>
             </div>
           </div>
@@ -121,7 +127,7 @@ const BuyerDashboard: React.FC = () => {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by village, highway, landmark or project name"
+                placeholder={t("buyerPanel.dashboard.searchPlaceholder")}
                 className="w-full rounded-2xl border border-[var(--b2)] bg-[var(--white)] px-9 py-2.5 text-xs text-[var(--b1)] placeholder:text-[var(--muted)]/70 shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
               />
             </div>
@@ -130,7 +136,7 @@ const BuyerDashboard: React.FC = () => {
                 type="text"
                 value={saveLabel}
                 onChange={(e) => setSaveLabel(e.target.value)}
-                placeholder="Label for saved search (optional)"
+                placeholder={t("buyerPanel.dashboard.saveSearchLabel")}
                 className="max-w-xs flex-1 rounded-xl border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-xs"
               />
               <Button
@@ -138,7 +144,7 @@ const BuyerDashboard: React.FC = () => {
                 onClick={() => {
                   dispatch(
                     addSavedSearch({
-                      label: saveLabel.trim() || query.trim() || "Saved search",
+                      label: saveLabel.trim() || query.trim() || t("buyerPanel.dashboard.savedSearchDefault"),
                       filter: { query, pathname: "/buyer/dashboard" },
                     })
                   );
@@ -146,7 +152,7 @@ const BuyerDashboard: React.FC = () => {
                 }}
                 className="rounded-full bg-[var(--b1)] px-4 py-2 text-xs text-[var(--fg)]"
               >
-                Save search
+                {t("buyerPanel.dashboard.saveSearch")}
               </Button>
             </div>
           </div>
@@ -154,7 +160,7 @@ const BuyerDashboard: React.FC = () => {
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <div className="inline-flex items-center gap-1 rounded-full bg-[var(--white)] px-2.5 py-1 text-[10px] text-[var(--b1-mid)] ring-1 ring-[var(--b2)]">
               <TrendingUp className="h-3 w-3" />
-              Trending corridors:
+              {t("buyerPanel.dashboard.trendingCorridors")}
             </div>
             {trendingLocations.map((loc) => (
               <Button
@@ -171,7 +177,7 @@ const BuyerDashboard: React.FC = () => {
 
         {savedSearches.length > 0 && (
           <section className="rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] p-4 shadow-sm">
-            <h2 className="text-sm font-semibold text-[var(--b1)]">Saved searches</h2>
+            <h2 className="text-sm font-semibold text-[var(--b1)]">{t("buyerPanel.dashboard.savedSearches")}</h2>
             <ul className="mt-3 space-y-2">
               {savedSearches.map((s) => (
                 <li
@@ -194,7 +200,7 @@ const BuyerDashboard: React.FC = () => {
                         if (typeof q === "string") setQuery(q);
                       }}
                     >
-                      Reapply
+                      {t("buyerPanel.dashboard.reapply")}
                     </Button>
                     <Button
                       type="button"
@@ -202,7 +208,7 @@ const BuyerDashboard: React.FC = () => {
                       className="rounded-full px-2 py-1 text-[10px] text-[var(--error)]"
                       onClick={() => dispatch(removeSavedSearch(s.id))}
                     >
-                      Remove
+                      {t("buyerPanel.dashboard.remove")}
                     </Button>
                   </div>
                 </li>
@@ -213,12 +219,14 @@ const BuyerDashboard: React.FC = () => {
 
         {activity.length > 0 && (
           <section className="rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] p-4 shadow-sm">
-            <h2 className="text-sm font-semibold text-[var(--b1)]">Recent activity</h2>
+            <h2 className="text-sm font-semibold text-[var(--b1)]">{t("buyerPanel.dashboard.recentActivity")}</h2>
             <ul className="mt-3 space-y-2 text-xs text-[var(--muted)]">
               {activity.slice(0, 6).map((a) => (
                 <li key={a.id} className="flex justify-between gap-2 border-b border-[var(--b2-soft)]/80 pb-2 last:border-0">
-                  <span className="text-[var(--b1)]">{a.title}</span>
-                  <span className="shrink-0 uppercase tracking-wide text-[10px]">{a.type}</span>
+                  <span className="text-[var(--b1)]">{translateBuyerActivityTitle(a.title)}</span>
+                  <span className="shrink-0 uppercase tracking-wide text-[10px]">
+                    {translateBuyerActivityType(a.type)}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -226,7 +234,7 @@ const BuyerDashboard: React.FC = () => {
               to="/buyer/activity"
               className="mt-3 inline-block text-[11px] font-medium text-[var(--b1-mid)] hover:text-[var(--b1)]"
             >
-              Full history →
+              {t("buyerPanel.dashboard.fullHistory")}
             </Link>
           </section>
         )}
@@ -236,10 +244,10 @@ const BuyerDashboard: React.FC = () => {
         <section className="space-y-3">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-sm font-semibold text-[var(--b1)]">
-              Matching properties
+              {t("buyerPanel.dashboard.matchingProperties")}
             </h2>
             <p className="text-[11px] text-[var(--muted)]">
-              {filtered.length} of {data.length} listings shown
+              {t("buyerPanel.dashboard.listingsShown", { shown: filtered.length, total: data.length })}
             </p>
           </div>
 
@@ -263,7 +271,7 @@ const BuyerDashboard: React.FC = () => {
 
         <section className="space-y-3">
           <h2 className="text-sm font-semibold text-[var(--b1)]">
-            Recommendations
+            {t("buyerPanel.dashboard.recommendations")}
           </h2>
           <PropertyRecommendations />
         </section>

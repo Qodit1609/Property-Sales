@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/common";
 import { ToastStack, type ToastMessage } from "@/components/propertyPost/Toast";
 import AdminLayout from "@/components/admin/AdminLayout";
 import api from "@/lib/apiClient";
+import CustomAlert from "@/components/common/CustomAlert";
 
 type MediaImage = {
   id: string;
@@ -86,10 +88,12 @@ const formatDate = (value?: string) => {
 };
 
 const AdminImagesPage: React.FC = () => {
+  const { t } = useTranslation();
   const [images, setImages] = useState<MediaImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [pendingDeleteImage, setPendingDeleteImage] = useState<MediaImage | null>(null);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   const pushToast = useCallback((toast: Omit<ToastMessage, "id">) => {
@@ -114,14 +118,14 @@ const AdminImagesPage: React.FC = () => {
     } catch (error) {
       pushToast({
         kind: "error",
-        title: "Load failed",
-        detail: error instanceof Error ? error.message : "Unable to fetch images",
+        title: t("adminPanel.images.page.loadFailed"),
+        detail: error instanceof Error ? error.message : t("adminPanel.images.page.loadFailed"),
       });
       setImages([]);
     } finally {
       setLoading(false);
     }
-  }, [pushToast]);
+  }, [pushToast, t]);
 
   useEffect(() => {
     void loadImages();
@@ -140,13 +144,13 @@ const AdminImagesPage: React.FC = () => {
       await api.post("/media/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      pushToast({ kind: "success", title: "Image uploaded" });
+      pushToast({ kind: "success", title: t("adminPanel.images.page.uploadSuccess") });
       await loadImages();
     } catch (error) {
       pushToast({
         kind: "error",
-        title: "Upload failed",
-        detail: error instanceof Error ? error.message : "Unable to upload image",
+        title: t("adminPanel.images.page.uploadFailed"),
+        detail: error instanceof Error ? error.message : t("adminPanel.images.page.uploadFailed"),
       });
     } finally {
       setUploading(false);
@@ -154,19 +158,16 @@ const AdminImagesPage: React.FC = () => {
   };
 
   const onDelete = async (image: MediaImage) => {
-    const confirmed = window.confirm("Delete this image permanently?");
-    if (!confirmed) return;
-
     setDeletingId(image.id);
     try {
       await api.delete(`/media/${encodeURIComponent(image.id)}`);
-      pushToast({ kind: "success", title: "Image deleted" });
+      pushToast({ kind: "success", title: t("adminPanel.images.page.deleteSuccess") });
       await loadImages();
     } catch (error) {
       pushToast({
         kind: "error",
-        title: "Delete failed",
-        detail: error instanceof Error ? error.message : "Unable to delete image",
+        title: t("adminPanel.images.page.deleteFailed"),
+        detail: error instanceof Error ? error.message : t("adminPanel.images.page.deleteFailed"),
       });
     } finally {
       setDeletingId(null);
@@ -174,14 +175,18 @@ const AdminImagesPage: React.FC = () => {
   };
 
   return (
-    <AdminLayout title="Images">
+    <AdminLayout title={t("adminPanel.images.page.heading")}>
       <ToastStack toasts={toasts} onDismiss={dismissToast} />
 
       <section className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm sm:p-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-base font-semibold text-[var(--b1)]">Images</h3>
-            <p className="mt-1 text-sm text-[var(--muted)]">Manage uploaded media images.</p>
+            <h3 className="text-base font-semibold text-[var(--b1)]">
+              {t("adminPanel.images.page.heading")}
+            </h3>
+            <p className="mt-1 text-sm text-[var(--muted)]">
+              {t("adminPanel.images.page.subtitle")}
+            </p>
           </div>
           <label>
             <input
@@ -194,16 +199,16 @@ const AdminImagesPage: React.FC = () => {
             <span>
               <Button type="button" variant="outline" size="sm" disabled={uploading}>
                 <Upload className="mr-1 h-4 w-4" />
-                {uploading ? "Uploading..." : "Add Image"}
+                {uploading ? t("adminPanel.images.page.uploading") : t("adminPanel.images.page.addImage")}
               </Button>
             </span>
           </label>
         </div>
 
         {loading ? (
-          <p className="mt-4 text-sm text-[var(--muted)]">Loading images...</p>
+          <p className="mt-4 text-sm text-[var(--muted)]">{t("adminPanel.images.page.loading")}</p>
         ) : images.length === 0 ? (
-          <p className="mt-4 text-sm text-[var(--muted)]">No images found.</p>
+          <p className="mt-4 text-sm text-[var(--muted)]">{t("adminPanel.images.page.empty")}</p>
         ) : (
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {images.map((image) => {
@@ -214,19 +219,35 @@ const AdminImagesPage: React.FC = () => {
                   className="overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--white)]"
                 >
                   <div className="aspect-[4/3] w-full overflow-hidden bg-[var(--b2-soft)]/40">
-                    <img src={image.url} alt={image.name || "Media"} className="h-full w-full object-cover" />
+                    <img
+                      src={image.url}
+                      alt={image.name || t("adminPanel.images.page.mediaAlt")}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
 
                   <div className="space-y-1 p-3">
                     {image.name ? <p className="line-clamp-1 text-sm font-medium text-[var(--b1)]">{image.name}</p> : null}
-                    {image.tag ? <p className="text-xs text-[var(--muted)]">Tag: {image.tag}</p> : null}
-                    {image.format ? <p className="text-xs text-[var(--muted)]">Format: {image.format}</p> : null}
-                    {image.width && image.height ? (
+                    {image.tag ? (
                       <p className="text-xs text-[var(--muted)]">
-                        Size: {image.width} x {image.height}
+                        {t("adminPanel.images.page.tag")}: {image.tag}
                       </p>
                     ) : null}
-                    {createdAt ? <p className="text-xs text-[var(--muted)]">Created: {createdAt}</p> : null}
+                    {image.format ? (
+                      <p className="text-xs text-[var(--muted)]">
+                        {t("adminPanel.images.page.format")}: {image.format}
+                      </p>
+                    ) : null}
+                    {image.width && image.height ? (
+                      <p className="text-xs text-[var(--muted)]">
+                        {t("adminPanel.images.page.size")}: {image.width} x {image.height}
+                      </p>
+                    ) : null}
+                    {createdAt ? (
+                      <p className="text-xs text-[var(--muted)]">
+                        {t("adminPanel.images.page.created")}: {createdAt}
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="border-t border-[var(--b2)] p-3">
@@ -236,10 +257,12 @@ const AdminImagesPage: React.FC = () => {
                       variant="outline"
                       className="w-full text-red-600 hover:text-red-700"
                       disabled={deletingId === image.id}
-                      onClick={() => void onDelete(image)}
+                      onClick={() => setPendingDeleteImage(image)}
                     >
                       <Trash2 className="mr-1 h-4 w-4" />
-                      {deletingId === image.id ? "Deleting..." : "Delete"}
+                      {deletingId === image.id
+                        ? t("adminPanel.images.page.deleting")
+                        : t("common.delete")}
                     </Button>
                   </div>
                 </article>
@@ -248,6 +271,18 @@ const AdminImagesPage: React.FC = () => {
           </div>
         )}
       </section>
+      <CustomAlert
+        open={Boolean(pendingDeleteImage)}
+        title={t("adminPanel.images.deleteTitle")}
+        message={t("adminPanel.images.deleteMessage")}
+        showCancel
+        onCancel={() => setPendingDeleteImage(null)}
+        onConfirm={() => {
+          if (!pendingDeleteImage) return;
+          void onDelete(pendingDeleteImage);
+          setPendingDeleteImage(null);
+        }}
+      />
     </AdminLayout>
   );
 };

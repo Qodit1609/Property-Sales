@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Upload, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import {
   addImages,
@@ -20,6 +21,7 @@ import {
 } from "../../lib/propertyImageUpload";
 
 export default function SellerDashboardImageUploader() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const media = useAppSelector((s) => s.postProperty.media);
   const [progressMap, setProgressMap] = useState<Record<string, number>>({});
@@ -35,7 +37,7 @@ export default function SellerDashboardImageUploader() {
 
     const remaining = MAX_PROPERTY_IMAGES - media.images.length;
     if (remaining <= 0) {
-      dispatch(setMediaUploadError(`Only ${MAX_PROPERTY_IMAGES} images are allowed.`));
+      dispatch(setMediaUploadError(t("sellerPanel.imageUploader.maxImages", { max: MAX_PROPERTY_IMAGES })));
       return;
     }
 
@@ -57,12 +59,12 @@ export default function SellerDashboardImageUploader() {
         setProgressMap((prev) => ({ ...prev, [key]: 0 }));
 
         if (!ALLOWED_PROPERTY_IMAGE_TYPES.has(file.type)) {
-          failures.push(`${file.name}: invalid file type`);
+          failures.push(t("sellerPanel.imageUploader.invalidType", { file: file.name }));
           setProgressMap((prev) => ({ ...prev, [key]: 100 }));
           continue;
         }
         if (file.size > MAX_PROPERTY_IMAGE_FILE_SIZE_BYTES) {
-          failures.push(`${file.name}: file size exceeds 10MB`);
+          failures.push(t("sellerPanel.imageUploader.fileTooLarge", { file: file.name }));
           setProgressMap((prev) => ({ ...prev, [key]: 100 }));
           continue;
         }
@@ -70,7 +72,7 @@ export default function SellerDashboardImageUploader() {
         try {
           const fileHash = await sha256Hex(file);
           if (existingHashes.has(fileHash) || batchHashes.has(fileHash)) {
-            failures.push(`${file.name}: duplicate skipped`);
+            failures.push(t("sellerPanel.imageUploader.duplicateSkipped", { file: file.name }));
             setProgressMap((prev) => ({ ...prev, [key]: 100 }));
             continue;
           }
@@ -84,7 +86,7 @@ export default function SellerDashboardImageUploader() {
             file: uploadFile,
             tag: "property",
             name: file.name,
-            altText: "Property image",
+            altText: t("sellerPanel.imageUploader.propertyImageAlt"),
             onUploadProgress: (percent: number) =>
               setProgressMap((prev) => ({ ...prev, [key]: percent })),
           });
@@ -101,7 +103,8 @@ export default function SellerDashboardImageUploader() {
           batchHashes.add(fileHash);
           setProgressMap((prev) => ({ ...prev, [key]: 100 }));
         } catch (error: unknown) {
-          const detail = error instanceof Error ? error.message : "upload failed";
+          const detail =
+            error instanceof Error ? error.message : t("sellerPanel.imageUploader.uploadFailed");
           failures.push(`${file.name}: ${detail}`);
           setProgressMap((prev) => ({ ...prev, [key]: 100 }));
         }
@@ -116,7 +119,10 @@ export default function SellerDashboardImageUploader() {
       if (list.length > queue.length) {
         dispatch(
           setMediaUploadError(
-            `${failures.join("; ")}${failures.length ? "; " : ""}${list.length - queue.length} file(s) skipped due to ${MAX_PROPERTY_IMAGES}-image limit`
+            `${failures.join("; ")}${failures.length ? "; " : ""}${t("sellerPanel.imageUploader.skippedLimit", {
+              count: list.length - queue.length,
+              max: MAX_PROPERTY_IMAGES,
+            })}`
           )
         );
       }
@@ -130,28 +136,29 @@ export default function SellerDashboardImageUploader() {
     <section className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-5 shadow-sm">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold text-[var(--b1)]">Quick Image Upload</h2>
-          <p className="text-xs text-[var(--muted)]">
-            Upload from dashboard. These images are used in post-property media step.
-          </p>
+          <h2 className="text-base font-semibold text-[var(--b1)]">{t("sellerPanel.imageUploader.title")}</h2>
+          <p className="text-xs text-[var(--muted)]">{t("sellerPanel.imageUploader.subtitle")}</p>
         </div>
         <Link
           to="/post-property/media"
           className="inline-flex items-center gap-2 text-sm font-medium text-[var(--b1-mid)] hover:underline"
         >
-          Open full media step
+          {t("sellerPanel.imageUploader.openMediaStep")}
         </Link>
       </div>
 
       <div className="mt-4">
-        <p className="text-xs text-[var(--muted)]">JPG/PNG/WEBP/GIF, max 10MB, up to 5 images.</p>
+        <p className="text-xs text-[var(--muted)]">{t("sellerPanel.imageUploader.hint")}</p>
         <label
           className={`mt-3 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold text-white transition ${
             canUpload ? "bg-[var(--b1-mid)] hover:bg-[var(--b1)]" : "bg-[var(--muted)]/50"
           }`}
         >
           <Upload className="h-4 w-4" />
-          Select images ({media.images.length}/{MAX_PROPERTY_IMAGES})
+          {t("sellerPanel.imageUploader.selectImages", {
+            current: media.images.length,
+            max: MAX_PROPERTY_IMAGES,
+          })}
           <input
             type="file"
             accept="image/jpeg,image/jpg,image/png,image/webp,image/gif"
@@ -175,7 +182,7 @@ export default function SellerDashboardImageUploader() {
 
       {Object.keys(progressMap).length > 0 && (
         <div className="mt-4 rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)]/30 p-3">
-          <p className="text-xs font-semibold text-[var(--b1)]">Uploading</p>
+          <p className="text-xs font-semibold text-[var(--b1)]">{t("sellerPanel.imageUploader.uploading")}</p>
           <div className="mt-2 space-y-2">
             {Object.entries(progressMap).map(([name, percent]) => (
               <div key={name}>
@@ -197,12 +204,18 @@ export default function SellerDashboardImageUploader() {
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {media.images.map((img) => (
           <div key={img.id} className="relative overflow-hidden rounded-xl border border-[var(--b2)]">
-            <img src={img.url} alt={img.fileName ?? "Property"} className="h-24 w-full object-cover" />
+            <img
+              src={img.url}
+              alt={img.fileName ?? t("sellerPanel.imageUploader.propertyAlt")}
+              className="h-24 w-full object-cover"
+            />
             <button
               type="button"
               onClick={() => dispatch(removeImage(img.id))}
               className="absolute right-1 top-1 inline-flex h-7 w-7 items-center justify-center rounded-md bg-black/70 text-white hover:bg-black/85"
-              aria-label={`Remove image ${img.fileName ?? ""}`.trim()}
+              aria-label={t("sellerPanel.imageUploader.removeImage", {
+                name: img.fileName ?? "",
+              }).trim()}
             >
               <X className="h-4 w-4" />
             </button>
@@ -210,11 +223,10 @@ export default function SellerDashboardImageUploader() {
         ))}
         {!media.images.length && (
           <div className="col-span-2 rounded-lg border border-[var(--b2)] bg-[var(--b2-soft)]/40 p-3 text-xs text-[var(--muted)] sm:col-span-3 lg:col-span-5">
-            No images uploaded yet.
+            {t("sellerPanel.imageUploader.empty")}
           </div>
         )}
       </div>
     </section>
   );
 }
-

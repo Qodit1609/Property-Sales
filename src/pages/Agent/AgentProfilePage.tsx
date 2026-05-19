@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { Input, Button } from "@/components/common";
 import { useAgentProfileLocal } from "./useAgentProfileLocal";
@@ -34,6 +35,7 @@ async function fileToOptimizedDataUrl(file: File, maxEdge = 480): Promise<string
 }
 
 const AgentProfilePage: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const { profile, saveProfile, saveError } = useAgentProfileLocal(user?.email);
 
@@ -82,16 +84,18 @@ const AgentProfilePage: React.FC = () => {
       setProfilePhotoUrl(optimizedUrl);
       setSaveMessage(null);
     } catch {
-      setSaveMessage("Unable to process image. Try another file.");
+      setSaveMessage(t("agentPanel.profilePage.imageError"));
     }
   };
 
   return (
     <section className="space-y-6 px-4 sm:px-6 lg:px-8 py-6">
       <div>
-        <h1 className="text-xl sm:text-2xl font-semibold text-[var(--b1)]">Agent Profile</h1>
+        <h1 className="text-xl sm:text-2xl font-semibold text-[var(--b1)]">
+          {t("agentPanel.profilePage.title")}
+        </h1>
         <p className="mt-1 text-xs text-[var(--muted)]">
-          Update your profile details and assigned area.
+          {t("agentPanel.profilePage.subtitle")}
         </p>
       </div>
 
@@ -107,7 +111,11 @@ const AgentProfilePage: React.FC = () => {
               />
               <div className="absolute inset-[3px] overflow-hidden rounded-full border border-[var(--b2)] bg-[var(--white)]">
                 {profilePhotoUrl ? (
-                  <img src={profilePhotoUrl} alt="Agent profile" className="h-full w-full object-cover" />
+                  <img
+                    src={profilePhotoUrl}
+                    alt={t("agentPanel.profilePage.profileAlt")}
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <span className="flex h-full w-full items-center justify-center font-serif text-base font-semibold text-[var(--b1-mid)]">
                     {initials}
@@ -119,8 +127,12 @@ const AgentProfilePage: React.FC = () => {
               </div>
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-[var(--b1)]">{agentName || "Agent"}</p>
-              <p className="text-xs text-[var(--muted)]">Profile preview</p>
+              <p className="truncate text-sm font-semibold text-[var(--b1)]">
+                {agentName || t("agentPanel.profilePage.agentFallback")}
+              </p>
+              <p className="text-xs text-[var(--muted)]">
+                {t("agentPanel.profilePage.profilePreview")}
+              </p>
             </div>
           </div>
         </div>
@@ -139,12 +151,14 @@ const AgentProfilePage: React.FC = () => {
               profilePhotoUrl,
             });
             setIsSaving(false);
-            setSaveMessage(ok ? "Profile saved successfully." : "Profile saved with limited data.");
+            setSaveMessage(
+              ok ? t("agentPanel.profilePage.savedSuccess") : t("agentPanel.profilePage.savedLimited")
+            );
           }}
         >
           <div>
             <label className="mb-1 block text-sm font-medium" htmlFor="profilePhoto">
-              Profile Image
+              {t("agentPanel.profilePage.profileImage")}
             </label>
             <input
               id="profilePhoto"
@@ -158,7 +172,7 @@ const AgentProfilePage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="mb-1 block text-sm font-medium" htmlFor="agentName">
-                Agent Name
+                {t("agentPanel.profilePage.agentName")}
               </label>
               <Input
                 id="agentName"
@@ -173,7 +187,7 @@ const AgentProfilePage: React.FC = () => {
                 className="mb-1 block text-sm font-medium"
                 htmlFor="mobileNumber"
               >
-                Mobile Number
+                {t("agentPanel.profilePage.mobileNumber")}
               </label>
               <Input
                 id="mobileNumber"
@@ -181,7 +195,7 @@ const AgentProfilePage: React.FC = () => {
                 onChange={(e) => setMobileNumber(e.target.value)}
                 inputMode="numeric"
                 className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
-                placeholder="Required"
+                placeholder={t("agentPanel.profilePage.required")}
                 required
               />
             </div>
@@ -190,7 +204,7 @@ const AgentProfilePage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="mb-1 block text-sm font-medium" htmlFor="email">
-                Email
+                {t("agentPanel.profilePage.email")}
               </label>
               <Input
                 id="email"
@@ -205,14 +219,14 @@ const AgentProfilePage: React.FC = () => {
                 className="mb-1 block text-sm font-medium"
                 htmlFor="assignedArea"
               >
-                Assigned Area
+                {t("agentPanel.profilePage.assignedArea")}
               </label>
               <Input
                 id="assignedArea"
                 value={assignedArea}
                 onChange={(e) => setAssignedArea(e.target.value)}
                 className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
-                placeholder="Village/Tehsil/District"
+                placeholder={t("agentPanel.profilePage.areaPlaceholder")}
               />
             </div>
           </div>
@@ -222,13 +236,13 @@ const AgentProfilePage: React.FC = () => {
               className="mb-1 block text-sm font-medium"
               htmlFor="basicSettings"
             >
-              Basic Settings
+              {t("agentPanel.profilePage.basicSettings")}
             </label>
             <div
               id="basicSettings"
               className="rounded-md border border-dashed border-[var(--b2)] bg-[var(--b2-soft)]/40 px-3 py-3 text-sm text-[var(--muted)]"
             >
-              Basic settings placeholder
+              {t("agentPanel.profilePage.basicSettingsPlaceholder")}
             </div>
           </div>
 
@@ -238,7 +252,7 @@ const AgentProfilePage: React.FC = () => {
               disabled={isSaving}
               className="rounded-md bg-[var(--b1-mid)] px-4 py-2 text-sm font-semibold text-[var(--fg)] hover:bg-[var(--b1)] transition"
             >
-              {isSaving ? "Saving..." : "Save"}
+              {isSaving ? t("agentPanel.profilePage.saving") : t("common.save")}
             </Button>
           </div>
           {saveMessage ? (

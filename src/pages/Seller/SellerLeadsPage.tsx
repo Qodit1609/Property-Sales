@@ -27,7 +27,7 @@ function SellerLeadsPage() {
         setPropertyLeads(leads);
       } catch (err) {
         if (!mounted) return;
-        const message = err instanceof Error ? err.message : "Failed to load leads.";
+        const message = err instanceof Error ? err.message : t("sellerPanel.leadsPage.loadError");
         setError(message);
       } finally {
         if (mounted) setLoading(false);
@@ -79,7 +79,7 @@ function SellerLeadsPage() {
         )
       );
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to delete row.";
+      const message = err instanceof Error ? err.message : t("sellerPanel.leadsPage.deleteError");
       setError(message);
     }
   };
@@ -93,7 +93,7 @@ function SellerLeadsPage() {
         )
       );
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to clear rows.";
+      const message = err instanceof Error ? err.message : t("sellerPanel.leadsPage.clearError");
       setError(message);
     }
   };
@@ -122,7 +122,7 @@ function SellerLeadsPage() {
       <div className="space-y-5">
         {loading && (
           <div className="rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] px-4 py-8 text-center text-[var(--muted)] shadow-sm">
-            Loading leads...
+            {t("sellerPanel.leadsPage.loading")}
           </div>
         )}
         {!loading && error && (
@@ -132,12 +132,12 @@ function SellerLeadsPage() {
         )}
         {!loading && !error && rows.length === 0 && (
           <div className="rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] px-4 py-8 text-center text-[var(--muted)] shadow-sm">
-            No approved properties found.
+            {t("sellerPanel.leadsPage.noApprovedProperties")}
           </div>
         )}
         {!loading && !error && rows.length > 0 && !hasLeads && (
           <div className="rounded-2xl border border-[var(--b2)]/80 bg-[var(--white)] px-4 py-8 text-center text-[var(--muted)] shadow-sm">
-            No leads found.
+            {t("sellerPanel.leadsPage.noLeads")}
           </div>
         )}
         {!loading &&

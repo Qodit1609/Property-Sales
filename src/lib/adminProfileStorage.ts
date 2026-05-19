@@ -1,5 +1,6 @@
 export type StoredAdminProfile = {
   profilePhotoUrl?: string | null;
+  phone?: string;
 };
 
 const profileKey = (identity: string | undefined) =>

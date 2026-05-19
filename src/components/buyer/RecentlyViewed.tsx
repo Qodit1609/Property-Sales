@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Clock3 } from "lucide-react";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import { useBuyerResolvedProperties } from "../../hooks/useBuyerResolvedProperties";
@@ -9,10 +10,9 @@ interface Props {
   className?: string;
 }
 
-const RecentlyViewed: React.FC<Props> = ({
-  title = "Recently viewed",
-  className = "",
-}) => {
+const RecentlyViewed: React.FC<Props> = ({ title, className = "" }) => {
+  const { t } = useTranslation();
+  const resolvedTitle = title ?? t("buyerPanel.recentlyViewed.title");
   const recentIds = useAppSelector((s) => s.buyer.recentIds);
   const { properties, loading } = useBuyerResolvedProperties(recentIds);
 
@@ -22,9 +22,11 @@ const RecentlyViewed: React.FC<Props> = ({
         className={`rounded-2xl border border-dashed border-[var(--b2)] bg-[var(--white)]/80 px-4 py-8 text-center ${className}`}
       >
         <Clock3 className="mx-auto mb-2 h-8 w-8 text-[var(--b2)]" />
-        <p className="text-sm font-medium text-[var(--b1)]">No recent views yet</p>
+        <p className="text-sm font-medium text-[var(--b1)]">
+          {t("buyerPanel.recentlyViewed.emptyTitle")}
+        </p>
         <p className="mt-1 text-xs text-[var(--muted)]">
-          Properties you open will appear here automatically.
+          {t("buyerPanel.recentlyViewed.emptyBody")}
         </p>
       </section>
     );
@@ -33,9 +35,11 @@ const RecentlyViewed: React.FC<Props> = ({
   return (
     <section className={`space-y-3 ${className}`}>
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold text-[var(--b1)]">{title}</h2>
+        <h2 className="text-sm font-semibold text-[var(--b1)]">{resolvedTitle}</h2>
         {loading && (
-          <span className="text-[10px] text-[var(--muted)]">Updating…</span>
+          <span className="text-[10px] text-[var(--muted)]">
+            {t("buyerPanel.recentlyViewed.updating")}
+          </span>
         )}
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">

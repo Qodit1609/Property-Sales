@@ -1,16 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import Modal from "../../components/Modal/Modal";
 import { Input, Button } from "@/components/common";
+import { fetchAgentLeadsAPI, type AgentLead } from "@/features/agent/agentAPI";
 
 type LeadStatus = "new" | "contacted" | "qualified" | "closed";
-
-type Lead = {
-  id: string;
-  name: string;
-  email: string;
-  property: string;
-  status: LeadStatus;
-};
 
 type Visit = {
   id: string;
@@ -20,25 +14,36 @@ type Visit = {
 };
 
 const AgentLeadsPage: React.FC = () => {
-  const [leads, setLeads] = useState<Lead[]>([
-    {
-      id: "L-1001",
-      name: "Rahul Sharma",
-      email: "rahul@example.com",
-      property: "Farmhouse - Goa",
-      status: "new",
-    },
-    {
-      id: "L-1002",
-      name: "Aakanshi",
-      email: "aakanshi@example.com",
-      property: "Resort - Lonavala",
-      status: "contacted",
-    },
-  ]);
+  const { t } = useTranslation();
+  const [leads, setLeads] = useState<AgentLead[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [visits, setVisits] = useState<Visit[]>([]);
-  const [scheduling, setScheduling] = useState<Lead | null>(null);
+  const [scheduling, setScheduling] = useState<AgentLead | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadLeads = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const rows = await fetchAgentLeadsAPI();
+        if (!mounted) return;
+        setLeads(rows);
+      } catch (err) {
+        if (!mounted) return;
+        const message = err instanceof Error ? err.message : t("agentPanel.leadsPage.failedLoad");
+        setError(message);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    loadLeads();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const activeCount = useMemo(
     () => leads.filter((l) => l.status !== "closed").length,
@@ -50,10 +55,10 @@ const AgentLeadsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold text-[var(--b1)]">
-            Leads Management
+            {t("agentPanel.leadsPage.title")}
           </h1>
           <p className="mt-1 text-xs text-[var(--muted)]">
-            {activeCount} active leads
+            {t("agentPanel.leadsPage.activeCount", { count: activeCount })}
           </p>
         </div>
       </div>
@@ -62,14 +67,14 @@ const AgentLeadsPage: React.FC = () => {
         <table className="min-w-[860px] w-full text-sm">
           <thead className="bg-[var(--b2-soft)] text-[var(--b1)]">
             <tr>
-              <th className="px-4 py-3 text-left font-semibold">Lead</th>
-              <th className="px-4 py-3 text-left font-semibold">Property</th>
-              <th className="px-4 py-3 text-left font-semibold">Status</th>
-              <th className="px-4 py-3 text-right font-semibold">Actions</th>
+              <th className="px-4 py-3 text-left font-semibold">{t("agentPanel.leadsPage.table.lead")}</th>
+              <th className="px-4 py-3 text-left font-semibold">{t("agentPanel.leadsPage.table.property")}</th>
+              <th className="px-4 py-3 text-left font-semibold">{t("agentPanel.leadsPage.table.status")}</th>
+              <th className="px-4 py-3 text-right font-semibold">{t("agentPanel.leadsPage.table.actions")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--b2)]">
-            {leads.map((l) => (
+            {!loading && !error && leads.map((l) => (
               <tr key={l.id} className="hover:bg-[var(--b2-soft)]">
                 <td className="px-4 py-3">
                   <p className="font-medium text-[var(--b1)]">{l.name}</p>
@@ -90,10 +95,10 @@ const AgentLeadsPage: React.FC = () => {
                     }
                     className="rounded-md border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
                   >
-                    <option value="new">New</option>
-                    <option value="contacted">Contacted</option>
-                    <option value="qualified">Qualified</option>
-                    <option value="closed">Closed</option>
+                    <option value="new">{t("agentPanel.leadsPage.status.new")}</option>
+                    <option value="contacted">{t("agentPanel.leadsPage.status.contacted")}</option>
+                    <option value="qualified">{t("agentPanel.leadsPage.status.qualified")}</option>
+                    <option value="closed">{t("agentPanel.leadsPage.status.closed")}</option>
                   </select>
                 </td>
                 <td className="px-4 py-3 text-right">
@@ -102,18 +107,38 @@ const AgentLeadsPage: React.FC = () => {
                     onClick={() => setScheduling(l)}
                     className="inline-flex items-center rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-1 text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)] transition"
                   >
-                    Schedule visit
+                    {t("agentPanel.leadsPage.scheduleVisit")}
                   </Button>
                 </td>
               </tr>
             ))}
-            {leads.length === 0 && (
+            {loading && (
               <tr>
                 <td
                   colSpan={4}
                   className="px-4 py-6 text-center text-sm text-[var(--muted)]"
                 >
-                  No leads found.
+                  {t("agentPanel.leadsPage.loading")}
+                </td>
+              </tr>
+            )}
+            {!loading && error && (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="px-4 py-6 text-center text-sm text-[var(--error)]"
+                >
+                  {error}
+                </td>
+              </tr>
+            )}
+            {!loading && !error && leads.length === 0 && (
+              <tr>
+                <td
+                  colSpan={4}
+                  className="px-4 py-6 text-center text-sm text-[var(--muted)]"
+                >
+                  {t("agentPanel.leadsPage.empty")}
                 </td>
               </tr>
             )}
@@ -124,7 +149,7 @@ const AgentLeadsPage: React.FC = () => {
       <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-sm">
         <div className="border-b border-[var(--b2)] px-4 py-3">
           <h2 className="text-sm font-semibold text-[var(--b1)]">
-            Scheduled visits
+            {t("agentPanel.leadsPage.scheduledVisits")}
           </h2>
           <p className="text-[11px] text-[var(--muted)]">
             Visits scheduled from leads.
@@ -161,7 +186,7 @@ const AgentLeadsPage: React.FC = () => {
       <Modal
         open={Boolean(scheduling)}
         onClose={() => setScheduling(null)}
-        title="Schedule Visit"
+        title={t("agentPanel.leadsPage.modal.scheduleTitle")}
       >
         {scheduling && (
           <ScheduleForm
@@ -191,10 +216,11 @@ function ScheduleForm({
   onCancel,
   onCreate,
 }: {
-  lead: Lead;
+  lead: AgentLead;
   onCancel: () => void;
   onCreate: (when: string, notes?: string) => void;
 }) {
+  const { t } = useTranslation();
   const [when, setWhen] = useState("");
   const [notes, setNotes] = useState("");
 
@@ -236,7 +262,7 @@ function ScheduleForm({
           id="notes"
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="Optional notes"
+          placeholder={t("agentPanel.leadsPage.modal.notesPlaceholder")}
           className="w-full rounded-md border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
           rows={3}
         />

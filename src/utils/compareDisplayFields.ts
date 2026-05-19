@@ -2,6 +2,7 @@ import type { Property } from "../features/properties/propertyType";
 import { formatSpecValue } from "./comparePropertySpecs";
 
 export type CompareSectionDef = {
+  id: string;
   title: string;
   rows: CompareRowDef[];
 };
@@ -43,6 +44,7 @@ export function resolveCompareRowValue(
 /** Ordered sections and rows — display-only; does not alter compare flattening. */
 export const COMPARE_DISPLAY_SECTIONS: CompareSectionDef[] = [
   {
+    id: "core",
     title: "Core Property Data",
     rows: [
       {
@@ -103,6 +105,7 @@ export const COMPARE_DISPLAY_SECTIONS: CompareSectionDef[] = [
     ],
   },
   {
+    id: "location",
     title: "Location",
     rows: [
       {
@@ -128,6 +131,7 @@ export const COMPARE_DISPLAY_SECTIONS: CompareSectionDef[] = [
     ],
   },
   {
+    id: "infrastructure",
     title: "Infrastructure",
     rows: [
       {
@@ -158,6 +162,7 @@ export const COMPARE_DISPLAY_SECTIONS: CompareSectionDef[] = [
     ],
   },
   {
+    id: "farming",
     title: "Farming & Land",
     rows: [
       {
@@ -199,6 +204,7 @@ export const COMPARE_DISPLAY_SECTIONS: CompareSectionDef[] = [
     ],
   },
   {
+    id: "water",
     title: "Water Resources",
     rows: [
       {
@@ -224,6 +230,7 @@ export const COMPARE_DISPLAY_SECTIONS: CompareSectionDef[] = [
     ],
   },
   {
+    id: "legal",
     title: "Legal",
     rows: [
       {
@@ -249,6 +256,7 @@ export const COMPARE_DISPLAY_SECTIONS: CompareSectionDef[] = [
     ],
   },
   {
+    id: "features",
     title: "Features",
     rows: [
       {

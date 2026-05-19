@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, useReducedMotion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 import { useStore } from "react-redux";
@@ -16,11 +17,12 @@ interface Props {
 }
 
 const CartButton: React.FC<Props> = ({ property, className = "" }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const store = useStore<RootState>();
   const reduceMotion = useReducedMotion();
   const active = useAppSelector((s) => s.buyer.cartIds.includes(property._id));
-  const buyerName = useAppSelector((s) => s.auth.user?.name ?? "Buyer");
+  const buyerName = useAppSelector((s) => s.auth.user?.name ?? t("common.buyerFallback"));
 
   const onClick = useCallback(
     (e: React.MouseEvent) => {
@@ -31,11 +33,13 @@ const CartButton: React.FC<Props> = ({ property, className = "" }) => {
       dispatch(toggleCart(property));
       const after = store.getState().buyer.cartIds.includes(id);
       if (before !== after) {
-        showBuyerActionFeedback(after ? "Added to cart" : "Removed from cart");
+        showBuyerActionFeedback(
+          after ? t("buyerPanel.actions.addedToCart") : t("buyerPanel.actions.removedFromCart")
+        );
         if (after) {
           void trackPropertyActivityAPI(property._id, "cart").then((result) => {
             if (result?.alreadyPresent) {
-              showBuyerActionFeedback("Property is already in cart");
+              showBuyerActionFeedback(t("buyerPanel.actions.alreadyInCart"));
             }
           });
           const rawSellerId = (property as Property & { sellerId?: unknown }).sellerId;
@@ -47,8 +51,11 @@ const CartButton: React.FC<Props> = ({ property, className = "" }) => {
               : "";
           if (sellerId) {
             void createNotificationAPI({
-              title: "Property added to cart",
-              message: `${buyerName} added ${property.title ?? "your property"} to cart.`,
+              title: t("buyerPanel.actions.propertyAddedToCartTitle"),
+              message: t("buyerPanel.actions.propertyAddedToCartMessage", {
+                buyer: buyerName,
+                property: property.title ?? t("buyerPanel.actions.yourProperty"),
+              }),
               type: "cart",
               receiverId: sellerId,
               propertyId: property._id,
@@ -59,7 +66,7 @@ const CartButton: React.FC<Props> = ({ property, className = "" }) => {
         }
       }
     },
-    [buyerName, dispatch, property, store]
+    [buyerName, dispatch, property, store, t]
   );
 
   return (
@@ -71,7 +78,7 @@ const CartButton: React.FC<Props> = ({ property, className = "" }) => {
       className={`inline-flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white shadow-sm backdrop-blur-md ring-1 ring-white/15 transition hover:bg-black/55 ${
         active ? "ring-amber-300/90" : ""
       } ${className}`}
-      aria-label="Shortlist in cart"
+      aria-label={t("buyerPanel.actions.shortlistInCart")}
       aria-pressed={active}
     >
       <ShoppingCart

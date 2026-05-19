@@ -18,11 +18,17 @@ import { useTranslation } from "react-i18next";
 import type { Property } from "../../features/properties/propertyType";
 import {
   getSellerListingDisplayStatus,
+  isSellerDirectRejectedListing,
   sortPropertiesByRecency,
   type SellerListingDisplayStatus,
 } from "../../lib/sellerHelpers";
 import { Button } from "@/components/common";
 import { cn } from "./sellerUtils";
+import {
+  formatSellerCurrency,
+  formatSellerDate,
+  translatePropertyType,
+} from "@/lib/sellerI18n";
 
 const PAGE_SIZE = 8;
 
@@ -49,15 +55,9 @@ function statusBadgeClass(s: SellerListingDisplayStatus) {
   return "bg-[var(--warning-bg)] text-[var(--warning)] border-[var(--warning)]/30";
 }
 
-function rowDate(p: Property) {
+function rowDate(p: Property, language: string) {
   const raw = p.statusDetails?.postedAt ?? p.postedAt ?? p.createdAt ?? "";
-  const t = Date.parse(raw);
-  if (!Number.isFinite(t)) return "—";
-  return new Date(t).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  return formatSellerDate(raw, language);
 }
 
 function thumb(p: Property) {
@@ -81,7 +81,7 @@ function SellerPropertiesTableComponent({
   limit,
   compact,
 }: SellerPropertiesTableProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | SellerListingDisplayStatus>("all");
   const [sort, setSort] = useState<SortKey>("recent");
@@ -139,10 +139,13 @@ function SellerPropertiesTableComponent({
     return processed.slice(start, start + PAGE_SIZE);
   }, [processed, currentPage, limit]);
 
-  const fmtPrice = useCallback((n: number) => {
-    if (!Number.isFinite(n)) return t("sellerDashboard.na");
-    return `₹ ${n.toLocaleString("en-IN")}`;
-  }, [t]);
+  const fmtPrice = useCallback(
+    (n: number) => {
+      if (!Number.isFinite(n)) return t("sellerDashboard.na");
+      return formatSellerCurrency(n, i18n.language);
+    },
+    [i18n.language, t]
+  );
 
   const loc = useCallback((p: Property) => {
     const parts = [p.location?.locality, p.location?.city, p.location?.state].filter(Boolean);
@@ -222,6 +225,9 @@ function SellerPropertiesTableComponent({
                 const st = getSellerListingDisplayStatus(p);
                 const isDeactivated = st === "deactivated";
                 const isSold = st === "sold";
+                const blockEdit = isSellerDirectRejectedListing(p);
+                const showMoreActionsMenu =
+                  st === "approved" || st === "sold" || st === "deactivated";
                 const img = thumb(p);
                 const menuOpen = openMenu === p._id;
                 return (
@@ -243,7 +249,11 @@ function SellerPropertiesTableComponent({
                     </td>
                     <td className="max-w-[220px] px-4 py-3 align-top">
                       <p className="line-clamp-2 font-medium text-[var(--b1)]">{p.title?.trim() || t("sellerDashboard.untitled")}</p>
-                      <p className="mt-0.5 text-xs text-[var(--muted)]">{p.propertyType}</p>
+                      <p className="mt-0.5 text-xs text-[var(--muted)]">
+                        {p.propertyType
+                          ? translatePropertyType(p.propertyType) || p.propertyType
+                          : t("sellerDashboard.na")}
+                      </p>
                     </td>
                     <td className="px-4 py-3 align-top tabular-nums text-[var(--b1)]">{fmtPrice(p.price)}</td>
                     <td className="hidden max-w-[200px] px-4 py-3 align-top text-[var(--b1)] md:table-cell">
@@ -265,7 +275,9 @@ function SellerPropertiesTableComponent({
                     <td className="hidden px-4 py-3 align-top tabular-nums text-[var(--b1)] lg:table-cell">
                       {p.analytics?.contactClicks ?? 0}
                     </td>
-                    <td className="hidden px-4 py-3 align-top text-[var(--b1)] xl:table-cell">{rowDate(p)}</td>
+                    <td className="hidden px-4 py-3 align-top text-[var(--b1)] xl:table-cell">
+                      {rowDate(p, i18n.language)}
+                    </td>
                     <td className="px-3 py-3 align-top text-right sm:px-4">
                       <div className="flex flex-nowrap justify-end gap-1.5">
                         <Link
@@ -275,7 +287,7 @@ function SellerPropertiesTableComponent({
                           <Eye className="h-3.5 w-3.5" />
                           <span className="hidden xl:inline">{t("sellerPanel.actions.view")}</span>
                         </Link>
-                        {isValidObjectId(p._id) ? (
+                        {isValidObjectId(p._id) && !blockEdit ? (
                           <Link
                             to={`/post-property/basic?edit=${p._id}`}
                             className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]"
@@ -287,6 +299,11 @@ function SellerPropertiesTableComponent({
                           <button
                             type="button"
                             disabled
+                            title={
+                              blockEdit
+                                ? t("sellerPanel.actions.editBlockedDirectReject")
+                                : undefined
+                            }
                             className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--muted)] opacity-60"
                           >
                             <Pencil className="h-3.5 w-3.5" />
@@ -302,89 +319,101 @@ function SellerPropertiesTableComponent({
                           <Copy className="h-3.5 w-3.5" />
                           <span className="hidden xl:inline">{t("sellerPanel.actions.duplicate")}</span>
                         </Button>
-                        <div className="relative inline-block shrink-0 text-left">
+                        {showMoreActionsMenu ? (
+                          <div className="relative inline-block shrink-0 text-left">
+                            <button
+                              type="button"
+                              className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenu(menuOpen ? null : p._id);
+                              }}
+                              aria-expanded={menuOpen}
+                            >
+                              <MoreHorizontal className="h-3.5 w-3.5" />
+                              <span className="hidden xl:inline">{t("sellerPanel.actions.more")}</span>
+                            </button>
+                            {menuOpen ? (
+                              <div
+                                className="absolute right-0 z-50 mt-1 w-48 overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--white)] py-1 shadow-lg"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {isSold ? (
+                                  <button
+                                    type="button"
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                                    onClick={() => {
+                                      onMarkUnsold(p);
+                                      setOpenMenu(null);
+                                    }}
+                                  >
+                                    <RotateCcw className="h-3.5 w-3.5" />
+                                    {t("sellerPanel.actions.markUnsold")}
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                                    onClick={() => {
+                                      onMarkSold(p);
+                                      setOpenMenu(null);
+                                    }}
+                                  >
+                                    <CircleCheck className="h-3.5 w-3.5" />
+                                    {t("sellerPanel.actions.markSold")}
+                                  </button>
+                                )}
+                                {isDeactivated ? (
+                                  <button
+                                    type="button"
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                                    onClick={() => {
+                                      onActivate(p);
+                                      setOpenMenu(null);
+                                    }}
+                                  >
+                                    <RotateCcw className="h-3.5 w-3.5" />
+                                    {t("sellerPanel.actions.activate")}
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
+                                    onClick={() => {
+                                      onDeactivate(p);
+                                      setOpenMenu(null);
+                                    }}
+                                  >
+                                    <Ban className="h-3.5 w-3.5" />
+                                    {t("sellerPanel.actions.deactivate")}
+                                  </button>
+                                )}
+                                <button
+                                  type="button"
+                                  disabled={actionLoading}
+                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--error)] hover:bg-[var(--error-bg)] disabled:opacity-50"
+                                  onClick={() => {
+                                    onDelete(p._id);
+                                    setOpenMenu(null);
+                                  }}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                  {t("sellerDashboard.delete")}
+                                </button>
+                              </div>
+                            ) : null}
+                          </div>
+                        ) : (
                           <button
                             type="button"
-                            className="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--b1)] transition hover:bg-[var(--b2-soft)]"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setOpenMenu(menuOpen ? null : p._id);
-                            }}
-                            aria-expanded={menuOpen}
+                            disabled={actionLoading}
+                            onClick={() => onDelete(p._id)}
+                            className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-lg border border-[var(--b2)] bg-[var(--white)] px-2 py-1 text-xs font-medium text-[var(--error)] transition hover:bg-[var(--error-bg)] disabled:opacity-50"
                           >
-                            <MoreHorizontal className="h-3.5 w-3.5" />
-                            <span className="hidden xl:inline">{t("sellerPanel.actions.more")}</span>
+                            <Trash2 className="h-3.5 w-3.5" />
+                            <span className="hidden xl:inline">{t("sellerDashboard.delete")}</span>
                           </button>
-                          {menuOpen ? (
-                            <div
-                              className="absolute right-0 z-50 mt-1 w-48 overflow-hidden rounded-xl border border-[var(--b2)] bg-[var(--white)] py-1 shadow-lg"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {isSold ? (
-                                <button
-                                  type="button"
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
-                                  onClick={() => {
-                                    onMarkUnsold(p);
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  <RotateCcw className="h-3.5 w-3.5" />
-                                  {t("sellerPanel.actions.markUnsold")}
-                                </button>
-                              ) : (
-                                <button
-                                  type="button"
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
-                                  onClick={() => {
-                                    onMarkSold(p);
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  <CircleCheck className="h-3.5 w-3.5" />
-                                  {t("sellerPanel.actions.markSold")}
-                                </button>
-                              )}
-                              {isDeactivated ? (
-                                <button
-                                  type="button"
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
-                                  onClick={() => {
-                                    onActivate(p);
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  <RotateCcw className="h-3.5 w-3.5" />
-                                  {t("sellerPanel.actions.activate")}
-                                </button>
-                              ) : (
-                                <button
-                                  type="button"
-                                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--b1)] hover:bg-[var(--b2-soft)]"
-                                  onClick={() => {
-                                    onDeactivate(p);
-                                    setOpenMenu(null);
-                                  }}
-                                >
-                                  <Ban className="h-3.5 w-3.5" />
-                                  {t("sellerPanel.actions.deactivate")}
-                                </button>
-                              )}
-                              <button
-                                type="button"
-                                disabled={actionLoading}
-                                className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs font-medium text-[var(--error)] hover:bg-[var(--error-bg)] disabled:opacity-50"
-                                onClick={() => {
-                                  onDelete(p._id);
-                                  setOpenMenu(null);
-                                }}
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                                {t("sellerDashboard.delete")}
-                              </button>
-                            </div>
-                          ) : null}
-                        </div>
+                        )}
                       </div>
                     </td>
                   </motion.tr>

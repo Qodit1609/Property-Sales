@@ -5,6 +5,7 @@ import { ArrowUpRight, Flame, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "./sellerUtils";
 import type { SellerDashboardRecentLead } from "@/features/seller/sellerAPI";
+import { formatSellerRelativeTime } from "@/lib/sellerI18n";
 
 export type SellerLeadPreview = {
   id: string;
@@ -20,18 +21,6 @@ function interestStyles(interest: SellerLeadPreview["interest"]) {
   return "bg-[var(--b2-soft)] text-[var(--b1-mid)] border-[var(--b2)]";
 }
 
-const getLastActivityLabel = (timestamp: string) => {
-  const time = new Date(timestamp).getTime();
-  if (Number.isNaN(time)) return "";
-  const diffMs = Date.now() - time;
-  const minute = 60 * 1000;
-  const hour = 60 * minute;
-  const day = 24 * hour;
-  if (diffMs < hour) return `${Math.max(1, Math.floor(diffMs / minute))}m ago`;
-  if (diffMs < day) return `${Math.floor(diffMs / hour)}h ago`;
-  return `${Math.floor(diffMs / day)}d ago`;
-};
-
 type SellerLeadsCardProps = {
   recentLeads?: SellerDashboardRecentLead[];
 };
@@ -45,7 +34,7 @@ function SellerLeadsCardComponent({ recentLeads }: SellerLeadsCardProps) {
       buyer: lead.buyer,
       propertyTitle: lead.propertyTitle,
       interest: lead.interest,
-      lastActivity: getLastActivityLabel(lead.timestamp),
+      lastActivity: formatSellerRelativeTime(lead.timestamp),
     }));
   }, [recentLeads]);
 
@@ -96,7 +85,9 @@ function SellerLeadsCardComponent({ recentLeads }: SellerLeadsCardProps) {
           </motion.li>
         ))}
         {items.length === 0 ? (
-          <li className="px-5 py-4 text-sm text-[var(--muted)]">No recent leads yet.</li>
+          <li className="px-5 py-4 text-sm text-[var(--muted)]">
+            {t("sellerPanel.leadsPreview.empty")}
+          </li>
         ) : null}
       </ul>
     </motion.div>

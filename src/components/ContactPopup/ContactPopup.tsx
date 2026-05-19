@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { submitInquiryAPI } from "@/features/contact/contactAPI";
 
 type ContactFormData = {
@@ -153,6 +154,7 @@ const Field = memo(function Field({
 });
 
 const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -169,17 +171,17 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
   const validate = useCallback((data: ContactFormData): ContactFormErrors => {
     const nextErrors: ContactFormErrors = {};
 
-    if (!data.name.trim()) nextErrors.name = "Name is required.";
+    if (!data.name.trim()) nextErrors.name = t("contactPopup.validation.nameRequired");
     if (!data.email.trim()) {
-      nextErrors.email = "Email is required.";
+      nextErrors.email = t("contactPopup.validation.emailRequired");
     } else if (!EMAIL_REGEX.test(data.email.trim())) {
-      nextErrors.email = "Enter a valid email address.";
+      nextErrors.email = t("contactPopup.validation.emailInvalid");
     }
-    if (!data.phone.trim()) nextErrors.phone = "Phone number is required.";
-    if (!data.message.trim()) nextErrors.message = "Please enter your message.";
+    if (!data.phone.trim()) nextErrors.phone = t("contactPopup.validation.phoneRequired");
+    if (!data.message.trim()) nextErrors.message = t("contactPopup.validation.messageRequired");
 
     return nextErrors;
-  }, []);
+  }, [t]);
 
   const isFormValid = useMemo(() => {
     const nextErrors = validate(formData);
@@ -205,11 +207,14 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
 
   const openWhatsApp = useCallback(() => {
     const phone = "919999999999";
+    const nameSuffix = formData.name
+      ? t("contactPopup.whatsapp.nameSuffix", { name: formData.name })
+      : "";
     const message = encodeURIComponent(
-      `Hi, I'm interested in your property listing.${formData.name ? ` My name is ${formData.name}.` : ""}`
+      t("contactPopup.whatsapp.message", { nameSuffix }),
     );
     window.open(`https://wa.me/${phone}?text=${message}`, "_blank", "noopener,noreferrer");
-  }, [formData.name]);
+  }, [formData.name, t]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -233,13 +238,14 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
         setFormData({ name: "", email: "", phone: "", message: "" });
       } catch (error) {
         setSubmitStatus("error");
-        const message = error instanceof Error ? error.message : "Something went wrong. Please try again in a moment.";
+        const message =
+          error instanceof Error ? error.message : t("contactPopup.errors.generic");
         setSubmitErrorMessage(message);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [formData, validate]
+    [formData, t, validate]
   );
 
   useEffect(() => {
@@ -307,13 +313,13 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="mb-2 inline-flex items-center rounded-full bg-[var(--b2-soft)] px-3 py-1 text-xs font-semibold tracking-wide text-[var(--b1-mid)]">
-              PREMIUM ASSISTANCE
+              {t("contactPopup.badge")}
             </p>
             <h2 id="contact-popup-title" className="text-[1.8rem] leading-tight font-semibold tracking-tight text-[var(--b1)] sm:text-[2.1rem]">
-              Let us find your perfect property
+              {t("contactPopup.title")}
             </h2>
             <p className="mt-1.5 text-sm text-[var(--brown)] sm:text-base">
-              Share your requirements and our expert team will connect with curated options.
+              {t("contactPopup.subtitle")}
             </p>
           </div>
 
@@ -321,7 +327,7 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close contact form"
+              aria-label={t("contactPopup.closeAriaLabel")}
               className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--b2)] bg-[var(--fg)] text-[var(--brown)] shadow-sm transition hover:scale-105 hover:border-[var(--b1-mid)] hover:text-[var(--b1)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
             >
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
@@ -336,7 +342,7 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
             <div className="md:col-span-1">
               <Field
                 id="name"
-                label="Full Name"
+                label={t("contactPopup.fields.fullName")}
                 value={formData.name}
                 autoComplete="name"
                 required
@@ -349,7 +355,7 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
               <Field
                 id="email"
                 type="email"
-                label="Email Address"
+                label={t("contactPopup.fields.email")}
                 value={formData.email}
                 autoComplete="email"
                 required
@@ -362,7 +368,7 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
               <Field
                 id="phone"
                 type="tel"
-                label="Phone Number"
+                label={t("contactPopup.fields.phone")}
                 value={formData.phone}
                 autoComplete="tel"
                 required
@@ -377,7 +383,7 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
                 htmlFor="message"
                 className="pointer-events-none absolute left-11 top-3 z-10 text-xs text-[var(--b1-mid)]"
               >
-                Message *
+                {t("contactPopup.fields.message")} *
               </label>
               <div className="pointer-events-none absolute left-3 top-4 z-10">
                 <MessageIcon />
@@ -392,7 +398,7 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
                 className={`w-full resize-none rounded-2xl border bg-[var(--fg)] pl-11 pr-4 pt-7 text-sm text-[var(--b1)] shadow-sm outline-none transition duration-200 placeholder:text-[var(--brown)] hover:border-[var(--b2)] focus:border-[var(--b1-mid)] focus:ring-2 focus:ring-[var(--b2)] ${
                   errors.message ? "border-[var(--error)] focus:border-[var(--error)] focus:ring-[var(--error-bg)]" : "border-[var(--b2)]"
                 }`}
-                placeholder="Tell us your location preference, budget, and purpose..."
+                placeholder={t("contactPopup.fields.messagePlaceholder")}
               />
               {errors.message ? (
                 <p id="message-error" className="mt-1.5 text-xs text-[var(--error)]">
@@ -409,7 +415,7 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
                   <path strokeLinecap="round" strokeLinejoin="round" d="m5 13 4 4L19 7" />
                 </svg>
               </span>
-              We will get back to you within 24 hours.
+              {t("contactPopup.footer.responseTime")}
             </p>
 
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
@@ -418,7 +424,7 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
                 onClick={openWhatsApp}
                 className="inline-flex h-11 items-center justify-center rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)] px-4 text-sm font-medium text-[var(--b1-mid)] transition hover:border-[var(--b1-mid)] hover:text-[var(--b1)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
               >
-                Quick WhatsApp
+                {t("contactPopup.actions.whatsapp")}
               </button>
               <button
                 type="submit"
@@ -428,10 +434,10 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
                 {isSubmitting ? (
                   <span className="inline-flex items-center gap-2">
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
-                    Sending...
+                    {t("contactPopup.actions.sending")}
                   </span>
                 ) : (
-                  "Send Inquiry"
+                  t("contactPopup.actions.submit")
                 )}
               </button>
             </div>
@@ -439,13 +445,13 @@ const ContactPopup: React.FC<ContactPopupProps> = ({ onClose }) => {
 
           {submitStatus === "success" ? (
             <div className="rounded-xl border border-[var(--b2)] bg-[var(--b2-soft)] px-4 py-3 text-sm text-[var(--b1)]">
-              Success! Your inquiry has been submitted. Our team will contact you shortly.
+              {t("contactPopup.success")}
             </div>
           ) : null}
 
           {submitStatus === "error" ? (
             <div className="rounded-xl border border-[var(--error)] bg-[var(--error-bg)] px-4 py-3 text-sm text-[var(--error)]">
-              {submitErrorMessage || "Something went wrong. Please try again in a moment."}
+              {submitErrorMessage || t("contactPopup.errors.generic")}
             </div>
           ) : null}
         </form>

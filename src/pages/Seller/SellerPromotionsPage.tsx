@@ -20,7 +20,7 @@ const SellerPromotionsPage = () => {
         <p className="mt-1 text-sm text-[var(--muted)]">{t("sellerPanel.promo.sub")}</p>
       </div>
 
-      {loading ? <p className="text-sm text-[var(--muted)]">Loading promotions...</p> : null}
+      {loading ? <p className="text-sm text-[var(--muted)]">{t("sellerPanel.promotionsPage.loading")}</p> : null}
       <SellerPromotionSection
         properties={listings ?? []}
         onPromotionSubmitted={() => {

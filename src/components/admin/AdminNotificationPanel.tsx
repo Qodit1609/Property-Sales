@@ -1,18 +1,73 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Bell } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import {
   clearReadNotifications,
   markNotificationRead,
 } from "../../features/notifications/notificationSlice";
 import { Button } from "@/components/common";
+import {
+  translateAdminNotificationMessage,
+  translateAdminNotificationTitle,
+} from "@/lib/adminI18n";
 
 const AdminNotificationPanel: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const notifications = useAppSelector((state) => state.notifications.items);
   const user = useAppSelector((state) => state.auth.user);
   const userId = String(user?.id ?? user?._id ?? "");
   const hasReadNotifications = notifications.some((n) => n.isRead);
+
+  const handleNotificationClick = (notification: {
+    id: string;
+    title: string;
+    message: string;
+    type?: string;
+  }) => {
+    dispatch(markNotificationRead(notification.id));
+
+    const normalizedType = (notification.type ?? "").trim().toLowerCase();
+    const normalizedTitle = notification.title.trim().toLowerCase();
+    const normalizedMessage = notification.message.trim().toLowerCase();
+
+    if (
+      normalizedType === "approval" ||
+      normalizedType === "property" ||
+      normalizedTitle.includes("new property submitted") ||
+      normalizedTitle.includes("property approved")
+    ) {
+      navigate("/admin/properties");
+      return;
+    }
+
+    if (
+      normalizedType === "testimonial" ||
+      normalizedTitle.includes("new testimonial submitted")
+    ) {
+      navigate("/admin/testimonial");
+      return;
+    }
+
+    if (
+      normalizedType === "promotion_request" ||
+      normalizedTitle.includes("new promotion request")
+    ) {
+      navigate("/admin/promotions");
+      return;
+    }
+
+    if (
+      normalizedType === "cart" ||
+      normalizedTitle.includes("property added to cart") ||
+      normalizedMessage.includes("added") && normalizedMessage.includes("to cart")
+    ) {
+      navigate("/admin/activity-logs");
+    }
+  };
 
   return (
     <div className="space-y-3 rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm">
@@ -23,10 +78,10 @@ const AdminNotificationPanel: React.FC = () => {
           </div>
           <div>
             <h2 className="text-sm font-semibold text-[var(--b1)]">
-              Notifications
+              {t("adminPanel.notificationsPanel.heading")}
             </h2>
             <p className="text-[11px] text-[var(--muted)]">
-              New listings and admin activity alerts.
+              {t("adminPanel.notificationsPanel.subtitle")}
             </p>
           </div>
         </div>
@@ -38,7 +93,7 @@ const AdminNotificationPanel: React.FC = () => {
             onClick={() => dispatch(clearReadNotifications(userId))}
             className="shrink-0 text-xs"
           >
-            Clear all
+            {t("common.clearAll")}
           </Button>
         ) : null}
       </div>
@@ -46,11 +101,10 @@ const AdminNotificationPanel: React.FC = () => {
       {notifications.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[var(--b2)] bg-[var(--b2-soft)] px-6 py-10 text-center">
           <p className="text-sm font-medium text-[var(--b1)]">
-            No notifications yet
+            {t("adminPanel.notificationsPanel.emptyTitle")}
           </p>
           <p className="mt-1 text-[11px] text-[var(--muted)]">
-            When a new property is added or other events occur, they will appear
-            here.
+            {t("adminPanel.notificationsPanel.emptySub")}
           </p>
         </div>
       ) : (
@@ -59,7 +113,14 @@ const AdminNotificationPanel: React.FC = () => {
             <Button
               key={n.id}
               type="button"
-              onClick={() => dispatch(markNotificationRead(n.id))}
+              onClick={() =>
+                handleNotificationClick({
+                  id: n.id,
+                  title: n.title,
+                  message: n.message,
+                  type: n.type,
+                })
+              }
               variant="ghost"
               className={[
                 "w-full items-start gap-3 rounded-xl border px-3 py-2 text-left",
@@ -76,10 +137,10 @@ const AdminNotificationPanel: React.FC = () => {
               />
               <div className="min-w-0 flex-1">
                 <p className="text-[11px] font-semibold text-[var(--b1)]">
-                  {n.title}
+                  {translateAdminNotificationTitle(n.title)}
                 </p>
                 <p className="mt-0.5 text-[11px] text-[var(--muted)]">
-                  {n.message}
+                  {translateAdminNotificationMessage(n.message)}
                 </p>
                 <p className="mt-0.5 text-[10px] text-[var(--muted)]/80">
                   {new Date(n.createdAt).toLocaleString()}

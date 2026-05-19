@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { DEFAULT_SERVICES } from "./serviceMockData";
 import type { ServiceSectionProps } from "./ServiceSection.types";
@@ -30,6 +31,7 @@ const gridItem = {
 };
 
 const ServiceSection: React.FC<ServiceSectionProps> = ({ services: servicesProp }) => {
+  const { t } = useTranslation();
   const services = servicesProp ?? DEFAULT_SERVICES;
 
   const initialActiveIndex = useMemo(() => {
@@ -58,14 +60,12 @@ const ServiceSection: React.FC<ServiceSectionProps> = ({ services: servicesProp 
         <motion.div {...headerMotion} className="mb-12">
           <div className="mb-4 flex items-center justify-center gap-6">
             <div className="h-px w-28 bg-[#2D6A4F]/40" />
-            <p className="font-medium tracking-wide text-[#2D6A4F]">OUR SERVICES</p>
+            <p className="font-medium tracking-wide text-[#2D6A4F]">{t("homeSection.serviceSection.eyebrow")}</p>
             <div className="h-px w-28 bg-[#2D6A4F]/40" />
           </div>
 
           <p className="mx-auto max-w-3xl text-base leading-relaxed text-[#6D4C41] transition-colors duration-300 md:text-lg">
-            We provide end-to-end real estate solutions focused on farmhouses,
-            villas, resort properties, and agricultural land, ensuring
-            transparency, expert guidance, and long-term value for every client.
+            {t("homeSection.serviceSection.description")}
           </p>
         </motion.div>
 
@@ -80,6 +80,15 @@ const ServiceSection: React.FC<ServiceSectionProps> = ({ services: servicesProp 
             const isActive = activeIndex === index;
             const isHovered = hoveredIndex === index;
             const cardKey = service.id ?? `service-${index}`;
+            const itemBase = service.id
+              ? `homeSection.serviceSection.items.${service.id}`
+              : null;
+            const cardTitle = itemBase
+              ? t(`${itemBase}.title`, { defaultValue: service.title })
+              : service.title;
+            const cardDescription = itemBase
+              ? t(`${itemBase}.description`, { defaultValue: service.description })
+              : service.description;
 
             return (
               <motion.div key={cardKey} variants={gridItem} className="h-full min-w-0">
@@ -158,7 +167,7 @@ const ServiceSection: React.FC<ServiceSectionProps> = ({ services: servicesProp 
                           : "text-[#1B4332] group-hover:text-white",
                       ].join(" ")}
                     >
-                      {service.title}
+                      {cardTitle}
                     </h3>
 
                     <p
@@ -169,7 +178,7 @@ const ServiceSection: React.FC<ServiceSectionProps> = ({ services: servicesProp 
                           : "text-[#6D4C41] group-hover:text-[#E8F5E9]",
                       ].join(" ")}
                     >
-                      {service.description}
+                      {cardDescription}
                     </p>
 
                     <span
@@ -180,7 +189,7 @@ const ServiceSection: React.FC<ServiceSectionProps> = ({ services: servicesProp 
                           : "text-[#2D6A4F] group-hover:text-[#D8F3DC]",
                       ].join(" ")}
                     >
-                      Check it
+                      {t("homeSection.serviceSection.checkIt")}
                       <motion.span
                         className="inline-block"
                         animate={{ x: isHovered ? 8 : 0 }}

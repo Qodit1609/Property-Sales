@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ClipboardList } from "lucide-react";
 
 import AdminLayout from "../../components/admin/AdminLayout";
@@ -100,6 +101,7 @@ function formatDuration(startIso: string, endIso: string): string {
 }
 
 const ActivityLogs: React.FC = () => {
+  const { t } = useTranslation();
   const [auditLogs, setAuditLogs] = useState<ActivityLogEntry[]>([]);
   const [userType, setUserType] = useState<UserTypeFilter>("all");
   const [activityCategory, setActivityCategory] =
@@ -381,7 +383,7 @@ const ActivityLogs: React.FC = () => {
   }, [auditLogs]);
 
   return (
-    <AdminLayout title="Audit logs">
+    <AdminLayout title={t("adminPanel.activityLogsPage.title")}>
       <div className="space-y-6">
         <header className="relative overflow-hidden rounded-2xl border border-[var(--b2)]/60 bg-[var(--white)] p-5 shadow-[0_2px_16px_rgba(27,67,50,0.07)] sm:p-6">
           <div
@@ -395,10 +397,10 @@ const ActivityLogs: React.FC = () => {
               </div>
               <div>
                 <h1 className="text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
-                  Activity logs
+                  {t("adminPanel.activityLogsPage.heading")}
                 </h1>
                 <p className="mt-1 max-w-2xl text-sm leading-relaxed text-[var(--muted)]">
-                  Track admin actions across properties and users.
+                  {t("adminPanel.activityLogsPage.subtitle")}
                 </p>
               </div>
             </div>
@@ -410,10 +412,10 @@ const ActivityLogs: React.FC = () => {
         <section className="space-y-4 rounded-2xl border border-[var(--b2)]/90 bg-[var(--white)] p-4 shadow-md shadow-[var(--b1)]/5 sm:p-6">
           <div className="border-b border-[var(--b2)]/60 pb-4">
             <h2 className="text-lg font-semibold text-[var(--b1)]">
-              Filters
+              {t("adminPanel.activityLogsPage.filters")}
             </h2>
             <p className="mt-1 text-sm text-[var(--muted)]">
-              Narrow by role and category.
+              {t("adminPanel.activityLogsPage.filtersHint")}
             </p>
           </div>
           <ActivityFilters
@@ -429,16 +431,16 @@ const ActivityLogs: React.FC = () => {
         <section className="grid gap-4 lg:grid-cols-2">
           <div className="overflow-hidden rounded-xl border border-[var(--b2)]/90 bg-[var(--white)] shadow-md shadow-[var(--b1)]/5">
             <div className="border-b border-[var(--b2)]/70 px-4 py-3 sm:px-5">
-              <h3 className="text-sm font-semibold text-[var(--b1)]">Seller activities</h3>
-              <p className="mt-1 text-xs text-[var(--muted)]">Total sellers: {sellerSummary.totalSellers}</p>
+              <h3 className="text-sm font-semibold text-[var(--b1)]">{t("adminPanel.activityLogsPage.sellerActivities")}</h3>
+              <p className="mt-1 text-xs text-[var(--muted)]">{t("adminPanel.activityLogsPage.totalSellers", { count: sellerSummary.totalSellers })}</p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[420px] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-[var(--b2)] bg-[var(--b2-soft)]/80">
-                    <th className="px-4 py-3 font-semibold text-[var(--b1)] sm:px-5">Name</th>
-                    <th className="px-4 py-3 font-semibold text-[var(--b1)] sm:px-5">Properties Added</th>
-                    <th className="px-4 py-3 font-semibold text-[var(--b1)] sm:px-5">Added At</th>
+                    <th className="px-4 py-3 font-semibold text-[var(--b1)] sm:px-5">{t("adminPanel.activityLogsPage.tableName")}</th>
+                    <th className="px-4 py-3 font-semibold text-[var(--b1)] sm:px-5">{t("adminPanel.activityLogsPage.propertiesAdded")}</th>
+                    <th className="px-4 py-3 font-semibold text-[var(--b1)] sm:px-5">{t("adminPanel.activityLogsPage.addedAt")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -464,14 +466,14 @@ const ActivityLogs: React.FC = () => {
 
           <div className="overflow-hidden rounded-xl border border-[var(--b2)]/90 bg-[var(--white)] shadow-md shadow-[var(--b1)]/5">
             <div className="border-b border-[var(--b2)]/70 px-4 py-3 sm:px-5">
-              <h3 className="text-sm font-semibold text-[var(--b1)]">Buyer activities</h3>
-              <p className="mt-1 text-xs text-[var(--muted)]">Total buyers: {buyerSummary.totalBuyers}</p>
+              <h3 className="text-sm font-semibold text-[var(--b1)]">{t("adminPanel.activityLogsPage.buyerActivities")}</h3>
+              <p className="mt-1 text-xs text-[var(--muted)]">{t("adminPanel.activityLogsPage.totalBuyers", { count: buyerSummary.totalBuyers })}</p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[320px] border-collapse text-left text-sm">
                 <thead>
                   <tr className="border-b border-[var(--b2)] bg-[var(--b2-soft)]/80">
-                    <th className="px-4 py-3 font-semibold text-[var(--b1)] sm:px-5">Name</th>
+                    <th className="px-4 py-3 font-semibold text-[var(--b1)] sm:px-5">{t("adminPanel.activityLogsPage.tableName")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -494,11 +496,11 @@ const ActivityLogs: React.FC = () => {
 
         <section className="space-y-3">
           <h2 className="text-lg font-semibold text-[var(--b1)]">
-            Activity table
+            {t("adminPanel.activityLogsPage.activityTable")}
           </h2>
           <ActivityLogTable rows={filteredRows} activityCategory={activityCategory} />
           {loading ? (
-            <p className="text-sm text-[var(--muted)]">Loading logs...</p>
+            <p className="text-sm text-[var(--muted)]">{t("adminPanel.activityLogsPage.loading")}</p>
           ) : null}
         </section>
       </div>

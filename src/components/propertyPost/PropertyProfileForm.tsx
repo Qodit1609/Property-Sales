@@ -19,6 +19,12 @@ import FormActions from "./FormActions";
 import type { PostPropertyOutletContext } from "./postPropertyOutletContext";
 import { Input, Button } from "@/components/common";
 import { useTranslation } from "react-i18next";
+import {
+  clampWords,
+  countWords,
+  MAX_PROPERTY_DESCRIPTION_WORDS,
+  PROPERTY_TEXT_WRAP_CLASS,
+} from "../../utils/wordText";
 
 const OWNERSHIP: OwnershipType[] = [
   "Freehold",
@@ -102,6 +108,10 @@ export default function PropertyProfileForm() {
   const errors = useMemo(
     () => validateProfileDetails(profile, basic as BasicDetails),
     [basic, profile]
+  );
+  const descriptionWordCount = useMemo(
+    () => countWords(profile.description),
+    [profile.description]
   );
   const showError = (key: string) =>
     Boolean(touched[key] && (errors as Record<string, string | undefined>)[key]);
@@ -486,7 +496,8 @@ export default function PropertyProfileForm() {
                 )
               }
               type="number"
-              min={0}
+              min={1}
+              max={100}
               placeholder={t("postProperty.profile.soilQualityIndexPlaceholder")}
               className="w-full rounded-md border border-[var(--b2)] px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)]"
             />
@@ -631,13 +642,25 @@ export default function PropertyProfileForm() {
           <textarea
             value={profile.description}
             onBlur={() => setTouched((p) => ({ ...p, description: true }))}
-            onChange={(e) => dispatch(updateProfileDetails({ description: e.target.value }))}
+            onChange={(e) =>
+              dispatch(
+                updateProfileDetails({
+                  description: clampWords(e.target.value, MAX_PROPERTY_DESCRIPTION_WORDS),
+                })
+              )
+            }
             rows={4}
             placeholder={t("postProperty.profile.descriptionPlaceholder")}
-            className={`w-full rounded-md border px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)] ${
+            className={`w-full rounded-md border px-3 py-2 text-sm bg-[var(--white)] focus:outline-none focus:ring-2 focus:ring-[var(--b2)] ${PROPERTY_TEXT_WRAP_CLASS} ${
               showError("description") ? "border-[var(--error)]" : "border-[var(--b2)]"
             }`}
           />
+          <p className="mt-1 text-right text-xs text-[var(--muted)]">
+            {t("postProperty.common.wordCount", {
+              current: descriptionWordCount,
+              max: MAX_PROPERTY_DESCRIPTION_WORDS,
+            })}
+          </p>
           {showError("description") && (
             <p className="mt-1 text-xs text-[var(--error)]">
               {t(errors.description || "")}

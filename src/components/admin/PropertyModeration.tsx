@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { CheckCircle2, Trash2, XCircle } from "lucide-react";
+import { translatePropertyType, translateStatus } from "@/lib/i18nHelpers";
 import { Button, Input } from "@/components/common";
 import AdminConfirmDialog from "./AdminConfirmDialog";
 
@@ -28,6 +30,7 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
   onReject,
   onDelete,
 }) => {
+  const { t } = useTranslation();
   const [query, setQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState<
     "all" | "approved" | "pending" | "rejected" | "sold"
@@ -80,17 +83,16 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h2 className="text-xl font-semibold tracking-tight text-[var(--b1)] sm:text-2xl">
-            Property moderation
+            {t("adminPanel.propertyModeration.title")}
           </h2>
           <p className="mt-1 max-w-xl text-sm text-[var(--muted)]">
-            Approve, reject, or remove listings. Use filters to focus on a
-            status.
+            {t("adminPanel.propertyModeration.subtitle")}
           </p>
         </div>
 
         <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-stretch lg:max-w-xl">
           <Input
-            placeholder="Search listings…"
+            placeholder={t("adminPanel.propertyModeration.searchPlaceholder")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full min-w-0 border-[var(--b2)] text-sm shadow-sm sm:flex-1"
@@ -110,11 +112,11 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
             }
             className="w-full rounded-lg border border-[var(--b2)] bg-[var(--white)] px-3 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--b1-mid)] sm:w-48"
           >
-            <option value="all">All statuses</option>
-            <option value="approved">Approved</option>
-            <option value="pending">Pending</option>
-            <option value="rejected">Rejected</option>
-            <option value="sold">Sold</option>
+            <option value="all">{t("adminPanel.propertyModeration.allStatuses")}</option>
+            <option value="approved">{t("adminPanel.properties.status.approved")}</option>
+            <option value="pending">{t("adminPanel.properties.status.pending")}</option>
+            <option value="rejected">{t("adminPanel.properties.status.rejected")}</option>
+            <option value="sold">{t("adminPanel.properties.status.sold")}</option>
           </select>
         </div>
       </div>
@@ -131,7 +133,7 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
       {loading && (
         <div className="flex items-center gap-3 rounded-xl border border-[var(--b2)] bg-[var(--white)] px-4 py-10 text-sm text-[var(--muted)]">
           <span className="inline-block h-5 w-5 animate-spin rounded-full border-2 border-[var(--b1-mid)] border-t-transparent" />
-          Loading listings…
+          {t("adminPanel.propertyModeration.loading")}
         </div>
       )}
 
@@ -146,7 +148,7 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <p className="font-semibold text-[var(--b1)]">
-                      {listing.title || "Untitled"}
+                      {listing.title || t("propertyCard.untitledProperty")}
                     </p>
                     <p className="mt-1 line-clamp-2 text-xs text-[var(--b1-mid)]">
                       {listing.address}
@@ -157,14 +159,14 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
                       listing.status ?? "pending"
                     )}`}
                   >
-                    {listing.status ?? "pending"}
+                    {translateStatus(listing.status ?? "pending")}
                   </span>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[var(--b1-mid)]">
-                  <span>{listing.propertyType}</span>
+                  <span>{translatePropertyType(listing.propertyType)}</span>
                   <span aria-hidden>·</span>
                   <span className="font-medium text-[var(--b1)]">
-                    ₹ {listing.price?.toLocaleString("en-IN") ?? "N/A"}
+                    ₹ {listing.price?.toLocaleString("en-IN") ?? t("common.na")}
                   </span>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -182,7 +184,7 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
                     className={`${actionBtnBase} border-emerald-400/60 text-emerald-700 hover:bg-emerald-50`}
                   >
                     <CheckCircle2 className="h-3.5 w-3.5" />
-                    Approve
+                    {t("common.approve")}
                   </Button>
 
                   <Button
@@ -199,7 +201,7 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
                     className={`${actionBtnBase} border-amber-400/60 text-amber-800 hover:bg-amber-50`}
                   >
                     <XCircle className="h-3.5 w-3.5" />
-                    Reject
+                    {t("common.reject")}
                   </Button>
 
                   <Button
@@ -211,14 +213,14 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
                     className={`${actionBtnBase} border-rose-300 text-rose-700 hover:bg-rose-50`}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                    Delete
+                    {t("common.delete")}
                   </Button>
                 </div>
               </article>
             ))}
             {filtered.length === 0 && (
               <p className="rounded-xl border border-dashed border-[var(--b2)] bg-[var(--b2-soft)]/30 py-12 text-center text-sm text-[var(--muted)]">
-                No listings match your filters.
+                {t("adminPanel.propertyModeration.emptyFilter")}
               </p>
             )}
           </div>
@@ -227,11 +229,13 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
             <table className="min-w-[880px] w-full text-sm text-[var(--b1)]">
               <thead className="sticky top-0 z-10 bg-gradient-to-r from-[var(--b2-soft)] to-[var(--white)] text-xs font-semibold uppercase tracking-wider shadow-sm">
                 <tr>
-                  <th className="px-4 py-3.5 text-left">Property</th>
-                  <th className="px-4 py-3.5 text-left">Type</th>
-                  <th className="px-4 py-3.5 text-left">Price</th>
-                  <th className="px-4 py-3.5 text-left">Status</th>
-                  <th className="px-4 py-3.5 text-right">Actions</th>
+                  <th className="px-4 py-3.5 text-left">
+                    {t("adminPanel.properties.table.property")}
+                  </th>
+                  <th className="px-4 py-3.5 text-left">{t("adminPanel.properties.table.type")}</th>
+                  <th className="px-4 py-3.5 text-left">{t("adminPanel.properties.table.price")}</th>
+                  <th className="px-4 py-3.5 text-left">{t("adminPanel.properties.table.status")}</th>
+                  <th className="px-4 py-3.5 text-right">{t("adminPanel.properties.table.actions")}</th>
                 </tr>
               </thead>
 
@@ -246,7 +250,7 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
                   >
                     <td className="px-4 py-3.5 align-top">
                       <p className="font-semibold text-[var(--b1)]">
-                        {listing.title || "Untitled"}
+                        {listing.title || t("propertyCard.untitledProperty")}
                       </p>
                       <p className="mt-0.5 line-clamp-2 text-xs text-[var(--b1-mid)]">
                         {listing.address}
@@ -254,11 +258,11 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
                     </td>
 
                     <td className="px-4 py-3.5 align-top text-[var(--b1-mid)]">
-                      {listing.propertyType}
+                      {translatePropertyType(listing.propertyType)}
                     </td>
 
                     <td className="px-4 py-3.5 align-top font-medium">
-                      ₹ {listing.price?.toLocaleString("en-IN") ?? "N/A"}
+                      ₹ {listing.price?.toLocaleString("en-IN") ?? t("common.na")}
                     </td>
 
                     <td className="px-4 py-3.5 align-top">
@@ -267,7 +271,7 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
                           listing.status ?? "pending"
                         )}`}
                       >
-                        {listing.status ?? "pending"}
+                        {translateStatus(listing.status ?? "pending")}
                       </span>
                     </td>
 
@@ -329,7 +333,7 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
                       colSpan={5}
                       className="px-4 py-12 text-center text-[var(--muted)]"
                     >
-                      No listings available.
+                      {t("adminPanel.propertyModeration.empty")}
                     </td>
                   </tr>
                 )}
@@ -341,13 +345,15 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
 
       <AdminConfirmDialog
         open={deleteId !== null}
-        title="Delete this listing?"
+        title={t("adminPanel.propertyModeration.deleteTitle")}
         description={
           deleteListing
-            ? `“${deleteListing.title || "Untitled"}” will be permanently removed.`
+            ? t("adminPanel.propertyModeration.deleteDescription", {
+                title: deleteListing.title || t("propertyCard.untitledProperty"),
+              })
             : ""
         }
-        confirmLabel="Delete listing"
+        confirmLabel={t("adminPanel.propertyModeration.deleteConfirm")}
         destructive
         loading={actionLoading}
         onClose={() => setDeleteId(null)}
@@ -356,9 +362,9 @@ const PropertyModeration: React.FC<PropertyModerationProps> = ({
 
       <AdminConfirmDialog
         open={rejectId !== null}
-        title="Reject this listing?"
-        description="The listing will be marked as rejected. You can change this later by approving it again if needed."
-        confirmLabel="Reject"
+        title={t("adminPanel.propertyModeration.rejectTitle")}
+        description={t("adminPanel.propertyModeration.rejectDescription")}
+        confirmLabel={t("adminPanel.propertyModeration.rejectConfirm")}
         loading={actionLoading}
         onClose={() => setRejectId(null)}
         onConfirm={confirmReject}

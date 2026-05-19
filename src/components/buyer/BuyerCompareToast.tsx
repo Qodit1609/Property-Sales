@@ -1,17 +1,26 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
-import { clearCompareNotice } from "../../features/buyer/buyerSlice";
+import { clearCompareNotice, COMPARE_LIMIT_NOTICE_KEY } from "../../features/buyer/buyerSlice";
+
+const MAX_COMPARE = 3;
 
 /** Single global toast so compare limit messages are not repeated on every PropertyCard. */
 const BuyerCompareToast: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const message = useAppSelector((s) => s.buyer.compareNotice);
+  const rawMessage = useAppSelector((s) => s.buyer.compareNotice);
+
+  const message =
+    rawMessage === COMPARE_LIMIT_NOTICE_KEY
+      ? t(COMPARE_LIMIT_NOTICE_KEY, { count: MAX_COMPARE })
+      : rawMessage;
 
   useEffect(() => {
-    if (!message) return;
-    const t = window.setTimeout(() => dispatch(clearCompareNotice()), 5000);
-    return () => window.clearTimeout(t);
-  }, [message, dispatch]);
+    if (!rawMessage) return;
+    const timer = window.setTimeout(() => dispatch(clearCompareNotice()), 5000);
+    return () => window.clearTimeout(timer);
+  }, [rawMessage, dispatch]);
 
   if (!message) return null;
 

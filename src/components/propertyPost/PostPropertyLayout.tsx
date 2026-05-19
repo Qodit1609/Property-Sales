@@ -1,4 +1,4 @@
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Stepper from "./Stepper";
 import { POST_PROPERTY_STEPS } from "./stepConfig";
@@ -16,6 +16,9 @@ import {
 } from "../../features/postProperty/postPropertyValidation";
 import Header from "../Header/Header";  // 👈 ADD THIS
 import { useTranslation } from "react-i18next";
+import { loadSellerProfile } from "../../lib/sellerProfileStorage";
+import { loadAdminProfile } from "../../lib/adminProfileStorage";
+import { fetchAdminUserById } from "../../features/admin/adminProfileAPI";
 
 function nowId() {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -25,10 +28,18 @@ export default function PostPropertyLayout() {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const dispatch = useAppDispatch();
 
   const authUser = useAppSelector((s) => s.auth.user);
   const post = useAppSelector((s) => s.postProperty);
+  const editIdFromUrl = searchParams.get("edit");
+  const showEditLoadError =
+    Boolean(editIdFromUrl) && Boolean(post.submitError) && !post.submitLoading;
+  const isEditLoading =
+    Boolean(editIdFromUrl) &&
+    !showEditLoadError &&
+    post.editPropertyId !== editIdFromUrl;
 
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
   const pushToast = useCallback((t: Omit<ToastMessage, "id">) => {
@@ -39,10 +50,58 @@ export default function PostPropertyLayout() {
   }, []);
 
   useEffect(() => {
-    if (authUser) {
-      dispatch(hydrateFromAuth({ name: authUser.name, email: authUser.email }));
-    }
-  }, [authUser, dispatch]);
+    if (!authUser || editIdFromUrl) return;
+    const authUserRecord = authUser as Record<string, unknown>;
+    const readText = (value: unknown): string | undefined => {
+      if (typeof value === "string" && value.trim()) return value.trim();
+      if (typeof value === "number" && Number.isFinite(value)) return String(value);
+      return undefined;
+    };
+    const mobile =
+      readText(authUser.mobile) ??
+      readText(authUserRecord.mobileNumber) ??
+      readText(authUserRecord.phone) ??
+      readText(authUserRecord.phoneNumber) ??
+      readText(authUserRecord.contact) ??
+      readText(authUserRecord.contactNumber) ??
+      readText(loadSellerProfile(authUser.email ?? undefined)?.phone) ??
+      readText(
+        loadAdminProfile(
+          String(authUser.id ?? authUser._id ?? authUser.email ?? "").trim() || undefined
+        )?.phone
+      );
+
+    dispatch(hydrateFromAuth({ name: authUser.name, email: authUser.email, mobile }));
+
+    const isAdmin = String(authUser.role ?? "").toLowerCase() === "admin";
+    const adminId = String(authUser.id ?? authUser._id ?? "").trim();
+    if (!isAdmin || mobile || !adminId) return;
+
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { raw } = await fetchAdminUserById(adminId);
+        const rawPhone =
+          readText(raw.contact) ??
+          readText(raw.phone) ??
+          readText(raw.mobile) ??
+          readText(raw.mobileNumber);
+        if (!rawPhone || cancelled) return;
+        dispatch(
+          hydrateFromAuth({
+            name: authUser.name,
+            email: authUser.email,
+            mobile: rawPhone,
+          })
+        );
+      } catch {
+        // Keep current fallback behavior if admin profile fetch fails.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser, dispatch, editIdFromUrl]);
 
   // Debounced autosave draft into localStorage
   useEffect(() => {
@@ -149,15 +208,23 @@ export default function PostPropertyLayout() {
 
             <section className="flex-1">
               <div className="rounded-2xl border border-[var(--b2)] bg-[var(--white)] shadow-sm p-5 sm:p-6">
-                <Suspense
-                  fallback={
-                    <div className="py-10 text-sm text-[var(--muted)]">
-                      {t("postProperty.layout.loadingStep")}
-                    </div>
-                  }
-                >
-                  <Outlet context={{ pushToast }} />
-                </Suspense>
+                {isEditLoading ? (
+                  <div className="py-10 text-sm text-[var(--muted)]">
+                    {t("postProperty.layout.loadingStep")}
+                  </div>
+                ) : showEditLoadError ? (
+                  <div className="py-10 text-sm text-[var(--error)]">{post.submitError}</div>
+                ) : (
+                  <Suspense
+                    fallback={
+                      <div className="py-10 text-sm text-[var(--muted)]">
+                        {t("postProperty.layout.loadingStep")}
+                      </div>
+                    }
+                  >
+                    <Outlet context={{ pushToast }} />
+                  </Suspense>
+                )}
               </div>
             </section>
           </div>

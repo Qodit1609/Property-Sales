@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Building2,
   ShieldCheck,
@@ -16,21 +17,23 @@ import type { ManagedAccount } from "../../features/auth/roleTypes";
 interface AdminStatsProps {
   accounts: ManagedAccount[];
   listings: Property[];
-  onCardClick?: (section: "listings" | "users", label: string) => void;
+  onCardClick?: (section: "listings" | "users", statId: string) => void;
 }
 
 type Tone = "emerald" | "sky" | "amber" | "rose" | "slate";
 
 interface StatItem {
-  label: string;
+  id: string;
+  labelKey: string;
   value: number;
   icon: React.ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
   tone: Tone;
 }
 
 interface StatSection {
-  title: string;
-  description: string;
+  id: "listings" | "users";
+  titleKey: string;
+  descriptionKey: string;
   items: StatItem[];
 }
 
@@ -39,6 +42,7 @@ const AdminStats: React.FC<AdminStatsProps> = ({
   listings,
   onCardClick,
 }) => {
+  const { t } = useTranslation();
   const totalAccounts = accounts.length;
   const buyers = accounts.filter((u) => u.role === "buyer").length;
   const sellers = accounts.filter((u) => u.role === "seller").length;
@@ -53,29 +57,34 @@ const AdminStats: React.FC<AdminStatsProps> = ({
 
   const sections: StatSection[] = [
     {
-      title: "Property listings",
-      description: "Moderation pipeline and inventory counts",
+      id: "listings",
+      titleKey: "adminPanel.dashboard.stats.listingsTitle",
+      descriptionKey: "adminPanel.dashboard.stats.listingsDescription",
       items: [
         {
-          label: "Total properties",
+          id: "totalProperties",
+          labelKey: "adminPanel.dashboard.stats.totalProperties",
           value: totalListings,
           icon: Building2,
           tone: "emerald",
         },
         {
-          label: "Approved",
+          id: "approved",
+          labelKey: "adminPanel.dashboard.stats.approved",
           value: approvedListings,
           icon: ShieldCheck,
           tone: "sky",
         },
         {
-          label: "Pending review",
+          id: "pendingReview",
+          labelKey: "adminPanel.dashboard.stats.pendingReview",
           value: pendingListings,
           icon: Clock,
           tone: "amber",
         },
         {
-          label: "Rejected",
+          id: "rejected",
+          labelKey: "adminPanel.dashboard.stats.rejected",
           value: rejectedListings,
           icon: XCircle,
           tone: "rose",
@@ -83,29 +92,34 @@ const AdminStats: React.FC<AdminStatsProps> = ({
       ],
     },
     {
-      title: "User accounts",
-      description: "Roles across your platform",
+      id: "users",
+      titleKey: "adminPanel.dashboard.stats.usersTitle",
+      descriptionKey: "adminPanel.dashboard.stats.usersDescription",
       items: [
         {
-          label: "Total accounts",
+          id: "totalAccounts",
+          labelKey: "adminPanel.dashboard.stats.totalAccounts",
           value: totalAccounts,
           icon: Users,
           tone: "slate",
         },
         {
-          label: "Buyers",
+          id: "buyers",
+          labelKey: "adminPanel.dashboard.stats.buyers",
           value: buyers,
           icon: UserRound,
           tone: "emerald",
         },
         {
-          label: "Sellers",
+          id: "sellers",
+          labelKey: "adminPanel.dashboard.stats.sellers",
           value: sellers,
           icon: Store,
           tone: "sky",
         },
         {
-          label: "Agents",
+          id: "agents",
+          labelKey: "adminPanel.dashboard.stats.agents",
           value: agents,
           icon: UserCog,
           tone: "amber",
@@ -152,45 +166,40 @@ const AdminStats: React.FC<AdminStatsProps> = ({
   return (
     <div className="space-y-10">
       {sections.map((section) => (
-        <section key={section.title} className="space-y-4">
+        <section key={section.id} className="space-y-4">
           <div className="border-b border-[var(--b2)]/40 pb-3">
             <h2 className="text-sm font-semibold tracking-tight text-[var(--b1)]">
-              {section.title}
+              {t(section.titleKey)}
             </h2>
-            <p className="mt-0.5 text-xs text-[var(--muted)]">{section.description}</p>
+            <p className="mt-0.5 text-xs text-[var(--muted)]">{t(section.descriptionKey)}</p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {section.items.map((card) => {
               const Icon = card.icon;
-              const t = toneStyles[card.tone];
+              const toneStyle = toneStyles[card.tone];
 
               return (
                 <article
-                  key={card.label}
-                  onClick={() =>
-                    onCardClick?.(
-                      section.title === "Property listings" ? "listings" : "users",
-                      card.label
-                    )
-                  }
+                  key={card.id}
+                  onClick={() => onCardClick?.(section.id, card.id)}
                   className="group relative overflow-hidden rounded-2xl border border-[var(--b2)]/50 bg-[var(--white)] p-5 shadow-[0_2px_12px_rgba(27,67,50,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--b2)] hover:shadow-[0_12px_28px_rgba(27,67,50,0.12)]"
                 >
                   <div
-                    className={`pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-gradient-to-br ${t.glow} to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-100`}
+                    className={`pointer-events-none absolute -right-6 -top-6 h-28 w-28 rounded-full bg-gradient-to-br ${toneStyle.glow} to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-100`}
                     aria-hidden
                   />
 
                   <div className="relative flex gap-4">
                     <div
-                      className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${t.iconGradient} text-white shadow-lg ${t.iconShadow}`}
+                      className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${toneStyle.iconGradient} text-white shadow-lg ${toneStyle.iconShadow}`}
                     >
                       <Icon className="h-7 w-7" aria-hidden />
                     </div>
 
                     <div className="min-w-0 flex-1 pt-0.5">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-                        {card.label}
+                        {t(card.labelKey)}
                       </p>
                       <p className="mt-1.5 text-3xl font-bold tabular-nums tracking-tight text-[var(--b1)]">
                         {card.value}

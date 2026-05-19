@@ -1,4 +1,5 @@
 import React, { Suspense, memo, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHomePageSections } from "@/hooks/useHomePageSections";
 import { SectionWrapper } from "./ui";
 import { getApprovedTestimonials } from "@/features/testimonials/testimonialApi";
@@ -15,11 +16,18 @@ const DistrictExplorerSection = React.lazy(
   () => import("./sections/DistrictExplorerSection"),
 );
 
-const SectionFallback: React.FC = () => (
-  <SectionWrapper className="py-10 sm:py-12">
-    <div className="h-48 rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] shadow-md animate-pulse" />
-  </SectionWrapper>
-);
+const SectionFallback: React.FC = () => {
+  const { t } = useTranslation();
+  return (
+    <SectionWrapper className="py-10 sm:py-12">
+      <div
+        className="h-48 rounded-2xl border border-[var(--b2-soft)] bg-[var(--white)] shadow-md animate-pulse"
+        role="status"
+        aria-label={t("common.loading")}
+      />
+    </SectionWrapper>
+  );
+};
 
 const HomePageSections: React.FC = () => {
   const { sections } = useHomePageSections();

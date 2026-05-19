@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Sparkles, MapPin, Flame } from "lucide-react";
 import { useAppSelector } from "../../hooks/reduxHooks";
 import PropertyCard from "../Cards/PropertyCard";
@@ -53,6 +54,7 @@ const PropertyRecommendations: React.FC<Props> = ({
   anchor = null,
   className = "",
 }) => {
+  const { t } = useTranslation();
   const catalog = useAppSelector((s) => s.properties.data);
 
   const approved = useMemo(
@@ -97,24 +99,24 @@ const PropertyRecommendations: React.FC<Props> = ({
     <div className={`space-y-4 ${className}`}>
       <RecommendationSection
         icon={<Sparkles className="h-4 w-4" />}
-        title="Similar properties"
-        subtitle="Same property type & profile as your selection when available."
+        title={t("buyerPanel.recommendations.similarTitle")}
+        subtitle={t("buyerPanel.recommendations.similarSubtitle")}
         properties={similar}
-        empty="Browse listings to populate similar recommendations from live inventory."
+        empty={t("buyerPanel.recommendations.similarEmpty")}
       />
       <RecommendationSection
         icon={<MapPin className="h-4 w-4" />}
-        title="Nearby properties"
-        subtitle="Heuristic match by city / locality from API data."
+        title={t("buyerPanel.recommendations.nearbyTitle")}
+        subtitle={t("buyerPanel.recommendations.nearbySubtitle")}
         properties={nearby}
-        empty="Location metadata will refine this section as listings include coordinates."
+        empty={t("buyerPanel.recommendations.nearbyEmpty")}
       />
       <RecommendationSection
         icon={<Flame className="h-4 w-4" />}
-        title="Trending & featured"
-        subtitle="Highlighted inventory from your current catalog."
+        title={t("buyerPanel.recommendations.trendingTitle")}
+        subtitle={t("buyerPanel.recommendations.trendingSubtitle")}
         properties={trending.length ? trending : approved.slice(0, 3)}
-        empty="No featured tags yet — showing top listings instead."
+        empty={t("buyerPanel.recommendations.trendingEmpty")}
       />
     </div>
   );

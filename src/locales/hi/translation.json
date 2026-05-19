@@ -75,7 +75,17 @@
     "toggleMenu": "मेन्यू टॉगल करें",
     "closeMenu": "मेन्यू बंद करें",
     "contactUs": "संपर्क करें",
-    "toggleOptions": "{{item}} विकल्प टॉगल करें"
+    "toggleOptions": "{{item}} विकल्प टॉगल करें",
+    "tags": "टैग्स",
+    "budgetUnderCr": "{{amount}} करोड़ से कम",
+    "budgetUnderL": "{{amount}} लाख से कम",
+    "budgetUnderK": "{{amount}} हजार से कम",
+    "languageEnglish": "English",
+    "languageHindi": "हिंदी",
+    "profilePhotoAlt": "{{name}} प्रोफ़ाइल",
+    "profilePhotoAltGeneric": "प्रोफ़ाइल",
+    "logoutConfirmTitle": "लॉगआउट की पुष्टि करें",
+    "logoutConfirmMessage": "क्या आप वाकई लॉगआउट करना चाहते हैं?"
   },
   "homePage": {
     "heroTitlePrefix": "आपकी अपनी",
@@ -97,8 +107,10 @@
       "ahmedabad": "अहमदाबाद",
       "ajmer": "अजमेर",
       "barwani": "बड़वानी",
+      "bhopal": "भोपाल",
       "dewas": "देवास",
       "indore": "इंदौर",
+      "indorecity": "इंदौर शहर",
       "jaipur": "जयपुर",
       "lyari": "ल्यारी",
       "mumbai": "मुंबई",
@@ -115,6 +127,8 @@
     "locationNotAvailable": "स्थान उपलब्ध नहीं",
     "propertyFallbackType": "प्रॉपर्टी",
     "imageNotAvailable": "छवि उपलब्ध नहीं",
+    "areaNotSpecified": "क्षेत्र निर्दिष्ट नहीं",
+    "perMonth": "/ माह",
     "rentTag": "किराया",
     "saleTag": "बिक्री",
     "viewDetails": "विवरण देखें",
@@ -123,7 +137,13 @@
     "featured": "फीचर्ड",
     "verified": "सत्यापित",
     "sizeUnitAc": "एकड़",
-    "sizeUnitSqft": "वर्गफुट"
+    "sizeUnitSqft": "वर्गफुट",
+    "units": {
+      "sqft": "वर्गफुट",
+      "ac": "एकड़",
+      "acre": "एकड़",
+      "bigha": "बीघा"
+    }
   },
   "propertySection": {
     "featuredProperty": "फीचर्ड प्रॉपर्टी",
@@ -142,7 +162,8 @@
       "yes": "हाँ",
       "no": "नहीं",
       "required": "आवश्यक",
-      "optional": "वैकल्पिक"
+      "optional": "वैकल्पिक",
+      "wordCount": "{{current}} / {{max}} शब्द"
     },
     "layout": {
       "loadingStep": "चरण लोड हो रहा है..."
@@ -339,14 +360,38 @@
       "stepTitle": "चरण 5: सुविधाएं / फीचर्स",
       "stepSubtitle": "जो लागू हो उसे चुनें। इससे यूजर्स फ़िल्टर और तुलना कर पाते हैं।",
       "options": {
-        "borewell": { "label": "बोरवेल", "desc": "विश्वसनीय भूजल स्रोत" },
-        "dripIrrigation": { "label": "ड्रिप सिंचाई", "desc": "पानी बचाने वाली व्यवस्था" },
-        "fencing": { "label": "फेंसिंग", "desc": "सीमा फेंसिंग उपलब्ध" },
-        "electricityConnection": { "label": "बिजली कनेक्शन", "desc": "सक्रिय बिजली कनेक्शन" },
-        "farmRoad": { "label": "फार्म रोड", "desc": "आंतरिक/एप्रोच रोड" },
-        "nearbyHighway": { "label": "नजदीकी हाईवे", "desc": "अच्छी कनेक्टिविटी" },
-        "storageFacility": { "label": "स्टोरेज सुविधा", "desc": "गोदाम/स्टोरेज स्पेस" },
-        "security": { "label": "सुरक्षा", "desc": "ऑन-साइट सुरक्षा" }
+        "borewell": {
+          "label": "बोरवेल",
+          "desc": "विश्वसनीय भूजल स्रोत"
+        },
+        "dripIrrigation": {
+          "label": "ड्रिप सिंचाई",
+          "desc": "पानी बचाने वाली व्यवस्था"
+        },
+        "fencing": {
+          "label": "फेंसिंग",
+          "desc": "सीमा फेंसिंग उपलब्ध"
+        },
+        "electricityConnection": {
+          "label": "बिजली कनेक्शन",
+          "desc": "सक्रिय बिजली कनेक्शन"
+        },
+        "farmRoad": {
+          "label": "फार्म रोड",
+          "desc": "आंतरिक/एप्रोच रोड"
+        },
+        "nearbyHighway": {
+          "label": "नजदीकी हाईवे",
+          "desc": "अच्छी कनेक्टिविटी"
+        },
+        "storageFacility": {
+          "label": "स्टोरेज सुविधा",
+          "desc": "गोदाम/स्टोरेज स्पेस"
+        },
+        "security": {
+          "label": "सुरक्षा",
+          "desc": "ऑन-साइट सुरक्षा"
+        }
       }
     },
     "documents": {
@@ -474,6 +519,8 @@
       "enterFloor": "फ़्लोर दर्ज करें",
       "enterFurnishing": "फर्निशिंग दर्ज करें",
       "addDescription": "विवरण जोड़ें",
+      "descriptionWordLimit": "विवरण 150 शब्दों से अधिक नहीं हो सकता",
+      "shortDescriptionWordLimit": "संक्षिप्त विवरण 40 शब्दों से अधिक नहीं हो सकता",
       "addAtLeastOneImage": "कम से कम एक इमेज जोड़ें (फ़ाइल अपलोड करें या इमेज URL पेस्ट करें)।"
     }
   },
@@ -555,8 +602,7 @@
       "noRisk": "कोई जोखिम नहीं",
       "owner": "मालिक",
       "dealer": "डीलर",
-      "seller": "विक्रेता"
-      ,
+      "seller": "विक्रेता",
       "sqft": "वर्गफुट",
       "month": "माह",
       "acre": "एकड़",
@@ -570,7 +616,57 @@
       "openGoogleMap": "Google Map खोलें",
       "call": "कॉल",
       "contact": "संपर्क",
-      "viewDronePreview": "ड्रोन प्रीव्यू देखें"
+      "viewDronePreview": "ड्रोन प्रीव्यू देखें",
+      "viewOnMap": "मैप पर देखें"
+    },
+    "units": {
+      "km": "किमी",
+      "ft": "फीट",
+      "m": "मी",
+      "mm": "मिमी",
+      "mmPerYear": "मिमी/वर्ष",
+      "percent": "%"
+    },
+    "aria": {
+      "locationMapTitle": "{{title}} लोकेशन मैप",
+      "mapPreviewAlt": "{{title}} मैप प्रीव्यू",
+      "mapScreenshotAlt": "{{title}} मैप स्क्रीनशॉट",
+      "imageAlt": "{{title}} इमेज {{index}}"
+    },
+    "dynamic": {
+      "facing": {
+        "North": "उत्तर",
+        "South": "दक्षिण",
+        "East": "पूर्व",
+        "West": "पश्चिम",
+        "North-East": "उत्तर-पूर्व",
+        "North-West": "उत्तर-पश्चिम",
+        "South-East": "दक्षिण-पूर्व",
+        "South-West": "दक्षिण-पश्चिम"
+      },
+      "landUseType": {
+        "Agricultural": "कृषि",
+        "Residential": "आवासीय",
+        "Commercial": "व्यावसायिक"
+      },
+      "roadType": {
+        "kachha": "कच्ची सड़क",
+        "pakka": "पक्की सड़क",
+        "highway": "हाईवे"
+      },
+      "waterAvailability": {
+        "High": "उच्च",
+        "Medium": "मध्यम",
+        "Low": "निम्न",
+        "Canal + Borewell": "नहर + बोरवेल"
+      },
+      "furnishing": {
+        "Unfurnished": "अनफर्निश्ड",
+        "Semi-furnished": "सेमी-फर्निश्ड",
+        "Semi Furnished": "सेमी फर्निश्ड",
+        "Fully-furnished": "फुली-फर्निश्ड",
+        "Fully Furnished": "पूर्ण फर्निश्ड"
+      }
     },
     "detail": {
       "basicDetails": "मूल विवरण",
@@ -668,8 +764,7 @@
       "noDataAvailable": "कोई डेटा उपलब्ध नहीं",
       "statusMetadataLimited": "इस लिस्टिंग के लिए स्थिति मेटाडेटा सीमित है।",
       "floodRiskDescription": "बैकएंड क्लाइमेट एनालिटिक्स के आधार पर बाढ़-प्रवण क्षेत्र का आकलन।",
-      "droughtRiskDescription": "ऐतिहासिक मौसम और जल-सहायता संकेतकों के आधार पर सूखा जोखिम आकलन।"
-      ,
+      "droughtRiskDescription": "ऐतिहासिक मौसम और जल-सहायता संकेतकों के आधार पर सूखा जोखिम आकलन।",
       "priceOnRequest": "मूल्य अनुरोध पर",
       "areaNotSpecified": "क्षेत्र निर्दिष्ट नहीं"
     }
@@ -736,12 +831,32 @@
       "aria": "सूचनाएं",
       "heading": "सूचनाएं",
       "sub": "लिस्टिंग और लीड अपडेट",
+      "clearAll": "सभी साफ़ करें",
       "approvedTitle": "लिस्टिंग स्वीकृत",
       "approvedDesc": "आपकी प्रॉपर्टी समीक्षा पास हो गई है।",
       "leadTitle": "नया लीड",
       "leadDesc": "खरीदार ने संपर्क अनुरोध किया।",
       "rejectedTitle": "अपडेट आवश्यक",
-      "rejectedDesc": "स्वीकृति से पहले बदलाव चाहिए।"
+      "rejectedDesc": "स्वीकृति से पहले बदलाव चाहिए।",
+      "titles": {
+        "Property approved": "संपत्ति स्वीकृत",
+        "Property rejected": "संपत्ति अस्वीकृत",
+        "Promotion approved": "प्रचार स्वीकृत",
+        "Property added to cart": "संपत्ति कार्ट में जोड़ी गई",
+        "New lead": "नया लीड",
+        "Update required": "अपडेट आवश्यक"
+      },
+      "messages": {
+        "approvedByAdmin": "{{target}} को व्यवस्थापक द्वारा स्वीकृत किया गया।",
+        "rejectedByAdmin": "{{target}} को व्यवस्थापक द्वारा अस्वीकृत किया गया।",
+        "propertyApproved": "आपकी संपत्ति {{target}} स्वीकृत हो गई है।",
+        "propertyRejected": "आपकी संपत्ति {{target}} अस्वीकृत की गई है।"
+      }
+    },
+    "time": {
+      "minutesAgo": "{{count}} मि. पहले",
+      "hoursAgo": "{{count}} घं. पहले",
+      "daysAgo": "{{count}} दि. पहले"
     },
     "stats": {
       "totalProperties": "कुल प्रॉपर्टी",
@@ -755,12 +870,14 @@
       "viewsTitle": "प्रॉपर्टी व्यू ट्रेंड",
       "viewsSub": "आपके पोर्टफोलियो एनालिटिक्स से साप्ताहिक संकेत।",
       "leadsTitle": "लीड ट्रेंड",
-      "leadsSub": "संपर्क क्रियाओं से जुड़ाव।"
+      "leadsSub": "संपर्क क्रियाओं से जुड़ाव।",
+      "weekLabel": "स{{week}}"
     },
     "leadsPreview": {
       "title": "हाल के लीड्स",
       "sub": "पूर्वावलोकन — API जुड़ने पर वर्कफ़्लो।",
-      "cta": "लीड्स खोलें"
+      "cta": "लीड्स खोलें",
+      "empty": "अभी कोई हालिया लीड नहीं।"
     },
     "propertyInsights": {
       "title": "प्रॉपर्टी इनसाइट्स",
@@ -806,6 +923,7 @@
     "actions": {
       "view": "देखें",
       "edit": "संपादित करें",
+      "editBlockedDirectReject": "यह लिस्टिंग प्रशासक द्वारा अस्वीकृत की गई है और इसे संपादित या पुनः जमा नहीं किया जा सकता।",
       "duplicate": "डुप्लिकेट",
       "more": "और",
       "markSold": "बिकी चिह्नित करें",
@@ -818,6 +936,13 @@
       "sold": "बिक्री की पुष्टि हमारी टीम करती है। सहायता से संपर्क करें या अपडेट की प्रतीक्षा करें।",
       "deactivate": "लिस्टिंग छुपाने के लिए प्रशासक अनुमोदन आवश्यक हो सकता है।",
       "ok": "समझ गया"
+    },
+    "statusAction": {
+      "success": "लिस्टिंग स्थिति अपडेट हो गई।",
+      "error": "लिस्टिंग स्थिति अपडेट नहीं हो सकी। कृपया पुनः प्रयास करें।"
+    },
+    "errors": {
+      "Failed to fetch your listings": "आपकी लिस्टिंग्स लोड नहीं हो सकीं"
     },
     "duplicateSuccess": "डुप्लिकेट लिस्टिंग बनाई गई।",
     "duplicateError": "डुप्लिकेट नहीं बन सका। छवियाँ और आवश्यक फ़ील्ड जाँचें।",
@@ -833,12 +958,22 @@
       "locationsTitle": "शीर्ष स्थान",
       "locationsSub": "आपकी इन्वेंटरी कहाँ केंद्रित है।",
       "noData": "अभी पर्याप्त डेटा नहीं।",
-      "footer": "आँकड़े लिस्टिंग एनालिटिक्स पर आधारित हैं।"
+      "footer": "आँकड़े लिस्टिंग एनालिटिक्स पर आधारित हैं।",
+      "fallback": {
+        "listing": "लिस्टिंग",
+        "other": "अन्य"
+      }
     },
     "leadsPage": {
       "title": "लीड प्रबंधन",
       "sub": "खरीदार रुचि ट्रैक करें। नमूना डेटा।",
       "searchPlaceholder": "खरीदार या प्रॉपर्टी खोजें",
+      "loading": "लीड्स लोड हो रहे हैं...",
+      "loadError": "लीड्स लोड नहीं हो सके।",
+      "deleteError": "पंक्ति हटाई नहीं जा सकी।",
+      "clearError": "पंक्तियाँ साफ़ नहीं हो सकीं।",
+      "noApprovedProperties": "कोई स्वीकृत संपत्ति नहीं मिली।",
+      "noLeads": "कोई लीड नहीं मिला।",
       "interest": "रुचि",
       "colBuyer": "खरीदार",
       "colContact": "संपर्क",
@@ -848,15 +983,42 @@
       "colStatus": "स्थिति",
       "colActions": "क्रियाएं"
     },
+    "leadsCard": {
+      "untitledProperty": "बिना शीर्षक संपत्ति",
+      "clearAll": "सभी साफ़ करें"
+    },
+    "leadsTable": {
+      "buyerName": "खरीदार का नाम",
+      "activityType": "गतिविधि प्रकार",
+      "propertyName": "संपत्ति का नाम",
+      "dateTime": "दिनांक और समय",
+      "action": "क्रिया",
+      "empty": "अभी कोई गतिविधि नहीं।",
+      "delete": "हटाएँ",
+      "activityTypes": {
+        "view": "संपत्ति देखें",
+        "cart": "कार्ट में जोड़ें",
+        "wishlist": "विशलिस्ट",
+        "compare": "संपत्ति की तुलना"
+      }
+    },
+    "statsAria": "विक्रेता आँकड़े",
     "leads": {
-      "interest": { "hot": "गर्म", "warm": "गुनगुना", "cold": "ठंडा" },
+      "interest": {
+        "hot": "गर्म",
+        "warm": "गुनगुना",
+        "cold": "ठंडा"
+      },
       "status": {
         "new": "नया",
         "contacted": "संपर्क किया",
         "converted": "रूपांतरित",
         "lost": "खोया"
       },
-      "actions": { "hot": "हॉट", "notes": "नोट्स" }
+      "actions": {
+        "hot": "हॉट",
+        "notes": "नोट्स"
+      }
     },
     "messages": {
       "title": "संदेश",
@@ -866,7 +1028,45 @@
       "encrypted": "चैट सक्षम होने पर एन्क्रिप्शन लागू हो सकता है।",
       "placeholderYou": "धन्यवाद — और विवरण साझा कर सकते हैं।",
       "composerPlaceholder": "संदेश लिखें…",
-      "send": "भेजें"
+      "send": "संदेश भेजें",
+      "threads": {
+        "t1": {
+          "name": "प्रिया · कृषि भूमि",
+          "preview": "क्या बोरवेल प्रमाणपत्र उपलब्ध है?",
+          "time": "10:42"
+        },
+        "t2": {
+          "name": "विक्रम · फार्महाउस",
+          "preview": "हम इस सप्ताहांत आ सकते हैं।",
+          "time": "कल"
+        },
+        "t3": {
+          "name": "नेहा · प्लॉट",
+          "preview": "कृपया सटीक पिन स्थान साझा करें।",
+          "time": "सोम"
+        }
+      }
+    },
+    "promotionsPage": {
+      "loading": "प्रचार लोड हो रहे हैं..."
+    },
+    "imageUploader": {
+      "title": "त्वरित छवि अपलोड",
+      "subtitle": "डैशबोर्ड से अपलोड करें। ये छवियाँ पोस्ट-प्रॉपर्टी मीडिया चरण में उपयोग होती हैं।",
+      "openMediaStep": "पूर्ण मीडिया चरण खोलें",
+      "hint": "JPG/PNG/WEBP/GIF, अधिकतम 10MB, 5 छवियाँ तक।",
+      "selectImages": "छवियाँ चुनें ({{current}}/{{max}})",
+      "uploading": "अपलोड हो रहा है",
+      "empty": "अभी कोई छवि अपलोड नहीं की गई।",
+      "propertyAlt": "संपत्ति",
+      "propertyImageAlt": "संपत्ति छवि",
+      "removeImage": "छवि हटाएँ {{name}}",
+      "maxImages": "केवल {{max}} छवियाँ अनुमत हैं।",
+      "invalidType": "{{file}}: अमान्य फ़ाइल प्रकार",
+      "fileTooLarge": "{{file}}: फ़ाइल का आकार 10MB से अधिक है",
+      "duplicateSkipped": "{{file}}: डुप्लिकेट छोड़ा गया",
+      "uploadFailed": "अपलोड विफल",
+      "skippedLimit": "{{count}} फ़ाइल(ें) {{max}}-छवि सीमा के कारण छोड़ी गईं"
     },
     "promo": {
       "title": "प्रचार",
@@ -881,6 +1081,36 @@
       "clicks": "क्लिक",
       "performance": "Δ",
       "ctaSoon": "जल्द आ रहा है"
+    },
+    "promotionSection": {
+      "title": "सशुल्क संपत्ति प्रचार",
+      "subtitle": "अपनी सर्वश्रेष्ठ लिस्टिंग की दृश्यता बढ़ाएँ। अवधि चुनें, अनुरोध भेजें और स्थिति यहाँ ट्रैक करें।",
+      "legendActive": "सक्रिय",
+      "legendPending": "लंबित",
+      "legendExpired": "समाप्त / अस्वीकृत",
+      "emptyTitle": "अभी प्रचार के लिए कोई संपत्ति नहीं",
+      "emptyBody": "संपत्तियाँ जोड़ने के बाद आप उन्हें यहाँ प्रचारित कर सकते हैं और प्रदर्शन देख सकते हैं।",
+      "noImage": "कोई छवि नहीं जोड़ी गई",
+      "daysLeft": "{{count}} दिन शेष",
+      "extendPromotion": "प्रचार बढ़ाएँ",
+      "promoteNow": "अभी प्रचार करें",
+      "blockedTitle": "प्रचार उपलब्ध नहीं",
+      "blockedMessage": "केवल स्वीकृत संपत्ति को प्रचारित किया जा सकता है।",
+      "statusPendingApproval": "स्वीकृति लंबित",
+      "statusActive": "सक्रिय",
+      "statusExpired": "समाप्त",
+      "statusRejected": "अस्वीकृत",
+      "statusNotPromoted": "प्रचारित नहीं"
+    },
+    "promotionModal": {
+      "title": "सशुल्क संपत्ति प्रचार",
+      "selectDuration": "अवधि चुनें",
+      "month": "{{count}} महीना",
+      "months": "{{count}} महीने",
+      "pricingFree": "मुफ़्त (पहला प्रचार)",
+      "pricingRs": "₹ {{amount}}",
+      "pricingLabel": "मूल्य",
+      "sendRequest": "प्रचार अनुरोध भेजें"
     },
     "profile": {
       "title": "विक्रेता प्रोफ़ाइल",
@@ -908,8 +1138,22 @@
       "verifySub": "दस्तावेज़ अपलोड करें।",
       "docPan": "PAN / ID",
       "docAddress": "पता प्रमाण",
+      "panLabel": "PAN",
+      "aadhaarLabel": "आधार",
+      "aadhaarUpload": "आधार कार्ड अपलोड",
+      "panUpload": "PAN कार्ड अपलोड",
+      "uploadSuccess": "सफलतापूर्वक",
+      "uploadAction": "अपलोड",
+      "profileCompletedTitle": "प्रोफ़ाइल पूर्ण",
+      "profileCompletedMessage": "आपकी प्रोफ़ाइल 100% पूर्ण है",
       "pending": "लंबित",
-      "optional": "वैकल्पिक"
+      "optional": "वैकल्पिक",
+      "validation": {
+        "nameRequired": "नाम आवश्यक है",
+        "phoneRequired": "मोबाइल नंबर आवश्यक है",
+        "panRequired": "PAN आवश्यक है",
+        "aadhaarRequired": "आधार आवश्यक है"
+      }
     },
     "settings": {
       "title": "सेटिंग्स",
@@ -920,6 +1164,1653 @@
       "listings": "लिस्टिंग स्थिति",
       "marketing": "टिप्स और अपडेट",
       "save": "सहेजें"
+    }
+  },
+  "status": {
+    "available": "उपलब्ध",
+    "pending": "लंबित",
+    "approved": "स्वीकृत",
+    "rejected": "अस्वीकृत",
+    "sold": "बिक चुकी",
+    "deactivated": "निष्क्रिय",
+    "active": "सक्रिय",
+    "inactive": "निष्क्रिय",
+    "success": "सफल",
+    "new": "नया",
+    "contacted": "संपर्क किया",
+    "qualified": "योग्य",
+    "closed": "बंद",
+    "converted": "रूपांतरित",
+    "lost": "खोया"
+  },
+  "listingType": {
+    "sell": "बेचें",
+    "sale": "बिक्री",
+    "rent": "किराया",
+    "lease": "लीज",
+    "rent/lease": "किराया/लीज"
+  },
+  "roles": {
+    "admin": "व्यवस्थापक",
+    "seller": "विक्रेता",
+    "buyer": "खरीदार",
+    "agent": "एजेंट"
+  },
+  "propertyList": {
+    "featuredListings": "फीचर्ड लिस्टिंग्स",
+    "description": "मांग वाले क्षेत्रों में विशेष संपत्तियाँ खोजें। बेहतर जीवन और जीवनशैली के लिए। उच्च रिटर्न और विश्वसनीय निवेश वृद्धि।",
+    "galleryRefreshFailed": "गैलरी छवियाँ रिफ्रेश नहीं हो सकीं; उपलब्ध होने पर लिस्टिंग छवियाँ दिखाई जा रही हैं।",
+    "scrollerLabel": "प्रॉपर्टी लिस्टिंग क्षैतिज स्क्रॉलर",
+    "emptyFiltered": "आपके फ़िल्टर से कोई प्रॉपर्टी मेल नहीं खाती।",
+    "emptyDefault": "अभी कोई प्रॉपर्टी नहीं मिली। कृपया थोड़ी देर बाद पुनः प्रयास करें।"
+  },
+  "propertyDetails": {
+    "loadFailedTitle": "प्रॉपर्टी विवरण लोड नहीं हो सके",
+    "goBack": "वापस जाएं",
+    "notFoundTitle": "प्रॉपर्टी नहीं मिली",
+    "notFoundBody": "प्रॉपर्टी हटाई गई हो सकती है या उपलब्ध नहीं है।",
+    "backToHome": "होम पर वापस"
+  },
+  "common": {
+    "close": "बंद करें",
+    "confirm": "पुष्टि करें",
+    "cancel": "रद्द करें",
+    "ok": "ठीक है",
+    "save": "सहेजें",
+    "edit": "संपादित करें",
+    "delete": "हटाएं",
+    "search": "खोजें",
+    "loading": "लोड हो रहा है...",
+    "submit": "जमा करें",
+    "back": "Back",
+    "next": "Next",
+    "yes": "Yes",
+    "no": "No",
+    "all": "सभी",
+    "actions": "कार्रवाई",
+    "status": "स्थिति",
+    "filters": "फ़िल्टर",
+    "view": "देखें",
+    "approve": "स्वीकृत करें",
+    "reject": "अस्वीकार करें",
+    "optional": "Optional",
+    "required": "Required",
+    "na": "N/A",
+    "unknown": "Unknown",
+    "expandSidebar": "साइडबार विस्तृत करें",
+    "collapseSidebar": "साइडबार संक्षिप्त करें",
+    "notifications": "सूचनाएं",
+    "logout": "लॉगआउट",
+    "welcome": "स्वागत है",
+    "closeMenu": "मेन्यू बंद करें",
+    "openNavigation": "Open navigation",
+    "confirmLogout": "लॉगआउट की पुष्टि करें",
+    "confirmLogoutMessage": "क्या आप वाकई लॉगआउट करना चाहते हैं?",
+    "clearAll": "सभी साफ़ करें",
+    "signedIn": "साइन इन",
+    "accountSettings": "खाता सेटिंग्स",
+    "viewFullDetails": "पूरी जानकारी देखें",
+    "profileIncompleteTitle": "प्रोफ़ाइल अधूरी है",
+    "profileIncompleteMessage": "इस पेज तक पहुँचने के लिए कृपया अपनी प्रोफ़ाइल 100% पूरी करें।",
+    "specification": "विशेष विवरण",
+    "highlightDifferences": "अंतर हाइलाइट करें",
+    "showAllEqual": "सभी समान दिखाएँ",
+    "submitting": "जमा हो रहा है...",
+    "deleting": "हटाया जा रहा है…",
+    "property": "संपत्ति",
+    "properties": "संपत्तियाँ",
+    "buyerFallback": "खरीदार"
+  },
+  "auth": {
+    "brand": "भूमिवाला",
+    "fields": {
+      "email": "ईमेल",
+      "password": "पासवर्ड",
+      "name": "नाम",
+      "mobile": "मोबाइल",
+      "confirmPassword": "पासवर्ड की पुष्टि करें",
+      "investmentInterest": "Investment Interest",
+      "propertyFocusType": "Property focus type",
+      "experienceYears": "Experience (years)"
+    },
+    "placeholders": {
+      "email": "अपना ईमेल दर्ज करें",
+      "fullName": "Enter your full name",
+      "mobile": "10-digit mobile",
+      "investmentInterest": "e.g. Weekend home, farmland, resort",
+      "propertyFocus": "e.g. Farmhouse, agriculture land",
+      "experienceYears": "3"
+    },
+    "actions": {
+      "hide": "Hide",
+      "show": "Show",
+      "hidePassword": "Hide password",
+      "showPassword": "Show password",
+      "hideConfirmPassword": "Hide confirm password",
+      "showConfirmPassword": "Show confirm password"
+    },
+    "login": {
+      "title": "साइन इन",
+      "subtitle": "अपने डैशबोर्ड और सहेजी गई गतिविधि तक पहुँचें।",
+      "rememberMe": "मुझे याद रखें",
+      "forgotPassword": "पासवर्ड भूल गए?",
+      "submitting": "साइन इन हो रहा है...",
+      "submit": "साइन इन",
+      "newHere": "नए हैं?",
+      "registerLink": "यहाँ रजिस्टर करें"
+    },
+    "register": {
+      "title": "अपना खाता बनाएं",
+      "subtitle": "Choose your role and we'll take you to the right dashboard.",
+      "role": "Role",
+      "roles": {
+        "buyer": "BUYER",
+        "seller": "SELLER",
+        "agent": "AGENT"
+      },
+      "hints": {
+        "seller": "Seller: tell us your property focus.",
+        "agent": "Agent: share your experience level.",
+        "buyer": "Buyer: choose your investment interest."
+      },
+      "submitting": "Creating account...",
+      "submit": "Register",
+      "signInCta": "Already have an account? Sign in",
+      "terms": "By registering, you agree to our terms."
+    },
+    "blocked": {
+      "title": "Alert",
+      "message": "आपको एडमिन द्वारा ब्लॉक किया गया है"
+    },
+    "toast": {
+      "passwordMismatch": {
+        "title": "Passwords do not match",
+        "detail": "Please confirm your password again."
+      },
+      "success": {
+        "title": "Registration successful",
+        "detail": "Signing you in..."
+      }
+    }
+  },
+  "footer": {
+    "sections": {
+      "quickLinks": "त्वरित लिंक",
+      "categories": "श्रेणियाँ",
+      "usefulLinks": "उपयोगी लिंक",
+      "contact": "संपर्क करें"
+    },
+    "newsletter": {
+      "title": "अपडेट रहें",
+      "description": "नवीनतम प्रॉपर्टी लिस्टिंग और निवेश सुझाव सीधे अपने इनबॉक्स में पाएँ।",
+      "emailLabel": "ईमेल पता",
+      "emailPlaceholder": "अपना ईमेल दर्ज करें",
+      "subscribeAria": "न्यूज़लेटर सब्सक्राइब करें",
+      "subscribe": "सब्सक्राइब करें",
+      "thankYou": "सब्सक्राइब करने के लिए धन्यवाद!"
+    },
+    "backToTop": "ऊपर जाएं",
+    "backToTopAria": "ऊपर जाएं",
+    "copyright": "© {{year}} BhoomiWala.com · सर्वाधिकार सुरक्षित",
+    "credits": "TRH द्वारा सावधानी से विकसित",
+    "links": {
+      "Home": "होम",
+      "About Us": "हमारे बारे में",
+      "About": "परिचय",
+      "Contact Us": "संपर्क करें",
+      "Contact": "संपर्क",
+      "Privacy Policy": "गोपनीयता नीति",
+      "Terms of Service": "सेवा की शर्तें",
+      "Terms & Conditions": "नियम और शर्तें",
+      "Terms and Conditions": "नियम और शर्तें",
+      "FAQ": "अक्सर पूछे जाने वाले प्रश्न",
+      "FAQs": "अक्सर पूछे जाने वाले प्रश्न",
+      "Help & Support": "सहायता और समर्थन",
+      "Help and Support": "सहायता और समर्थन",
+      "Blog": "ब्लॉग",
+      "Careers": "करियर",
+      "Sitemap": "साइटमैप",
+      "Login": "लॉगिन",
+      "Register": "रजिस्टर",
+      "Sign In": "साइन इन",
+      "Sign Up": "साइन अप",
+      "Post Property": "प्रॉपर्टी पोस्ट करें",
+      "List Property": "प्रॉपर्टी लिस्ट करें",
+      "Buy Property": "प्रॉपर्टी खरीदें",
+      "Rent Property": "प्रॉपर्टी किराए पर",
+      "Explore Properties": "प्रॉपर्टीज़ देखें",
+      "Farmland": "कृषि भूमि",
+      "Agri Resort": "कृषि रिसॉर्ट",
+      "Residential": "आवासीय",
+      "Commercial": "व्यावसायिक",
+      "Testimonials": "प्रशंसापत्र",
+      "How It Works": "यह कैसे काम करता है",
+      "Seller Dashboard": "विक्रेता डैशबोर्ड",
+      "Buyer Dashboard": "खरीदार डैशबोर्ड",
+      "Buy Land": "भूमि खरीदें",
+      "Blogs": "ब्लॉग",
+      "Farm Land": "फार्म भूमि",
+      "Agricultural Land": "कृषि भूमि",
+      "Investment Land": "निवेश भूमि",
+      "Rent Properties": "किराए की प्रॉपर्टी"
+    },
+    "badges": {
+      "Verified Listings": "सत्यापित लिस्टिंग",
+      "Verified Documentation": "सत्यापित दस्तावेज़",
+      "Secure Transactions": "सुरक्षित लेनदेन",
+      "Legal Support": "कानूनी सहायता",
+      "100% Transparency": "100% पारदर्शिता",
+      "RERA Registered": "RERA पंजीकृत",
+      "Trusted Platform": "विश्वसनीय प्लेटफ़ॉर्म",
+      "Expert Support": "विशेषज्ञ सहायता",
+      "Verified Properties": "सत्यापित प्रॉपर्टी",
+      "Safe & Secure": "सुरक्षित और भरोसेमंद",
+      "Transparent Deals": "पारदर्शी सौदे",
+      "End-to-End Support": "एंड-टू-एंड सहायता"
+    },
+    "brand": {
+      "names": {},
+      "descriptions": {
+        "The easiest way to find, buy, and invest in your dream land.": "अपनी सपनों की ज़मीन खोजने, खरीदने और निवेश करने का सबसे आसान तरीका।",
+        "Discover premium land investments in Indore. More valuable than gold, more lasting than time.": "इंदौर में प्रीमियम भूमि निवेश खोजें। सोने से अधिक मूल्यवान, समय से अधिक स्थायी।",
+        "Your trusted partner in finding the perfect land investment. Explore verified farm lands, farmhouses, and agricultural properties across India.": "सही भूमि निवेश खोजने में आपका विश्वसनीय साथी। पूरे भारत में सत्यापित फार्म भूमि, फार्महाउस और कृषि प्रॉपर्टी देखें।"
+      }
+    },
+    "social": {
+      "Instagram": "इंस्टाग्राम",
+      "Facebook": "फेसबुक",
+      "YouTube": "यूट्यूब",
+      "WhatsApp": "व्हाट्सऐप",
+      "Twitter": "ट्विटर",
+      "LinkedIn": "लिंक्डइन",
+      "X": "एक्स"
+    },
+    "addresses": {}
+  },
+  "homeSections": {
+    "farmingPromo": {
+      "eyebrow": "कृषि भूमि निवेश",
+      "title": "दीर्घकालिक मूल्य के लिए उच्च संभावित कृषि अवसर",
+      "description": "मिट्टी प्रोफ़ाइल, सिंचाई उपलब्धता और जिला-स्तरीय विकास मांग से जुड़े व्यावहारिक डेटा के साथ सत्यापित कृषि भूमि लिस्टिंग खोजें।",
+      "badges": {
+        "verifiedDocs": "सत्यापित दस्तावेज़",
+        "farmingFilters": "कृषि-विशिष्ट फ़िल्टर",
+        "advisorSupport": "सलाहकार सहायता"
+      },
+      "ctaExplore": "कृषि भूमि देखें",
+      "ctaPostLand": "अपनी जमीन पोस्ट करें",
+      "imageAlt": "कृषि भूमि का हवाई दृश्य"
+    },
+    "featuredFarms": {
+      "eyebrow": "फीचर्ड",
+      "title": "भूमिवाला आश्वस्त — अत्यधिक अनुशंसित फीचर्ड प्रॉपर्टी",
+      "description": "यहाँ केवल सक्रिय फीचर्ड प्रॉपर्टी दिखाई जाती हैं।"
+    },
+    "districtExplorer": {
+      "eyebrow": "स्थान एक्सप्लोरर",
+      "title": "शीर्ष कृषि भूमि खोजें",
+      "description": "अवसर खोजें और उपलब्ध इन्वेंटरी में तुरंत जाएँ।",
+      "listingsCount": "{{count}}+ कृषि भूमि",
+      "viewListings": "लिस्टिंग देखें",
+      "ariaExploreDistrict": "{{district}} में कृषि भूमि लिस्टिंग देखें",
+      "imageAlt": "{{district}} में कृषि भूमि"
+    },
+    "benefits": {
+      "eyebrow": "हमें क्यों चुनें",
+      "title": "आधुनिक कृषि भूमि लेनदेन के लिए बनाया गया",
+      "description": "खोज, जाँच और समापन में घर्षण कम करने के लिए डिज़ाइन किया गया केंद्रित अनुभव।",
+      "items": {
+        "benefit-1": {
+          "title": "सत्यापित भूमि दस्तावेज़",
+          "description": "हर लिस्टिंग स्वामित्व स्पष्टता और दस्तावेज़ विश्वसनीयता के लिए सत्यापित है।"
+        },
+        "benefit-2": {
+          "title": "कृषि-केंद्रित फ़िल्टर",
+          "description": "मिट्टी की गुणवत्ता, सिंचाई स्रोत, एकड़ और जिले के आधार पर तुरंत खोजें।"
+        },
+        "benefit-3": {
+          "title": "स्थानीय सहायता नेटवर्क",
+          "description": "साइट विज़िट, बातचीत और समापन के लिए स्थानीय विशेषज्ञों से मार्गदर्शन पाएँ।"
+        },
+        "benefit-4": {
+          "title": "तेज़ लिस्टिंग दृश्यता",
+          "description": "विक्रेताओं को कृषि भूमि-विशिष्ट विवरण के साथ मजबूत लिस्टिंग दृश्यता मिलती है।"
+        }
+      }
+    },
+    "testimonials": {
+      "eyebrow": "प्रशंसापत्र",
+      "title": "कृषि भूमि खरीदारों और विक्रेताओं का भरोसा",
+      "description": "सफल कृषि भूमि खोज और समापन यात्राओं की वास्तविक ग्राहक कहानियाँ।",
+      "emptyMessageFallback": "इस ग्राहक ने भूमिवाला के साथ सकारात्मक अनुभव साझा किया।",
+      "defaultOccupation": "कृषि भूमि उपयोगकर्ता",
+      "carouselAriaLabel": "ग्राहक प्रशंसापत्र",
+      "prevAriaLabel": "पिछला प्रशंसापत्र",
+      "nextAriaLabel": "अगला प्रशंसापत्र",
+      "goToAriaLabel": "प्रशंसापत्र {{index}} पर जाएँ",
+      "items": {
+        "69df7b36de6aa2439a2d9e0f": {
+          "message": "मैं इंदौर के पास जैविक खेती शुरू करने के लिए उपजाऊ कृषि भूमि की तलाश कर रहा था, लेकिन विश्वसनीय जानकारी मिलना बहुत कठिन था। अन्य प्लेटफ़ॉर्म की अधिकांश लिस्टिंग अधूरी या भ्रामक थीं। यहाँ मुझे मिट्टी की गुणवत्ता, पानी की उपलब्धता और सड़क कनेक्टिविटी के बारे में विस्तृत जानकारी मिली, जिससे बड़ा अंतर पड़ा। मैंने कुछ संपत्तियों को शॉर्टलिस्ट किया और व्यक्तिगत रूप से देखा। ऑनलाइन दिखाए गए विवरण से सब कुछ पूरी तरह मेल खाता था, जिससे मेरा भरोसा बना। बिना किसी भ्रम या दलालों पर निर्भरता के मैं अपनी जमीन अंतिम रूप दे सका। कुल मिलाकर, अनुभव पारदर्शी और पेशेवर रहा।",
+          "occupation": "बागवानी किसान",
+          "location": "खरगोन"
+        },
+        "69df7b6ade6aa2439a2d9e21": {
+          "message": "पहली बार कृषि भूमि खरीदने वाले होने के कारण, कानूनी पहलुओं और स्थान की सटीकता को लेकर मुझे काफी अनिश्चितता थी। मैं कोई जोखिम नहीं लेना चाहता था, इसलिए मैंने विभिन्न प्लेटफ़ॉर्म पर शोध किया। संपत्ति विवरण और मानचित्र स्थानों की स्पष्टता के कारण यह प्लेटफ़ॉर्म अलग दिखा। दौरा करने से पहले मैं आसपास के वातावरण और पहुँच को आसानी से समझ सका। जब मैं अंत में साइट पर गया, तो कोई आश्चर्य नहीं हुआ, सब कुछ वैसा ही था जैसा बताया गया था। इससे खरीदारी आगे बढ़ाने का आत्मविश्वास मिला। पूरी यात्रा सुगम और सूचित रही।",
+          "occupation": "गन्ना किसान",
+          "location": "खेतिया"
+        },
+        "69df7ba7de6aa2439a2d9e35": {
+          "message": "मैं लंबे समय से अपनी कृषि भूमि बेचने की कोशिश कर रहा था, लेकिन गंभीर खरीदार नहीं मिल रहे थे। यहाँ पूर्ण विवरण के साथ अपनी संपत्ति सूचीबद्ध करने के बाद, कुछ दिनों में वास्तविक पूछताछ मिलनी शुरू हो गई। खरीदार पहले से संपत्ति की विशेषताओं से अवगत थे, जिससे चर्चा आसान हो गई। मुझे बार-बार सब कुछ समझाने की ज़रूरत नहीं पड़ी। प्लेटफ़ॉर्म ने बिना ज़्यादा बिचौलियों के सही दर्शकों तक पहुँचने में मदद की। मैं कम समय में उचित कीमत पर सौदा पूरा कर सका। यह बहुत संतोषजनक अनुभव था।",
+          "occupation": "किसान यूनियन अध्यक्ष",
+          "location": "रीवा"
+        },
+        "69df7bdade6aa2439a2d9e47": {
+          "message": "मुझे अपने क्षेत्र में उपजाऊ कृषि भूमि चाहिए थी, लेकिन अधिकांश लिस्टिंग में सही जानकारी नहीं थी। इस प्लेटफ़ॉर्म पर मुझे मिट्टी, पानी और सड़क से जुड़ाव जैसे विवरण स्पष्ट रूप से मिले। मैंने कुछ संपत्तियाँ देखीं और सब कुछ उम्मीद के अनुरूप था। बिचौलियों पर निर्भर किए बिना मैंने उचित कीमत पर जमीन खरीद ली। पूरा अनुभव भरोसेमंद और सुव्यवस्थित रहा।",
+          "occupation": "किसान",
+          "location": "बड़वानी"
+        },
+        "69df7c17de6aa2439a2d9e5b": {
+          "message": "यदि आप सही खरीदारों तक नहीं पहुँचते तो कृषि भूमि बेचना कठिन हो सकता है। मैंने पहले भी इस समस्या का सामना किया था। यहाँ अपनी संपत्ति सूचीबद्ध करने के बाद, गंभीर खरीदारों से पूछताछ मिलनी शुरू हो गई जो पहले से संपत्ति विवरण समझते थे। इससे अनावश्यक चर्चा कम हुई और समय बचा। प्रक्रिया पारदर्शी और कुशल लगी। मैं बिना जटिलताओं के सौदा पूरा कर सका। मैं निश्चित रूप से दूसरों को इस प्लेटफ़ॉर्म की सलाह दूँगा।",
+          "occupation": "सरकारी शिक्षक",
+          "location": "सेंधवा"
+        },
+        "69df7c52de6aa2439a2d9e6f": {
+          "message": "मैं मध्य प्रदेश भर में दीर्घकालिक मूल्य वृद्धि पर ध्यान केंद्रित करते हुए कृषि भूमि में निवेश करना चाहती थी। इस प्लेटफ़ॉर्म ने विभिन्न जिलों में संपत्तियों का स्पष्ट अवलोकन प्रदान किया। फ़िल्टर विकल्प और संरचित डेटा ने स्थानों की तुलना आसान बना दी। मैं कनेक्टिविटी और विकास क्षमता के आधार पर संपत्तियों को शॉर्टलिस्ट कर सकी। कुछ विकल्पों का दौरा करने के बाद, मैं अपने निवेश निर्णय के बारे में आत्मविश्वित थी। अनुभव सुगम और सुव्यवस्थित था।",
+          "occupation": "बैंक अधिकारी",
+          "location": "उज्जैन"
+        },
+        "69df7c91de6aa2439a2d9e85": {
+          "message": "यहाँ अपनी संपत्ति सूचीबद्ध करना सरल और सीधा था, और मैं स्वयं सभी महत्वपूर्ण विवरण जोड़ सकी। कम समय में, वास्तव में इच्छुक खरीदारों के कॉल आने लगे। अन्य प्लेटफ़ॉर्म के विपरीत, मुझे यादृच्छिक या अप्रासंगिक पूछताछ नहीं मिली। खरीदार सूचित थे, जिससे बातचीत की प्रक्रिया आसान हो गई। मैं जल्दी और उचित कीमत पर सौदा अंतिम रूप दे सकी। कुल मिलाकर, प्लेटफ़ॉर्म ने समय और प्रयास बचाने में मदद की।",
+          "occupation": "आंगनवाड़ी कार्यकर्ता",
+          "location": "झाबुआ"
+        }
+      }
+    },
+    "footerCta": {
+      "title": "अपना अगला कृषि भूमि निवेश खोजने के लिए तैयार हैं?",
+      "description": "सत्यापित लिस्टिंग देखें, कृषि-विशिष्ट मेट्रिक्स की तुलना करें, और आत्मविश्वास से समापन के लिए भूमि मालिकों और सलाहकारों से सीधे जुड़ें।",
+      "ctaExplore": "खोज शुरू करें",
+      "ctaPostFree": "मुफ़्त में जमीन पोस्ट करें"
+    }
+  },
+  "contactPopup": {
+    "badge": "PREMIUM ASSISTANCE",
+    "title": "आपकी सही प्रॉपर्टी खोजने में हमारी मदद लें",
+    "subtitle": "Share your requirements and our expert team will connect with curated options.",
+    "closeAriaLabel": "Close contact form",
+    "fields": {
+      "fullName": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "message": "Message",
+      "messagePlaceholder": "Tell us your location preference, budget, and purpose..."
+    },
+    "validation": {
+      "nameRequired": "Name is required.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Enter a valid email address.",
+      "phoneRequired": "Phone number is required.",
+      "messageRequired": "Please enter your message."
+    },
+    "whatsapp": {
+      "message": "Hi, I'm interested in your property listing.{{nameSuffix}}",
+      "nameSuffix": " My name is {{name}}."
+    },
+    "footer": {
+      "responseTime": "We will get back to you within 24 hours."
+    },
+    "actions": {
+      "whatsapp": "Quick WhatsApp",
+      "sending": "Sending...",
+      "submit": "पूछताछ भेजें"
+    },
+    "success": "Success! Your inquiry has been submitted. Our team will contact you shortly.",
+    "errors": {
+      "generic": "Something went wrong. Please try again in a moment."
+    }
+  },
+  "adminPanel": {
+    "fallbackName": "व्यवस्थापक",
+    "defaultSubtitle": "अपने कार्यक्षेत्र और कार्यों का एक नज़र में अवलोकन।",
+    "mobileMenuTitle": "व्यवस्थापक मेनू",
+    "a11y": {
+      "openNavigation": "Open admin navigation",
+      "closeMenu": "Close menu"
+    },
+    "logoutConfirm": {
+      "title": "लॉगआउट की पुष्टि",
+      "message": "क्या आप वाकई लॉग आउट करना चाहते हैं?"
+    },
+    "nav": {
+      "dashboard": "डैशबोर्ड",
+      "properties": "संपत्तियाँ",
+      "users": "उपयोगकर्ता",
+      "sellers": "विक्रेता",
+      "activityLogs": "गतिविधि लॉग",
+      "leadsManagement": "लीड प्रबंधन",
+      "testimonial": "प्रशंसापत्र",
+      "promotions": "प्रमोशन अनुरोध",
+      "images": "छवियाँ",
+      "notifications": "सूचनाएँ",
+      "account": "मेरा खाता"
+    },
+    "dashboard": {
+      "title": "व्यवस्थापक पैनल",
+      "overview": "अवलोकन",
+      "subtitle": "लिस्टिंग, उपयोगकर्ताओं और लीड में पोर्टफोलियो स्थिति।",
+      "overviewSubtitle": "लिस्टिंग और उपयोगकर्ता खातों का एक नज़र में अवलोकन।",
+      "stats": {
+        "listingsTitle": "संपत्ति लिस्टिंग",
+        "listingsDescription": "मॉडरेशन पाइपलाइन और इन्वेंटरी गिनती",
+        "usersTitle": "उपयोगकर्ता खाते",
+        "usersDescription": "प्लेटफ़ॉर्म भर में भूमिकाएँ",
+        "totalProperties": "कुल संपत्तियाँ",
+        "approved": "स्वीकृत",
+        "pendingReview": "समीक्षा लंबित",
+        "rejected": "अस्वीकृत",
+        "totalAccounts": "कुल खाते",
+        "buyers": "खरीदार",
+        "sellers": "विक्रेता",
+        "agents": "एजेंट"
+      }
+    },
+    "properties": {
+      "title": "प्रॉपर्टीज",
+      "heading": "सभी संपत्तियाँ",
+      "subtitle": "प्रत्येक लिस्टिंग के लिए CRUD और मॉडरेशन।",
+      "loading": "संपत्तियाँ लोड हो रही हैं…",
+      "emptyPage": "इस पृष्ठ पर कोई संपत्ति नहीं।",
+      "propertyTypeLabel": "संपत्ति प्रकार",
+      "filtersAria": "फ़िल्टर",
+      "searchPlaceholder": "इस पृष्ठ पर खोजें…",
+      "allStatuses": "सभी स्थितियाँ",
+      "allTypes": "सभी प्रकार",
+      "status": {
+        "pending": "लंबित",
+        "approved": "स्वीकृत",
+        "rejected": "अस्वीकृत",
+        "sold": "बिकी"
+      },
+      "table": {
+        "property": "संपत्ति",
+        "type": "प्रकार",
+        "price": "मूल्य",
+        "status": "स्थिति",
+        "actions": "कार्रवाई"
+      },
+      "rejectModal": {
+        "title": "Reject listing",
+        "propertyName": "Property name",
+        "shortDescription": "Short description",
+        "suggestionMessage": "Suggestion / message",
+        "errorBothFields": "Please enter both a short description and a suggestion/message.",
+        "rejectWithoutReason": "Reject directly without giving any reason"
+      },
+      "deleteModal": {
+        "title": "Delete property?",
+        "body": "This permanently removes the listing."
+      },
+      "pagination": {
+        "pageOf": "Page {{page}} of {{totalPages}}",
+        "total": "{{count}} total",
+        "prev": "Prev",
+        "next": "Next"
+      },
+      "submitting": "Submitting…",
+      "deleting": "Deleting…",
+      "actionBlocked": {
+        "title": "Action blocked",
+        "message": "First view the property"
+      },
+      "toast": {
+        "approved": "Property approved",
+        "rejected": "Property rejected",
+        "deleted": "Property deleted"
+      },
+      "viewed": "Viewed",
+      "unviewed": "Unviewed"
+    },
+    "propertyModeration": {
+      "title": "संपत्ति मॉडरेशन",
+      "subtitle": "लिस्टिंग स्वीकृत, अस्वीकृत या हटाएँ। स्थिति से फ़िल्टर करें।",
+      "searchPlaceholder": "लिस्टिंग खोजें…",
+      "allStatuses": "सभी स्थितियाँ",
+      "loading": "लिस्टिंग लोड हो रही हैं…",
+      "emptyFilter": "आपके फ़िल्टर से कोई लिस्टिंग मेल नहीं खाती।",
+      "empty": "कोई लिस्टिंग उपलब्ध नहीं।",
+      "deleteTitle": "यह लिस्टिंग हटाएँ?",
+      "deleteDescription": "“{{title}}” स्थायी रूप से हटा दी जाएगी।",
+      "deleteConfirm": "लिस्टिंग हटाएँ",
+      "rejectTitle": "यह लिस्टिंग अस्वीकार करें?",
+      "rejectDescription": "लिस्टिंग अस्वीकृत चिह्नित होगी। बाद में फिर स्वीकृत कर सकते हैं।",
+      "rejectConfirm": "अस्वीकार"
+    },
+    "promotions": {
+      "title": "प्रमोशन अनुरोध",
+      "repromoteTitle": "RePromotion Request",
+      "repromoteDescription": "This will reset the promotion for 30 days starting from today. Do you want to continue?",
+      "heading": "Promotion Requests",
+      "subtitle": "Dynamic list of seller promotion requests.",
+      "loading": "Loading requests...",
+      "empty": "No promotion requests found.",
+      "seller": "Seller: {{name}}",
+      "requestedDuration": "Requested Duration: {{months}} month(s)",
+      "statusLine": "Status: {{status}}",
+      "approvedAt": "Approved At: {{date}}",
+      "liveDuration": "Live Duration: {{from}} to {{to}}",
+      "remainingDays": "Remaining Days Left: {{days}}",
+      "repromote": "RePromotion Request",
+      "toast": {
+        "approved": "Promotion approved",
+        "rejected": "Promotion rejected",
+        "extended": "Promotion extended for 30 days",
+        "deleted": "Promotion request deleted"
+      },
+      "unknownSeller": "विक्रेता: अज्ञात",
+      "statuses": {
+        "pending": "लंबित",
+        "approved": "स्वीकृत",
+        "rejected": "अस्वीकृत",
+        "none": "कोई नहीं"
+      }
+    },
+    "users": {
+      "roleTitle": "Role",
+      "roleSubtitle": "Filter by role, search, and manage accounts.",
+      "searchPlaceholder": "Search accounts…",
+      "exportCsv": "Export CSV",
+      "filterByRole": "Filter by role",
+      "roles": {
+        "all": "All",
+        "buyer": "Buyer",
+        "seller": "Seller",
+        "agent": "Agent"
+      },
+      "table": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role"
+      },
+      "block": "Block",
+      "unblock": "Unblock",
+      "deleteConfirm": {
+        "title": "Are you sure you want to Delete?",
+        "description": "This will permanently remove {{name}} ({{email}}). This action cannot be undone.",
+        "confirm": "Delete account"
+      },
+      "blockConfirm": {
+        "blockTitle": "Are you sure you want to Block?",
+        "unblockTitle": "Are you sure you want to Unblock?",
+        "description": "{{action}} {{name}} ({{email}})?"
+      },
+      "empty": {
+        "noAccounts": "No accounts yet",
+        "noMatching": "No matching users",
+        "noAccountsHint": "When users register, they will appear here.",
+        "noMatchingHint": "Try adjusting your search{{searchPart}} or switch from “{{roleFilter}}”.",
+        "searchPart": " “{{query}}”"
+      }
+    },
+    "leads": {
+      "title": "लीड प्रबंधन",
+      "subtitle": "पूछताछ, भ्रमण और एजेंट-संग्रहित लीड एक जगह ट्रैक करें।",
+      "allStatuses": "सभी स्थितियाँ",
+      "searchPlaceholder": "नाम, ईमेल, फ़ोन, संपत्ति, एजेंट…",
+      "failedLoad": "लीड लोड विफल",
+      "failedLoadDetails": "लीड विवरण लोड विफल",
+      "tabs": {
+        "all": "सभी लीड",
+        "buyerInquiries": "खरीदार पूछताछ",
+        "visitRequests": "भ्रमण अनुरोध",
+        "contactRequests": "संपर्क अनुरोध",
+        "callRequests": "कॉल अनुरोध",
+        "sellerLeads": "विक्रेता लीड",
+        "agentInquiries": "एजेंट पूछताछ",
+        "agentDetailedEntries": "एजेंट विस्तृत प्रविष्टियाँ"
+      },
+      "statusOptions": {
+        "received": "प्राप्त",
+        "sent": "भेजा गया",
+        "failed": "विफल",
+        "scheduled": "निर्धारित",
+        "rescheduled": "पुनर्निर्धारित",
+        "cancelled": "रद्द",
+        "viewed": "देखा गया",
+        "interested": "रुचि",
+        "contacted": "संपर्क किया",
+        "uninterested": "अरुचि",
+        "draft": "ड्राफ्ट",
+        "incomplete": "अधूरा",
+        "ready": "तैयार",
+        "approved": "स्वीकृत",
+        "rejected": "अस्वीकृत"
+      },
+      "dateFrom": "से",
+      "dateTo": "तक",
+      "matchingCount": "{{count}} matching lead",
+      "matchingCount_plural": "{{count}} matching leads",
+      "resetFilters": "Reset filters",
+      "loading": "Loading leads…",
+      "empty": "No leads match the current filters.",
+      "loadingDetails": "Loading full lead details…",
+      "message": "Message",
+      "visitDetails": "Visit details",
+      "unknown": "Unknown",
+      "source": "Source: {{source}}",
+      "tableSubject": "Property / Subject",
+      "pagination": {
+        "pageOf": "Page {{page}} of {{totalPages}}",
+        "total": "{{count}} total",
+        "prev": "Prev",
+        "next": "Next"
+      },
+      "stats": {
+        "total": "Total leads",
+        "buyerInquiries": "Buyer inquiries",
+        "visitRequests": "Visit requests",
+        "contactRequests": "Contact requests",
+        "callRequests": "Call requests",
+        "sellerLeads": "Seller leads",
+        "agentInquiries": "Agent inquiries"
+      },
+      "table": {
+        "lead": "Lead",
+        "type": "Type",
+        "status": "Status",
+        "linked": "Linked",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "detailTitle": "Lead details",
+      "fields": {
+        "email": "Email",
+        "phone": "Phone",
+        "created": "Created",
+        "lastUpdate": "Last update",
+        "propertySubject": "Property / subject",
+        "agent": "Agent",
+        "seller": "Seller",
+        "scheduledAt": "Scheduled at",
+        "visitType": "Visit type",
+        "notes": "Notes",
+        "submittedAt": "Submitted at",
+        "sentAt": "Sent at",
+        "failureReason": "Failure reason",
+        "viewCount": "View count",
+        "lastViewedAt": "Last viewed at",
+        "propertyType": "Property type",
+        "price": "Price",
+        "address": "Address",
+        "linkedProperty": "लिंक की गई संपत्ति",
+        "propertyStatus": "संपत्ति स्थिति",
+        "buyerRole": "खरीदार भूमिका",
+        "propertyId": "संपत्ति ID",
+        "adminRemark": "व्यवस्थापक टिप्पणी",
+        "hasDetailedEntry": "विस्तृत प्रविष्टि है"
+      },
+      "sections": {
+        "inquiryMeta": "पूछताछ विवरण",
+        "engagement": "सगाई",
+        "activityHistory": "गतिविधि इतिहास",
+        "agentEntry": "एजेंट प्रविष्टि",
+        "step1": "चरण 1 – फ़ील्ड प्रविष्टि",
+        "step2": "चरण 2 – विस्तृत प्रविष्टि"
+      },
+      "leadTypes": {
+        "buyer_inquiry": "खरीदार पूछताछ",
+        "contact_request": "संपर्क अनुरोध",
+        "call_request": "कॉल अनुरोध",
+        "visit_request": "भ्रमण अनुरोध",
+        "seller_lead": "विक्रेता लीड",
+        "agent_inquiry": "एजेंट पूछताछ",
+        "agent_detailed_entry": "एजेंट विस्तृत प्रविष्टि"
+      },
+      "visitTypes": {
+        "in_person": "सामने",
+        "virtual": "आभासी",
+        "phone": "फ़ोन"
+      },
+      "activityTypes": {},
+      "noAdditionalData": "कोई अतिरिक्त डेटा नहीं।"
+    },
+    "accessManagement": "पहुँच प्रबंधन",
+    "sellersPage": {
+      "title": "विक्रेता",
+      "heading": "विक्रेता",
+      "subtitle": "विक्रेता भूमिका वाले खाते और प्रत्येक की लिस्टिंग संख्या।",
+      "searchPlaceholder": "नाम, ईमेल या ID से खोजें…",
+      "loading": "विक्रेता लोड हो रहे हैं…",
+      "noSellers": "कोई विक्रेता खाता नहीं मिला।",
+      "propertiesPosted": "पोस्ट की गई संपत्तियाँ",
+      "countsIncomplete": "{{loaded}} में से {{total}} संपत्तियाँ लोड; गिनती अधूरी हो सकती है।",
+      "countsError": "संपत्ति गिनती लोड नहीं हो सकी: {{error}}",
+      "table": {
+        "name": "नाम",
+        "email": "ईमेल",
+        "userId": "उपयोगकर्ता ID"
+      }
+    },
+    "activityLogsPage": {
+      "title": "गतिविधि लॉग",
+      "heading": "गतिविधि लॉग",
+      "subtitle": "संपत्तियों और उपयोगकर्ताओं पर व्यवस्थापक कार्य ट्रैक करें।",
+      "filters": "फ़िल्टर",
+      "filtersHint": "भूमिका और श्रेणी से संकीर्ण करें।",
+      "sellerActivities": "विक्रेता गतिविधियाँ",
+      "buyerActivities": "खरीदार गतिविधियाँ",
+      "totalSellers": "कुल विक्रेता: {{count}}",
+      "totalBuyers": "कुल खरीदार: {{count}}",
+      "activityTable": "गतिविधि तालिका",
+      "loading": "लॉग लोड हो रहे हैं...",
+      "propertiesAdded": "जोड़ी गई संपत्तियाँ",
+      "addedAt": "जोड़ा गया",
+      "filterUserType": "उपयोगकर्ता प्रकार",
+      "filterActivityType": "गतिविधि प्रकार",
+      "searchLabel": "खोजें",
+      "searchPlaceholder": "नाम या गतिविधि से खोजें",
+      "filterAll": "सभी",
+      "filterSeller": "विक्रेता",
+      "filterBuyer": "खरीदार",
+      "filterAllTypes": "सभी प्रकार",
+      "filterLogin": "लॉगिन",
+      "filterProperty": "प्रॉपर्टी",
+      "tableRole": "भूमिका",
+      "tableActivity": "गतिविधि",
+      "tableName": "नाम",
+      "tableLoginAt": "लॉगिन समय",
+      "tableLogoutAt": "लॉगआउट समय",
+      "tableDuration": "अवधि",
+      "tableTarget": "लक्ष्य",
+      "tableDate": "तारीख",
+      "tableStatus": "स्थिति",
+      "empty": "कोई गतिविधि लॉग नहीं मिला।",
+      "activityTypes": {
+        "PROPERTY_CREATED": "प्रॉपर्टी बनाई गई",
+        "PROPERTY_EDITED": "प्रॉपर्टी संपादित",
+        "PROPERTY_DELETED": "प्रॉपर्टी हटाई गई",
+        "DOCUMENT_UPLOADED": "दस्तावेज़ अपलोड",
+        "SELLER_LOGIN": "विक्रेता लॉगिन",
+        "SELLER_LOGOUT": "विक्रेता लॉगआउट",
+        "PROFILE_UPDATED": "प्रोफ़ाइल अपडेट",
+        "BUYER_LOGIN": "खरीदार लॉगिन",
+        "BUYER_LOGOUT": "खरीदार लॉगआउट",
+        "PROPERTY_VIEWED": "प्रॉपर्टी देखी",
+        "CONTACT_REQUEST": "संपर्क अनुरोध",
+        "PROPERTY_SAVED": "प्रॉपर्टी सहेजी",
+        "SEARCH_ACTIVITY": "खोज गतिविधि",
+        "PROPERTY_APPROVED": "प्रॉपर्टी स्वीकृत",
+        "PROPERTY_REJECTED": "प्रॉपर्टी अस्वीकृत",
+        "DOCUMENT_VERIFIED": "दस्तावेज़ सत्यापित",
+        "USER_BLOCKED": "उपयोगकर्ता अवरुद्ध",
+        "USER_VERIFIED": "उपयोगकर्ता सत्यापित"
+      },
+      "statuses": {
+        "Success": "सफल",
+        "Pending": "लंबित",
+        "Failed": "असफल",
+        "Approved": "स्वीकृत",
+        "Rejected": "अस्वीकृत"
+      },
+      "emptyMatch": "कोई गतिविधि मेल नहीं खाती",
+      "emptyHint": "फ़िल्टर या खोज बदलें — जुड़े API से लाइव लॉग यहाँ दिखेंगे।",
+      "statsTotal": "कुल गतिविधियाँ",
+      "statsSeller": "विक्रेता गतिविधियाँ",
+      "statsBuyer": "खरीदार गतिविधियाँ",
+      "statsAdmin": "व्यवस्थापक गतिविधियाँ",
+      "searchByUserPlaceholder": "उपयोगकर्ता नाम से खोजें"
+    },
+    "testimonial": {
+      "actionBlocked": {
+        "title": "कार्रवाई अवरुद्ध",
+        "message": "पहले संपत्ति देखें"
+      },
+      "page": {
+        "loading": "प्रशंसापत्र लोड हो रहे हैं...",
+        "empty": "कोई प्रशंसापत्र नहीं मिला।",
+        "detailsTitle": "प्रशंसापत्र विवरण",
+        "viewGuardMessage": "इस कार्रवाई के लिए पहले देखें पर क्लिक करें।",
+        "loadFailed": "लोड विफल",
+        "actionFailed": "कार्रवाई विफल",
+        "approved": "प्रशंसापत्र स्वीकृत",
+        "rejected": "प्रशंसापत्र अस्वीकृत",
+        "deleted": "प्रशंसापत्र हटाया गया",
+        "table": {
+          "fullName": "पूरा नाम",
+          "role": "भूमिका",
+          "location": "स्थान",
+          "rating": "रेटिंग",
+          "status": "स्थिति",
+          "createdDate": "बनाने की तिथि"
+        },
+        "fields": {
+          "name": "नाम",
+          "role": "भूमिका",
+          "location": "स्थान",
+          "occupation": "व्यवसाय",
+          "rating": "रेटिंग",
+          "status": "स्थिति",
+          "description": "विवरण"
+        }
+      }
+    },
+    "images": {
+      "deleteTitle": "छवि हटाएँ?",
+      "deleteMessage": "इस छवि को स्थायी रूप से हटाएँ?",
+      "page": {
+        "heading": "छवियाँ",
+        "subtitle": "अपलोड की गई मीडिया छवियाँ प्रबंधित करें।",
+        "loading": "छवियाँ लोड हो रही हैं...",
+        "empty": "कोई छवि नहीं मिली।",
+        "uploading": "अपलोड हो रहा है...",
+        "addImage": "छवि जोड़ें",
+        "mediaAlt": "मीडिया",
+        "tag": "टैग",
+        "format": "प्रारूप",
+        "size": "आकार",
+        "created": "बनाया गया",
+        "loadFailed": "लोड विफल",
+        "uploadSuccess": "छवि अपलोड हुई",
+        "uploadFailed": "अपलोड विफल",
+        "deleteSuccess": "छवि हटाई गई",
+        "deleteFailed": "हटाना विफल",
+        "deleting": "हटाया जा रहा है..."
+      }
+    },
+    "notificationsPanel": {
+      "heading": "सूचनाएँ",
+      "subtitle": "नई लिस्टिंग और व्यवस्थापक गतिविधि अलर्ट।",
+      "emptyTitle": "अभी कोई सूचना नहीं",
+      "emptySub": "नई संपत्ति या अन्य घटनाओं पर सूचनाएँ यहाँ दिखेंगी।"
+    },
+    "notifications": {
+      "fallbackListing": "एक लिस्टिंग",
+      "titles": {
+        "Property approved": "संपत्ति स्वीकृत",
+        "Property rejected": "संपत्ति अस्वीकृत",
+        "New property pending approval": "नई संपत्ति स्वीकृति लंबित",
+        "New property added": "नई संपत्ति जोड़ी गई",
+        "New user registered": "नया उपयोगकर्ता पंजीकृत"
+      },
+      "messages": {
+        "approvedByAdmin": "{{target}} को व्यवस्थापक ने स्वीकृत किया।",
+        "rejectedByAdmin": "{{target}} को व्यवस्थापक ने अस्वीकृत किया।",
+        "userJoined": "{{name}} प्लेटफ़ॉर्म से जुड़ा।",
+        "waitingForReview": "{{target}} समीक्षा की प्रतीक्षा में है।",
+        "hasBeenAdded": "{{target}} जोड़ दी गई है।"
+      }
+    },
+    "account": {
+      "title": "मेरा खाता",
+      "pageTitle": "मेरा खाता",
+      "pageSubtitle": "अपनी व्यवस्थापक प्रोफ़ाइल, सुरक्षा और प्राथमिकताएँ देखें और अपडेट करें।",
+      "signInRequired": "व्यवस्थापक के रूप में लॉग इन होना आवश्यक है।",
+      "editProfile": "प्रोफ़ाइल संपादित करें",
+      "cancelAll": "सभी रद्द करें",
+      "saveAll": "सभी सहेजें",
+      "basicInfo": "मूल जानकारी",
+      "security": "सुरक्षा",
+      "professional": "पेशेवर",
+      "address": "पता",
+      "preferences": "प्राथमिकताएँ",
+      "activity": "गतिविधि",
+      "profileCompleted": "प्रोफ़ाइल पूर्ण",
+      "profileCompletedMessage": "आपकी प्रोफ़ाइल 100% पूर्ण है",
+      "profilePicture": "प्रोफ़ाइल चित्र",
+      "upload": "अपलोड",
+      "uploaded": "अपलोड हो गया",
+      "noImageUploaded": "कोई चित्र अपलोड नहीं",
+      "changePassword": "पासवर्ड बदलें",
+      "theme": "थीम",
+      "themeLight": "हल्का",
+      "themeDark": "गहरा",
+      "emailNotifications": "ईमेल और उत्पाद सूचनाएँ",
+      "lastLogin": "अंतिम लॉगिन",
+      "phonePlaceholder": "+91 …",
+      "experiencePlaceholder": "उदा. 5 वर्ष",
+      "departmentPlaceholder": "उदा. संचालन",
+      "unknownError": "अज्ञात त्रुटि",
+      "fields": {
+        "fullName": "पूरा नाम",
+        "email": "ईमेल",
+        "phone": "फ़ोन नंबर",
+        "password": "पासवर्ड",
+        "currentPassword": "वर्तमान पासवर्ड",
+        "newPassword": "नया पासवर्ड",
+        "confirmPassword": "नया पासवर्ड पुष्टि करें",
+        "role": "भूमिका",
+        "experience": "अनुभव (वैकल्पिक)",
+        "department": "विभाग (वैकल्पिक)",
+        "country": "देश",
+        "state": "राज्य",
+        "city": "शहर",
+        "zipCode": "पिन कोड"
+      },
+      "toast": {
+        "notSignedIn": "साइन इन नहीं",
+        "notSignedInDetail": "खाता प्रबंधित करने के लिए फिर साइन इन करें।",
+        "loadFailed": "प्रोफ़ाइल लोड नहीं हो सकी",
+        "validation": "सत्यापन",
+        "password": "पासवर्ड",
+        "saved": "सहेजा गया",
+        "savedDetail": "आपकी प्रोफ़ाइल अपडेट हो गई।",
+        "saveFailed": "सहेजना विफल"
+      }
+    },
+    "toast": {
+      "accessRestricted": "Access Restricted"
+    }
+  },
+  "buyerPanel": {
+    "shell": {
+      "menuTitle": "खरीदार मेनू",
+      "openNavigation": "खरीदार नेविगेशन खोलें"
+    },
+    "nav": {
+      "overview": "अवलोकन",
+      "wishlist": "विशलिस्ट",
+      "compare": "तुलना",
+      "cart": "कार्ट",
+      "enquiries": "पूछताछ",
+      "activity": "गतिविधि",
+      "notifications": "सूचनाएँ",
+      "account": "खाता",
+      "testimonial": "प्रशंसापत्र"
+    },
+    "topBar": {
+      "overview": {
+        "title": "अवलोकन",
+        "subtitle": "सहेजी गई संपत्तियाँ और गतिविधि एक नज़र में देखें।"
+      },
+      "wishlist": {
+        "title": "विशलिस्ट",
+        "subtitle": "बाद के लिए सहेजी गई संपत्तियाँ।"
+      },
+      "compare": {
+        "title": "तुलना",
+        "subtitle": "लिस्टिंग की साथ-साथ तुलना।"
+      },
+      "cart": {
+        "title": "कार्ट",
+        "subtitle": "जिन लिस्टिंग पर आप पूछताछ करना चाहते हैं।"
+      },
+      "account": {
+        "title": "खाता",
+        "subtitle": "आपकी प्रोफ़ाइल और प्राथमिकताएँ।"
+      },
+      "activity": {
+        "title": "गतिविधि",
+        "subtitle": "हाल की दृश्य और इंटरैक्शन।"
+      },
+      "enquiries": {
+        "title": "पूछताछ",
+        "subtitle": "विक्रेता और एजेंट से बातचीत की स्थिति।"
+      },
+      "testimonial": {
+        "title": "प्रशंसापत्र",
+        "subtitle": "खरीदारों और विक्रेताओं के साथ अपना अनुभव साझा करें।"
+      },
+      "notifications": {
+        "title": "सूचनाएँ",
+        "subtitle": "आपके खाते की अलर्ट और अपडेट।"
+      },
+      "fallback": {
+        "title": "खरीदार अवलोकन",
+        "subtitle": "सहेजी गई संपत्तियाँ और गतिविधि एक नज़र में देखें।"
+      }
+    },
+    "dashboard": {
+      "wishlist": "विशलिस्ट",
+      "compare": "तुलना",
+      "cart": "कार्ट",
+      "viewList": "सूची देखें →",
+      "openCompare": "तालिका खोलें →",
+      "goToCart": "कार्ट पर जाएँ →",
+      "curatedInventory": "चुनिंदा इन्वेंटरी",
+      "heroTitle": "सत्यापित भूमि, फार्महाउस और एग्री रिसॉर्ट डील खोजें",
+      "heroSubtitle": "खोजें, शॉर्टलिस्ट करें, तुलना करें और विज़िट ट्रैक करें — गंभीर खरीदारों के लिए।",
+      "searchPlaceholder": "गाँव, हाईवे, लैंडमार्क या प्रोजेक्ट नाम से खोजें",
+      "saveSearchLabel": "सहेजी खोज का लेबल (वैकल्पिक)",
+      "saveSearch": "खोज सहेजें",
+      "savedSearchDefault": "सहेजी खोज",
+      "savedSearches": "सहेजी खोजें",
+      "reapply": "फिर लागू करें",
+      "remove": "हटाएँ",
+      "trendingCorridors": "ट्रेंडिंग कॉरिडोर:",
+      "recentActivity": "हाल की गतिविधि",
+      "fullHistory": "पूरा इतिहास →",
+      "matchingProperties": "मिलती संपत्तियाँ",
+      "listingsShown": "{{shown}} of {{total}} listings shown",
+      "recommendations": "सुझाव",
+      "compareLimitNotice": "आप अधिकतम {{count}} प्रॉपर्टी की तुलना कर सकते हैं। नई जोड़ने के लिए एक हटाएं।"
+    },
+    "enquiries": {
+      "title": "आपकी पूछताछ",
+      "pageHeading": "पूछताछ और संपर्क अनुरोध",
+      "pageSubtitle": "विक्रेताओं और एजेंटों से बातचीत का संरचित दृश्य।",
+      "empty": "अभी कोई पूछताछ नहीं। विक्रेता से संपर्क या जवाब मिलने पर यहाँ स्वतः दिखेगा।",
+      "propertyEnquiry": "संपत्ति पूछताछ",
+      "visitScheduled": "भ्रमण निर्धारित",
+      "callbackRequested": "कॉलबैक अनुरोधित",
+      "enquirySent": "पूछताछ भेजी गई",
+      "sellerResponse": "विक्रेता का जवाब",
+      "updatedOn": "{{date}} को अपडेट",
+      "replyRead": "जवाब पढ़ा गया",
+      "replyReceived": "जवाब प्राप्त"
+    },
+    "testimonial": {
+      "title": "अपना प्रशंसापत्र साझा करें",
+      "subtitle": "भूमिवाला के साथ अपने अनुभव के बारे में बताएं।",
+      "form": {
+        "fullName": "पूरा नाम",
+        "location": "स्थान",
+        "occupation": "व्यवसाय",
+        "rating": "रेटिंग (1-5)",
+        "description": "विवरण",
+        "submit": "प्रशंसापत्र सबमिट करें"
+      },
+      "toast": {
+        "submitted": "प्रशंसापत्र सबमिट हुआ",
+        "submittedDetail": "आपका प्रशंसापत्र व्यवस्थापक समीक्षा के लिए भेज दिया गया है।",
+        "failed": "सबमिट विफल",
+        "failedDetail": "प्रशंसापत्र सबमिट नहीं हो सका"
+      }
+    },
+    "account": {
+      "photoHint": "खरीदार साइडबार में दिखता है। JPG या PNG, अधिकतम लगभग 1.5 MB।",
+      "profileDetails": "प्रोफ़ाइल विवरण",
+      "profileCompletedMessage": "आपकी प्रोफ़ाइल 100% पूर्ण है",
+      "savePreferenceBlueprint": "प्राथमिकता ब्लूप्रिंट सहेजें",
+      "propertyTypes": {
+        "agricultureLand": "कृषि भूमि",
+        "farmhouse": "फार्महाउस",
+        "resort": "रिसॉर्ट",
+        "agriResort": "एग्री रिसॉर्ट"
+      },
+      "fields": {
+        "fullName": "पूरा नाम",
+        "email": "ईमेल",
+        "mobile": "मोबाइल नंबर",
+        "occupation": "व्यवसाय",
+        "gender": "लिंग",
+        "role": "भूमिका"
+      },
+      "placeholders": {
+        "mobile": "मोबाइल नंबर दर्ज करें",
+        "occupation": "व्यवसाय दर्ज करें",
+        "gender": "लिंग चुनें",
+        "locations": "उदा. इंदौर बाईपास, म्हो, राउ, उज्जैन रोड"
+      },
+      "gender": {
+        "male": "पुरुष",
+        "female": "महिला",
+        "other": "अन्य"
+      },
+      "roleBadge": "खरीदार",
+      "preferences": {
+        "title": "खरीदार प्राथमिकताएँ",
+        "subtitle": "सुझाव और अलर्ट को व्यक्तिगत बनाने के लिए।",
+        "locations": "पसंदीदा स्थान",
+        "budgetFrom": "बजट से",
+        "budgetTo": "बजट तक",
+        "propertyTypes": "संपत्ति प्रकार",
+        "propertyFocus": "संपत्ति फ़ोकस",
+        "save": "प्राथमिकताएँ सहेजें"
+      }
+    },
+    "wishlistPage": {
+      "emptyTitle": "अभी कोई संपत्ति सहेजी नहीं",
+      "emptyBody": "कृषि भूमि, फार्महाउस और रिसॉर्ट देखें। किसी भी कार्ड पर दिल से सहेजें।",
+      "discoverCta": "संपत्तियाँ खोजें",
+      "savedTitle": "सहेजी गई संपत्तियाँ",
+      "countSummary": "आपकी विशलिस्ट में {{count}} संपत्तियाँ हैं।",
+      "refreshing": " विवरण ताज़ा हो रहे हैं…",
+      "moveToCart": "कार्ट में ले जाएँ",
+      "addedToCartTitle": "संपत्ति कार्ट में जोड़ी गई",
+      "addedToCartMessage": "{{buyer}} ने {{property}} कार्ट में जोड़ी।"
+    },
+    "cartPage": {
+      "emptyTitle": "आपकी संपत्ति कार्ट खाली है",
+      "emptyBody": "फार्महाउस या रिसॉर्ट शॉर्टलिस्ट करें और एक जगह प्रबंधित करें।",
+      "exploreCta": "लिस्टिंग देखें",
+      "shortlistedTitle": "शॉर्टलिस्ट की संपत्तियाँ",
+      "countSummary": "कार्ट में {{count}} {{unit}}",
+      "loadingData": " · नवीनतम डेटा लोड…",
+      "portfolioValue": "पोर्टफोलियो मूल्य: ₹ {{value}}",
+      "clearCart": "कार्ट साफ़ करें",
+      "negotiationWorkspace": "बातचीत कार्यक्षेत्र",
+      "negotiationHint": "विक्रेता या एजेंट से यहाँ संपर्क करें और विज़िट व्यवस्थित रखें।",
+      "requestCallback": "कॉलबैक अनुरोध",
+      "scheduleVisit": "विज़िट शेड्यूल करें",
+      "sendEnquiry": "पूछताछ भेजें",
+      "downloadBrochure": "ब्रोशर डाउनलोड",
+      "shareProperty": "संपत्ति साझा करें",
+      "addToCompare": "तुलना में जोड़ें",
+      "saveForLater": "बाद के लिए सहेजें"
+    },
+    "comparePage": {
+      "emptyTitle": "तुलना के लिए कोई संपत्ति नहीं",
+      "emptyBody": "किसी भी कार्ड से तुलना करके कीमत, स्थान और आकार देखें।",
+      "browseCta": "संपत्तियाँ देखें",
+      "loading": "तुलना लोड हो रही है…",
+      "title": "संपत्ति तुलना",
+      "subtitle": "चयनित फ़ील्ड साथ में दिखाई जाती हैं। अंतर हाइलाइट करने के लिए टॉगल करें।",
+      "countBadge": "{{count}} / 3"
+    },
+    "notificationsPanel": {
+      "title": "खरीदार सूचनाएँ",
+      "subtitle": "कीमत में गिरावट, नई लॉन्च और विक्रेता जवाब।",
+      "emptyTitle": "आप अपडेट हैं",
+      "emptySub": "मिलान लिस्टिंग और विक्रेता जवाब की सूचनाएँ यहाँ दिखेंगी।"
+    },
+    "headerActions": {
+      "roleBadge": "खरीदार"
+    },
+    "actions": {
+      "addedToCart": "कार्ट में जोड़ा गया",
+      "removedFromCart": "कार्ट से हटाया गया",
+      "alreadyInCart": "संपत्ति पहले से कार्ट में है",
+      "addedToCompare": "तुलना में जोड़ा गया",
+      "removedFromCompare": "तुलना से हटाया गया",
+      "alreadyInCompare": "संपत्ति पहले से तुलना में है",
+      "addedToWishlist": "विशलिस्ट में जोड़ा गया",
+      "removedFromWishlist": "विशलिस्ट से हटाया गया",
+      "alreadyInWishlist": "संपत्ति पहले से विशलिस्ट में है",
+      "shortlistInCart": "कार्ट में शॉर्टलिस्ट",
+      "compare": "तुलना",
+      "wishlist": "विशलिस्ट",
+      "shareProperty": "संपत्ति साझा करें",
+      "linkCopied": "लिंक क्लिपबोर्ड पर कॉपी हो गया",
+      "shareMenu": "साझा करें…",
+      "copyLink": "लिंक कॉपी करें",
+      "whatsApp": "व्हाट्सऐप",
+      "email": "ईमेल",
+      "propertyAddedToCartTitle": "संपत्ति कार्ट में जोड़ी गई",
+      "propertyAddedToCartMessage": "{{buyer}} ने {{property}} कार्ट में जोड़ी।",
+      "yourProperty": "आपकी संपत्ति",
+      "feedbackAria": "खरीदार कार्रवाई प्रतिक्रिया"
+    },
+    "activity": {
+      "emptyTitle": "कोई हालिया गतिविधि नहीं",
+      "emptyBody": "जैसे आप संपत्तियाँ देखें, शॉर्टलिस्ट, तुलना और पूछताछ करेंगे, आपकी गतिविधि यहाँ दिखेगी।",
+      "title": "खरीदार गतिविधि",
+      "touchpoints": "अंतिम {{count}} इंटरैक्शन",
+      "types": {
+        "saved": "विशलिस्ट में सहेजा",
+        "viewed": "संपत्ति देखी",
+        "enquiry": "पूछताछ भेजी",
+        "callback": "कॉलबैक का अनुरोध",
+        "visit": "भ्रमण निर्धारित",
+        "cart": "कार्ट में जोड़ा",
+        "compare": "तुलना में जोड़ा"
+      }
+    },
+    "recommendations": {
+      "similarTitle": "समान संपत्तियाँ",
+      "similarSubtitle": "उपलब्ध होने पर आपके चयन जैसा प्रकार और प्रोफ़ाइल।",
+      "similarEmpty": "लाइव इन्वेंटरी से समान सुझाव भरने के लिए लिस्टिंग देखें।",
+      "nearbyTitle": "नज़दीकी संपत्तियाँ",
+      "nearbySubtitle": "शहर / इलाके से API डेटा पर आधारित मिलान।",
+      "nearbyEmpty": "निर्देशांक जोड़ने पर यह अनुभाग बेहतर होगा।",
+      "trendingTitle": "ट्रेंडिंग और फ़ीचर्ड",
+      "trendingSubtitle": "आपकी वर्तमान कैटलॉग से चुनिंदा इन्वेंटरी।",
+      "trendingEmpty": "अभी फ़ीचर्ड टैग नहीं — शीर्ष लिस्टिंग दिखा रहे हैं।"
+    },
+    "recentlyViewed": {
+      "title": "हाल में देखी गई",
+      "emptyTitle": "अभी कोई हालिया दृश्य नहीं",
+      "emptyBody": "जो संपत्तियाँ आप खोलेंगे वे यहाँ स्वतः दिखेंगी।",
+      "updating": "अपडेट हो रहा है…"
+    },
+    "security": {
+      "title": "सुरक्षा और पासवर्ड",
+      "subtitle": "आपके खाते के लिए एंटरप्राइज़-स्तर सुरक्षा। पासवर्ड और OTP बैकएंड से जुड़े हैं।",
+      "currentPassword": "वर्तमान पासवर्ड",
+      "newPassword": "नया पासवर्ड",
+      "confirmPassword": "पासवर्ड की पुष्टि",
+      "strongPassword": "मज़बूत पासवर्ड",
+      "repeatPassword": "नया पासवर्ड दोहराएँ",
+      "updatePassword": "पासवर्ड अपडेट करें",
+      "forgotPassword": "पासवर्ड भूल गए? OTP प्रवाह शुरू करें"
+    },
+    "fallbacks": {
+      "property": "संपत्ति"
+    },
+    "sidebarSections": {
+      "buyer menu": "खरीदार मेनू",
+      "navigation": "नेविगेशन"
+    },
+    "notifications": {
+      "titles": {
+        "Property added to cart": "संपत्ति कार्ट में जोड़ी गई",
+        "Price drop alert": "कीमत में गिरावट अलर्ट",
+        "New listing match": "नई मिलान लिस्टिंग",
+        "Seller reply": "विक्रेता का जवाब"
+      },
+      "messages": {
+        "addedToCart": "{{buyer}} ने {{property}} कार्ट में जोड़ी।",
+        "priceDrop": "{{target}} पर कीमत में गिरावट",
+        "newListingMatch": "नई मिलान लिस्टिंग: {{target}}",
+        "sellerReply": "विक्रेता ने {{target}} पर आपकी पूछताछ का जवाब दिया"
+      }
+    },
+    "compare": {
+      "sections": {
+        "core": "मुख्य संपत्ति डेटा",
+        "location": "स्थान",
+        "infrastructure": "अवसंरचना",
+        "farming": "खेती और भूमि",
+        "water": "जल संसाधन",
+        "legal": "कानूनी",
+        "features": "विशेषताएँ"
+      },
+      "fields": {
+        "core-title": "शीर्षक",
+        "core-propertyType": "संपत्ति प्रकार",
+        "core-listingType": "लिस्टिंग प्रकार",
+        "core-status": "स्थिति",
+        "core-price": "कीमत",
+        "core-pricePerSqft": "प्रति वर्ग फुट कीमत",
+        "core-area": "क्षेत्र",
+        "core-bedrooms": "बेडरूम",
+        "core-bathrooms": "बाथरूम",
+        "core-floor": "मंज़िल",
+        "core-facing": "दिशा",
+        "loc-address": "पता",
+        "loc-city": "शहर",
+        "loc-state": "राज्य",
+        "loc-mapLink": "मानचित्र लिंक",
+        "infra-roadAccess": "सड़क पहुँच",
+        "infra-roadType": "सड़क प्रकार",
+        "infra-electricity": "बिजली",
+        "infra-fencing": "बाड़",
+        "infra-gated": "गेटेड",
+        "farm-soilType": "मिट्टी प्रकार",
+        "farm-soilQualityIndex": "मिट्टी गुणवत्ता सूचकांक",
+        "farm-cropSuitability": "फसल उपयुक्तता",
+        "farm-farmingPercentage": "खेती प्रतिशत",
+        "farm-irrigationSupport": "सिंचाई सहायता",
+        "farm-waterAvailability": "जल उपलब्धता",
+        "water-borewell": "बोरवेल",
+        "water-borewellDepth": "बोरवेल गहराई",
+        "water-irrigationSystem": "सिंचाई प्रणाली",
+        "water-nearbySources": "नज़दीकी जल स्रोत",
+        "legal-ownershipDocs": "स्वामित्व दस्तावेज़",
+        "legal-landRegistry": "भूमि रजिस्ट्री",
+        "legal-encumbranceFree": "बोझ मुक्त",
+        "legal-landUseType": "भूमि उपयोग प्रकार",
+        "feat-powerBackup": "पावर बैकअप",
+        "feat-security": "सुरक्षा",
+        "feat-constructionAllowed": "निर्माण अनुमत",
+        "feat-farmhouseBuilt": "फार्महाउस निर्मित"
+      },
+      "values": {
+        "facing": {
+          "North": "उत्तर",
+          "South": "दक्षिण",
+          "East": "पूर्व",
+          "West": "पश्चिम",
+          "North-East": "उत्तर-पूर्व",
+          "North-West": "उत्तर-पश्चिम",
+          "South-East": "दक्षिण-पूर्व",
+          "South-West": "दक्षिण-पश्चिम"
+        },
+        "landUseType": {
+          "Agricultural": "कृषि",
+          "Residential": "आवासीय",
+          "Commercial": "व्यावसायिक"
+        },
+        "infrastructure": {
+          "Paved": "पक्की",
+          "Unpaved": "कच्ची",
+          "Available": "उपलब्ध",
+          "Not Available": "उपलब्ध नहीं"
+        },
+        "amenities": {}
+      }
+    }
+  },
+  "statsSection": {
+    "loadFailed": "आँकड़े लोड करने में विफल।",
+    "titles": {
+      "trustedByOurClients": "हमारे ग्राहकों का विश्वास"
+    },
+    "subtitles": {
+      "ratedByClients": "200+ ग्राहकों द्वारा 4.8 ★ रेटिंग"
+    },
+    "descriptions": {
+      "highlyRated": "हम पारदर्शिता, विशेषज्ञ मार्गदर्शन और फार्महाउस, विला, रिसॉर्ट संपत्तियों तथा कृषि भूमि निवेश में दीर्घकालिक मूल्य प्रदान करने की प्रतिबद्धता के लिए अत्यधिक रेटेड हैं।"
+    },
+    "labels": {
+      "averageRating": "औसत रेटिंग",
+      "yearsExperience": "वर्षों का अनुभव",
+      "happyClients": "संतुष्ट ग्राहक"
+    }
+  },
+  "homeSection": {
+    "newlyLaunched": {
+      "eyebrow": "नई लॉन्च परियोजनाएँ",
+      "title": "नवीनतम रियल एस्टेट विकास देखें",
+      "empty": "अभी कोई परियोजना उपलब्ध नहीं। बाद में देखें।",
+      "errorPrefix": "त्रुटि"
+    },
+    "projectCard": {
+      "startingFrom": "शुरुआत",
+      "posted": "पोस्ट: {{date}}"
+    },
+    "serviceSection": {
+      "eyebrow": "हमारी सेवाएँ",
+      "description": "फार्महाउस, विला, रिसॉर्ट और कृषि भूमि के लिए पारदर्शी, विशेषज्ञ मार्गदर्शन वाले समाधान।",
+      "checkIt": "देखें",
+      "items": {
+        "farmhouse-development": {
+          "title": "फार्महाउस विकास",
+          "description": "प्रीमियम फार्महाउस खरीदने, बेचने और विकसित करने में पूर्ण कानूनी और योजना सहायता।"
+        },
+        "agricultural-land": {
+          "title": "कृषि भूमि",
+          "description": "सत्यापित दस्तावेजों के साथ कृषि भूमि खरीदने और बेचने में विशेषज्ञ मार्गदर्शन।"
+        },
+        "resort-properties": {
+          "title": "रिसॉर्ट संपत्ति",
+          "description": "निवेश और आतिथ्य व्यवसाय के लिए उच्च रिटर्न वाली रिसॉर्ट संपत्तियाँ खोजें।"
+        },
+        "farmhouse-rental": {
+          "title": "फार्महाउस किराया",
+          "description": "कार्यक्रमों और अवकाश के लिए अल्पकालिक और दीर्घकालिक फार्महाउस किराया समाधान।"
+        }
+      }
+    }
+  },
+  "agentPanel": {
+    "shell": {
+      "menuTitle": "एजेंट मेनू",
+      "openNavigation": "एजेंट नेविगेशन खोलें",
+      "profileCompletion": "{{percent}}% पूर्ण"
+    },
+    "nav": {
+      "dashboard": "एजेंट डैशबोर्ड",
+      "fieldEntry": "फ़ील्ड प्रविष्टि",
+      "detailedEntry": "विस्तृत प्रविष्टि",
+      "properties": "संपत्तियाँ",
+      "addProperty": "संपत्ति जोड़ें",
+      "leads": "लीड प्रबंधन",
+      "visits": "विज़िट अनुसूची",
+      "calendar": "कैलेंडर",
+      "clients": "ग्राहक",
+      "notifications": "सूचनाएं",
+      "profile": "एजेंट प्रोफ़ाइल"
+    },
+    "topBar": {
+      "dashboard": {
+        "title": "अवलोकन",
+        "subtitle": "Portfolio health across listings and client activity."
+      },
+      "fieldEntry": {
+        "title": "Field Entry",
+        "subtitle": "Capture on-ground lead and listing updates."
+      },
+      "detailedEntry": {
+        "title": "Detailed Entry",
+        "subtitle": "Submit complete listing details for review."
+      },
+      "properties": {
+        "title": "Properties",
+        "subtitle": "Manage assigned and published properties."
+      },
+      "addProperty": {
+        "title": "Add Property",
+        "subtitle": "Create a new property draft with required details."
+      },
+      "leads": {
+        "title": "Leads",
+        "subtitle": "Track and convert active buyer leads."
+      },
+      "visits": {
+        "title": "Visits",
+        "subtitle": "Coordinate and monitor scheduled site visits."
+      },
+      "calendar": {
+        "title": "Calendar",
+        "subtitle": "Review scheduled visits date-wise."
+      },
+      "clients": {
+        "title": "Clients",
+        "subtitle": "Manage client information and follow-ups."
+      },
+      "profile": {
+        "title": "Agent Profile",
+        "subtitle": "Update your professional profile details."
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Track latest alerts and updates."
+      }
+    },
+    "calendar": {
+      "unknownDate": "अज्ञात तिथि",
+      "failedLoad": "कैलेंडर लोड नहीं हो सका",
+      "title": "कैलेंडर",
+      "subtitle": "तिथि के अनुसार निर्धारित विज़िट।",
+      "loading": "कैलेंडर लोड हो रहा है...",
+      "empty": "कोई विज़िट निर्धारित नहीं।"
+    },
+    "dashboard": {
+      "title": "एजेंट डैशबोर्ड",
+      "subtitle": "लिस्टिंग, लीड और विज़िट एक नज़र में।",
+      "exportCsv": "CSV निर्यात",
+      "downloadPdf": "PDF डाउनलोड",
+      "stats": {
+        "collected": "एकत्रित संपत्तियाँ",
+        "collectedHint": "एजेंट संग्रह प्रविष्टियाँ।",
+        "draft": "ड्राफ़्ट",
+        "draftHint": "चरण 1 सहेजा और संपादन योग्य।",
+        "incomplete": "अधूरी",
+        "incompleteHint": "चरण 2 विवरण लंबित।",
+        "ready": "तैयार",
+        "readyHint": "व्यवस्थापक स्वीकृति के लिए तैयार।"
+      },
+      "recentActivity": "हाल की गतिविधि",
+      "recentActivityHint": "नवीनतम संपत्ति स्थिति।",
+      "noRecentActivity": "कोई हालिया गतिविधि नहीं।",
+      "untitled": "शीर्षकहीन",
+      "entryTitle": "प्रविष्टि",
+      "editTitle": "संपादित करें",
+      "deleteTitle": "संपत्ति हटाएँ?",
+      "deleteMessage": "क्या आप \"{{name}}\" हटाना चाहते हैं? यह पूर्ववत नहीं हो सकता।",
+      "deleteBlocked": "यह प्रविष्टि सर्वर पर सहेजी नहीं है, इसलिए हटाई नहीं जा सकती।",
+      "deleteFailed": "संपत्ति हटाने में विफल।",
+      "saveChanges": "परिवर्तन सहेजें",
+      "saving": "सहेजा जा रहा है…",
+      "step1": "चरण 1",
+      "step2": "चरण 2",
+      "removeDocument": "दस्तावेज़ हटाएँ",
+      "missingServerRef": "इस प्रविष्टि के लिए सर्वर संदर्भ नहीं।",
+      "documentUploadFailed": "दस्तावेज़ अपलोड विफल",
+      "step2Incomplete": "चरण 2: अपेक्षित मूल्य, स्वामित्व प्रकार और संपर्क पूरा करें या खाली करें।",
+      "saveFailed": "सहेजना विफल"
+    },
+    "leadsPage": {
+      "title": "लीड प्रबंधन",
+      "activeCount": "{{count}} सक्रिय लीड",
+      "failedLoad": "लीड लोड नहीं हो सकीं।",
+      "loading": "लीड लोड हो रही हैं...",
+      "empty": "कोई लीड नहीं मिली।",
+      "scheduleVisit": "विज़िट शेड्यूल करें",
+      "scheduledVisits": "निर्धारित विज़िट",
+      "table": {
+        "lead": "लीड",
+        "property": "संपत्ति",
+        "status": "स्थिति",
+        "actions": "कार्रवाई"
+      },
+      "status": {
+        "new": "नई",
+        "contacted": "संपर्क किया",
+        "qualified": "योग्य",
+        "closed": "बंद"
+      },
+      "modal": {
+        "scheduleTitle": "विज़िट शेड्यूल करें",
+        "notesPlaceholder": "वैकल्पिक नोट्स"
+      }
+    },
+    "clientsPage": {
+      "title": "ग्राहक",
+      "buyerList": "खरीदार सूची",
+      "sellerList": "विक्रेता सूची",
+      "failedLoad": "ग्राहक लोड नहीं हो सके।",
+      "loading": "ग्राहक लोड हो रहे हैं...",
+      "empty": "कोई ग्राहक नहीं मिला।"
+    },
+    "visitsPage": {
+      "title": "विज़िट शेड्यूलिंग",
+      "activeCount": "{{count}} सक्रिय विज़िट",
+      "failedLoad": "विज़िट लोड नहीं हो सकीं।",
+      "createVisit": "विज़िट बनाएँ",
+      "loading": "विज़िट लोड हो रही हैं...",
+      "empty": "कोई विज़िट नहीं बनाई गई।",
+      "reschedule": "पुनर्निर्धारित करें",
+      "cancel": "रद्द करें",
+      "createModalTitle": "विज़िट बनाएँ",
+      "rescheduleModalTitle": "विज़िट पुनर्निर्धारित करें",
+      "cancelModalTitle": "विज़िट रद्द करें",
+      "cancelConfirm": "{{name}} की विज़िट रद्द करें?",
+      "keep": "रखें",
+      "cancelling": "रद्द हो रहा है...",
+      "cancelVisit": "विज़िट रद्द करें",
+      "clientName": "ग्राहक का नाम",
+      "clientNamePlaceholder": "ग्राहक का नाम दर्ज करें",
+      "dateTime": "दिनांक और समय",
+      "propertyPlaceholder": "फार्महाउस - गोवा",
+      "failedCreate": "विज़िट बनाने में विफल।",
+      "failedReschedule": "विज़िट पुनर्निर्धारित करने में विफल।",
+      "failedCancel": "विज़िट रद्द करने में विफल।",
+      "status": {
+        "scheduled": "निर्धारित",
+        "rescheduled": "पुनर्निर्धारित",
+        "cancelled": "रद्द"
+      },
+      "table": {
+        "client": "ग्राहक",
+        "property": "संपत्ति",
+        "when": "कब",
+        "status": "स्थिति",
+        "actions": "कार्रवाई"
+      }
+    },
+    "propertiesPage": {
+      "title": "मेरी संपत्तियाँ",
+      "subtitle": "असाइन की गई इन्वेंटरी प्रबंधित करें।",
+      "property": "संपत्ति",
+      "price": "कीमत",
+      "status": "स्थिति",
+      "actions": "क्रियाएँ",
+      "untitled": "बिना शीर्षक",
+      "statusActive": "सक्रिय",
+      "statusInactive": "निष्क्रिय",
+      "statusSold": "बिकी",
+      "edit": "संपादित करें",
+      "delete": "हटाएँ",
+      "empty": "कोई संपत्ति असाइन नहीं।",
+      "editTitle": "संपत्ति संपादित करें",
+      "deleteTitle": "संपत्ति हटाएँ",
+      "deleteConfirm": "क्या आप {{name}} हटाना चाहते हैं?",
+      "titlePlaceholder": "शीर्षक",
+      "pricePlaceholder": "कीमत",
+      "addressPlaceholder": "पता",
+      "save": "सहेजें"
+    },
+    "notificationsPage": {
+      "title": "सूचनाएँ",
+      "subtitle": "लीड, भ्रमण और असाइन गतिविधि से जुड़ी अलर्ट।"
+    },
+    "fieldEntryPage": {
+      "step1Title": "संपत्ति संग्रह - चरण 1",
+      "step1Subtitle": "एजेंट संग्रह के लिए त्वरित फ़ील्ड विवरण।",
+      "step2Title": "संपत्ति संग्रह - चरण 2",
+      "step2Subtitle": "समीक्षा के लिए पूर्ण विस्तृत जानकारी।",
+      "totalLandArea": "कुल भूमि क्षेत्र",
+      "saveContinue": "सहेजें और आगे",
+      "acre": "एकड़",
+      "hectare": "हेक्टेयर",
+      "yes": "हाँ",
+      "no": "नहीं",
+      "linkedPropertyId": "लिंक्ड संपत्ति ID",
+      "statusPreview": "वर्तमान स्थिति पूर्वावलोकन: {{status}}",
+      "sections": {
+        "basicInfo": "मूल जानकारी",
+        "fieldEntryDetails": "फ़ील्ड विवरण",
+        "locationDetails": "स्थान विवरण",
+        "propertyDetails": "संपत्ति विवरण",
+        "mediaDocuments": "मीडिया और दस्तावेज़",
+        "uploadDocs": "खसरा खतौनी नक्शा अपलोड"
+      },
+      "exactLocationDescription": "सटीक स्थान विवरण",
+      "anyLandDispute": "कोई भूमि विवाद",
+      "notes": "नोट्स",
+      "uploadFiles": "फ़ाइलें अपलोड करें (छवि, वीडियो, दस्तावेज़, ऑडियो)",
+      "uploadKhasra": "खसरा अपलोड",
+      "uploadKhatauni": "खतौनी अपलोड",
+      "uploadNaksha": "नक्शा अपलोड",
+      "highlightsPlaceholder": "मुख्य बिंदु और विशेषताएँ...",
+      "issuesPlaceholder": "कोई ज्ञात समस्या या सीमा...",
+      "notesPlaceholder": "अतिरिक्त नोट्स...",
+      "backToStep1": "चरण 1 पर वापस",
+      "saveIncomplete": "अपूर्ण के रूप में सहेजें",
+      "markReady": "तैयार चिह्नित करें",
+      "removeFile": "{{name}} हटाएँ"
+    },
+    "profilePage": {
+      "title": "एजेंट प्रोफ़ाइल",
+      "subtitle": "प्रोफ़ाइल और असाइन क्षेत्र अपडेट करें।",
+      "profileAlt": "एजेंट प्रोफ़ाइल",
+      "profilePreview": "प्रोफ़ाइल पूर्वावलोकन",
+      "agentFallback": "एजेंट",
+      "profileImage": "प्रोफ़ाइल छवि",
+      "agentName": "एजेंट का नाम",
+      "mobileNumber": "मोबाइल नंबर",
+      "required": "आवश्यक",
+      "email": "ईमेल",
+      "assignedArea": "असाइन क्षेत्र",
+      "areaPlaceholder": "गाँव/तहसील/ज़िला",
+      "basicSettings": "मूल सेटिंग्स",
+      "basicSettingsPlaceholder": "मूल सेटिंग्स प्लेसहोल्डर",
+      "saving": "सहेजा जा रहा है...",
+      "savedSuccess": "प्रोफ़ाइल सफलतापूर्वक सहेजी गई।",
+      "savedLimited": "सीमित डेटा के साथ सहेजी गई।",
+      "imageError": "छवि संसाधित नहीं हो सकी। दूसरी फ़ाइल आज़माएँ।"
+    },
+    "fieldEntry": {
+      "propertyId": "संपत्ति ID",
+      "selectOption": "विकल्प चुनें"
+    },
+    "form": {
+      "agentName": "एजेंट का नाम",
+      "village": "गाँव",
+      "tehsil": "तहसील",
+      "district": "ज़िला",
+      "soilType": "मिट्टी का प्रकार",
+      "roadAccess": "सड़क पहुँच",
+      "waterAvailability": "पानी उपलब्धता",
+      "ownerName": "मालिक का नाम",
+      "ownerContact": "मालिक संपर्क",
+      "expectedPrice": "अपेक्षित मूल्य",
+      "ownershipType": "स्वामित्व प्रकार",
+      "negotiable": "मोलभाव योग्य",
+      "registryAvailable": "रजिस्ट्री उपलब्ध",
+      "khasraAvailable": "खसरा उपलब्ध",
+      "landDispute": "भूमि विवाद",
+      "electricity": "बिजली",
+      "cropHistory": "फसल इतिहास",
+      "ownerContactStep2": "मालिक संपर्क (चरण 2)",
+      "exactLocation": "सटीक स्थान",
+      "nearbyLandmarks": "निकट स्थलचिह्न",
+      "roadType": "सड़क प्रकार",
+      "waterSourceDetails": "जल स्रोत विवरण",
+      "connectivityInfo": "कनेक्टिविटी जानकारी",
+      "propertyHighlights": "संपत्ति विशेषताएँ",
+      "issuesDrawbacks": "समस्याएँ / कमियाँ",
+      "select": "चुनें"
     }
   }
 }

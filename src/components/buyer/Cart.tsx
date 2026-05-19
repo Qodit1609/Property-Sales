@@ -1,4 +1,5 @@
 import React, { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import {
   MessageCircle,
   PhoneCall,
@@ -20,8 +21,10 @@ import { useBuyerResolvedProperties } from "../../hooks/useBuyerResolvedProperti
 import PropertyCard from "../Cards/PropertyCard";
 import CartGrid from "./CartGrid";
 import { Button } from "@/components/common";
+import { formatBuyerCurrency } from "../../lib/buyerI18n";
 
 const Cart: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const cartIds = useAppSelector((s) => s.buyer.cartIds);
   const { properties: cart, loading } = useBuyerResolvedProperties(cartIds);
@@ -35,17 +38,16 @@ const Cart: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-[var(--b2)] bg-[var(--white)] px-8 py-16 text-center shadow-sm">
         <h2 className="text-lg font-semibold text-[var(--b1)]">
-          Your property cart is empty
+          {t("buyerPanel.cartPage.emptyTitle")}
         </h2>
         <p className="mt-2 max-w-md text-sm text-[var(--muted)]">
-          Shortlist farmland, farmhouse or resort listings to manage visits and
-          enquiries in one place.
+          {t("buyerPanel.cartPage.emptyBody")}
         </p>
         <Link
           to="/buyer/dashboard"
           className="mt-6 inline-flex items-center justify-center rounded-full bg-[var(--b1)] px-5 py-2 text-sm font-semibold text-[var(--fg)] transition hover:opacity-95"
         >
-          Explore listings
+          {t("buyerPanel.cartPage.exploreCta")}
         </Link>
       </div>
     );
@@ -56,17 +58,21 @@ const Cart: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-base font-semibold text-[var(--b1)]">
-            Shortlisted properties
+            {t("buyerPanel.cartPage.shortlistedTitle")}
           </h2>
           <p className="text-xs text-[var(--muted)]">
-            {cartIds.length} {cartIds.length === 1 ? "property" : "properties"} in
-            your cart
-            {loading ? " · Loading latest data…" : ""}
+            {t("buyerPanel.cartPage.countSummary", {
+              count: cartIds.length,
+              unit: cartIds.length === 1 ? t("common.property") : t("common.properties"),
+            })}
+            {loading ? t("buyerPanel.cartPage.loadingData") : ""}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-[var(--b2-soft)] px-3 py-1 text-[11px] font-medium text-[var(--b1)] ring-1 ring-[var(--b2)]">
-            Portfolio value: ₹ {totalValue.toLocaleString("en-IN")}
+            {t("buyerPanel.cartPage.portfolioValue", {
+              value: formatBuyerCurrency(totalValue, i18n.language).replace(/^\u20B9\s?/, ""),
+            })}
           </span>
           <Button
             type="button"
@@ -74,7 +80,7 @@ const Cart: React.FC = () => {
             onClick={() => dispatch(clearCart())}
             className="rounded-full px-3 py-1 text-[11px] text-[var(--error)] ring-1 ring-[var(--error)]/30 hover:bg-[var(--error-bg)]"
           >
-            Clear cart
+            {t("buyerPanel.cartPage.clearCart")}
           </Button>
         </div>
       </div>
@@ -93,7 +99,7 @@ const Cart: React.FC = () => {
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-xs font-semibold uppercase tracking-wide text-[var(--b1-mid)]">
-                    Negotiation workspace
+                    {t("buyerPanel.cartPage.negotiationWorkspace")}
                   </p>
 
                   <Button
@@ -103,13 +109,12 @@ const Cart: React.FC = () => {
                     className="rounded-full bg-[var(--error-bg)] px-3 py-1 text-[11px] font-medium text-[var(--error)] ring-1 ring-[var(--error)]/40 hover:bg-[var(--error-bg)]/80"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
-                    Remove
+                    {t("buyerPanel.dashboard.remove")}
                   </Button>
                 </div>
 
                 <p className="text-xs text-slate-400">
-                  Coordinate with the seller or agent directly from here. Keep
-                  your communication, visits and documents organized.
+                  {t("buyerPanel.cartPage.negotiationHint")}
                 </p>
               </div>
 
@@ -120,7 +125,7 @@ const Cart: React.FC = () => {
                   className="justify-center px-3 py-2"
                 >
                   <PhoneCall className="h-3.5 w-3.5" />
-                  Request callback
+                  {t("buyerPanel.cartPage.requestCallback")}
                 </Button>
 
                 <Button
@@ -129,7 +134,7 @@ const Cart: React.FC = () => {
                   className="justify-center px-3 py-2"
                 >
                   <CalendarClock className="h-3.5 w-3.5" />
-                  Schedule visit
+                  {t("buyerPanel.cartPage.scheduleVisit")}
                 </Button>
 
                 <Button
@@ -138,7 +143,7 @@ const Cart: React.FC = () => {
                   className="justify-center px-3 py-2"
                 >
                   <MessageCircle className="h-3.5 w-3.5" />
-                  Send enquiry
+                  {t("buyerPanel.cartPage.sendEnquiry")}
                 </Button>
 
                 <Button
@@ -147,7 +152,7 @@ const Cart: React.FC = () => {
                   className="justify-center px-3 py-2"
                 >
                   <Download className="h-3.5 w-3.5" />
-                  Download brochure
+                  {t("buyerPanel.cartPage.downloadBrochure")}
                 </Button>
 
                 <Button
@@ -156,7 +161,7 @@ const Cart: React.FC = () => {
                   className="justify-center px-3 py-2"
                 >
                   <Share2 className="h-3.5 w-3.5" />
-                  Share property
+                  {t("buyerPanel.cartPage.shareProperty")}
                 </Button>
 
                 <div className="flex gap-2">
@@ -167,7 +172,7 @@ const Cart: React.FC = () => {
                     className="flex-1 justify-center px-3 py-2"
                   >
                     <Scale className="h-3.5 w-3.5" />
-                    Add to compare
+                    {t("buyerPanel.cartPage.addToCompare")}
                   </Button>
 
                   <Button
@@ -176,7 +181,7 @@ const Cart: React.FC = () => {
                     variant="ghost"
                     className="flex-1 justify-center px-3 py-2"
                   >
-                    Save for later
+                    {t("buyerPanel.cartPage.saveForLater")}
                   </Button>
                 </div>
               </div>

@@ -11,6 +11,7 @@ import type {
 } from "./buyerTypes";
 
 const MAX_COMPARE = 3;
+export const COMPARE_LIMIT_NOTICE_KEY = "buyerPanel.dashboard.compareLimitNotice";
 const MAX_RECENT = 10;
 
 export interface BuyerState {
@@ -109,7 +110,7 @@ const buyerSlice = createSlice({
         return;
       }
       if (state.compareIds.length >= MAX_COMPARE) {
-        state.compareNotice = `You can compare up to ${MAX_COMPARE} properties. Remove one to add another.`;
+        state.compareNotice = COMPARE_LIMIT_NOTICE_KEY;
         return;
       }
       state.compareIds.push(id);
@@ -222,7 +223,7 @@ const buyerSlice = createSlice({
       upsertEntity(state, action.payload);
       if (state.compareIds.includes(id)) return;
       if (state.compareIds.length >= MAX_COMPARE) {
-        state.compareNotice = `You can compare up to ${MAX_COMPARE} properties.`;
+        state.compareNotice = COMPARE_LIMIT_NOTICE_KEY;
         return;
       }
       state.compareIds.push(id);

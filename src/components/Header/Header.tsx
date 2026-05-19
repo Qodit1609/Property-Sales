@@ -11,7 +11,9 @@ import type { Property } from "../../features/properties/propertyType";
 import api, { API_ENDPOINTS } from "../../lib/apiClient";
 import { mapPropertyListPayload } from "../../features/properties/propertyAPI";
 import { Button } from "@/components/common";
+import CustomAlert from "@/components/common/CustomAlert";
 import { normalizeLanguage, preloadLanguage } from "../../i18n";
+import { translateHeaderLabel } from "../../lib/i18nHelpers";
 import { loadBuyerProfile } from "../../lib/buyerProfileStorage";
 import { loadSellerProfile } from "../../lib/sellerProfileStorage";
 import { loadAdminProfile } from "../../lib/adminProfileStorage";
@@ -55,12 +57,6 @@ interface HeaderApiResponse {
   data?: HeaderPayload;
   header?: HeaderPayload;
 }
-
-const NAV_LABEL_KEY_MAP: Record<string, string> = {};
-
-const SECTION_TITLE_KEY_MAP: Record<string, string> = {};
-
-const SECTION_ITEM_KEY_MAP: Record<string, string> = {};
 
 const normalizeValue = (value: string): string => value.trim().toLowerCase();
 const normalizePath = (value: string): string =>
@@ -195,6 +191,14 @@ const roleDashboardPath = (role: AppRole) => {
   if (role === "seller") return "/seller/dashboard";
   if (role === "agent") return "/agent/dashboard";
   return "/admin";
+};
+
+const roleMyAccountPath = (role: AppRole): string => {
+  if (role === "buyer") return "/buyer/account";
+  if (role === "seller") return "/seller/profile";
+  if (role === "admin") return "/admin/account";
+  if (role === "agent") return "/agent/profile";
+  return roleDashboardPath(role);
 };
 
 const resolveLanguageCode = (value?: string): "en" | "hi" | null => {
@@ -630,6 +634,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   );
   const [loginOpen, setLoginOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
   const [menuProperties, setMenuProperties] = useState<Property[]>([]);
   const [headerData, setHeaderData] = useState<NonNullable<
     NonNullable<HeaderApiResponse["data"]>["header"]
@@ -770,11 +775,16 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
         : undefined,
   }));
 
-  const brandName = headerData?.brand?.name ?? "";
+  const brandNameRaw = headerData?.brand?.name ?? "";
+  const brandName = brandNameRaw
+    ? translateHeaderLabel(brandNameRaw)
+    : t("header.brand");
   const brandLogo = headerData?.brand?.logo ?? "";
   const primaryCta = headerData?.ctaButtons?.[0];
-  const ctaLabel = primaryCta?.label ?? "";
-  const ctaTag = primaryCta?.tag ?? "";
+  const ctaLabelRaw = primaryCta?.label ?? "";
+  const ctaTagRaw = primaryCta?.tag ?? "";
+  const ctaLabel = ctaLabelRaw ? translateHeaderLabel(ctaLabelRaw) : "";
+  const ctaTag = ctaTagRaw ? translateHeaderLabel(ctaTagRaw) : "";
   const ctaUrl = primaryCta?.url ?? "";
   const hasCta = Boolean(ctaLabel && ctaUrl);
   const contactPhone = headerData?.contact?.phone ?? "";
@@ -832,11 +842,11 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
   };
 
   const handleLogout = () => {
-    const shouldLogout = window.confirm("Are you sure you want to logout?");
-    if (!shouldLogout) return;
+    setLogoutAlertOpen(false);
     dispatch(logout());
     navigate("/", { replace: true });
   };
+  const requestLogout = () => setLogoutAlertOpen(true);
 
   const toggleMobileSection = (label: string) => {
     setMobileActiveSections((prev) =>
@@ -850,13 +860,10 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
     setContactOpen(false);
   };
 
-  const translateHeaderValue = (value: string) => {
-    const key =
-      NAV_LABEL_KEY_MAP[value] ??
-      SECTION_TITLE_KEY_MAP[value] ??
-      SECTION_ITEM_KEY_MAP[value];
-    return key ? t(key) : value;
-  };
+  const translateHeaderValue = (value: string) => translateHeaderLabel(value);
+
+  const languageSwitcherLabel = (code: "en" | "hi") =>
+    code === "hi" ? t("header.languageHindi") : t("header.languageEnglish");
 
   const changeLanguage = (language: "en" | "hi") => {
     if (activeLanguage === language) return;
@@ -1080,7 +1087,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         }`}
                         aria-pressed={activeLanguage === option.code}
                       >
-                        {option.label}
+                        {languageSwitcherLabel(option.code)}
                       </button>
                       {index < safeLanguageOptions.length - 1 && (
                         <span
@@ -1168,7 +1175,9 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                           <img
                             src={profilePhotoUrl}
                             alt={
-                              user?.name ? `${user.name} profile` : "Profile"
+                              user?.name
+                                ? t("header.profilePhotoAlt", { name: user.name })
+                                : t("header.profilePhotoAltGeneric")
                             }
                             className="h-full w-full rounded-full object-cover"
                           />
@@ -1214,15 +1223,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         onMouseLeave={closeLogin}
                       >
                         <Link
-                          to={
-                            user?.role === "buyer"
-                              ? "/buyer/account"
-                              : user?.role === "seller"
-                                ? "/seller/profile"
-                                : user?.role === "admin"
-                                  ? "/admin/account"
-                                  : roleDashboardPath(user?.role ?? "buyer")
-                          }
+                          to={roleMyAccountPath(user?.role ?? "buyer")}
                           className="flex h-10 items-center rounded-md px-3 text-sm font-medium text-[var(--b1)] transition-colors hover:bg-[var(--b2-soft)]/50 hover:text-[var(--b1-mid)]"
                         >
                           {t("header.myAccount")}
@@ -1237,7 +1238,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
 
                         <button
                           type="button"
-                          onClick={handleLogout}
+                          onClick={requestLogout}
                           className="flex h-10 w-full items-center rounded-md px-3 text-left text-sm font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
                         >
                           {t("header.logout")}
@@ -1444,7 +1445,7 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
                         type="button"
                         onClick={() => {
                           closeMobileMenu();
-                          handleLogout();
+                          requestLogout();
                         }}
                         className="flex h-11 w-full items-center justify-center rounded-lg border border-red-500 bg-white px-4 text-center font-medium text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
                       >
@@ -1474,6 +1475,14 @@ const Header: React.FC<HeaderProps> = ({ forceSolid = false }) => {
       <Modal open={contactOpen} onClose={closeContactModal}>
         <ContactPopup onClose={closeContactModal} />
       </Modal>
+      <CustomAlert
+        open={logoutAlertOpen}
+        title={t("header.logoutConfirmTitle")}
+        message={t("header.logoutConfirmMessage")}
+        showCancel
+        onCancel={() => setLogoutAlertOpen(false)}
+        onConfirm={handleLogout}
+      />
     </>
   );
 };

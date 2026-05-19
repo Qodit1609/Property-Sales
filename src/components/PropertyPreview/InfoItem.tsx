@@ -1,5 +1,6 @@
 import Badge from "./Badge";
 import { useTranslation } from "react-i18next";
+import { PROPERTY_TEXT_WRAP_CLASS } from "../../utils/wordText";
 
 type InfoValue = string | number | boolean | null | undefined;
 
@@ -36,22 +37,22 @@ const InfoItem = ({ label, value, suffix }: InfoItemProps) => {
   );
 
   return (
-    <div className="rounded-lg border border-[var(--b2-soft)] bg-[var(--b2-soft)]/20 px-3 py-2">
+    <div className="min-w-0 rounded-lg border border-[var(--b2-soft)] bg-[var(--b2-soft)]/20 px-3 py-2">
       <p className="text-xs text-[var(--muted)]">{label}</p>
-      <div className="mt-1 text-sm font-semibold text-[var(--b1)] break-all">
-  {typeof displayValue === "string" && displayValue.startsWith("http") ? (
-    <a
-      href={displayValue}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-blue-600 underline"
-    >
-      View on Map
-    </a>
-  ) : (
-    displayValue
-  )}
-</div>
+      <div className={`mt-1 text-sm font-semibold text-[var(--b1)] ${PROPERTY_TEXT_WRAP_CLASS}`}>
+        {typeof displayValue === "string" && displayValue.startsWith("http") ? (
+          <a
+            href={displayValue}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            {t("propertyPreview.actions.viewOnMap")}
+          </a>
+        ) : (
+          displayValue
+        )}
+      </div>
     </div>
   );
 };

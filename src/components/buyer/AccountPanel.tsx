@@ -11,6 +11,7 @@ import {
   setBuyerAccountCreatedIfMissing,
 } from "../../lib/buyerProfileStorage";
 import { Button, Input } from "@/components/common";
+import CustomAlert from "@/components/common/CustomAlert";
 
 import type { BuyerPreference } from "../../features/buyer/buyerTypes";
 
@@ -40,11 +41,20 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
   const { t, i18n } = useTranslation();
   const { user } = useAppSelector((state) => state.auth);
   const { preferences } = useAppSelector((state) => state.buyer);
+  const userRecord = user as Record<string, unknown> | null;
+  const userMobile = String(
+    user?.mobile ??
+      userRecord?.phone ??
+      userRecord?.phoneNumber ??
+      userRecord?.mobileNumber ??
+      ""
+  ).trim();
   const email = user?.email;
   const storedProfile = useBuyerProfileLocal(email);
   const activity = useBuyerActivityLocal(email);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [completionAlertOpen, setCompletionAlertOpen] = useState(false);
   const [profileForm, setProfileForm] = useState({
     fullName: "",
     emailAddress: "",
@@ -117,7 +127,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
     setProfileForm({
       fullName: (user?.name ?? "").trim(),
       emailAddress: (user?.email ?? "").trim(),
-      mobileNumber: (storedProfile?.mobileNumber ?? "").trim(),
+      mobileNumber: (storedProfile?.mobileNumber ?? userMobile).trim(),
       occupation: (storedProfile?.occupation ?? "").trim(),
       gender: (storedProfile?.gender ?? "").trim(),
     });
@@ -126,7 +136,9 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
     storedProfile?.mobileNumber,
     storedProfile?.occupation,
     user?.email,
+    user?.mobile,
     user?.name,
+    userMobile,
   ]);
 
   const handleProfileChange = useCallback(
@@ -149,7 +161,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
       gender: profileForm.gender.trim(),
     });
     if (profileCompletion === 100) {
-      window.alert("Your profile is 100% completed");
+      setCompletionAlertOpen(true);
     }
     setIsEditingProfile(false);
   }, [email, isEditingProfile, profileCompletion, profileForm.gender, profileForm.mobileNumber, profileForm.occupation]);
@@ -158,14 +170,15 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
     setProfileForm({
       fullName: (user?.name ?? "").trim(),
       emailAddress: (user?.email ?? "").trim(),
-      mobileNumber: (storedProfile?.mobileNumber ?? "").trim(),
+      mobileNumber: (storedProfile?.mobileNumber ?? userMobile).trim(),
       occupation: (storedProfile?.occupation ?? "").trim(),
       gender: (storedProfile?.gender ?? "").trim(),
     });
     setIsEditingProfile(false);
-  }, [storedProfile?.gender, storedProfile?.mobileNumber, storedProfile?.occupation, user?.email, user?.name]);
+  }, [storedProfile?.gender, storedProfile?.mobileNumber, storedProfile?.occupation, user?.email, user?.name, userMobile]);
 
   return (
+    <>
     <div className="space-y-4">
       <motion.div
         initial={{ opacity: 0, y: 8 }}
@@ -200,7 +213,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
               {t("sellerPanel.profile.photoLabel")}
             </p>
             <p className="text-xs text-[var(--muted)]">
-              Shown in your buyer sidebar. JPG or PNG, max about 1.5 MB.
+              {t("buyerPanel.account.photoHint")}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
               <label className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-[var(--b2)] bg-[var(--white)] px-4 py-2 text-sm font-medium text-[var(--b1)] shadow-sm transition hover:bg-[var(--b2-soft)]">
@@ -259,16 +272,16 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
         <div className="space-y-4 rounded-2xl border border-[var(--b2)] bg-[var(--white)] p-4 shadow-sm">
           <div className="flex items-center justify-between gap-3">
             <h2 className="text-sm font-semibold text-[var(--b1)]">
-              Profile details
+              {t("buyerPanel.account.profileDetails")}
             </h2>
             <div className="flex items-center gap-2">
               {isEditingProfile ? (
                 <Button type="button" variant="ghost" className="text-[11px] px-3 py-1.5" onClick={handleCancelProfileEdit}>
-                  Cancel
+                  {t("common.cancel")}
                 </Button>
               ) : null}
               <Button type="button" variant="primary" className="text-[11px] px-3 py-1.5" onClick={handleProfileEditToggle}>
-                {isEditingProfile ? "Save" : "Edit"}
+                {isEditingProfile ? t("common.save") : t("common.edit")}
               </Button>
             </div>
           </div>
@@ -276,7 +289,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
           <div className="space-y-3 text-xs text-[var(--b1)]">
             <div>
               <p className="text-[11px] font-medium text-[var(--muted)]">
-                Full name
+                {t("buyerPanel.account.fields.fullName")}
               </p>
               <Input
                 value={profileForm.fullName}
@@ -287,7 +300,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
 
             <div>
               <p className="text-[11px] font-medium text-[var(--muted)]">
-                Email
+                {t("buyerPanel.account.fields.email")}
               </p>
               <Input
                 value={profileForm.emailAddress}
@@ -298,7 +311,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
 
             <div>
               <p className="text-[11px] font-medium text-[var(--muted)]">
-                Mobile number
+                {t("buyerPanel.account.fields.mobile")}
               </p>
               <Input
                 value={profileForm.mobileNumber}
@@ -306,7 +319,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
                 onFocus={() => {
                   if (!isEditingProfile) setIsEditingProfile(true);
                 }}
-                placeholder="Enter mobile number"
+                placeholder={t("buyerPanel.account.placeholders.mobile")}
                 readOnly={!isEditingProfile}
                 className="mt-1 text-sm"
               />
@@ -314,7 +327,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
 
             <div>
               <p className="text-[11px] font-medium text-[var(--muted)]">
-                Occupation
+                {t("buyerPanel.account.fields.occupation")}
               </p>
               <Input
                 value={profileForm.occupation}
@@ -322,7 +335,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
                 onFocus={() => {
                   if (!isEditingProfile) setIsEditingProfile(true);
                 }}
-                placeholder="Enter occupation"
+                placeholder={t("buyerPanel.account.placeholders.occupation")}
                 readOnly={!isEditingProfile}
                 className="mt-1 text-sm"
               />
@@ -330,7 +343,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
 
             <div>
               <p className="text-[11px] font-medium text-[var(--muted)]">
-                Gender
+                {t("buyerPanel.account.fields.gender")}
               </p>
               <select
                 value={profileForm.gender}
@@ -340,19 +353,19 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
                 }}
                 className="mt-1 w-full rounded-xl border border-[var(--b2)] bg-[var(--white)] px-3 py-2 text-sm text-[var(--b1)] outline-none transition focus:border-[var(--b1)]"
               >
-                <option value="">Select gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
+                <option value="">{t("buyerPanel.account.placeholders.gender")}</option>
+                <option value="Male">{t("buyerPanel.account.gender.male")}</option>
+                <option value="Female">{t("buyerPanel.account.gender.female")}</option>
+                <option value="Other">{t("buyerPanel.account.gender.other")}</option>
               </select>
             </div>
 
             <div>
               <p className="text-[11px] font-medium text-[var(--muted)]">
-                Role
+                {t("buyerPanel.account.fields.role")}
               </p>
               <p className="mt-0.5 inline-flex rounded-full bg-[var(--b2-soft)] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-[var(--b1-mid)]">
-                Buyer
+                {t("buyerPanel.account.roleBadge")}
               </p>
             </div>
           </div>
@@ -363,10 +376,10 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-sm font-semibold text-[var(--b1)]">
-                Buyer preferences
+                {t("buyerPanel.account.preferences.title")}
               </h2>
               <p className="text-[11px] text-[var(--muted)]">
-                Used to personalize recommendations and alerts.
+                {t("buyerPanel.account.preferences.subtitle")}
               </p>
             </div>
           </div>
@@ -377,12 +390,12 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
           >
             <div>
               <label className="text-[11px] font-medium text-[var(--muted)]">
-                Preferred locations
+                {t("buyerPanel.account.preferences.locations")}
               </label>
 
               <Input
                 defaultValue={preferences.locations.join(", ")}
-                placeholder="E.g. Indore bypass, Mhow, Rau, Ujjain road"
+                placeholder={t("buyerPanel.account.placeholders.locations")}
                 className="mt-1 text-sm"
               />
             </div>
@@ -390,7 +403,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="text-[11px] font-medium text-[var(--muted)]">
-                  Budget from (₹)
+                  {t("buyerPanel.account.preferences.budgetFrom")} (₹)
                 </label>
 
                 <Input
@@ -402,7 +415,7 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
 
               <div>
                 <label className="text-[11px] font-medium text-[var(--muted)]">
-                  Budget to (₹)
+                  {t("buyerPanel.account.preferences.budgetTo")} (₹)
                 </label>
 
                 <Input
@@ -415,23 +428,25 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
 
             <div>
               <label className="text-[11px] font-medium text-[var(--muted)]">
-                Property focus
+                {t("buyerPanel.account.preferences.propertyFocus")}
               </label>
 
               <div className="mt-2 flex flex-wrap gap-2">
-                {[
-                  "Agriculture land",
-                  "Farmhouse",
-                  "Resort",
-                  "Agri resort",
-                ].map((type) => (
+                {(
+                  [
+                    ["agricultureLand", "buyerPanel.account.propertyTypes.agricultureLand"],
+                    ["farmhouse", "buyerPanel.account.propertyTypes.farmhouse"],
+                    ["resort", "buyerPanel.account.propertyTypes.resort"],
+                    ["agriResort", "buyerPanel.account.propertyTypes.agriResort"],
+                  ] as const
+                ).map(([key, labelKey]) => (
                   <Button
-                    key={type}
+                    key={key}
                     type="button"
                     variant="ghost"
                     className="text-[11px] px-3 py-1 rounded-full bg-[var(--b2-soft)] ring-1 ring-[var(--b2)] hover:bg-[var(--b2)]"
                   >
-                    {type}
+                    {t(labelKey)}
                   </Button>
                 ))}
               </div>
@@ -448,13 +463,20 @@ const AccountPanel: React.FC<AccountPanelProps> = ({
                 variant="primary"
                 className="text-[11px] px-4 py-2"
               >
-                Save preference blueprint
+                {t("buyerPanel.account.savePreferenceBlueprint")}
               </Button>
             </div>
           </form>
         </div>
       </div>
     </div>
+    <CustomAlert
+      open={completionAlertOpen}
+      title={t("adminPanel.account.profileCompleted")}
+      message={t("buyerPanel.account.profileCompletedMessage")}
+      onConfirm={() => setCompletionAlertOpen(false)}
+    />
+    </>
   );
 };
 

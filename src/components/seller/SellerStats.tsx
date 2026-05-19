@@ -1,4 +1,5 @@
 import { memo } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
@@ -39,11 +40,13 @@ type SellerStatsProps = {
 };
 
 function SellerStatsComponent({ items, loading }: SellerStatsProps) {
+  const { t } = useTranslation();
+
   return (
     <div
       className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6"
       role="list"
-      aria-label="Seller statistics"
+      aria-label={t("sellerPanel.statsAria")}
     >
       {items.map((card, index) => {
         const Icon = card.icon;

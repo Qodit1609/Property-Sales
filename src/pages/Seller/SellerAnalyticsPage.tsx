@@ -18,24 +18,25 @@ import { fetchMyListings } from "../../features/seller/sellerSlice";
 import type { Property } from "../../features/properties/propertyType";
 import { useSellerAggregates } from "../../hooks/useSellerAggregates";
 import { SellerChartSkeleton } from "@/components/seller/SellerSkeleton";
+import { formatSellerNumber, translateSellerAnalyticsFallback } from "@/lib/sellerI18n";
 
 const COLORS = ["#2D6A4F", "#40916C", "#52B788", "#74C69D", "#95D5B2"];
 
-function topListings(listings: Property[], n: number) {
+function topListings(listings: Property[], n: number, listingFallback: string) {
   return [...listings]
     .sort((a, b) => (b.analytics?.views ?? 0) - (a.analytics?.views ?? 0))
     .slice(0, n)
     .map((p) => ({
-      name: (p.title ?? "Listing").slice(0, 22),
+      name: (p.title?.trim() || listingFallback).slice(0, 22),
       views: p.analytics?.views ?? 0,
       leads: p.analytics?.contactClicks ?? 0,
     }));
 }
 
-function locationBuckets(listings: Property[]) {
+function locationBuckets(listings: Property[], otherFallback: string) {
   const map = new Map<string, number>();
   for (const p of listings) {
-    const key = p.location?.city?.trim() || p.location?.state?.trim() || "Other";
+    const key = p.location?.city?.trim() || p.location?.state?.trim() || otherFallback;
     map.set(key, (map.get(key) ?? 0) + 1);
   }
   return [...map.entries()]
@@ -45,7 +46,7 @@ function locationBuckets(listings: Property[]) {
 }
 
 const SellerAnalyticsPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const { listings, loading } = useAppSelector((s: RootState) => s.seller);
   const stats = useSellerAggregates(listings as Property[]);
@@ -64,8 +65,14 @@ const SellerAnalyticsPage = () => {
     return `${(stats.totalLeads / stats.totalViews).toFixed(2)} : 1`;
   }, [stats.totalLeads, stats.totalViews]);
 
-  const top = useMemo(() => topListings(listings as Property[], 5), [listings]);
-  const loc = useMemo(() => locationBuckets(listings as Property[]), [listings]);
+  const top = useMemo(
+    () => topListings(listings as Property[], 5, translateSellerAnalyticsFallback("listing")),
+    [listings]
+  );
+  const loc = useMemo(
+    () => locationBuckets(listings as Property[], translateSellerAnalyticsFallback("other")),
+    [listings]
+  );
 
   return (
     <section className="space-y-8">
@@ -110,7 +117,7 @@ const SellerAnalyticsPage = () => {
                 {t("sellerPanel.analytics.statViews")}
               </p>
               <p className="mt-2 text-3xl font-semibold tabular-nums text-[var(--b1)]">
-                {stats.totalViews.toLocaleString("en-IN")}
+                {formatSellerNumber(stats.totalViews, i18n.language)}
               </p>
             </motion.div>
             <motion.div
@@ -123,7 +130,7 @@ const SellerAnalyticsPage = () => {
                 {t("sellerPanel.analytics.statLeads")}
               </p>
               <p className="mt-2 text-3xl font-semibold tabular-nums text-[var(--b1)]">
-                {stats.totalLeads.toLocaleString("en-IN")}
+                {formatSellerNumber(stats.totalLeads, i18n.language)}
               </p>
             </motion.div>
           </div>

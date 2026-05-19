@@ -7,4 +7,5 @@ export interface ManagedAccount {
   name: string;
   email: string;
   role?: AppRole;
+  isBlocked?: boolean;
 }

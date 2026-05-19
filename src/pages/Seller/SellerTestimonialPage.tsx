@@ -1,10 +1,12 @@
 import React, { useCallback, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ToastStack, type ToastMessage } from "@/components/propertyPost/Toast";
 import TestimonialFormCard from "@/components/testimonial/TestimonialFormCard";
 import { createTestimonial } from "@/features/testimonials/testimonialApi";
 import type { CreateTestimonialRequest } from "@/features/testimonials/testimonialTypes";
 
 const SellerTestimonialPage: React.FC = () => {
+  const { t } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
@@ -26,14 +28,15 @@ const SellerTestimonialPage: React.FC = () => {
       await createTestimonial(payload);
       pushToast({
         kind: "success",
-        title: "Testimonial submitted",
-        detail: "Your testimonial has been sent for admin review.",
+        title: t("buyerPanel.testimonial.toast.submitted"),
+        detail: t("buyerPanel.testimonial.toast.submittedDetail"),
       });
     } catch (error) {
       pushToast({
         kind: "error",
-        title: "Submit failed",
-        detail: error instanceof Error ? error.message : "Unable to submit testimonial",
+        title: t("buyerPanel.testimonial.toast.failed"),
+        detail:
+          error instanceof Error ? error.message : t("buyerPanel.testimonial.toast.failedDetail"),
       });
     } finally {
       setSubmitting(false);
@@ -44,8 +47,8 @@ const SellerTestimonialPage: React.FC = () => {
     <section className="space-y-6">
       <ToastStack toasts={toasts} onDismiss={dismissToast} />
       <TestimonialFormCard
-        title="Share Your Testimonial"
-        subtitle="Tell us about your BhoomiWala experience."
+        title={t("buyerPanel.testimonial.title")}
+        subtitle={t("buyerPanel.testimonial.subtitle")}
         submitting={submitting}
         onSubmit={handleSubmit}
       />

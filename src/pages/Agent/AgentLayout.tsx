@@ -1,4 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Bell, ChevronLeft, ChevronRight, LogOut, Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -11,61 +13,46 @@ import { DashboardPageTopBar } from "../../components/common/DashboardPageTopBar
 import { ProfileAvatar } from "../../components/common/ProfileAvatar";
 import { twMerge } from "tailwind-merge";
 import { logout } from "../../features/auth/authSlice";
+import CustomAlert from "@/components/common/CustomAlert";
 
 const AGENT_SIDEBAR_WIDTH_EXPANDED = 280;
 const AGENT_SIDEBAR_WIDTH_COLLAPSED = 72;
 
-function agentTopBarFromPath(pathname: string): { title: string; subtitle: string } {
-  const p = pathname.replace(/\/$/, "") || "/";
-  const map: Record<string, { title: string; subtitle: string }> = {
-    "/agent/dashboard": {
-      title: "Overview",
-      subtitle: "Portfolio health across listings and client activity.",
-    },
-    "/agent/field-entry": {
-      title: "Field Entry",
-      subtitle: "Capture on-ground lead and listing updates.",
-    },
-    "/agent/detailed-entry": {
-      title: "Detailed Entry",
-      subtitle: "Submit complete listing details for review.",
-    },
-    "/agent/properties": {
-      title: "Properties",
-      subtitle: "Manage assigned and published properties.",
-    },
-    "/agent/add-property": {
-      title: "Add Property",
-      subtitle: "Create a new property draft with required details.",
-    },
-    "/agent/leads": {
-      title: "Leads",
-      subtitle: "Track and convert active buyer leads.",
-    },
-    "/agent/visits": {
-      title: "Visits",
-      subtitle: "Coordinate and monitor scheduled site visits.",
-    },
-    "/agent/clients": {
-      title: "Clients",
-      subtitle: "Manage client information and follow-ups.",
-    },
-    "/agent/profile": {
-      title: "Agent Profile",
-      subtitle: "Update your professional profile details.",
-    },
-  };
+const AGENT_ROUTE_TOP_BAR_KEY: Record<string, string> = {
+  "/agent/dashboard": "dashboard",
+  "/agent/field-entry": "fieldEntry",
+  "/agent/detailed-entry": "detailedEntry",
+  "/agent/properties": "properties",
+  "/agent/add-property": "addProperty",
+  "/agent/leads": "leads",
+  "/agent/visits": "visits",
+  "/agent/calendar": "calendar",
+  "/agent/clients": "clients",
+  "/agent/profile": "profile",
+  "/agent/notifications": "notifications",
+};
 
-  return map[p] ?? map["/agent/dashboard"];
+function agentTopBarFromPath(
+  pathname: string,
+  t: TFunction
+): { title: string; subtitle: string } {
+  const p = pathname.replace(/\/$/, "") || "/";
+  const key = AGENT_ROUTE_TOP_BAR_KEY[p] ?? "dashboard";
+  return {
+    title: t(`agentPanel.topBar.${key}.title`),
+    subtitle: t(`agentPanel.topBar.${key}.subtitle`),
+  };
 }
 
-function AgentNotificationsBell() {
+function AgentNotificationsBell({ onClick }: { onClick: () => void }) {
+  const { t } = useTranslation();
   const unreadCount = useAppSelector((state) => state.notifications.unreadCount);
   return (
     <button
       type="button"
+      onClick={onClick}
       className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--b2)]/80 bg-[var(--white)] text-[var(--b1)] shadow-sm transition hover:bg-[var(--b2-soft)] hover:shadow-md"
-      aria-label="Notifications"
+      aria-label={t("common.notifications")}
     >
       <Bell className="h-5 w-5" strokeWidth={1.75} aria-hidden />
       {unreadCount > 0 ? (
@@ -98,6 +85,7 @@ function AgentShellSidebar({
   profileCompletion,
   onLogout,
 }: AgentShellSidebarProps) {
+  const { t } = useTranslation();
   const headerExpanded = !collapsed || mobile;
   const width =
     collapsed && !mobile ? AGENT_SIDEBAR_WIDTH_COLLAPSED : AGENT_SIDEBAR_WIDTH_EXPANDED;
@@ -130,7 +118,9 @@ function AgentShellSidebar({
               "absolute top-2 z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--b2)] bg-[var(--white)] text-[var(--b1)] shadow-sm transition hover:bg-[var(--b2-soft)]",
               collapsed && !mobile ? "left-1/2 top-3 -translate-x-1/2" : "right-2"
             )}
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={
+              collapsed ? t("common.expandSidebar") : t("common.collapseSidebar")
+            }
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </button>
@@ -151,7 +141,9 @@ function AgentShellSidebar({
             style={{
               background: `conic-gradient(var(--b1) ${profileCompletion * 3.6}deg, var(--b2) 0deg)`,
             }}
-            aria-label={`Profile completion ${profileCompletion}%`}
+            aria-label={t("agentPanel.shell.profileCompletion", {
+              percent: profileCompletion,
+            })}
           >
             <ProfileAvatar
               name={displayName}
@@ -165,7 +157,9 @@ function AgentShellSidebar({
               <p className="truncate text-left font-serif text-sm font-semibold leading-tight text-[var(--b1)]">
                 {displayName}
               </p>
-              <p className="text-[10px] font-medium text-[var(--muted)]">{profileCompletion}% complete</p>
+              <p className="text-[10px] font-medium text-[var(--muted)]">
+                {t("agentPanel.shell.profileCompletion", { percent: profileCompletion })}
+              </p>
             </div>
           ) : null}
         </div>
@@ -188,7 +182,7 @@ function AgentShellSidebar({
           )}
         >
           <LogOut className="h-[18px] w-[18px] shrink-0" />
-          {(!collapsed || mobile) && <span>Logout</span>}
+          {(!collapsed || mobile) && <span>{t("common.logout")}</span>}
         </button>
       </div>
     </motion.aside>
@@ -196,6 +190,7 @@ function AgentShellSidebar({
 }
 
 const AgentLayout: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -203,6 +198,7 @@ const AgentLayout: React.FC = () => {
   const { profile } = useAgentProfileLocal(user?.email);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
 
   const displayName =
     profile.displayName.trim() || user?.name?.trim() || "Agent";
@@ -223,14 +219,20 @@ const AgentLayout: React.FC = () => {
   const toggleCollapsed = useCallback(() => setCollapsed((c) => !c), []);
   const closeMobile = useCallback(() => setMobileNavOpen(false), []);
 
-  const overview = useMemo(() => agentTopBarFromPath(location.pathname), [location.pathname]);
+  const overview = useMemo(
+    () => agentTopBarFromPath(location.pathname, t),
+    [location.pathname, t]
+  );
 
   const handleLogout = () => {
-    const shouldLogout = window.confirm("Are you sure you want to logout?");
-    if (!shouldLogout) return;
+    setLogoutAlertOpen(true);
+  };
+
+  const confirmLogout = () => {
     dispatch(logout());
     navigate("/login", { replace: true });
     setMobileNavOpen(false);
+    setLogoutAlertOpen(false);
   };
 
   useEffect(() => {
@@ -247,13 +249,13 @@ const AgentLayout: React.FC = () => {
   }, [mobileNavOpen]);
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-gradient-to-b from-[var(--b2-soft)] to-[var(--white)] text-[var(--b1)] antialiased">
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-[var(--b2-soft)] to-[var(--white)] text-[var(--b1)] antialiased">
       <Header forceSolid />
       <button
         type="button"
         className="fixed left-4 top-[76px] z-40 flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--b2)] bg-[var(--white)] text-[var(--b1)] shadow-sm transition hover:bg-[var(--b2-soft)] md:hidden"
         onClick={() => setMobileNavOpen(true)}
-        aria-label="Open agent navigation"
+        aria-label={t("agentPanel.shell.openNavigation")}
       >
         <Menu className="h-5 w-5" aria-hidden />
       </button>
@@ -282,7 +284,7 @@ const AgentLayout: React.FC = () => {
             <>
               <motion.button
                 type="button"
-                aria-label="Close menu"
+                aria-label={t("common.closeMenu")}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -297,12 +299,14 @@ const AgentLayout: React.FC = () => {
                 className="fixed left-0 top-0 z-[70] flex h-full w-[min(88vw,300px)] flex-col border-r border-[var(--b2)] bg-[var(--white)] shadow-2xl md:hidden"
               >
                 <div className="flex shrink-0 items-center justify-between border-b border-[var(--b2)] px-4 py-3">
-                  <span className="text-sm font-semibold text-[var(--b1)]">Agent menu</span>
+                  <span className="text-sm font-semibold text-[var(--b1)]">
+                    {t("agentPanel.shell.menuTitle")}
+                  </span>
                   <button
                     type="button"
                     className="rounded-lg p-2 text-[var(--muted)] hover:bg-[var(--b2-soft)]"
                     onClick={closeMobile}
-                    aria-label="Close"
+                    aria-label={t("common.close")}
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -324,18 +328,18 @@ const AgentLayout: React.FC = () => {
           ) : null}
         </AnimatePresence>
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <motion.main
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.22 }}
-            className="mx-auto w-full max-w-[min(100%,88rem)] min-h-0 flex-1 overflow-y-auto py-5 pl-14 pr-4 md:px-6 md:py-6 md:pl-6 lg:px-8 lg:py-8"
+            className="mx-auto w-full max-w-[min(100%,88rem)] flex-1 py-5 pl-14 pr-4 md:px-6 md:py-6 md:pl-6 lg:px-8 lg:py-8"
           >
             <div className="space-y-6">
               <DashboardPageTopBar
                 title={overview.title}
                 subtitle={overview.subtitle}
-                rightSlot={<AgentNotificationsBell />}
+                rightSlot={<AgentNotificationsBell onClick={() => navigate("/agent/notifications")} />}
               />
               <AgentCollectionProvider>
                 <Outlet />
@@ -344,6 +348,16 @@ const AgentLayout: React.FC = () => {
           </motion.main>
         </div>
       </div>
+      <CustomAlert
+        open={logoutAlertOpen}
+        title={t("common.confirmLogout")}
+        message={t("common.confirmLogoutMessage")}
+        confirmLabel={t("common.confirm")}
+        cancelLabel={t("common.cancel")}
+        showCancel
+        onCancel={() => setLogoutAlertOpen(false)}
+        onConfirm={confirmLogout}
+      />
     </div>
   );
 };

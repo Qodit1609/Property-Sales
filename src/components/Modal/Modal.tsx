@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Button } from "@/components/common";
 
 interface ModalProps {
@@ -9,6 +9,14 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ open, onClose, title, children }) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const el = scrollContainerRef.current;
+    if (el) el.scrollTop = 0;
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
 
@@ -28,7 +36,10 @@ const Modal: React.FC<ModalProps> = ({ open, onClose, title, children }) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-start sm:items-center justify-center overflow-y-auto no-scrollbar p-3 sm:p-4">
+    <div
+      ref={scrollContainerRef}
+      className="fixed inset-0 z-[999] flex items-start justify-center overflow-y-auto no-scrollbar p-3 sm:p-4"
+    >
 
       {/* Background Blur */}
       <div

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Activity, Store, UserRound, Shield } from "lucide-react";
 
 import type { ActivityLogStats } from "./activityLogTypes";
@@ -8,27 +9,29 @@ interface ActivityStatsProps {
 }
 
 const ActivityStats: React.FC<ActivityStatsProps> = ({ stats }) => {
+  const { t } = useTranslation();
+
   const cards = [
     {
-      label: "Total activities",
+      labelKey: "adminPanel.activityLogsPage.statsTotal",
       value: stats.total,
       icon: Activity,
       tone: "slate" as const,
     },
     {
-      label: "Seller activities",
+      labelKey: "adminPanel.activityLogsPage.statsSeller",
       value: stats.seller,
       icon: Store,
       tone: "sky" as const,
     },
     {
-      label: "Buyer activities",
+      labelKey: "adminPanel.activityLogsPage.statsBuyer",
       value: stats.buyer,
       icon: UserRound,
       tone: "emerald" as const,
     },
     {
-      label: "Admin activities",
+      labelKey: "adminPanel.activityLogsPage.statsAdmin",
       value: stats.admin,
       icon: Shield,
       tone: "amber" as const,
@@ -62,29 +65,27 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ stats }) => {
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {cards.map((card) => {
         const Icon = card.icon;
-        const t = toneStyles[card.tone];
+        const tone = toneStyles[card.tone];
         return (
           <article
-            key={card.label}
+            key={card.labelKey}
             className="group relative overflow-hidden rounded-2xl border border-[var(--b2)]/50 bg-[var(--white)] p-4 shadow-[0_2px_12px_rgba(27,67,50,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[var(--b2)] hover:shadow-[0_12px_28px_rgba(27,67,50,0.12)]"
           >
             <div
-              className={`pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br ${t.glow} to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-100`}
+              className={`pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br ${tone.glow} to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-100`}
               aria-hidden
             />
             <div className="relative flex items-center gap-3">
               <div
-                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${t.gradient} text-white shadow-lg ${t.shadow}`}
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${tone.gradient} text-white shadow-lg ${tone.shadow}`}
               >
                 <Icon className="h-6 w-6" aria-hidden />
               </div>
-              <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">
-                  {card.label}
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wide text-[var(--muted)]">
+                  {t(card.labelKey)}
                 </p>
-                <p className="mt-0.5 text-2xl font-bold tabular-nums tracking-tight text-[var(--b1)]">
-                  {card.value}
-                </p>
+                <p className="text-2xl font-bold tabular-nums text-[var(--b1)]">{card.value}</p>
               </div>
             </div>
           </article>
@@ -95,3 +96,4 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ stats }) => {
 };
 
 export default ActivityStats;
+

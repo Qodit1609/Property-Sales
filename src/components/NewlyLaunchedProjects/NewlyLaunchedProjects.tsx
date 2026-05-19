@@ -1,10 +1,12 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import ProjectCard, { ProjectCardSkeleton } from "./ProjectCard";
 import type { Project } from "./ProjectCard";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchNewProperties } from "../../store/slices/newPropertiesSlice";
 
 const NewlyLaunchedProjects: React.FC = () => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { data, loading, error } = useAppSelector((state) => state.newProperties);
 
@@ -31,10 +33,10 @@ const NewlyLaunchedProjects: React.FC = () => {
         <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">
-              Newly Launched Projects
+              {t("homeSection.newlyLaunched.eyebrow")}
             </p>
             <h2 className="mt-1 text-lg sm:text-2xl md:text-3xl font-bold text-slate-900 leading-tight">
-              Explore the latest real estate developments
+              {t("homeSection.newlyLaunched.title")}
             </h2>
           </div>
         </div>
@@ -61,14 +63,14 @@ const NewlyLaunchedProjects: React.FC = () => {
 
         {error && (
           <div className="mt-6 text-center text-sm text-red-500">
-            Error: {error}
+            {t("homeSection.newlyLaunched.errorPrefix")}: {error}
           </div>
         )}
 
         {/* EMPTY STATE */}
         {!loading && !error && projects.length === 0 && (
           <div className="mt-6 text-center text-sm text-slate-500">
-            No projects available right now. Please check back soon.
+            {t("homeSection.newlyLaunched.empty")}
           </div>
         )}
       </div>

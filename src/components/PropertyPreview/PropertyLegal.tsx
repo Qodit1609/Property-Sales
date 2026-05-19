@@ -1,6 +1,6 @@
 import type { Property } from "../../features/properties/propertyType";
 import PropertyFeatureList from "./PropertyFeatureList";
-import { yesNoOptional } from "./previewUtils";
+import { translateLandUseType, yesNoOptional } from "./previewUtils";
 import { useTranslation } from "react-i18next";
 
 type PropertyLegalProps = {
@@ -14,7 +14,10 @@ const PropertyLegal = ({ property }: PropertyLegalProps) => {
     { label: t("propertyPreview.labels.landRegistry"), value: yesNoOptional(legal?.landRegistry) },
     { label: t("propertyPreview.labels.ownershipDocs"), value: yesNoOptional(legal?.ownershipDocs) },
     { label: t("propertyPreview.labels.encumbrance"), value: yesNoOptional(legal?.encumbrance) },
-    { label: t("propertyPreview.labels.landUseType"), value: legal?.landUseType },
+    {
+      label: t("propertyPreview.labels.landUseType"),
+      value: translateLandUseType(legal?.landUseType),
+    },
     { label: t("propertyPreview.labels.constructionAllowed"), value: yesNoOptional(legal?.constructionAllowed) },
   ].filter((item): item is { label: string; value: string } => Boolean(item.value));
 

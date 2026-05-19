@@ -28,6 +28,8 @@ import {
   SELLER_SIDEBAR_WIDTH_EXPANDED,
 } from "./sellerUtils";
 import api from "@/lib/apiClient";
+import CustomAlert from "@/components/common/CustomAlert";
+import { translateSellerNavLabel } from "@/lib/sellerI18n";
 
 type SidebarNavItem = SellerNavItem & { label?: string };
 
@@ -59,7 +61,9 @@ function NavBlock({ collapsed, onNavigate, workspaceTitle, mainItems, accountIte
           collapsed && "sr-only"
         )}
       >
-        {workspaceTitle ?? t("sellerPanel.sidebar.workspace")}
+        {workspaceTitle
+          ? translateSellerNavLabel(workspaceTitle)
+          : t("sellerPanel.sidebar.workspace")}
       </p>
       <ul className="space-y-1">
         {mainItems.map((item) => {
@@ -68,7 +72,11 @@ function NavBlock({ collapsed, onNavigate, workspaceTitle, mainItems, accountIte
             <>
               <Icon className="h-[18px] w-[18px] shrink-0 opacity-90 transition group-hover:scale-[1.03]" />
               {!collapsed ? (
-                <span className="truncate">{item.label ?? t(item.labelKey)}</span>
+                <span className="truncate">
+                  {item.label
+                    ? translateSellerNavLabel(item.label, item.to)
+                    : t(item.labelKey)}
+                </span>
               ) : null}
             </>
           );
@@ -107,7 +115,13 @@ function NavBlock({ collapsed, onNavigate, workspaceTitle, mainItems, accountIte
             <li key={item.key}>
               <NavLink to={item.to} className={linkClass} onClick={onNavigate}>
                 <Icon className="h-[18px] w-[18px] shrink-0 opacity-90" />
-                {!collapsed ? <span className="truncate">{item.label ?? t(item.labelKey)}</span> : null}
+                {!collapsed ? (
+                  <span className="truncate">
+                    {item.label
+                      ? translateSellerNavLabel(item.label, item.to)
+                      : t(item.labelKey)}
+                  </span>
+                ) : null}
               </NavLink>
             </li>
           );
@@ -165,8 +179,7 @@ export function SellerSidebar({
   const storedProfile = useSellerProfileLocal(user?.email);
 
   const handleLogout = () => {
-    const shouldLogout = window.confirm("Are you sure you want to logout?");
-    if (!shouldLogout) return;
+    setLogoutAlertOpen(false);
     dispatch(logout());
     navigate("/login", { replace: true });
     onNavigate?.();
@@ -184,6 +197,7 @@ export function SellerSidebar({
   const [workspaceTitle, setWorkspaceTitle] = useState<string | undefined>();
   const [mainItems, setMainItems] = useState<SidebarNavItem[]>([]);
   const [accountItems, setAccountItems] = useState<SidebarNavItem[]>([]);
+  const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
 
   const headerExpanded = !collapsed || mobile;
 
@@ -365,7 +379,7 @@ export function SellerSidebar({
       <div className="border-t border-[var(--b2)]/80 p-2 pb-4">
         <button
           type="button"
-          onClick={handleLogout}
+          onClick={() => setLogoutAlertOpen(true)}
           className={cn(
             "flex w-full items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium text-[var(--error)] transition hover:border-[var(--error)]/30 hover:bg-[var(--error-bg)]",
             collapsed && !mobile ? "justify-center px-2" : ""
@@ -375,6 +389,14 @@ export function SellerSidebar({
           {(!collapsed || mobile) && <span>{t("header.logout")}</span>}
         </button>
       </div>
+      <CustomAlert
+        open={logoutAlertOpen}
+        title={t("header.confirmLogout")}
+        message={t("header.confirmLogoutMessage")}
+        showCancel
+        onCancel={() => setLogoutAlertOpen(false)}
+        onConfirm={handleLogout}
+      />
     </motion.aside>
   );
 }
@@ -388,13 +410,14 @@ export function SellerMobileOverlay({
   onClose: () => void;
   children: ReactNode;
 }) {
+  const { t } = useTranslation();
   return (
     <AnimatePresence>
       {open ? (
         <>
           <motion.button
             type="button"
-            aria-label="Close menu"
+            aria-label={t("header.closeMenu")}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

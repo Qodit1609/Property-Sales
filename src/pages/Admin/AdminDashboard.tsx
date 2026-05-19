@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../hooks/reduxHooks";
 import AdminLayout from "../../components/admin/AdminLayout";
@@ -12,6 +13,7 @@ import {
   fetchAdminListings,
   fetchAdminUsers,
   rejectListing,
+  toggleUserBlockStatusById,
 } from "../../features/admin/adminSlice";
 
 type Tab = "overview" | "users" | "listings";
@@ -28,6 +30,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   layoutTitle,
   initialUserRoleFilter,
 }) => {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const activeTab: Tab = initialTab ?? "overview";
@@ -63,29 +66,33 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     dispatch(deleteUserById(String(userId)));
   };
 
+  const handleToggleUserBlock = (userId: string | number) => {
+    dispatch(toggleUserBlockStatusById(String(userId)));
+  };
+
   const handleStatsCardClick = (
     section: "listings" | "users",
-    label: string
+    statId: string
   ) => {
     if (section === "listings") {
       const mapping: Record<string, string> = {
-        "Total properties": "",
-        Approved: "approved",
-        "Pending review": "pending",
-        Rejected: "rejected",
+        totalProperties: "",
+        approved: "approved",
+        pendingReview: "pending",
+        rejected: "rejected",
       };
-      const status = mapping[label] ?? "";
+      const status = mapping[statId] ?? "";
       navigate(status ? `/admin/properties?status=${status}` : "/admin/properties");
       return;
     }
 
     const mapping: Record<string, string> = {
-      "Total accounts": "",
-      Buyers: "user",
-      Sellers: "seller",
-      Agents: "agent",
+      totalAccounts: "",
+      buyers: "user",
+      sellers: "seller",
+      agents: "agent",
     };
-    const role = mapping[label] ?? "";
+    const role = mapping[statId] ?? "";
     navigate(role ? `/admin/users?role=${role}` : "/admin/users");
   };
 
@@ -106,6 +113,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       error={usersError}
       actionLoading={actionLoading}
       onDelete={handleDeleteUser}
+      onToggleBlock={handleToggleUserBlock}
       initialRoleFilter={initialUserRoleFilter}
     />
   );
@@ -130,12 +138,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   return (
     <AdminLayout
-      title={layoutTitle ?? "Admin Panel"}
-      topBarTitle={activeTab === "overview" ? "Overview" : undefined}
+      title={layoutTitle ?? t("adminPanel.dashboard.title")}
+      topBarTitle={activeTab === "overview" ? t("adminPanel.dashboard.overview") : undefined}
       topBarSubtitle={
-        activeTab === "overview"
-          ? "Portfolio health across listings and user accounts at a glance."
-          : undefined
+        activeTab === "overview" ? t("adminPanel.dashboard.overviewSubtitle") : undefined
       }
     >
       {content}
